@@ -1,0 +1,131 @@
+import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:minimaltodo/global_utils.dart';
+import 'package:minimaltodo/theme/app_theme.dart';
+import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/view_models/category_view_model.dart';
+import 'package:minimaltodo/view_models/task_view_model.dart';
+import 'package:minimaltodo/views/pages/task_editor_page.dart';
+import 'package:provider/provider.dart';
+
+class TaskView extends StatelessWidget {
+  const TaskView({super.key, required this.task});
+  final Task task;
+  @override
+  Widget build(BuildContext context) {
+    task.printTask();
+    return Scaffold(
+      appBar: AppBar(title: Text('${task.title}')),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Consumer2<TaskViewModel, CategoryViewModel>(builder: (_, tvm, cvm, __) {
+          debugPrint('Finished At: ${tvm.currentTask.finishedAt}');
+
+          task.printTask();
+          return ListView(
+            children: [
+              DetailItem(
+                icon: Icons.assignment_outlined,
+                title: 'Task',
+                subtitle: '${task.title}',
+              ),
+              DetailItem(
+                icon: Icons.folder_outlined,
+                title: 'List',
+                subtitle: task.category!.categoryName ?? 'General (not added to a list)',
+              ),
+              DetailItem(
+                icon: Icons.flag_outlined,
+                title: 'Priority',
+                subtitle: '${task.priority}',
+              ),
+              DetailItem(
+                icon: Icons.calendar_today,
+                title: 'Created',
+                subtitle: formatDateTime(task.createdAt!),
+              ),
+              DetailItem(
+                icon: Icons.event_outlined,
+                title: 'Due Date',
+                subtitle: task.dueDate == null
+                    ? 'Not scheduled'
+                    : "${formatDateTime(task.dueDate!)}\n${task.isDone! ? 'Task Finished' : (task.dueDate!.isBefore(DateTime.now()) ? 'Task Overdue' : (task.isNotifyEnabled! ? 'Notify on ${formatDateTime(task.notifyTime!.add(const Duration(seconds: 20)))}' : 'Notification Disabled'))}",
+
+              ),
+              DetailItem(
+                icon: Icons.task_alt,
+                title: 'Finished',
+                subtitle: task.finishedAt != null
+                    ? '${formatDateTime(task.finishedAt!)}'
+                    : 'Not finished yet',
+              ),
+              gap,
+              Row(
+                children: [
+                  Expanded(
+                      child: TaskViewButton(
+                          label: 'Edit',
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                PageTransition(
+                                    child: TaskEditorPage(
+                                      editMode: true,
+                                      taskToEdit: task,
+                                    ),
+                                    type: PageTransitionType.fade));
+                          })),
+                ],
+              )
+            ],
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class DetailItem extends StatelessWidget {
+  const DetailItem({super.key, required this.icon, required this.title, required this.subtitle});
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    const titleStyle = TextStyle(fontSize: 19);
+    final subtitleStyle = TextStyle(fontSize: 18, color: Colors.black.withAlpha(160));
+    return Card(
+      elevation: 0,
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(
+          title,
+          style: titleStyle,
+        ),
+        subtitle: Text(subtitle, style: subtitleStyle),
+      ),
+    );
+  }
+}
+
+class TaskViewButton extends StatelessWidget {
+  const TaskViewButton({super.key, required this.label, required this.onTap});
+  final Function() onTap;
+  final String label;
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        height: 50,
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppTheme.primary, AppTheme.secondary],
+            ),
+            borderRadius: BorderRadius.circular(9)),
+        child: Center(child: Text(label, style: TextStyle(fontSize: 23, color: Colors.white))),
+      ),
+    );
+  }
+}

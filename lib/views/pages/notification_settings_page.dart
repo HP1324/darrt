@@ -1,0 +1,176 @@
+import 'package:flutter/material.dart';
+import 'package:minimaltodo/global_utils.dart';
+import 'package:minimaltodo/services/notification_service.dart';
+import 'package:minimaltodo/view_models/task_view_model.dart';
+import 'package:provider/provider.dart';
+
+class TaskNotificationSettingsPage extends StatefulWidget {
+  const TaskNotificationSettingsPage({super.key});
+  @override
+  State<TaskNotificationSettingsPage> createState() => _TaskNotificationSettingsPageState();
+}
+
+class _TaskNotificationSettingsPageState extends State<TaskNotificationSettingsPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<TaskViewModel>(builder: (context, tvm, _) {
+      return PopScope(
+        onPopInvokedWithResult: (_,__){
+
+        },
+        child: Scaffold(
+          appBar: AppBar(title: const Text('Notification Settings', style: TextStyle(fontSize: 20))),
+          body: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: SwitchListTile(
+                  title: const Text(
+                    "Enable notification",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  value: tvm.currentTask.isNotifyEnabled!,
+                  onChanged: (value) async {
+                    if (await NotificationService.managePermission(context)) {
+                      tvm.toggleNotifSwitch(value);
+                      logger.d('isNotifyEnabled: ${tvm.currentTask.isNotifyEnabled}');
+                      logger.d(
+                          'Notification Time at the time of toggling: ${tvm.currentTask.notifyTime}');
+                    }
+                  },
+                ),
+              ),
+              if (tvm.currentTask.isNotifyEnabled!) ...[
+                const SizedBox(height: 16),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Theme.of(context).primaryColor.withAlpha(100)),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withAlpha(30),
+                        spreadRadius: 1,
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Notify me before',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        runAlignment: WrapAlignment.start,
+                        children: [
+                          _TimeOption(minutes: 0, label: 'On time'),
+                          _TimeOption(minutes: 5, label: '5 min'),
+                          _TimeOption(minutes: 10, label: '10 min'),
+                          _TimeOption(minutes: 15, label: '15 min'),
+                          _TimeOption(minutes: 30, label: '30 min'),
+                          _TimeOption(minutes: 45, label: '45 min'),
+                          _TimeOption(minutes: 60, label: '1 hour'),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ]
+            ],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              if (!tvm.currentTask.isNotifyEnabled!) {
+                tvm.resetNotifSettings();
+              } else {
+                showToast(
+                    title: 'Notification set on ${formatDateTime(tvm.currentTask.notifyTime!)}');
+              }
+              Navigator.pop(context);
+              tvm.currentTask.printTask();
+            },
+            shape: const CircleBorder(),
+            child: const Icon(Icons.done),
+          ),
+        ),
+      );
+    });
+  }
+}
+
+class _TimeOption extends StatelessWidget {
+  const _TimeOption({
+    required this.minutes,
+    required this.label,
+  });
+
+  final int minutes;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<TaskViewModel>(
+      builder: (context, tvm, _) {
+        final isSelected = tvm.selectedMinutes == minutes;
+        return Material(
+          color: isSelected ? Theme.of(context).primaryColor : Colors.grey[200],
+          borderRadius: BorderRadius.circular(20),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () {
+              tvm.updateNotifyTime(minutes);
+              logger.d('notify time after selecting it from chips: ${tvm.currentTask.notifyTime}');
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.grey[700],
+                  fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// TextButton(
+// onPressed: () {
+// AwesomeNotifications().requestPermissionToSendNotifications();
+// AwesomeNotifications().createNotification(
+// content: NotificationContent(
+// id: 1,
+// channelKey: 'task_notif',
+// title: 'Test notification',
+// body: 'This is test notification body',
+// actionType: ActionType.Default,
+// notificationLayout: NotificationLayout.Default,
+// category: NotificationCategory.Reminder,
+// wakeUpScreen: true,
+// ),
+// schedule: NotificationCalendar.fromDate(
+// date: DateTime.now().add(Duration(minutes: 2)),
+// allowWhileIdle: true,
+// preciseAlarm: true,
+// repeats: true,
+// ),
+// );
+// },
+// child: Text('Test notification')),

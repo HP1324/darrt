@@ -1,0 +1,51 @@
+Add a good filter icon after search text field
+Improve filter logic:
+    Show tasks only by date in view
+    Add search mechanism
+    in search, show date of the task to get a references
+
+Add SearchAnchor in AppBar action property.
+Open search view in different page.
+Create a separate page for viewing the task, this page will not be able to edit it.
+Add and alarm page.
+
+
+///TODO: Today's first and foremost priority is to set the state of alarm play button
+
+create the map and manage states accordingly:
+
+Feature: Enable and disable notifications for tasks
+1)Use get_storage to save preferences
+2)Add isNotifyEnabled field in Task model
+    i.  Change toJson() and fromJson() accordingly
+3)Add isNotifyEnabled in DatabaseService, in table migration query
+    i.  Change insertion and updation queries accordingly
+
+///TODO: HANDLE NAVIGATION TO THE TASK VIEW WHEN NOTIFICATION IS TAPPED, EVEN WHEN THE APP IS IN BACKGROUND
+///TODO: TERMINATED
+
+-> Task marked as finished -> task.isDone = true ->
+    if (task.isDone) ->->
+        if(wasNotifyEnabled)
+            task.isNotifyEnabled = false;
+            removeTaskNotification();
+            showToast('Task marked finished, notification disabled for the task')
+        else
+            showToast('Task marked finished')
+
+-> Task marked pending -> task.isDone = false ->
+    else if(task is not done)
+        if(wasNotifyEnabled)
+            if(task.dueDate is not null and a valid date)
+                task.isNotifyEnable = true;
+                createTaskNotification(task);
+                showToast('Task marked pending, notifications enabled again');
+            else
+                showToast('Please reschedule the notification with new valid date and time');
+                task.isNotifyEnabled = false;
+         else
+            showToast('Task marked pending');
+
+
+
+
