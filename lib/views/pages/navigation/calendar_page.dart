@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/task_item.dart';
@@ -125,7 +126,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 ),
               ),
               Container(
-                height: 85,
+                height: 80,
                 child: PageView.builder(
                   controller: _weekController,
                   onPageChanged: (page) {
@@ -162,7 +163,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         return GestureDetector(
                           onTap: () {
                             setState(() => _selectedDate = date);
-                            debugPrint('Date Tapped -> _selectedDate = $_selectedDate');
+                            logger.d('Date Tapped -> _selectedDate = $_selectedDate');
                           },
                           child: AnimatedContainer(
                             duration: _animationDuration,
@@ -172,22 +173,20 @@ class _CalendarPageState extends State<CalendarPage> {
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? AppTheme.primary
-                                  : isToday
-                                      ? AppTheme.background100
-                                      : Colors.transparent,
+                                  : AppTheme.background100,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: isSelected
                                     ? AppTheme.primary
                                     : isToday
-                                        ? AppTheme.primary.withOpacity(0.3)
+                                        ? AppTheme.primary
                                         : Colors.transparent,
                                 width: 1.5,
                               ),
                               boxShadow: isSelected
                                   ? [
                                       BoxShadow(
-                                        color: AppTheme.primary.withOpacity(0.2),
+                                        color: AppTheme.primary.withAlpha(50),
                                         blurRadius: 8,
                                         offset: const Offset(0, 4),
                                       ),
@@ -201,7 +200,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                 Text(
                                   DateFormat('EEE').format(date),
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: isSelected
                                         ? Colors.white
@@ -216,14 +215,14 @@ class _CalendarPageState extends State<CalendarPage> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: isSelected
-                                        ? Colors.white.withAlpha(60)
-                                        : Colors.transparent,
+                                        ? Colors.white.withAlpha(65)
+                                        : Colors.black.withAlpha(12),
                                   ),
                                   child: Center(
                                     child: Text(
                                       date.day.toString(),
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                         color: isSelected
                                             ? Colors.white
