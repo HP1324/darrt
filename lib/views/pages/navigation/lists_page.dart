@@ -5,6 +5,7 @@ import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/new_list_page.dart';
 import 'package:minimaltodo/views/pages/tasks_for_list_page.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:toastification/toastification.dart';
@@ -28,7 +29,7 @@ class ListsPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                      Text(
-                      'Your Lists',
+                      'All Lists',
                       style: TextStyle(
                         fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize,
                         fontWeight: FontWeight.bold,
@@ -39,8 +40,9 @@ class ListsPage extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) =>  NewListPage(),
+                          PageTransition(
+                            type: PageTransitionType.fade,
+                            child: NewListPage(),
                           ),
                         );
                       },

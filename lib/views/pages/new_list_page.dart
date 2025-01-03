@@ -14,17 +14,17 @@ class NewListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background50,
+      backgroundColor: AppTheme.primary,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: AppTheme.primary),
+          icon: Icon(Icons.arrow_back_ios_new, color: AppTheme.background50),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'Create New List',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: AppTheme.primary,
+            color: AppTheme.background50,
           ),
         ),
         centerTitle: true,
@@ -139,14 +139,7 @@ class NewListPage extends StatelessWidget {
                           colors: [AppTheme.primary, AppTheme.secondary],
                         ),
                         borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.primary.withOpacity(0.3),
-                            spreadRadius: 1,
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+
                       ),
                       child: const Center(
                         child: Text(

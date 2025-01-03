@@ -263,7 +263,6 @@ class AddToListButton extends StatelessWidget {
       onTap: () {
         showModalBottomSheet(
           backgroundColor: Colors.transparent,
-          showDragHandle: true,
           useRootNavigator: true,
           context: context,
           builder: (_) {
@@ -282,14 +281,6 @@ class AddToListButton extends StatelessWidget {
               child: Column(
                 children: [
                   const SizedBox(height: 8),
-                  Text(
-                    'Select List',
-                    style: TextStyle(
-                      fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.primary,
-                    ),
-                  ),
                   ListTile(
                     onTap: () {
                       Navigator.of(context).push(PageTransition(
