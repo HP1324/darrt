@@ -35,7 +35,26 @@ class DatabaseService {
         low_tasks INTEGER NOT NULL
       )
     """;
-
+  static const createDefaultLists = """INSERT INTO lists (name) VALUES
+('Sports'),
+('Health'),
+('Work'),
+('Shopping'),
+('Groceries'),
+('Books'),
+('Travel'),
+('Education'),
+('Personal'),
+('Finance'),
+('Hobbies'),
+('Fitness'),
+('Food'),
+('Friends'),
+('Family'),
+('Chores'),
+('Projects'),
+('Entertainment');
+""";
 
   static Future<Database> openDb() async {
     logger.d('${formatDateTime(DateTime.now())} openDb() called');
@@ -47,6 +66,7 @@ class DatabaseService {
           await txn.execute(createListsTable);
           await txn.execute(createTasksTable);
           await txn.execute(createStatsTable);
+          await txn.execute(createDefaultLists);
         });
       },
       onConfigure: (database) async {
