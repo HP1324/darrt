@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
+import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:provider/provider.dart';
@@ -154,7 +155,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                 const SizedBox(width: 12),
                               ],
                               Icon(
-                                Icons.folder_outlined,
+                                ListService.getIcon(widget.task.list?.iconCode),
                                 size: 14,
                                 color: AppTheme.primary.withAlpha(160),
                               ),

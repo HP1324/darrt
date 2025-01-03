@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/global_utils.dart';
+import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
@@ -147,7 +148,7 @@ class _ListsPageState extends State<ListsPage> {
               ),
             ),
             SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               sliver: filteredLists.isEmpty
                   ? SliverFillRemaining(
                       child: Center(
@@ -239,7 +240,7 @@ class _ListsPageState extends State<ListsPage> {
                                               BorderRadius.circular(8),
                                         ),
                                         child: Icon(
-                                          Iconsax.folder_2,
+                                          ListService.getIcon(list.iconCode),
                                           color: AppTheme.primary,
                                           size: 20,
                                         ),

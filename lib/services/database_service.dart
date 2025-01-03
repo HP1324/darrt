@@ -4,8 +4,8 @@ import 'package:sqflite/sqflite.dart';
 class DatabaseService {
   static const createListsTable = """ CREATE TABLE lists(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name NOT NULL UNIQUE,
-      icon_code TEXT DEFAULT 'folder',
+      name TEXT NOT NULL UNIQUE,
+      icon_code TEXT DEFAULT 'folder'
       )
      """;
   static const createTasksTable = """CREATE TABLE tasks (
