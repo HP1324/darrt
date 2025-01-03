@@ -3,7 +3,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/data_models/task.dart';
-import 'package:minimaltodo/view_models/category_view_model.dart';
+import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/task_editor_page.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +18,7 @@ class TaskView extends StatelessWidget {
       appBar: AppBar(title: Text('${task.title}')),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Consumer2<TaskViewModel, CategoryViewModel>(builder: (_, tvm, cvm, __) {
+        child: Consumer2<TaskViewModel, ListViewModel>(builder: (_, tvm, cvm, __) {
           debugPrint('Finished At: ${tvm.currentTask.finishedAt}');
 
           task.printTask();
@@ -32,7 +32,7 @@ class TaskView extends StatelessWidget {
               DetailItem(
                 icon: Icons.folder_outlined,
                 title: 'List',
-                subtitle: task.category!.categoryName ?? 'General (not added to a list)',
+                subtitle: task.list!.name ?? 'General (not added to a list)',
               ),
               DetailItem(
                 icon: Icons.flag_outlined,

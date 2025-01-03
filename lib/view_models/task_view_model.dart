@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:minimaltodo/data_models/category.dart';
+import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/stats_service.dart';
@@ -18,8 +18,8 @@ class TaskViewModel extends ChangeNotifier {
   List<Task> get tasks => _tasks;
   Task currentTask = Task();
 
-  set category(CategoryModel category) {
-    currentTask.category = category;
+  set list(ListModel list) {
+    currentTask.list = list;
     notifyListeners();
   }
 
@@ -213,12 +213,12 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Handle tasks when their category is deleted
-  void updateTasksAfterCategoryDeletion(int categoryId) {
-    // Update all tasks in the deleted category to have no category
+  // Handle tasks when their list is deleted
+  void updateTasksAfterListDeletion(int listId) {
+    // Update all tasks in the deleted list to have no list
     for (var task in _tasks) {
-      if (task.category?.categoryId == categoryId) {
-        task.category = null;
+      if (task.list?.id == listId) {
+        task.list = null;
       }
     }
     notifyListeners();

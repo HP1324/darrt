@@ -161,7 +161,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
-                                  widget.task.category?.categoryName ?? 'General',
+                                  widget.task.list?.name ?? 'General',
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
-import 'package:minimaltodo/data_models/category.dart';
+import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
@@ -9,16 +9,16 @@ import 'package:minimaltodo/views/task_item.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:provider/provider.dart';
 
-class CategoryTasksPage extends StatefulWidget {
-  final CategoryModel category;
+class TasksForListPage extends StatefulWidget {
+  final ListModel list;
 
-  const CategoryTasksPage({super.key, required this.category});
+  const TasksForListPage({super.key, required this.list});
 
   @override
-  State<CategoryTasksPage> createState() => _CategoryTasksPageState();
+  State<TasksForListPage> createState() => _TasksForListPageState();
 }
 
-class _CategoryTasksPageState extends State<CategoryTasksPage> {
+class _TasksForListPageState extends State<TasksForListPage> {
   Set<int> _selectedTaskIds = {};
   bool _isSelectionMode = false;
 
@@ -87,7 +87,7 @@ class _CategoryTasksPageState extends State<CategoryTasksPage> {
                 ),
               )
             : Text(
-                widget.category.categoryName ?? 'Unnamed List',
+                widget.list.name ?? 'Unnamed List',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -133,17 +133,17 @@ class _CategoryTasksPageState extends State<CategoryTasksPage> {
       ),
       body: Consumer<TaskViewModel>(
         builder: (context, taskVM, _) {
-          final tasksInCategory = widget.category.categoryId == -1
+          final tasksInList = widget.list.id == -1
               ? taskVM.tasks.where((task) => 
-                  task.category == null || 
-                  task.category?.categoryId == null ||
-                  task.category?.categoryName == null
+                  task.list == null ||
+                  task.list?.id == null ||
+                  task.list?.name == null
                 ).toList()
               : taskVM.tasks
-                  .where((task) => task.category?.categoryId == widget.category.categoryId)
+                  .where((task) => task.list?.id == widget.list.id)
                   .toList();
 
-          if (tasksInCategory.isEmpty) {
+          if (tasksInList.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -184,7 +184,7 @@ class _CategoryTasksPageState extends State<CategoryTasksPage> {
 
           // Group tasks by date
           final groupedTasks = <DateTime, List<Task>>{};
-          for (var task in tasksInCategory) {
+          for (var task in tasksInList) {
             final date = task.dueDate ?? task.createdAt ?? DateTime.now();
             final dateOnly = DateTime(date.year, date.month, date.day);
             if (!groupedTasks.containsKey(dateOnly)) {

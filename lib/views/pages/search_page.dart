@@ -15,7 +15,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  String? _selectedCategory;
+  String? _selectedList;
   String? _selectedPriority;
   bool _showFilters = false;
 
@@ -29,25 +29,25 @@ class _SearchPageState extends State<SearchPage> {
 
   List<Task> _filterTasks(List<Task> tasks) {
     return tasks.where((task) {
-      // Title, Priority and Category search
+      // Title, Priority and List search
       if (_searchQuery.isNotEmpty) {
         bool matchesTitle = task.title?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
         bool matchesPriority = task.priority?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
-        bool matchesCategory = task.category?.categoryName?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
+        bool matchesList = task.list?.name?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
         
-        if (!matchesTitle && !matchesPriority && !matchesCategory) {
+        if (!matchesTitle && !matchesPriority && !matchesList) {
           return false;
         }
       }
 
-      // Category filter
-      if (_selectedCategory != null) {
-        if (_selectedCategory == 'General') {
-          if (task.category != null && task.category!.categoryName != 'General') {
+      // list filter
+      if (_selectedList != null) {
+        if (_selectedList == 'General') {
+          if (task.list != null && task.list!.name != 'General') {
             return false;
           }
         } else {
-          if (task.category?.categoryName?.toLowerCase() != _selectedCategory?.toLowerCase()) {
+          if (task.list?.name?.toLowerCase() != _selectedList?.toLowerCase()) {
             return false;
           }
         }
@@ -98,9 +98,9 @@ class _SearchPageState extends State<SearchPage> {
       body: Consumer<TaskViewModel>(
         builder: (context, taskVM, _) {
           // Get all categories including 'General'
-          final allCategories = ['General']..addAll(
+          final allLists = ['General']..addAll(
             taskVM.tasks
-                .map((task) => task.category?.categoryName)
+                .map((task) => task.list?.name)
                 .where((name) => name != null && name != 'General')
                 .toSet()
                 .cast<String>()
@@ -126,25 +126,25 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      // Category Filter
+                      // list Filter
                       Wrap(
                         spacing: 8,
                         children: [
                           FilterChip(
                             label: const Text('All Categories'),
-                            selected: _selectedCategory == null,
+                            selected: _selectedList == null,
                             onSelected: (selected) {
                               setState(() {
-                                _selectedCategory = null;
+                                _selectedList = null;
                               });
                             },
                           ),
-                          ...allCategories.map((category) => FilterChip(
-                                label: Text(category),
-                                selected: _selectedCategory == category,
+                          ...allLists.map((list) => FilterChip(
+                                label: Text(list),
+                                selected: _selectedList == list,
                                 onSelected: (selected) {
                                   setState(() {
-                                    _selectedCategory = selected ? category : null;
+                                    _selectedList = selected ? list : null;
                                   });
                                 },
                               )),

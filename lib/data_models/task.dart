@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:minimaltodo/data_models/category.dart';
+import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/global_utils.dart';
 
 class Task {
@@ -7,7 +7,7 @@ class Task {
     this.id,
     this.title,
     this.isDone = false,
-    this.category,
+    this.list,
     DateTime? createdAt,
     this.dueDate,
     this.finishedAt,
@@ -20,7 +20,7 @@ class Task {
 
   int? id;
   String? title;
-  CategoryModel? category;
+  ListModel? list;
   bool? isDone;
   DateTime? createdAt;
   DateTime? dueDate;
@@ -35,7 +35,7 @@ class Task {
     int? id,
     String? title,
     bool? isDone,
-    CategoryModel? category,
+    ListModel? list,
     DateTime? createdAt,
     DateTime? dueDate,
     DateTime? finishedAt,
@@ -49,7 +49,7 @@ class Task {
         id: id ?? this.id,
         title: title ?? this.title,
         isDone: isDone ?? this.isDone,
-        category: category ?? this.category,
+        list: list ?? this.list,
         createdAt: createdAt ?? this.createdAt,
         dueDate: dueDate ?? this.dueDate,
         finishedAt: finishedAt ?? this.finishedAt,
@@ -67,9 +67,9 @@ class Task {
            'id': $id,
            'title': $title,
            'isDone': $isDone,
-           'category': {
-             'categoryId' : ${category?.categoryId},
-             'categoryName': ${category?.categoryName}
+           'list': {
+             'listId' : ${list?.id},
+             'listName': ${list?.name}
            } ,
            'createdAt':$createdAt,
            'dueDate': $dueDate,
@@ -90,7 +90,7 @@ class Task {
         id == other.id &&
         title == other.title &&
         isDone == other.isDone &&
-        category == other.category &&
+        list == other.list &&
         createdAt == other.createdAt &&
         dueDate == other.dueDate &&
         finishedAt == other.finishedAt &&
@@ -106,7 +106,7 @@ class Task {
     id,
     title,
     isDone,
-    category,
+    list,
     createdAt,
     dueDate,
     finishedAt,
@@ -131,8 +131,8 @@ class Task {
   Map<String, dynamic> toJson() => {
     'id': id,
     'title': title,
-    'categoryId': category?.categoryId,
-    'categoryName': category?.categoryName,
+    'list_id': list?.id,
+    'list_name': list?.name,
     'createdAt': createdAt != null ? createdAt!.toIso8601String() :DateTime.now().toIso8601String(),
     'dueDate': dueDate!= null ?dueDate!.toIso8601String(): DateTime.now().toIso8601String(),
     'finishedAt': finishedAt?.toIso8601String(),
@@ -150,9 +150,9 @@ class Task {
       id: json['id'],
       title: json['title'] ?? '',
       isDone: json['isDone'] == 1,
-      category: CategoryModel(
-        categoryId: json['categoryId'],
-        categoryName: json['categoryName'],
+      list: ListModel(
+        id: json['list_id'],
+        name: json['list_name'],
       ),
       createdAt: DateTime.parse(json['createdAt']) ,
       dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : null,

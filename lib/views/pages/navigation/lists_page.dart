@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
-import 'package:minimaltodo/view_models/category_view_model.dart';
+import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
-import 'package:minimaltodo/views/pages/new_category_page.dart';
-import 'package:minimaltodo/views/pages/category_tasks_page.dart';
+import 'package:minimaltodo/views/pages/new_list_page.dart';
+import 'package:minimaltodo/views/pages/tasks_for_list_page.dart';
 import 'package:provider/provider.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:toastification/toastification.dart';
@@ -14,9 +14,9 @@ class ListsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<CategoryViewModel, TaskViewModel>(
-      builder: (context, categoryVM, taskVM, _) {
-        final categories = categoryVM.categories;
+    return Consumer2<ListViewModel, TaskViewModel>(
+      builder: (context, listVM, taskVM, _) {
+        final lists = listVM.lists;
 
         return CustomScrollView(
           slivers: [
@@ -39,7 +39,7 @@ class ListsPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>  NewCategoryPage(),
+                            builder: (context) =>  NewListPage(),
                           ),
                         );
                       },
@@ -64,17 +64,17 @@ class ListsPage extends StatelessWidget {
                 ),
                 delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                    final category = categories[index];
-                    final tasksInCategory = category.categoryId == -1
+                    final list = lists[index];
+                    final tasksInList = list.id == -1
                         ? taskVM.tasks.where((task) => 
-                            task.category == null || 
-                            task.category?.categoryId == null ||
-                            task.category?.categoryName == null
+                            task.list == null ||
+                            task.list?.id == null ||
+                            task.list?.name == null
                           ).toList()
                         : taskVM.tasks
-                            .where((task) => task.category?.categoryId == category.categoryId)
+                            .where((task) => task.list?.id == list.id)
                             .toList();
-                    final completedTasks = tasksInCategory
+                    final completedTasks = tasksInList
                         .where((task) => task.isDone ?? false)
                         .length;
 
@@ -83,8 +83,8 @@ class ListsPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CategoryTasksPage(
-                              category: category,
+                            builder: (context) => TasksForListPage(
+                              list: list,
                             ),
                           ),
                         );
@@ -124,7 +124,7 @@ class ListsPage extends StatelessWidget {
                                   ),
                                 ),
                                 const Spacer(),
-                                if (category.categoryId != -1) // Only show popup menu for non-General lists
+                                if (list.id != -1) // Only show popup menu for non-General lists
                                   PopupMenuButton(
                                     icon: const Icon(
                                       Iconsax.more,
@@ -154,7 +154,7 @@ class ListsPage extends StatelessWidget {
                                           builder: (context) => AlertDialog(
                                             title: Text('Delete List'),
                                             content: Text(
-                                              'Are you sure you want to delete "${category.categoryName}"? All tasks in this list will be moved to General list.',
+                                              'Are you sure you want to delete "${list.name}"? All tasks in this list will be moved to General list.',
                                             ),
                                             actions: [
                                               TextButton(
@@ -165,7 +165,7 @@ class ListsPage extends StatelessWidget {
                                               TextButton(
                                                 onPressed: () {
                                                   final taskVM = Provider.of<TaskViewModel>(context, listen: false);
-                                                  categoryVM.deleteCategory(category, taskVM).then((deleted){
+                                                  listVM.deleteList(list, taskVM).then((deleted){
                                                     if(deleted){
                                                       showToast(
                                                         title: 'List deleted', 
@@ -191,7 +191,7 @@ class ListsPage extends StatelessWidget {
                                           ),
                                         );
                                       } else if (value == 'edit') {
-                                        final textController = TextEditingController(text: category.categoryName);
+                                        final textController = TextEditingController(text: list.name);
                                         showModalBottomSheet(
                                           context: context,
                                           isScrollControlled: true,
@@ -252,8 +252,8 @@ class ListsPage extends StatelessWidget {
                                                             );
                                                             return;
                                                           }
-                                                          categoryVM
-                                                              .editCategory(category, textController.text)
+                                                          listVM
+                                                              .editList(list, textController.text)
                                                               .then((success) {
                                                             if (success) {
                                                               showToast(title: 'List name updated');
@@ -286,7 +286,7 @@ class ListsPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              category.categoryName ?? 'Unnamed List',
+                              list.name ?? 'Unnamed List',
                               style:  TextStyle(
                                 fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
                                 fontWeight: FontWeight.bold,
@@ -297,16 +297,16 @@ class ListsPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '${tasksInCategory.length} tasks',
+                              '${tasksInList.length} tasks',
                               style: TextStyle(
                                 fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
                                 color: Colors.black54,
                               ),
                             ),
                             const Spacer(),
-                            if (tasksInCategory.isNotEmpty)
+                            if (tasksInList.isNotEmpty)
                               LinearProgressIndicator(
-                                value: completedTasks / tasksInCategory.length,
+                                value: completedTasks / tasksInList.length,
                                 backgroundColor: AppTheme.background100,
                                 valueColor: AlwaysStoppedAnimation(
                                   AppTheme.primary,
@@ -318,7 +318,7 @@ class ListsPage extends StatelessWidget {
                       ),
                     );
                   },
-                  childCount: categories.length,
+                  childCount: lists.length,
                 ),
               ),
             ),

@@ -1,17 +1,17 @@
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseService {
-  static const createCategoriesTable = """ CREATE TABLE categories(
-      categoryId INTEGER PRIMARY KEY AUTOINCREMENT,
-      categoryName TEXT NOT NULL UNIQUE
+  static const createListsTable = """ CREATE TABLE lists(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name NOT NULL UNIQUE
       )
      """;
   static const createTasksTable = """CREATE TABLE tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT,
         isDone INTEGER DEFAULT 0,
-        categoryId INTEGER DEFAULT 1,
-        categoryName TEXT,
+        list_id INTEGER DEFAULT 1,
+        list_name TEXT,
         createdAt TEXT,
         dueDate TEXT,
         finishedAt TEXT,
@@ -20,7 +20,7 @@ class DatabaseService {
         notifyTime TEXT,
         priority TEXT DEFAULT 'Low',
         isRepeating INTEGER DEFAULT 0,
-        FOREIGN KEY(categoryId) REFERENCES categories (categoryId) ON DELETE SET DEFAULT
+        FOREIGN KEY(list_id) REFERENCES lists (id) ON DELETE SET DEFAULT
       )
     """;
   static const createStatsTable = """CREATE TABLE stats (
@@ -38,11 +38,11 @@ class DatabaseService {
 
   static Future<Database> openDb() async {
     return openDatabase(
-      'simple_todo.db',
-      version: 4,
+      'minimal_todo.db',
+      version: 0,
       onCreate: (database, version) async {
         await database.transaction((txn)async{
-          await txn.execute(createCategoriesTable);
+          await txn.execute(createListsTable);
           await txn.execute(createTasksTable);
           await txn.execute(createStatsTable);
         });

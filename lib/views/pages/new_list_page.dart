@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/global_utils.dart';
-import 'package:minimaltodo/data_models/category.dart';
-import 'package:minimaltodo/view_models/category_view_model.dart';
+import 'package:minimaltodo/data_models/list_model.dart';
+import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/views/helper_widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
-class NewCategoryPage extends StatelessWidget {
-  NewCategoryPage({super.key});
+class NewListPage extends StatelessWidget {
+  NewListPage({super.key});
   final textController = TextEditingController();
 
   @override
@@ -66,7 +66,7 @@ class NewCategoryPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Hero(
-                tag: 'category_field',
+                tag: 'list_field',
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -106,15 +106,15 @@ class NewCategoryPage extends StatelessWidget {
                         );
                         return;
                       }
-                      CategoryModel cm = CategoryModel(categoryName: textController.text.trim());
-                      final cvm = Provider.of<CategoryViewModel>(context, listen: false);
+                      ListModel cm = ListModel(name: textController.text.trim());
+                      final cvm = Provider.of<ListViewModel>(context, listen: false);
                       final navigator = Navigator.of(context);
-                      cvm.addNewCategory(cm).then((success) {
+                      cvm.addNewList(cm).then((success) {
                         if (success) {
                           showToast(title: 'New List Added');
                           Future.delayed(const Duration(milliseconds: 500), () {
                             navigator.pop();
-                            cvm.chosenCategory = cm;
+                            cvm.chosenList = cm;
                             cvm.listScrollController.animateTo(
                               cvm.listScrollController.position.maxScrollExtent,
                               duration: const Duration(milliseconds: 400),

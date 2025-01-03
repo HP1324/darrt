@@ -4,7 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
-import 'package:minimaltodo/view_models/category_view_model.dart';
+import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/view_models/duedate_view_model.dart';
 import 'package:minimaltodo/view_models/navigation_view_model.dart';
 import 'package:minimaltodo/view_models/priority_view_model.dart';
@@ -35,7 +35,7 @@ class SimpleTodo extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => TaskViewModel()),
-        ChangeNotifierProvider(create: (_) => CategoryViewModel()),
+        ChangeNotifierProvider(create: (_) => ListViewModel()),
         ChangeNotifierProvider(create: (_) => PriorityViewModel()),
         ChangeNotifierProvider(
           create: (_) => DuedateViewModel(),

@@ -2,16 +2,16 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:minimaltodo/data_models/category.dart';
+import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
-import 'package:minimaltodo/view_models/category_view_model.dart';
+import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/view_models/duedate_view_model.dart';
 import 'package:minimaltodo/view_models/priority_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
-import 'package:minimaltodo/views/pages/new_category_page.dart';
+import 'package:minimaltodo/views/pages/new_list_page.dart';
 import 'package:minimaltodo/views/helper_widgets/custom_text_field.dart';
 import 'package:minimaltodo/views/pages/notification_settings_page.dart';
 import 'package:provider/provider.dart';
@@ -43,9 +43,9 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
     if (widget.editMode) tvm.currentTask = widget.taskToEdit!;
     return PopScope(
       onPopInvokedWithResult: (_, __) {
-        final cvmodel = Provider.of<CategoryViewModel>(context, listen: false);
+        final cvmodel = Provider.of<ListViewModel>(context, listen: false);
         final pvmodel = Provider.of<PriorityViewModel>(context, listen: false);
-        cvmodel.resetCategory();
+        cvmodel.resetList();
         pvmodel.resetPriority();
         tvm.resetSelectedMinutes();
       },
@@ -293,7 +293,7 @@ class AddToListButton extends StatelessWidget {
                   ListTile(
                     onTap: () {
                       Navigator.of(context).push(PageTransition(
-                          child: NewCategoryPage(), type: PageTransitionType.leftToRightWithFade));
+                          child: NewListPage(), type: PageTransitionType.leftToRightWithFade));
                     },
                     title: const Text(
                       'Create New List',
@@ -313,9 +313,9 @@ class AddToListButton extends StatelessWidget {
                     trailing: const Icon(Icons.list_alt, color: AppTheme.primary),
                   ),
                   Expanded(
-                    child: Consumer2<CategoryViewModel, TaskViewModel>(
+                    child: Consumer2<ListViewModel, TaskViewModel>(
                       builder: (_, cvm, tvm, __) {
-                        List<CategoryModel> items = cvm.categories;
+                        List<ListModel> items = cvm.lists;
                         return Scrollbar(
                           thickness: 8,
                           radius: const Radius.circular(4),
@@ -326,27 +326,27 @@ class AddToListButton extends StatelessWidget {
                             itemBuilder: (_, index) {
                               return Card(
                                 elevation: 0,
-                                color: cvm.chosenCategory == items[index]
+                                color: cvm.chosenList == items[index]
                                     ? AppTheme.background100
                                     : Colors.transparent,
                                 margin: const EdgeInsets.symmetric(vertical: 4),
-                                child: RadioListTile<CategoryModel>(
+                                child: RadioListTile<ListModel>(
                                   activeColor: AppTheme.primary,
                                   value: items[index],
-                                  groupValue: cvm.chosenCategory,
+                                  groupValue: cvm.chosenList,
                                   title: Text(
-                                    items[index].categoryName!,
+                                    items[index].name!,
                                     style: TextStyle(
-                                      fontWeight: cvm.chosenCategory == items[index]
+                                      fontWeight: cvm.chosenList == items[index]
                                           ? FontWeight.bold
                                           : FontWeight.normal,
                                     ),
                                   ),
                                   onChanged: (selected) {
-                                    cvm.updateChosenCategory(selected!);
-                                    tvm.category = cvm.chosenCategory!;
+                                    cvm.updateChosenList(selected!);
+                                    tvm.list = cvm.chosenList!;
                                     debugPrint(
-                                        'chosen category: ${cvm.chosenCategory!.categoryName}');
+                                        'chosen list: ${cvm.chosenList!.name}');
                                   },
                                 ),
                               );
@@ -364,11 +364,11 @@ class AddToListButton extends StatelessWidget {
                         color: AppTheme.primary,
                         borderRadius: BorderRadius.circular(12),
                         onPressed: () {
-                          final cvm = Provider.of<CategoryViewModel>(context, listen: false);
+                          final cvm = Provider.of<ListViewModel>(context, listen: false);
                           final tvm = Provider.of<TaskViewModel>(context, listen: false);
-                          tvm.category = cvm.chosenCategory!;
+                          tvm.list = cvm.chosenList!;
                           debugPrint(
-                              'TVM Category: ${tvm.currentTask.category!.categoryName}, CVM Category: ${cvm.chosenCategory!.categoryName}');
+                              'TVM list: ${tvm.currentTask.list!.name}, CVM list: ${cvm.chosenList!.name}');
                           Navigator.of(context).pop();
                           showToast(title: 'Added to the list');
                         },
@@ -412,10 +412,10 @@ class AddToListButton extends StatelessWidget {
               ],
             ),
             Consumer<TaskViewModel>(builder: (_, tvm, __) {
-              debugPrint('Chosen category in consumer' +
-                  '${tvm.currentTask.category?.categoryName ?? 'General'}');
+              debugPrint('Chosen list in consumer' +
+                  '${tvm.currentTask.list?.name ?? 'General'}');
               return Text(
-                tvm.currentTask.category?.categoryName ?? 'General',
+                tvm.currentTask.list?.name ?? 'General',
                 style: TextStyle(fontSize: Theme.of(context).textTheme.labelLarge!.fontSize),
               );
             }),
