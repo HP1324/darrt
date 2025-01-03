@@ -118,14 +118,14 @@ class _CalendarPageState extends State<CalendarPage> {
                 ),
                 child: Text(
                   DateFormat('MMMM yyyy').format(_selectedDate),
-                  style: const TextStyle(
-                    fontSize: 18,
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.primary,
                   ),
                 ),
               ),
-              Container(
+              SizedBox(
                 height: 80,
                 child: PageView.builder(
                   controller: _weekController,
@@ -200,7 +200,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                 Text(
                                   DateFormat('EEE').format(date),
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
                                     fontWeight: FontWeight.w600,
                                     color: isSelected
                                         ? Colors.white
@@ -222,7 +222,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                     child: Text(
                                       date.day.toString(),
                                       style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
                                         fontWeight: FontWeight.bold,
                                         color: isSelected
                                             ? Colors.white
@@ -242,7 +242,6 @@ class _CalendarPageState extends State<CalendarPage> {
                   },
                 ),
               ),
-              // Tasks section
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.only(top: 8),
@@ -252,7 +251,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       child: Text(
                         'Tasks for ${DateFormat('MMMM d').format(_selectedDate)}',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey.shade800,
                         ),
@@ -283,7 +282,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                   Text(
                                     'No tasks scheduled for this day',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
                                       color: Colors.grey.shade600,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -292,7 +291,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                   Text(
                                     'Tap the + button to add a new task',
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
                                       color: Colors.grey.shade500,
                                     ),
                                   ),

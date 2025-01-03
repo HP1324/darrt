@@ -18,66 +18,6 @@ class ListsPage extends StatelessWidget {
       builder: (context, categoryVM, taskVM, _) {
         final categories = categoryVM.categories;
 
-        if (categories.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppTheme.background50,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Iconsax.folder_2,
-                    size: 48,
-                    color: AppTheme.primary.withOpacity(0.7),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'No Lists Yet',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Create lists to organize your tasks',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>  NewCategoryPage(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Iconsax.add),
-                  label: const Text('Create New List'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-
         return CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
@@ -86,10 +26,10 @@ class ListsPage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                     Text(
                       'Your Lists',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
@@ -120,7 +60,7 @@ class ListsPage extends StatelessWidget {
                   crossAxisCount: 2,
                   mainAxisSpacing: 16,
                   crossAxisSpacing: 16,
-                  childAspectRatio: 0.95,
+                  childAspectRatio: 0.97,
                 ),
                 delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -160,7 +100,7 @@ class ListsPage extends StatelessWidget {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
+                              color: Colors.black.withAlpha(15),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -174,7 +114,7 @@ class ListsPage extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: AppTheme.primary.withOpacity(0.1),
+                                    color: AppTheme.primary.withAlpha(30),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Icon(
@@ -347,8 +287,8 @@ class ListsPage extends StatelessWidget {
                             const SizedBox(height: 16),
                             Text(
                               category.categoryName ?? 'Unnamed List',
-                              style: const TextStyle(
-                                fontSize: 16,
+                              style:  TextStyle(
+                                fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black87,
                               ),
@@ -359,7 +299,7 @@ class ListsPage extends StatelessWidget {
                             Text(
                               '${tasksInCategory.length} tasks',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
                                 color: Colors.black54,
                               ),
                             ),

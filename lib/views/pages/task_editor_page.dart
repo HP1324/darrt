@@ -16,8 +16,6 @@ import 'package:minimaltodo/views/helper_widgets/custom_text_field.dart';
 import 'package:minimaltodo/views/pages/notification_settings_page.dart';
 import 'package:provider/provider.dart';
 
-const _titleStyle = TextStyle(fontSize: 22);
-
 //ignore: must_be_immutable
 class TaskEditorPage extends StatefulWidget {
   TaskEditorPage({super.key, this.taskToEdit, required this.editMode});
@@ -57,11 +55,11 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
           title: widget.editMode
               ? Text(
                   widget.taskToEdit!.title!,
-                  style: _titleStyle,
+                  style: TextStyle(fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
                 )
-              : const Text(
+              : Text(
                   'New Task',
-                  style: _titleStyle,
+                  style: TextStyle(fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
                 ),
         ),
         body: Padding(
@@ -90,7 +88,8 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
               if (success) {
                 navigator.pop();
                 showToast(title: 'Task Added');
-                logger.d('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
+                logger.d(
+                    'Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
               }
             } else {
               final changes = await tvm.editTask();
@@ -99,8 +98,10 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                 showToast(title: 'Task edited');
               }
             }
-            if(isNotifEnabled!) await NotificationService.createTaskNotification(tvm.currentTask);
-            else await NotificationService.removeTaskNotification(tvm.currentTask);
+            if (isNotifEnabled!)
+              await NotificationService.createTaskNotification(tvm.currentTask);
+            else
+              await NotificationService.removeTaskNotification(tvm.currentTask);
           },
           shape: const CircleBorder(),
           child: const Icon(Icons.done),
@@ -146,15 +147,15 @@ class TaskTextField extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
                 Icon(Icons.edit_note_rounded, color: Colors.white, size: 28),
-                 SizedBox(width: 10),
+                SizedBox(width: 10),
                 Text(
                   'Task',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
                   ),
@@ -214,7 +215,10 @@ class SetPriorityWidget extends StatelessWidget {
             children: [
               Text(
                 'Set a priority',
-                style: TextStyle(color: AppTheme.primary, fontSize: 16),
+                style: TextStyle(
+                  color: AppTheme.primary,
+                  fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
+                ),
               ),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -278,10 +282,10 @@ class AddToListButton extends StatelessWidget {
               child: Column(
                 children: [
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Select List',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.primary,
                     ),
@@ -368,10 +372,10 @@ class AddToListButton extends StatelessWidget {
                           Navigator.of(context).pop();
                           showToast(title: 'Added to the list');
                         },
-                        child: const Text(
+                        child: Text(
                           'Done',
                           style: TextStyle(
-                              fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                              fontSize: Theme.of(context).textTheme.labelLarge!.fontSize, color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -390,7 +394,7 @@ class AddToListButton extends StatelessWidget {
         ),
         child: Column(
           children: [
-            const Row(
+             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Icon(
@@ -399,7 +403,7 @@ class AddToListButton extends StatelessWidget {
                 ),
                 Text(
                   'Add to a list',
-                  style: TextStyle(fontSize: 20, color: AppTheme.primary),
+                  style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize, color: AppTheme.primary),
                 ),
                 Icon(
                   CupertinoIcons.chevron_right,
@@ -412,7 +416,7 @@ class AddToListButton extends StatelessWidget {
                   '${tvm.currentTask.category?.categoryName ?? 'General'}');
               return Text(
                 tvm.currentTask.category?.categoryName ?? 'General',
-                style: TextStyle(fontSize: 15),
+                style: TextStyle(fontSize: Theme.of(context).textTheme.labelLarge!.fontSize),
               );
             }),
           ],
@@ -475,7 +479,7 @@ class DateTimePickerButton extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Icon(
@@ -484,7 +488,7 @@ class DateTimePickerButton extends StatelessWidget {
                           ),
                           Text(
                             'Set due date',
-                            style: TextStyle(color: AppTheme.primary, fontSize: 20),
+                            style: TextStyle(color: AppTheme.primary, fontSize: Theme.of(context).textTheme.titleMedium!.fontSize),
                           ),
                           Icon(
                             CupertinoIcons.chevron_right,
@@ -538,7 +542,10 @@ class GotoNotificationSettings extends StatelessWidget {
         return ListTile(
             onTap: () {
               if (taskVM.currentTask.dueDate != null) {
-                Navigator.push(context,PageTransition(child: TaskNotificationSettingsPage(), type: PageTransitionType.fade));
+                Navigator.push(
+                    context,
+                    PageTransition(
+                        child: TaskNotificationSettingsPage(), type: PageTransitionType.fade));
                 taskVM.setNotifConfigInUI();
               } else {
                 showToast(
@@ -550,7 +557,7 @@ class GotoNotificationSettings extends StatelessWidget {
             },
             title: Text(
               'Notification Settings',
-              style: TextStyle(fontSize: 17.5),
+              style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize),
             ),
             trailing: Icon(Icons.notifications));
       }),

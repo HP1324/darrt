@@ -39,7 +39,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
-          color: widget.isSelected ? AppTheme.primary.withOpacity(0.1) : Colors.white,
+          color: widget.isSelected ? AppTheme.primary.withAlpha(60) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: widget.isSelected
@@ -59,7 +59,6 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
               height: 72,
               child: Row(
                 children: [
-                  // Checkbox for selection
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: Transform.scale(
@@ -92,7 +91,6 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Title row with priority
                           Row(
                             children: [
                               Expanded(
@@ -101,7 +99,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
                                     fontWeight: FontWeight.w500,
                                     decoration: widget.task.isDone!
                                         ? TextDecoration.lineThrough
@@ -127,7 +125,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                   Text(
                                     widget.task.priority!,
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
                                       color: isUrgent ? Colors.red.shade400 : AppTheme.primary.withAlpha(135),
                                     ),
                                   ),
@@ -149,8 +147,8 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                 Text(
                                   formatDate(widget.task.dueDate!),
                                   style: TextStyle(
-                                    fontSize: 13,
-                                    color: isUrgent ? Colors.red.shade400 : AppTheme.primary.withOpacity(0.6),
+                                    fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+                                    color: isUrgent ? Colors.red.shade400 : AppTheme.primary.withAlpha(160),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
@@ -158,7 +156,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                               Icon(
                                 Icons.folder_outlined,
                                 size: 14,
-                                color: AppTheme.primary.withOpacity(0.6),
+                                color: AppTheme.primary.withAlpha(160),
                               ),
                               const SizedBox(width: 4),
                               Expanded(
@@ -166,8 +164,8 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                   widget.task.category?.categoryName ?? 'General',
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontSize: 13,
-                                    color: AppTheme.primary.withOpacity(0.6),
+                                    fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+                                    color: AppTheme.primary.withAlpha(160),
                                   ),
                                 ),
                               ),

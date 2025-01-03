@@ -56,7 +56,7 @@ class TaskView extends StatelessWidget {
                 icon: Icons.task_alt,
                 title: 'Finished',
                 subtitle: task.finishedAt != null
-                    ? '${formatDateTime(task.finishedAt!)}'
+                    ? formatDateTime(task.finishedAt!)
                     : 'Not finished yet',
               ),
               gap,

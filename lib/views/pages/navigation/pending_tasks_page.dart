@@ -104,8 +104,8 @@ class _PendingTasksPageState extends State<PendingTasksPage> {
                   ),
                   Text(
                     '${_selectedTaskIds.length} selected',
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style:  TextStyle(
+                      fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
                       color: Colors.white,
                     ),
                   ),
@@ -148,12 +148,12 @@ class _PendingTasksPageState extends State<PendingTasksPage> {
               children: [
                 // Overdue tasks section
                 if (overdue.isNotEmpty) ...[
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
                       'Overdue',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
                         fontWeight: FontWeight.bold,
                         color: Colors.red,
                       ),
@@ -181,8 +181,8 @@ class _PendingTasksPageState extends State<PendingTasksPage> {
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
                           dateTitle,
-                          style: const TextStyle(
-                            fontSize: 18,
+                          style: TextStyle(
+                            fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.primary,
                           ),
@@ -192,7 +192,7 @@ class _PendingTasksPageState extends State<PendingTasksPage> {
                       const SizedBox(height: 8),
                     ],
                   );
-                }).toList(),
+                }),
               ],
             ),
           ),
