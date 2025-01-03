@@ -13,6 +13,7 @@ class TaskView extends StatelessWidget {
   final Task task;
   @override
   Widget build(BuildContext context) {
+
     task.printTask();
     return Scaffold(
       appBar: AppBar(title: Text('${task.title}')),
@@ -93,8 +94,8 @@ class DetailItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const titleStyle = TextStyle(fontSize: 19);
-    final subtitleStyle = TextStyle(fontSize: 18, color: Colors.black.withAlpha(160));
+    final titleStyle = TextStyle(fontSize: Theme.of(context).textTheme.titleLarge!.fontSize);
+    final subtitleStyle = TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize);
     return Card(
       elevation: 0,
       child: ListTile(
