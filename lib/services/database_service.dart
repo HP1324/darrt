@@ -1,3 +1,4 @@
+import 'package:minimaltodo/global_utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseService {
@@ -37,9 +38,10 @@ class DatabaseService {
 
 
   static Future<Database> openDb() async {
+    logger.d('${formatDateTime(DateTime.now())} openDb() called');
     return openDatabase(
       'minimal_todo.db',
-      version: 0,
+      version: 1,
       onCreate: (database, version) async {
         await database.transaction((txn)async{
           await txn.execute(createListsTable);
@@ -48,7 +50,9 @@ class DatabaseService {
         });
       },
       onConfigure: (database) async {
-        await database.execute('PRAGMA foreign_keys = ON');
+        await database.transaction((txn)async{
+          await txn.execute('PRAGMA foreign_keys = ON');
+        });
       },
     );
   }
