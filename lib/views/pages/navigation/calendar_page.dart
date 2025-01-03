@@ -59,56 +59,62 @@ class _CalendarPageState extends State<CalendarPage> {
     final DateTime firstDayOfWeek = _todayReference.add(
       Duration(days: -(_todayReference.weekday - 1) + (weekOffset * 7)),
     );
-    return List.generate(7, (index) => firstDayOfWeek.add(Duration(days: index)));
+    return List.generate(
+        7, (index) => firstDayOfWeek.add(Duration(days: index)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<TaskViewModel>(
       builder: (context, taskVM, _) {
-        final scheduledTasks = taskVM.tasks.where((task) => 
-          task.dueDate != null).toList();
+        final scheduledTasks =
+            taskVM.tasks.where((task) => task.dueDate != null).toList();
 
         return Scaffold(
-          appBar: _isSelectionMode ? AppBar(
-            backgroundColor: AppTheme.primary,
-            leading: IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: _clearSelection,
-            ),
-            title: Text('${_selectedTaskIds.length} selected'),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Delete Tasks'),
-                      content: Text('Delete ${_selectedTaskIds.length} tasks?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            for (var id in _selectedTaskIds) {
-                              final task = taskVM.tasks.firstWhere((t) => t.id == id);
-                              taskVM.deleteTask(task);
-                            }
-                            _clearSelection();
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Delete', style: TextStyle(color: Colors.red)),
-                        ),
-                      ],
+          appBar: _isSelectionMode
+              ? AppBar(
+                  backgroundColor: AppTheme.primary,
+                  leading: IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: _clearSelection,
+                  ),
+                  title: Text('${_selectedTaskIds.length} selected'),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Delete Tasks'),
+                            content: Text(
+                                'Delete ${_selectedTaskIds.length} tasks?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  for (var id in _selectedTaskIds) {
+                                    final task = taskVM.tasks
+                                        .firstWhere((t) => t.id == id);
+                                    taskVM.deleteTask(task);
+                                  }
+                                  _clearSelection();
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Delete',
+                                    style: TextStyle(color: Colors.red)),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ],
-          ) : null,
+                  ],
+                )
+              : null,
           body: Column(
             children: [
               Container(
@@ -163,7 +169,8 @@ class _CalendarPageState extends State<CalendarPage> {
                         return GestureDetector(
                           onTap: () {
                             setState(() => _selectedDate = date);
-                            logger.d('Date Tapped -> _selectedDate = $_selectedDate');
+                            logger.d(
+                                'Date Tapped -> _selectedDate = $_selectedDate');
                           },
                           child: AnimatedContainer(
                             duration: _animationDuration,
@@ -171,17 +178,16 @@ class _CalendarPageState extends State<CalendarPage> {
                             width: 48,
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
-                              color: isSelected
-                                  ? AppTheme.primary
-                                  : AppTheme.background100,
+                              color:
+                                  isSelected ? AppTheme.primary : Colors.white,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: isSelected
                                     ? AppTheme.primary
                                     : isToday
                                         ? AppTheme.primary
-                                        : Colors.transparent,
-                                width: 1.5,
+                                        : AppTheme.background200,
+                                width: isSelected || isToday ? 2 : 1,
                               ),
                               boxShadow: isSelected
                                   ? [
@@ -200,7 +206,10 @@ class _CalendarPageState extends State<CalendarPage> {
                                 Text(
                                   DateFormat('EEE').format(date),
                                   style: TextStyle(
-                                    fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall!
+                                        .fontSize,
                                     fontWeight: FontWeight.w600,
                                     color: isSelected
                                         ? Colors.white
@@ -215,14 +224,19 @@ class _CalendarPageState extends State<CalendarPage> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: isSelected
-                                        ? Colors.white.withAlpha(65)
-                                        : Colors.black.withAlpha(12),
+                                        ? Colors.white.withAlpha(25)
+                                        : isToday
+                                            ? AppTheme.primary.withAlpha(15)
+                                            : AppTheme.background100,
                                   ),
                                   child: Center(
                                     child: Text(
                                       date.day.toString(),
                                       style: TextStyle(
-                                        fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                                        fontSize: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium!
+                                            .fontSize,
                                         fontWeight: FontWeight.bold,
                                         color: isSelected
                                             ? Colors.white
@@ -251,7 +265,8 @@ class _CalendarPageState extends State<CalendarPage> {
                       child: Text(
                         'Tasks for ${DateFormat('MMMM d').format(_selectedDate)}',
                         style: TextStyle(
-                          fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
+                          fontSize:
+                              Theme.of(context).textTheme.titleMedium!.fontSize,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey.shade800,
                         ),
@@ -259,7 +274,8 @@ class _CalendarPageState extends State<CalendarPage> {
                     ),
                     Builder(
                       builder: (context) {
-                        final tasksForSelectedDate = scheduledTasks.where((task) {
+                        final tasksForSelectedDate =
+                            scheduledTasks.where((task) {
                           final taskDate = task.dueDate!;
                           return taskDate.year == _selectedDate.year &&
                               taskDate.month == _selectedDate.month &&
@@ -282,7 +298,10 @@ class _CalendarPageState extends State<CalendarPage> {
                                   Text(
                                     'No tasks scheduled for this day',
                                     style: TextStyle(
-                                      fontSize: Theme.of(context).textTheme.bodyLarge!.fontSize,
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!
+                                          .fontSize,
                                       color: Colors.grey.shade600,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -291,7 +310,10 @@ class _CalendarPageState extends State<CalendarPage> {
                                   Text(
                                     'Tap the + button to add a new task',
                                     style: TextStyle(
-                                      fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize,
+                                      fontSize: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .fontSize,
                                       color: Colors.grey.shade500,
                                     ),
                                   ),
@@ -302,14 +324,19 @@ class _CalendarPageState extends State<CalendarPage> {
                         }
 
                         return Column(
-                          children: tasksForSelectedDate.map((task) => TaskItem(
-                            key: ValueKey('${task.id}_${task.isDone}'),
-                            task: task,
-                            isSelected: _selectedTaskIds.contains(task.id),
-                            isSelectionMode: _isSelectionMode,
-                            onLongPress: () => _toggleTaskSelection(task),
-                            onSelect: (selected) => _toggleTaskSelection(task),
-                          )).toList(),
+                          children: tasksForSelectedDate
+                              .map((task) => TaskItem(
+                                    key: ValueKey('${task.id}_${task.isDone}'),
+                                    task: task,
+                                    isSelected:
+                                        _selectedTaskIds.contains(task.id),
+                                    isSelectionMode: _isSelectionMode,
+                                    onLongPress: () =>
+                                        _toggleTaskSelection(task),
+                                    onSelect: (selected) =>
+                                        _toggleTaskSelection(task),
+                                  ))
+                              .toList(),
                         );
                       },
                     ),
