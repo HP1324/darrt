@@ -44,6 +44,7 @@ dependencies:
   toastification: ^2.3.0
   logger: ^2.5.0
   fl_chart: ^0.65.0
+  font_awesome_flutter: ^10.8.0
 
 dev_dependencies:
   flutter_test:

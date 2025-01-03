@@ -4,7 +4,8 @@ import 'package:sqflite/sqflite.dart';
 class DatabaseService {
   static const createListsTable = """ CREATE TABLE lists(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name NOT NULL UNIQUE
+      name NOT NULL UNIQUE,
+      icon_code TEXT DEFAULT 'folder',
       )
      """;
   static const createTasksTable = """CREATE TABLE tasks (
@@ -35,25 +36,26 @@ class DatabaseService {
         low_tasks INTEGER NOT NULL
       )
     """;
-  static const createDefaultLists = """INSERT INTO lists (name) VALUES
-('Sports'),
-('Health'),
-('Work'),
-('Shopping'),
-('Groceries'),
-('Books'),
-('Travel'),
-('Education'),
-('Personal'),
-('Finance'),
-('Hobbies'),
-('Fitness'),
-('Food'),
-('Friends'),
-('Family'),
-('Chores'),
-('Projects'),
-('Entertainment');
+  static const createDefaultLists =
+      """INSERT INTO lists (name, icon_code) VALUES
+('Sports', 'running'),
+('Health', 'heart'),
+('Work', 'briefcase'),
+('Shopping', 'cart'),
+('Groceries', 'shop'),
+('Books', 'book'),
+('Travel', 'airplane'),
+('Education', 'teacher'),
+('Personal', 'home'),
+('Finance', 'wallet'),
+('Hobbies', 'game'),
+('Fitness', 'weight'),
+('Food', 'apple'),
+('Friends', 'heart'),
+('Family', 'home'),
+('Chores', 'task'),
+('Projects', 'chart'),
+('Entertainment', 'video');
 """;
 
   static Future<Database> openDb() async {
@@ -62,7 +64,7 @@ class DatabaseService {
       'minimal_todo.db',
       version: 1,
       onCreate: (database, version) async {
-        await database.transaction((txn)async{
+        await database.transaction((txn) async {
           await txn.execute(createListsTable);
           await txn.execute(createTasksTable);
           await txn.execute(createStatsTable);
@@ -70,13 +72,10 @@ class DatabaseService {
         });
       },
       onConfigure: (database) async {
-        await database.transaction((txn)async{
+        await database.transaction((txn) async {
           await txn.execute('PRAGMA foreign_keys = ON');
         });
       },
     );
   }
 }
-
-
-
