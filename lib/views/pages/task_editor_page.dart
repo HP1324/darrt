@@ -276,7 +276,7 @@ class AddToListButton extends StatelessWidget {
                     Colors.white,
                   ],
                 ),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: Column(
                 children: [
@@ -305,39 +305,39 @@ class AddToListButton extends StatelessWidget {
                   ),
                   Expanded(
                     child: Consumer2<ListViewModel, TaskViewModel>(
-                      builder: (_, cvm, tvm, __) {
-                        List<ListModel> items = cvm.lists;
+                      builder: (_, lvm, tvm, __) {
+                        List<ListModel> items = lvm.lists;
                         return Scrollbar(
                           thickness: 8,
                           radius: const Radius.circular(4),
                           child: ListView.builder(
                             padding: const EdgeInsets.symmetric(horizontal: 8),
-                            controller: cvm.listScrollController,
+                            controller: lvm.listScrollController,
                             itemCount: items.length,
                             itemBuilder: (_, index) {
                               return Card(
                                 elevation: 0,
-                                color: cvm.chosenList == items[index]
+                                color: lvm.chosenList == items[index]
                                     ? AppTheme.background100
                                     : Colors.transparent,
                                 margin: const EdgeInsets.symmetric(vertical: 4),
                                 child: RadioListTile<ListModel>(
                                   activeColor: AppTheme.primary,
                                   value: items[index],
-                                  groupValue: cvm.chosenList,
+                                  groupValue: lvm.chosenList,
                                   title: Text(
                                     items[index].name!,
                                     style: TextStyle(
-                                      fontWeight: cvm.chosenList == items[index]
+                                      fontWeight: lvm.chosenList == items[index]
                                           ? FontWeight.bold
                                           : FontWeight.normal,
                                     ),
                                   ),
                                   onChanged: (selected) {
-                                    cvm.updateChosenList(selected!);
-                                    tvm.list = cvm.chosenList!;
-                                    debugPrint(
-                                        'chosen list: ${cvm.chosenList!.name}');
+                                    lvm.updateChosenList(selected!);
+                                    tvm.list = lvm.chosenList!;
+                                    logger.d(
+                                        'chosen list: ${lvm.chosenList!.name}');
                                   },
                                 ),
                               );
