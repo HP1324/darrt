@@ -19,6 +19,7 @@ class ListsPage extends StatelessWidget {
         final lists = listVM.lists;
 
         return CustomScrollView(
+          controller: listVM.listScrollController,
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
