@@ -336,8 +336,8 @@ class AddToListButton extends StatelessWidget {
                                   onChanged: (selected) {
                                     lvm.updateChosenList(selected!);
                                     tvm.list = lvm.chosenList!;
-                                    logger.d(
-                                        'chosen list: ${lvm.chosenList!.name}');
+                                    logger.d('chosen list: ${lvm.chosenList!.name}');
+                                    logger.d("Chosen list icon: ${lvm.chosenList!.iconCode}");
                                   },
                                 ),
                               );

@@ -39,10 +39,7 @@ class _ListsPageState extends State<ListsPage> {
         // Filter lists based on search query
         final filteredLists = lists.where((list) {
           if (_searchQuery.isEmpty) return true;
-          return list.name
-                  ?.toLowerCase()
-                  .contains(_searchQuery.toLowerCase()) ??
-              false;
+          return list.name?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
         }).toList();
 
         return CustomScrollView(
@@ -59,17 +56,13 @@ class _ListsPageState extends State<ListsPage> {
                         Text(
                           'All Lists',
                           style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .textTheme
-                                .headlineSmall!
-                                .fontSize,
+                            fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
                           ),
                         ),
                         Row(
                           children: [
-                            // Search Icon Button
                             IconButton(
                               onPressed: () {
                                 setState(() {
@@ -81,12 +74,8 @@ class _ListsPageState extends State<ListsPage> {
                                 });
                               },
                               icon: Icon(
-                                _showSearch
-                                    ? Icons.close
-                                    : Iconsax.search_normal,
-                                color: _showSearch
-                                    ? AppTheme.error
-                                    : AppTheme.primary,
+                                _showSearch ? Icons.close : Iconsax.search_normal,
+                                color: _showSearch ? AppTheme.error : AppTheme.primary,
                               ),
                               style: IconButton.styleFrom(
                                 backgroundColor: AppTheme.background50,
@@ -128,7 +117,7 @@ class _ListsPageState extends State<ListsPage> {
                         child: CustomTextField(
                           controller: _searchController,
                           isMaxLinesNull: false,
-                          isAutoFocus: true,
+                          isAutoFocus: false,
                           hintText: 'Search lists...',
                           fillColor: Colors.white,
                           contentPadding: const EdgeInsets.symmetric(
@@ -174,8 +163,7 @@ class _ListsPageState extends State<ListsPage> {
                     )
                   : SliverGrid(
                       // Existing grid code but use filteredLists instead of lists
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         mainAxisSpacing: 16,
                         crossAxisSpacing: 16,
@@ -191,12 +179,11 @@ class _ListsPageState extends State<ListsPage> {
                                       task.list?.id == null ||
                                       task.list?.name == null)
                                   .toList()
-                              : taskVM.tasks
-                                  .where((task) => task.list?.id == list.id)
-                                  .toList();
-                          final completedTasks = tasksInList
-                              .where((task) => task.isDone ?? false)
-                              .length;
+                              : taskVM.tasks.where((task) => task.list?.id == list.id).toList();
+                          final completedTasks =
+                              tasksInList.where((task) => task.isDone ?? false).length;
+
+                          logger.d('List: ${list.name}, Icon code: ${list.iconCode}'); // Debug log
 
                           return InkWell(
                             onTap: () {
@@ -236,8 +223,7 @@ class _ListsPageState extends State<ListsPage> {
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
                                           color: AppTheme.primary.withAlpha(30),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Icon(
                                           ListService.getIcon(list.iconCode),
@@ -259,16 +245,14 @@ class _ListsPageState extends State<ListsPage> {
                                               value: 'edit',
                                               child: Text(
                                                 'Edit',
-                                                style: TextStyle(
-                                                    color: Colors.black87),
+                                                style: TextStyle(color: Colors.black87),
                                               ),
                                             ),
                                             PopupMenuItem(
                                               value: 'delete',
                                               child: Text(
                                                 'Delete',
-                                                style: TextStyle(
-                                                    color: AppTheme.error),
+                                                style: TextStyle(color: AppTheme.error),
                                               ),
                                             ),
                                           ],
@@ -276,41 +260,33 @@ class _ListsPageState extends State<ListsPage> {
                                             if (value == 'delete') {
                                               showDialog(
                                                 context: context,
-                                                builder: (context) =>
-                                                    AlertDialog(
+                                                builder: (context) => AlertDialog(
                                                   title: Text('Delete List'),
                                                   content: Text(
                                                     'Are you sure you want to delete "${list.name}"? All tasks in this list will be moved to General list.',
                                                   ),
                                                   actions: [
                                                     TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.pop(
-                                                              context),
+                                                      onPressed: () => Navigator.pop(context),
                                                       child: Text('Cancel'),
                                                     ),
                                                     TextButton(
                                                       onPressed: () {
-                                                        final taskVM = Provider
-                                                            .of<TaskViewModel>(
-                                                                context,
-                                                                listen: false);
+                                                        final taskVM = Provider.of<TaskViewModel>(
+                                                            context,
+                                                            listen: false);
                                                         listVM
-                                                            .deleteList(
-                                                                list, taskVM)
+                                                            .deleteList(list, taskVM)
                                                             .then((deleted) {
                                                           if (deleted) {
                                                             showToast(
-                                                                title:
-                                                                    'List deleted',
+                                                                title: 'List deleted',
                                                                 description:
                                                                     'All tasks have been moved to General list');
                                                           } else {
                                                             showToast(
-                                                                title:
-                                                                    'Failed to delete list',
-                                                                description:
-                                                                    'Please try again');
+                                                                title: 'Failed to delete list',
+                                                                description: 'Please try again');
                                                           }
                                                         });
                                                         Navigator.pop(context);
@@ -327,139 +303,96 @@ class _ListsPageState extends State<ListsPage> {
                                               );
                                             } else if (value == 'edit') {
                                               final textController =
-                                                  TextEditingController(
-                                                      text: list.name);
+                                                  TextEditingController(text: list.name);
                                               showModalBottomSheet(
                                                 context: context,
                                                 isScrollControlled: true,
-                                                backgroundColor:
-                                                    Colors.transparent,
+                                                backgroundColor: Colors.transparent,
                                                 builder: (context) => Container(
                                                   padding: EdgeInsets.only(
                                                     bottom:
-                                                        MediaQuery.of(context)
-                                                            .viewInsets
-                                                            .bottom,
+                                                        MediaQuery.of(context).viewInsets.bottom,
                                                   ),
-                                                  decoration:
-                                                      const BoxDecoration(
+                                                  decoration: const BoxDecoration(
                                                     color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.vertical(
+                                                    borderRadius: BorderRadius.vertical(
                                                       top: Radius.circular(20),
                                                     ),
                                                   ),
                                                   child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            20),
+                                                    padding: const EdgeInsets.all(20),
                                                     child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
                                                         const Text(
                                                           'Edit List Name',
                                                           style: TextStyle(
                                                             fontSize: 20,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color: AppTheme
-                                                                .primary,
+                                                            fontWeight: FontWeight.bold,
+                                                            color: AppTheme.primary,
                                                           ),
                                                         ),
-                                                        const SizedBox(
-                                                            height: 20),
+                                                        const SizedBox(height: 20),
                                                         TextField(
-                                                          controller:
-                                                              textController,
+                                                          controller: textController,
                                                           autofocus: true,
-                                                          decoration:
-                                                              InputDecoration(
-                                                            hintText:
-                                                                'Enter list name',
+                                                          decoration: InputDecoration(
+                                                            hintText: 'Enter list name',
                                                             filled: true,
-                                                            fillColor: AppTheme
-                                                                .background50,
-                                                            border:
-                                                                OutlineInputBorder(
+                                                            fillColor: AppTheme.background50,
+                                                            border: OutlineInputBorder(
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                              borderSide:
-                                                                  BorderSide
-                                                                      .none,
+                                                                  BorderRadius.circular(10),
+                                                              borderSide: BorderSide.none,
                                                             ),
                                                           ),
                                                         ),
-                                                        const SizedBox(
-                                                            height: 20),
+                                                        const SizedBox(height: 20),
                                                         Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .end,
+                                                          mainAxisAlignment: MainAxisAlignment.end,
                                                           children: [
                                                             TextButton(
                                                               onPressed: () =>
-                                                                  Navigator.pop(
-                                                                      context),
-                                                              child: const Text(
-                                                                  'Cancel'),
+                                                                  Navigator.pop(context),
+                                                              child: const Text('Cancel'),
                                                             ),
-                                                            const SizedBox(
-                                                                width: 10),
+                                                            const SizedBox(width: 10),
                                                             ElevatedButton(
                                                               onPressed: () {
-                                                                if (textController
-                                                                    .text
+                                                                if (textController.text
                                                                     .trim()
                                                                     .isEmpty) {
                                                                   showToast(
                                                                     title:
                                                                         'List name cannot be empty',
-                                                                    type: ToastificationType
-                                                                        .error,
+                                                                    type: ToastificationType.error,
                                                                   );
                                                                   return;
                                                                 }
                                                                 listVM
                                                                     .editList(
-                                                                        list,
-                                                                        textController
-                                                                            .text)
-                                                                    .then(
-                                                                        (success) {
+                                                                        list, textController.text)
+                                                                    .then((success) {
                                                                   if (success) {
                                                                     showToast(
-                                                                        title:
-                                                                            'List name updated');
-                                                                    Navigator.pop(
-                                                                        context);
+                                                                        title: 'List name updated');
+                                                                    Navigator.pop(context);
                                                                   } else {
                                                                     showToast(
                                                                       title:
                                                                           'Failed to update list name',
-                                                                      type: ToastificationType
-                                                                          .error,
+                                                                      type:
+                                                                          ToastificationType.error,
                                                                     );
                                                                   }
                                                                 });
                                                               },
-                                                              style:
-                                                                  ElevatedButton
-                                                                      .styleFrom(
-                                                                backgroundColor:
-                                                                    AppTheme
-                                                                        .primary,
-                                                                foregroundColor:
-                                                                    Colors
-                                                                        .white,
+                                                              style: ElevatedButton.styleFrom(
+                                                                backgroundColor: AppTheme.primary,
+                                                                foregroundColor: Colors.white,
                                                               ),
-                                                              child: const Text(
-                                                                  'Save'),
+                                                              child: const Text('Save'),
                                                             ),
                                                           ],
                                                         ),
@@ -477,10 +410,7 @@ class _ListsPageState extends State<ListsPage> {
                                   Text(
                                     list.name ?? 'Unnamed List',
                                     style: TextStyle(
-                                      fontSize: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium!
-                                          .fontSize,
+                                      fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
                                     ),
@@ -491,18 +421,14 @@ class _ListsPageState extends State<ListsPage> {
                                   Text(
                                     '${tasksInList.length} tasks',
                                     style: TextStyle(
-                                      fontSize: Theme.of(context)
-                                          .textTheme
-                                          .labelLarge!
-                                          .fontSize,
+                                      fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
                                       color: Colors.black54,
                                     ),
                                   ),
                                   const Spacer(),
                                   if (tasksInList.isNotEmpty)
                                     LinearProgressIndicator(
-                                      value:
-                                          completedTasks / tasksInList.length,
+                                      value: completedTasks / tasksInList.length,
                                       backgroundColor: AppTheme.background100,
                                       valueColor: AlwaysStoppedAnimation(
                                         AppTheme.primary,

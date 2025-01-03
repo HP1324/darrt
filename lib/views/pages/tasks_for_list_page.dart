@@ -3,6 +3,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/task_item.dart';
@@ -155,9 +156,9 @@ class _TasksForListPageState extends State<TasksForListPage> {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      Iconsax.clipboard_text,
+                      ListService.getIcon(widget.list.iconCode),
                       size: 48,
-                      color: AppTheme.primary.withOpacity(0.7),
+                      color: AppTheme.primary.withAlpha(170),
                     ),
                   ),
                   const SizedBox(height: 24),

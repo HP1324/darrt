@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
+import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/database_service.dart';
 
 class ListService {
   static Future<List<ListModel>> getLists() async {
     final database = await DatabaseService.openDb();
     final List<Map<String, dynamic>> listMaps = await database.query('lists');
+
+    // Debug: Print all lists and their icon codes
+    for (var map in listMaps) {
+      logger.d('List: ${map['name']}, Icon code: ${map['icon_code']}');
+    }
+
     return List.generate(listMaps.length, (index) {
       return ListModel.fromJson(listMaps[index]);
     });
@@ -60,24 +67,24 @@ class ListService {
 
   ///Icon related logic
   static final Map<String, String> defaultIconCodes = {
-    'Sports': 'football',          // FontAwesomeIcons.football
-    'Health': 'heart',             // Iconsax.heart
-    'Work': 'briefcase',           // Iconsax.briefcase
-    'Shopping': 'cart',            // Iconsax.shopping_cart
-    'Groceries': 'shop',           // Iconsax.shop
-    'Books': 'book',               // Iconsax.book
-    'Travel': 'airplane',          // Iconsax.airplane
-    'Education': 'graduation_cap',  // FontAwesomeIcons.graduationCap
-    'Personal': 'home',            // Iconsax.home
-    'Finance': 'wallet',           // Iconsax.wallet
-    'Hobbies': 'gamepad',          // FontAwesomeIcons.gamepad
-    'Fitness': 'dumbbell',         // FontAwesomeIcons.dumbbell
-    'Food': 'utensils',            // FontAwesomeIcons.utensils
-    'Friends': 'heart',            // Iconsax.heart
-    'Family': 'home',              // Iconsax.home
-    'Chores': 'task',              // Iconsax.task_square
-    'Projects': 'chart',           // Iconsax.chart
-    'Entertainment': 'video',       // Iconsax.video
+    'Sports': 'football', // FontAwesomeIcons.football
+    'Health': 'heart', // Iconsax.heart
+    'Work': 'briefcase', // Iconsax.briefcase
+    'Shopping': 'cart', // Iconsax.shopping_cart
+    'Groceries': 'shop', // Iconsax.shop
+    'Books': 'book', // Iconsax.book
+    'Travel': 'airplane', // Iconsax.airplane
+    'Education': 'graduation_cap', // FontAwesomeIcons.graduationCap
+    'Personal': 'home', // Iconsax.home
+    'Finance': 'wallet', // Iconsax.wallet
+    'Hobbies': 'gamepad', // FontAwesomeIcons.gamepad
+    'Fitness': 'dumbbell', // FontAwesomeIcons.dumbbell
+    'Food': 'utensils', // FontAwesomeIcons.utensils
+    'Friends': 'people', // Iconsax.heart
+    'Family': 'home', // Iconsax.home
+    'Chores': 'task', // Iconsax.task_square
+    'Projects': 'chart', // Iconsax.chart
+    'Entertainment': 'video', // Iconsax.video
   };
 
   static final Map<String, IconData> icons = {
@@ -136,7 +143,7 @@ class ListService {
     'cat': FontAwesomeIcons.cat,
     'dog': FontAwesomeIcons.dog,
     'fish': FontAwesomeIcons.fish,
-    'burger': FontAwesomeIcons.hamburger,
+    'burger': FontAwesomeIcons.burger,
     'pizza': FontAwesomeIcons.pizzaSlice,
     'ice_cream': FontAwesomeIcons.iceCream,
     'cookie': FontAwesomeIcons.cookie,
@@ -155,15 +162,24 @@ class ListService {
     'tools': FontAwesomeIcons.screwdriverWrench,
     'paint_roller': FontAwesomeIcons.paintRoller,
     'scissors': FontAwesomeIcons.scissors,
+    'people' : FontAwesomeIcons.handshake,
 
-    // Custom icons added as placeholders (use appropriate icon fonts if available):
-    'task': Iconsax.task_square, // Placeholder for 'task'
-    'graduation_cap': FontAwesomeIcons.graduationCap, // Education
-    'football': FontAwesomeIcons.football, // Sports
   };
 
-
   static IconData getIcon(String? code) {
-    return icons[code ?? 'folder'] ?? Iconsax.folder;
+    logger.d('Getting icon for code: $code'); // Debug log
+    if (code == null) {
+      logger.d('Code is null, returning folder icon');
+      return Iconsax.folder;
+    }
+
+    final icon = icons[code];
+    if (icon == null) {
+      logger.d('No icon found for code: $code, returning folder icon');
+      return Iconsax.folder;
+    }
+
+    logger.d('Found icon for code: $code');
+    return icon;
   }
 }

@@ -15,6 +15,7 @@ class ListViewModel extends ChangeNotifier {
   final generalList = ListModel(
     id: -1,  // Special ID for general list
     name: 'General',
+    iconCode: 'folder',
   );
 
   void _refreshLists() async {
@@ -24,7 +25,7 @@ class ListViewModel extends ChangeNotifier {
       lists.insert(0, generalList);
     }
     if(kDebugMode){
-      debugPrint('${lists.toString()}');
+      debugPrint(lists.toString());
     }
     notifyListeners();
   }

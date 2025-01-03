@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/list_service.dart';
@@ -155,7 +156,9 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                 const SizedBox(width: 12),
                               ],
                               Icon(
-                                ListService.getIcon(widget.task.list?.iconCode),
+                                widget.task.list?.iconCode != null
+                                    ? ListService.getIcon(widget.task.list!.iconCode)
+                                    : Iconsax.folder_2,
                                 size: 14,
                                 color: AppTheme.primary.withAlpha(160),
                               ),
