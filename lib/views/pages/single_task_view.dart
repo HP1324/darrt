@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/services/list_service.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
@@ -13,7 +14,6 @@ class TaskView extends StatelessWidget {
   final Task task;
   @override
   Widget build(BuildContext context) {
-
     task.printTask();
     return Scaffold(
       appBar: AppBar(title: Text('${task.title}')),
@@ -31,7 +31,7 @@ class TaskView extends StatelessWidget {
                 subtitle: '${task.title}',
               ),
               DetailItem(
-                icon: Icons.folder_outlined,
+                icon: ListService.getIcon(task.list!.iconCode),
                 title: 'List',
                 subtitle: task.list!.name ?? 'General (not added to a list)',
               ),

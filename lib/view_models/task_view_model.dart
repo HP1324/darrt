@@ -19,6 +19,7 @@ class TaskViewModel extends ChangeNotifier {
   Task currentTask = Task();
 
   set list(ListModel list) {
+    logger.i('current task list icon code: ${list.iconCode}');
     currentTask.list = list;
     notifyListeners();
   }
@@ -38,6 +39,7 @@ class TaskViewModel extends ChangeNotifier {
 
   bool isNewTaskAdded = false;
   Future<bool> addNewTask() async {
+    logger.t('Adding task list icon: ${currentTask.list!.iconCode}');
     if (currentTask.isValid()) {
       final id = await TaskService.addTask(currentTask);
       currentTask.id = id;

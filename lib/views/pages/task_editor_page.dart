@@ -55,11 +55,15 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
           title: widget.editMode
               ? Text(
                   widget.taskToEdit!.title!,
-                  style: TextStyle(fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
+                  style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.headlineSmall!.fontSize),
                 )
               : Text(
                   'New Task',
-                  style: TextStyle(fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
+                  style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.headlineSmall!.fontSize),
                 ),
         ),
         body: Padding(
@@ -179,10 +183,12 @@ class TaskTextField extends StatelessWidget {
                   isMaxLinesNull: true,
                   isAutoFocus: false,
                   fillColor: Colors.transparent,
-                  hintText:
-                      widget.editMode ? 'What needs changing?' : 'What\'s on your to-do list?',
+                  hintText: widget.editMode
+                      ? 'What needs changing?'
+                      : 'What\'s on your to-do list?',
                   onChanged: (_) {
-                    final tvm = Provider.of<TaskViewModel>(context, listen: false);
+                    final tvm =
+                        Provider.of<TaskViewModel>(context, listen: false);
                     tvm.title = titleController.text;
                   },
                 ),
@@ -233,7 +239,8 @@ class SetPriorityWidget extends StatelessWidget {
                           label: Text(pvm.priorities[index]),
                           selected: pvm.currentValue == index,
                           color: pvm.setChipColor(index),
-                          labelStyle: TextStyle(color: pvm.setLabelColor(index)),
+                          labelStyle:
+                              TextStyle(color: pvm.setLabelColor(index)),
                           checkmarkColor: Colors.white,
                           onSelected: (selected) {
                             pvm.updatePriority(selected, index);
@@ -284,7 +291,8 @@ class AddToListButton extends StatelessWidget {
                   ListTile(
                     onTap: () {
                       Navigator.of(context).push(PageTransition(
-                          child: NewListPage(), type: PageTransitionType.leftToRightWithFade));
+                          child: NewListPage(),
+                          type: PageTransitionType.leftToRightWithFade));
                     },
                     title: const Text(
                       'Create New List',
@@ -301,7 +309,8 @@ class AddToListButton extends StatelessWidget {
                       ),
                       child: const Icon(Icons.add, color: AppTheme.primary),
                     ),
-                    trailing: const Icon(Icons.list_alt, color: AppTheme.primary),
+                    trailing:
+                        const Icon(Icons.list_alt, color: AppTheme.primary),
                   ),
                   Expanded(
                     child: Consumer2<ListViewModel, TaskViewModel>(
@@ -336,8 +345,8 @@ class AddToListButton extends StatelessWidget {
                                   onChanged: (selected) {
                                     lvm.updateChosenList(selected!);
                                     tvm.list = lvm.chosenList!;
-                                    logger.d('chosen list: ${lvm.chosenList!.name}');
-                                    logger.d("Chosen list icon: ${lvm.chosenList!.iconCode}");
+                                    logger.d(
+                                        'chosen list: ${lvm.chosenList!.name}, icon: ${lvm.chosenList!.iconCode}');
                                   },
                                 ),
                               );
@@ -355,18 +364,28 @@ class AddToListButton extends StatelessWidget {
                         color: AppTheme.primary,
                         borderRadius: BorderRadius.circular(12),
                         onPressed: () {
-                          final cvm = Provider.of<ListViewModel>(context, listen: false);
-                          final tvm = Provider.of<TaskViewModel>(context, listen: false);
-                          tvm.list = cvm.chosenList!;
-                          debugPrint(
-                              'TVM list: ${tvm.currentTask.list!.name}, CVM list: ${cvm.chosenList!.name}');
+                          final cvm = Provider.of<ListViewModel>(context,
+                              listen: false);
+                          final tvm = Provider.of<TaskViewModel>(context,
+                              listen: false);
+                          if (cvm.chosenList != null) {
+                            logger.d("done pressed in list: ${cvm.chosenList!.iconCode}");
+                            tvm.list = cvm.chosenList!;
+                            logger.d(
+                                'Set task list: ${tvm.currentTask.list?.name}, icon: ${tvm.currentTask.list?.iconCode}');
+                          }
                           Navigator.of(context).pop();
                           showToast(title: 'Added to the list');
                         },
                         child: Text(
                           'Done',
                           style: TextStyle(
-                              fontSize: Theme.of(context).textTheme.labelLarge!.fontSize, color: Colors.white, fontWeight: FontWeight.bold),
+                              fontSize: Theme.of(context)
+                                  .textTheme
+                                  .labelLarge!
+                                  .fontSize,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -385,7 +404,7 @@ class AddToListButton extends StatelessWidget {
         ),
         child: Column(
           children: [
-             Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Icon(
@@ -394,7 +413,10 @@ class AddToListButton extends StatelessWidget {
                 ),
                 Text(
                   'Add to a list',
-                  style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize, color: AppTheme.primary),
+                  style: TextStyle(
+                      fontSize:
+                          Theme.of(context).textTheme.titleMedium!.fontSize,
+                      color: AppTheme.primary),
                 ),
                 Icon(
                   CupertinoIcons.chevron_right,
@@ -407,7 +429,8 @@ class AddToListButton extends StatelessWidget {
                   '${tvm.currentTask.list?.name ?? 'General'}');
               return Text(
                 tvm.currentTask.list?.name ?? 'General',
-                style: TextStyle(fontSize: Theme.of(context).textTheme.labelLarge!.fontSize),
+                style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.labelLarge!.fontSize),
               );
             }),
           ],
@@ -430,22 +453,27 @@ class DateTimePickerButton extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Consumer2<TaskViewModel, DuedateViewModel>(builder: (_, tvm, nvm, __) {
+          child: Consumer2<TaskViewModel, DuedateViewModel>(
+              builder: (_, tvm, nvm, __) {
             return InkWell(
               onTap: () {
                 showDatePicker(
                         context: context,
                         firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 18250)))
+                        lastDate:
+                            DateTime.now().add(const Duration(days: 18250)))
                     .then((selectedDate) {
                   if (selectedDate != null && mounted) {
-                    showTimePicker(context: context, initialTime: TimeOfDay.now())
+                    showTimePicker(
+                            context: context, initialTime: TimeOfDay.now())
                         .then((selectedTime) {
                       if (selectedTime != null) {
                         nvm.updateDateTime(selectedDate, selectedTime);
                         if (nvm.notifyAt != null) {
                           tvm.dueDate = nvm.notifyAt;
-                          showToast(title: 'Task scheduled!', alignment: Alignment.center);
+                          showToast(
+                              title: 'Task scheduled!',
+                              alignment: Alignment.center);
                         } else {
                           showToast(
                               title: 'Invalid date or time',
@@ -479,7 +507,12 @@ class DateTimePickerButton extends StatelessWidget {
                           ),
                           Text(
                             'Set due date',
-                            style: TextStyle(color: AppTheme.primary, fontSize: Theme.of(context).textTheme.titleMedium!.fontSize),
+                            style: TextStyle(
+                                color: AppTheme.primary,
+                                fontSize: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium!
+                                    .fontSize),
                           ),
                           Icon(
                             CupertinoIcons.chevron_right,
@@ -500,7 +533,8 @@ class DateTimePickerButton extends StatelessWidget {
         ),
         IconButton(
             onPressed: () {
-              final dateVM = Provider.of<DuedateViewModel>(context, listen: false);
+              final dateVM =
+                  Provider.of<DuedateViewModel>(context, listen: false);
               final taskVM = Provider.of<TaskViewModel>(context, listen: false);
               dateVM.removeDueDate();
               taskVM.removeDueDate();
@@ -527,8 +561,9 @@ class GotoNotificationSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration:
-          BoxDecoration(color: AppTheme.background100, borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+          color: AppTheme.background100,
+          borderRadius: BorderRadius.circular(10)),
       child: Consumer<TaskViewModel>(builder: (_, taskVM, __) {
         return ListTile(
             onTap: () {
@@ -536,7 +571,8 @@ class GotoNotificationSettings extends StatelessWidget {
                 Navigator.push(
                     context,
                     PageTransition(
-                        child: TaskNotificationSettingsPage(), type: PageTransitionType.fade));
+                        child: TaskNotificationSettingsPage(),
+                        type: PageTransitionType.fade));
                 taskVM.setNotifConfigInUI();
               } else {
                 showToast(
@@ -548,7 +584,8 @@ class GotoNotificationSettings extends StatelessWidget {
             },
             title: Text(
               'Notification Settings',
-              style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize),
+              style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.titleMedium!.fontSize),
             ),
             trailing: Icon(Icons.notifications));
       }),

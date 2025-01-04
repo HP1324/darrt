@@ -8,6 +8,7 @@ class Task {
     this.title,
     this.isDone = false,
     this.list,
+    this.listIconCode,
     DateTime? createdAt,
     this.dueDate,
     this.finishedAt,
@@ -21,6 +22,7 @@ class Task {
   int? id;
   String? title;
   ListModel? list;
+  String? listIconCode; // New field for list icon code
   bool? isDone;
   DateTime? createdAt;
   DateTime? dueDate;
@@ -36,6 +38,7 @@ class Task {
     String? title,
     bool? isDone,
     ListModel? list,
+    String? listIconCode,
     DateTime? createdAt,
     DateTime? dueDate,
     DateTime? finishedAt,
@@ -50,6 +53,7 @@ class Task {
         title: title ?? this.title,
         isDone: isDone ?? this.isDone,
         list: list ?? this.list,
+        listIconCode: listIconCode ?? this.listIconCode,
         createdAt: createdAt ?? this.createdAt,
         dueDate: dueDate ?? this.dueDate,
         finishedAt: finishedAt ?? this.finishedAt,
@@ -69,9 +73,11 @@ class Task {
            'isDone': $isDone,
            'list': {
              'listId' : ${list?.id},
-             'listName': ${list?.name}
+             'listName': ${list?.name},
+             'icon_code': ${list?.iconCode},
            } ,
-           'createdAt':$createdAt,
+           'listIconCode': $listIconCode,
+           'createdAt': $createdAt,
            'dueDate': $dueDate,
            'finishedAt': $finishedAt,
            'isNotifyEnabled': $isNotifyEnabled,
@@ -91,6 +97,7 @@ class Task {
         title == other.title &&
         isDone == other.isDone &&
         list == other.list &&
+        listIconCode == other.listIconCode &&
         createdAt == other.createdAt &&
         dueDate == other.dueDate &&
         finishedAt == other.finishedAt &&
@@ -107,6 +114,7 @@ class Task {
     title,
     isDone,
     list,
+    listIconCode,
     createdAt,
     dueDate,
     finishedAt,
@@ -133,15 +141,20 @@ class Task {
     'title': title,
     'list_id': list?.id,
     'list_name': list?.name,
-    'createdAt': createdAt != null ? createdAt!.toIso8601String() :DateTime.now().toIso8601String(),
-    'dueDate': dueDate!= null ?dueDate!.toIso8601String(): DateTime.now().toIso8601String(),
+    'list_icon_code': list?.iconCode,
+    'createdAt': createdAt != null
+        ? createdAt!.toIso8601String()
+        : DateTime.now().toIso8601String(),
+    'dueDate': dueDate != null
+        ? dueDate!.toIso8601String()
+        : DateTime.now().toIso8601String(),
     'finishedAt': finishedAt?.toIso8601String(),
     'isDone': isDone! ? 1 : 0,
     'isNotifyEnabled': isNotifyEnabled! ? 1 : 0,
     'notifyTime': notifyTime?.toIso8601String(),
     'notifType': notifType,
     'priority': priority,
-    'isRepeating' : isRepeating! ? 1 : 0,
+    'isRepeating': isRepeating! ? 1 : 0,
   };
 
   // Create a Task from JSON
@@ -153,11 +166,14 @@ class Task {
       list: ListModel(
         id: json['list_id'],
         name: json['list_name'],
-      ),
-      createdAt: DateTime.parse(json['createdAt']) ,
-      dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : null,
-      finishedAt:
-      json['finishedAt'] != null ? DateTime.parse(json['finishedAt']) : null,
+        iconCode: json['list_icon_code'],
+      ),// Parse listIconCode from JSON
+      createdAt: DateTime.parse(json['createdAt']),
+      dueDate:
+      json['dueDate'] != null ? DateTime.parse(json['dueDate']) : null,
+      finishedAt: json['finishedAt'] != null
+          ? DateTime.parse(json['finishedAt'])
+          : null,
       isNotifyEnabled: json['isNotifyEnabled'] == 1,
       notifyTime: json['notifyTime'] != null
           ? DateTime.parse(json['notifyTime'])

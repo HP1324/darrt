@@ -14,6 +14,7 @@ class DatabaseService {
         isDone INTEGER DEFAULT 0,
         list_id INTEGER DEFAULT 1,
         list_name TEXT,
+        list_icon_code TEXT,
         createdAt TEXT,
         dueDate TEXT,
         finishedAt TEXT,

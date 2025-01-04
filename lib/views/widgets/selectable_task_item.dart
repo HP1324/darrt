@@ -143,7 +143,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                 Icon(
                                   Icons.access_time_rounded,
                                   size: 14,
-                                  color: isUrgent ? Colors.red.shade400 : AppTheme.primary.withOpacity(0.6),
+                                  color: isUrgent ? Colors.red.shade400 : AppTheme.primary.withAlpha(170),
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
