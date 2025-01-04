@@ -9,13 +9,18 @@ import 'package:toastification/toastification.dart';
 import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/views/widgets/icon_picker_dialog.dart';
 
+//ignore: must_be_immutable
 class NewListPage extends StatelessWidget {
   NewListPage({super.key, this.editMode, this.listToEdit});
   final textController = TextEditingController();
-  bool? editMode = false;
+  bool? editMode;
   ListModel? listToEdit;
   @override
   Widget build(BuildContext context) {
+    final lvm = Provider.of<ListViewModel>(context, listen: false);
+    if (editMode!) {
+      lvm.currentList = listToEdit!;
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -27,8 +32,7 @@ class NewListPage extends StatelessWidget {
             children: [
               AppBar(
                 leading: IconButton(
-                  icon: Icon(Icons.arrow_back_ios_new,
-                      color: AppTheme.background50),
+                  icon: Icon(Icons.arrow_back_ios_new, color: AppTheme.background50),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 title: Text(
@@ -102,7 +106,7 @@ class NewListPage extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(15),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.grey.withOpacity(0.1),
+                                      color: Colors.grey.withAlpha(50),
                                       spreadRadius: 1,
                                       blurRadius: 10,
                                       offset: const Offset(0, 1),
@@ -118,6 +122,9 @@ class NewListPage extends StatelessWidget {
                                     horizontal: 20,
                                     vertical: 15,
                                   ),
+                                  onChanged: (value){
+                                    lvm.name = textController.text;
+                                  },
                                 ),
                               ),
                             ),
@@ -140,26 +147,22 @@ class NewListPage extends StatelessWidget {
                                   return ListTile(
                                     onTap: () async {
                                       FocusScope.of(context).unfocus();
-                                      await Future.delayed(
-                                          const Duration(milliseconds: 100));
+                                      await Future.delayed(const Duration(milliseconds: 100));
                                       if (context.mounted) {
                                         showDialog(
                                           context: context,
-                                          builder: (_) =>
-                                              const IconPickerDialog(),
+                                          builder: (_) => const IconPickerDialog(),
                                         );
                                       }
                                     },
                                     leading: Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color:
-                                            AppTheme.primary.withOpacity(0.1),
+                                        color: AppTheme.primary.withOpacity(0.1),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Icon(
-                                        ListService.getIcon(
-                                            listVM.selectedIcon),
+                                        ListService.getIcon(listVM.selectedIcon),
                                         color: AppTheme.primary,
                                       ),
                                     ),
@@ -184,44 +187,21 @@ class NewListPage extends StatelessWidget {
                               child: Material(
                                 color: Colors.transparent,
                                 child: InkWell(
-                                  onTap: () {
-                                    if (textController.text.trim().isEmpty) {
-                                      showToast(
-                                        title: 'Please enter a list name',
-                                        type: ToastificationType.error,
-                                      );
-                                      return;
-                                    }
-                                    ListModel cm = ListModel(
-                                        name: textController.text.trim());
-                                    final cvm = Provider.of<ListViewModel>(
-                                        context,
-                                        listen: false);
-                                    final navigator = Navigator.of(context);
-                                    cvm.addNewList(cm).then((success) {
+                                  onTap: () async {
+                                    final nav = Navigator.of(context);
+                                    if (!editMode!) {
+                                      final success = await lvm.addNewList();
                                       if (success) {
-                                        showToast(title: 'New List Added');
-                                        Future.delayed(
-                                            const Duration(milliseconds: 500),
-                                            () {
-                                          navigator.pop();
-                                          cvm.selectedList = cm;
-                                          cvm.listScrollController.animateTo(
-                                            cvm.listScrollController.position
-                                                .maxScrollExtent,
-                                            duration: const Duration(
-                                                milliseconds: 400),
-                                            curve: Curves.easeInOut,
-                                          );
-                                        });
+                                        showToast(title: 'List added');
+                                        nav.pop();
                                       }
-                                    }).catchError((error) {
-                                      showToast(
-                                        title: 'List already exists',
-                                        bgColor: Colors.red,
-                                        fgColor: Colors.white,
-                                      );
-                                    });
+                                    } else {
+                                      final edited = await lvm.editList();
+                                      if (edited) {
+                                        showToast(title: 'List edited');
+                                        nav.pop();
+                                      }
+                                    }
                                   },
                                   child: Container(
                                     margin: const EdgeInsets.only(bottom: 20),
@@ -229,10 +209,7 @@ class NewListPage extends StatelessWidget {
                                     height: 55,
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
-                                        colors: [
-                                          AppTheme.primary,
-                                          AppTheme.secondary
-                                        ],
+                                        colors: [AppTheme.primary, AppTheme.secondary],
                                       ),
                                       borderRadius: BorderRadius.circular(15),
                                     ),

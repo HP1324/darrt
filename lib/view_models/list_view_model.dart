@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
+import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 
@@ -17,7 +18,9 @@ class ListViewModel extends ChangeNotifier {
     name: 'General',
     iconCode: 'folder',
   );
-  ListModel? currentList = ListModel();
+  ListModel? currentList = ListModel(iconCode: 'folder');
+  set name(String name) => currentList!.name = name;
+  set iconCode(String iconCode) => currentList!.iconCode = iconCode;
   String? selectedIcon = 'folder'; // Default icon
 
   void _refreshLists() async {
@@ -32,15 +35,15 @@ class ListViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> addNewList(ListModel list) async {
-    if (list.isValid()) {
-      // Set the selected icon before adding
-      list.iconCode = selectedIcon;
-      final id = await ListService.addList(list);
-      _refreshLists();
+  Future<bool> addNewList() async {
+    //TODO: fix new list not showing in the lists page
+    logger.d('AddNewList() called');
+    if (currentList!.isValid()) {
+    logger.d('currentList is valid');
+      final id = await ListService.addList(currentList!);
       // Reset selected icon after adding
       selectedIcon = 'folder';
-      notifyListeners();
+      _refreshLists();
       return true;
     }
     return false;
@@ -62,13 +65,10 @@ class ListViewModel extends ChangeNotifier {
     return false;
   }
 
-  Future<bool> editList(ListModel list, String newName) async {
-    if (newName.trim().isEmpty) return false;
-
-    list.name = newName.trim();
-    int rowsAffected = await ListService.editList(list);
-    if (rowsAffected > 0) {
-      _refreshLists();
+  Future<bool> editList() async {
+    final changes = await ListService.editList(currentList!);
+    if(changes > 0) {
+      notifyListeners();
       return true;
     }
     return false;
@@ -87,6 +87,7 @@ class ListViewModel extends ChangeNotifier {
 
   void updateSelectedIcon(String iconCode) {
     selectedIcon = iconCode;
+    currentList!.iconCode = iconCode;
     notifyListeners();
   }
 

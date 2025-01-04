@@ -22,7 +22,12 @@ class ListService {
 
   static Future<int> addList(ListModel list) async {
     final database = await DatabaseService.openDb();
-    final id = database.insert('lists', list.toJson());
+    int id = 0;
+    try {
+      id = await database.insert('lists', list.toJson());
+    }catch (e){
+      logger.e('an Exception or Error is thrown when adding list to database ${e.toString()}');
+    }
     return id;
   }
 
@@ -56,12 +61,17 @@ class ListService {
 
   static Future<int> editList(ListModel list) async {
     final database = await DatabaseService.openDb();
-    int rowsAffected = await database.update(
-      'lists',
-      list.toJson(),
-      where: 'id = ?',
-      whereArgs: [list.id],
-    );
+    int rowsAffected = 0;
+    try {
+      rowsAffected = await database.update(
+        'lists',
+        list.toJson(),
+        where: 'id = ?',
+        whereArgs: [list.id],
+      );
+    }catch  (e){
+      logger.e('an Exception or Error is thrown when editing a list in database ${e.toString()}');
+    }
     return rowsAffected;
   }
 
@@ -214,7 +224,7 @@ class ListService {
   };
 
   static IconData getIcon(String? code) {
-    logger.d('Getting icon for code: $code');
+    // logger.d('Getting icon for code: $code');
     if (code == null) {
       logger.d('Code is null, returning folder icon');
       return Iconsax.folder;
@@ -222,11 +232,11 @@ class ListService {
 
     final icon = icons[code];
     if (icon == null) {
-      logger.d('No icon found for code: $code, returning folder icon');
+      // logger.d('No icon found for code: $code, returning folder icon');
       return Iconsax.folder;
     }
 
-    logger.d('Found icon for code: $code');
+    // logger.d('Found icon for code: $code');
     return icon;
   }
 }

@@ -187,8 +187,7 @@ class TaskTextField extends StatelessWidget {
                       ? 'What needs changing?'
                       : 'What\'s on your to-do list?',
                   onChanged: (_) {
-                    final tvm =
-                        Provider.of<TaskViewModel>(context, listen: false);
+                    final tvm =Provider.of<TaskViewModel>(context, listen: false);
                     tvm.title = titleController.text;
                   },
                 ),
@@ -291,7 +290,7 @@ class AddToListButton extends StatelessWidget {
                   ListTile(
                     onTap: () {
                       Navigator.of(context).push(PageTransition(
-                          child: NewListPage(),
+                          child: NewListPage(editMode: false,),
                           type: PageTransitionType.leftToRightWithFade));
                     },
                     title: const Text(
