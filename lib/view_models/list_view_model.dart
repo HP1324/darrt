@@ -17,7 +17,7 @@ class ListViewModel extends ChangeNotifier {
     name: 'General',
     iconCode: 'folder',
   );
-
+  ListModel? currentList = ListModel();
   String? selectedIcon = 'folder'; // Default icon
 
   void _refreshLists() async {
@@ -74,14 +74,14 @@ class ListViewModel extends ChangeNotifier {
     return false;
   }
 
-  ListModel? chosenList;
+  ListModel? selectedList;
   void updateChosenList(ListModel selected) {
-    chosenList = selected;
+    selectedList = selected;
     //Not calling notify listeners here, because called it in TaskViewModel where the currentTask's list is selected, because of state reaction problems.
   }
 
   void resetList() {
-    chosenList = null;
+    selectedList = null;
     notifyListeners();
   }
 

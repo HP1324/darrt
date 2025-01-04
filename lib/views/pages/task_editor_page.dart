@@ -326,27 +326,27 @@ class AddToListButton extends StatelessWidget {
                             itemBuilder: (_, index) {
                               return Card(
                                 elevation: 0,
-                                color: lvm.chosenList == items[index]
+                                color: lvm.selectedList == items[index]
                                     ? AppTheme.background100
                                     : Colors.transparent,
                                 margin: const EdgeInsets.symmetric(vertical: 4),
                                 child: RadioListTile<ListModel>(
                                   activeColor: AppTheme.primary,
                                   value: items[index],
-                                  groupValue: lvm.chosenList,
+                                  groupValue: lvm.selectedList,
                                   title: Text(
                                     items[index].name!,
                                     style: TextStyle(
-                                      fontWeight: lvm.chosenList == items[index]
+                                      fontWeight: lvm.selectedList == items[index]
                                           ? FontWeight.bold
                                           : FontWeight.normal,
                                     ),
                                   ),
                                   onChanged: (selected) {
                                     lvm.updateChosenList(selected!);
-                                    tvm.list = lvm.chosenList!;
+                                    tvm.list = lvm.selectedList!;
                                     logger.d(
-                                        'chosen list: ${lvm.chosenList!.name}, icon: ${lvm.chosenList!.iconCode}');
+                                        'chosen list: ${lvm.selectedList!.name}, icon: ${lvm.selectedList!.iconCode}');
                                   },
                                 ),
                               );
@@ -368,9 +368,9 @@ class AddToListButton extends StatelessWidget {
                               listen: false);
                           final tvm = Provider.of<TaskViewModel>(context,
                               listen: false);
-                          if (cvm.chosenList != null) {
-                            logger.d("done pressed in list: ${cvm.chosenList!.iconCode}");
-                            tvm.list = cvm.chosenList!;
+                          if (cvm.selectedList != null) {
+                            logger.d("done pressed in list: ${cvm.selectedList!.iconCode}");
+                            tvm.list = cvm.selectedList!;
                             logger.d(
                                 'Set task list: ${tvm.currentTask.list?.name}, icon: ${tvm.currentTask.list?.iconCode}');
                           }

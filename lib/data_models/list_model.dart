@@ -21,7 +21,7 @@ class ListModel {
       );
 
   bool isValid() {
-    return name!.trim().isNotEmpty && name!.toLowerCase() != 'general';
+    return name != null &&  name!.trim().isNotEmpty && name!.toLowerCase() != 'general';
   }
 
   @override

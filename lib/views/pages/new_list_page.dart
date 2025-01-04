@@ -10,9 +10,10 @@ import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/views/widgets/icon_picker_dialog.dart';
 
 class NewListPage extends StatelessWidget {
-  NewListPage({super.key});
+  NewListPage({super.key, this.editMode, this.listToEdit});
   final textController = TextEditingController();
-
+  bool? editMode = false;
+  ListModel? listToEdit;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -204,7 +205,7 @@ class NewListPage extends StatelessWidget {
                                             const Duration(milliseconds: 500),
                                             () {
                                           navigator.pop();
-                                          cvm.chosenList = cm;
+                                          cvm.selectedList = cm;
                                           cvm.listScrollController.animateTo(
                                             cvm.listScrollController.position
                                                 .maxScrollExtent,
