@@ -42,12 +42,13 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
     tvm.currentTask = Task();
     if (widget.editMode) tvm.currentTask = widget.taskToEdit!;
     return PopScope(
-      onPopInvokedWithResult: (_, __) {
-        final cvmodel = Provider.of<ListViewModel>(context, listen: false);
-        final pvmodel = Provider.of<PriorityViewModel>(context, listen: false);
-        cvmodel.resetList();
-        pvmodel.resetPriority();
-        tvm.resetSelectedMinutes();
+      onPopInvokedWithResult: (_,__)async{
+        if(widget.editMode){
+          final changes = await tvm.editTask();
+          if(changes > 0){
+            showToast(title: 'Task Edited');
+          }
+        }
       },
       child: Scaffold(
         backgroundColor: AppTheme.background50,
