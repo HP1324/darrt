@@ -1,6 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/services/list_service.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/services/notification_service.dart';
@@ -42,10 +43,10 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
     tvm.currentTask = Task();
     if (widget.editMode) tvm.currentTask = widget.taskToEdit!;
     return PopScope(
-      onPopInvokedWithResult: (_,__)async{
-        if(widget.editMode){
+      onPopInvokedWithResult: (_, __) async {
+        if (widget.editMode) {
           final changes = await tvm.editTask();
-          if(changes > 0){
+          if (changes > 0) {
             showToast(title: 'Task Edited');
           }
         }
@@ -188,7 +189,8 @@ class TaskTextField extends StatelessWidget {
                       ? 'What needs changing?'
                       : 'What\'s on your to-do list?',
                   onChanged: (_) {
-                    final tvm =Provider.of<TaskViewModel>(context, listen: false);
+                    final tvm =
+                        Provider.of<TaskViewModel>(context, listen: false);
                     tvm.title = titleController.text;
                   },
                 ),
@@ -291,7 +293,9 @@ class AddToListButton extends StatelessWidget {
                   ListTile(
                     onTap: () {
                       Navigator.of(context).push(PageTransition(
-                          child: NewListPage(editMode: false,),
+                          child: NewListPage(
+                            editMode: false,
+                          ),
                           type: PageTransitionType.leftToRightWithFade));
                     },
                     title: const Text(
@@ -326,26 +330,59 @@ class AddToListButton extends StatelessWidget {
                             itemBuilder: (_, index) {
                               return Card(
                                 elevation: 0,
-                                color: lvm.selectedList == items[index]
+                                color: (tvm.currentTask.list ?? items[0]) ==
+                                        items[index]
                                     ? AppTheme.background100
                                     : Colors.transparent,
                                 margin: const EdgeInsets.symmetric(vertical: 4),
                                 child: RadioListTile(
-                                  activeColor: AppTheme.primary,
+                                  activeColor: items[index].listColor != null
+                                      ? ListService.getColorFromString(
+                                          items[index].listColor!)
+                                      : AppTheme.primary,
                                   value: items[index],
                                   groupValue: tvm.currentTask.list ?? items[0],
-                                  title: Text(
-                                    items[index].name!,
-                                    style: TextStyle(
-                                      fontWeight: lvm.selectedList == items[index]
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                    ),
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: items[index].listColor != null
+                                              ? ListService.getColorFromString(
+                                                      items[index].listColor!)
+                                                  .withAlpha(50)
+                                              : AppTheme.primary.withAlpha(50),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: Icon(
+                                          ListService.getIcon(
+                                              items[index].iconCode),
+                                          color: items[index].listColor != null
+                                              ? ListService.getColorFromString(
+                                                  items[index].listColor!)
+                                              : AppTheme.primary,
+                                          size: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        items[index].name!,
+                                        style: TextStyle(
+                                          fontWeight: (tvm.currentTask.list ??
+                                                      items[0]) ==
+                                                  items[index]
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   onChanged: (selected) {
                                     lvm.updateChosenList(selected!);
-                                    tvm.list = lvm.selectedList!;
-                                    logger.d('chosen list: ${lvm.selectedList!.name}, icon: ${lvm.selectedList!.iconCode}');
+                                    tvm.list = selected;
+                                    logger.d(
+                                        'chosen list: ${selected.name}, icon: ${selected.iconCode}');
                                   },
                                 ),
                               );
@@ -363,16 +400,6 @@ class AddToListButton extends StatelessWidget {
                         color: AppTheme.primary,
                         borderRadius: BorderRadius.circular(12),
                         onPressed: () {
-                          final cvm = Provider.of<ListViewModel>(context,
-                              listen: false);
-                          final tvm = Provider.of<TaskViewModel>(context,
-                              listen: false);
-                          if (cvm.selectedList != null) {
-                            logger.d("done pressed in list: ${cvm.selectedList!.iconCode}");
-                            tvm.list = cvm.selectedList!;
-                            logger.d(
-                                'Set task list: ${tvm.currentTask.list?.name}, icon: ${tvm.currentTask.list?.iconCode}');
-                          }
                           Navigator.of(context).pop();
                           showToast(title: 'Added to the list');
                         },
