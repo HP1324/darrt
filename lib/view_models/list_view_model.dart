@@ -14,9 +14,9 @@ class ListViewModel extends ChangeNotifier {
   ListModel? currentList = ListModel(iconCode: 'folder');
   set name(String name) => currentList!.name = name;
   set iconCode(String iconCode) => currentList!.iconCode = iconCode;
-
+  set listColor(String listColor) => currentList!.listColor  = listColor;
   String? selectedIcon = 'folder'; // Default icon
-
+  String? selectedColor;
   void _refreshLists() async {
     lists = await ListService.getLists();
 
@@ -81,6 +81,12 @@ class ListViewModel extends ChangeNotifier {
 
   void resetIconSelection() {
     selectedIcon = 'folder';
+    notifyListeners();
+  }
+
+  void updateSelectedColor(String listColor){
+    selectedColor = listColor;
+    currentList!.listColor = listColor;
     notifyListeners();
   }
 }

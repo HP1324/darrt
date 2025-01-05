@@ -4,6 +4,7 @@ import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/views/helper_widgets/custom_text_field.dart';
+import 'package:minimaltodo/views/widgets/color_picker_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/views/widgets/icon_picker_dialog.dart';
@@ -31,7 +32,8 @@ class NewListPage extends StatelessWidget {
             children: [
               AppBar(
                 leading: IconButton(
-                  icon: Icon(Icons.arrow_back_ios_new, color: AppTheme.background50),
+                  icon: Icon(Icons.arrow_back_ios_new,
+                      color: AppTheme.background50),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 title: Text(
@@ -134,7 +136,7 @@ class NewListPage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(15),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.grey.withOpacity(0.1),
+                                    color: Colors.grey.withAlpha(50),
                                     spreadRadius: 1,
                                     blurRadius: 10,
                                     offset: const Offset(0, 1),
@@ -146,27 +148,94 @@ class NewListPage extends StatelessWidget {
                                   return ListTile(
                                     onTap: () async {
                                       FocusScope.of(context).unfocus();
-                                      await Future.delayed(const Duration(milliseconds: 100));
+                                      await Future.delayed(
+                                          const Duration(milliseconds: 100));
                                       if (context.mounted) {
                                         showDialog(
                                           context: context,
-                                          builder: (_) => const IconPickerDialog(),
+                                          builder: (_) =>
+                                              const IconPickerDialog(),
                                         );
                                       }
                                     },
                                     leading: Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: AppTheme.primary.withOpacity(0.1),
+                                        color:
+                                            AppTheme.primary.withOpacity(0.1),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Icon(
-                                        ListService.getIcon(listVM.selectedIcon),
+                                        ListService.getIcon(
+                                            listVM.selectedIcon),
                                         color: AppTheme.primary,
                                       ),
                                     ),
                                     title: const Text(
                                       'Choose Icon',
+                                      style: TextStyle(
+                                        color: AppTheme.primary,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    trailing: const Icon(
+                                      Icons.chevron_right,
+                                      color: AppTheme.primary,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withAlpha(50),
+                                    spreadRadius: 1,
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              child: Consumer<ListViewModel>(
+                                builder: (context, listVM, _) {
+                                  return ListTile(
+                                    onTap: () async {
+                                      FocusScope.of(context).unfocus();
+                                      await Future.delayed(
+                                          const Duration(milliseconds: 100));
+                                      if (context.mounted) {
+                                        showDialog(
+                                          context: context,
+                                          builder: (_) =>
+                                              const ColorPickerDialog(),
+                                        );
+                                      }
+                                    },
+                                    leading: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: listVM.selectedColor != null
+                                            ? ListService.listColors[
+                                                    listVM.selectedColor]!
+                                                .withAlpha(50)
+                                            : AppTheme.primary.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Icon(
+                                        Icons.color_lens,
+                                        color: listVM.selectedColor != null
+                                            ? ListService.listColors[
+                                                listVM.selectedColor]
+                                            : AppTheme.primary,
+                                      ),
+                                    ),
+                                    title: const Text(
+                                      'Choose Color',
                                       style: TextStyle(
                                         color: AppTheme.primary,
                                         fontWeight: FontWeight.w500,
@@ -190,11 +259,16 @@ class NewListPage extends StatelessWidget {
                                     final nav = Navigator.of(context);
                                     if (!editMode!) {
                                       final success = await lvm.addNewList();
-                                      final scrollController = lvm.listScrollController;
+                                      final scrollController =
+                                          lvm.listScrollController;
                                       if (success) {
                                         showToast(title: 'List added');
-                                        scrollController
-                                            .animateTo(scrollController.position.maxScrollExtent,duration: Duration(milliseconds: 500),curve: Curves.easeOut);
+                                        scrollController.animateTo(
+                                            scrollController
+                                                .position.maxScrollExtent,
+                                            duration:
+                                                Duration(milliseconds: 500),
+                                            curve: Curves.easeOut);
                                         nav.pop();
                                       }
                                     } else {
@@ -211,13 +285,16 @@ class NewListPage extends StatelessWidget {
                                     height: 55,
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
-                                        colors: [AppTheme.primary, AppTheme.secondary],
+                                        colors: [
+                                          AppTheme.primary,
+                                          AppTheme.secondary
+                                        ],
                                       ),
                                       borderRadius: BorderRadius.circular(15),
                                     ),
-                                    child:  Center(
+                                    child: Center(
                                       child: Text(
-                                        editMode! ? 'Edit List' :'Create List',
+                                        editMode! ? 'Edit List' : 'Create List',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 18,

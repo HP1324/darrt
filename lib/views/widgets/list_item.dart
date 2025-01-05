@@ -20,9 +20,12 @@ class ListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Consumer2<TaskViewModel,ListViewModel>(builder: (context, taskVM,listVM, _) {
-      final tasksInList = taskVM.tasks.where((task) => task.list?.id == list.id).toList();
-      final completedTasks = tasksInList.where((task) => task.isDone == true).length;
+    return Consumer2<TaskViewModel, ListViewModel>(
+        builder: (context, taskVM, listVM, _) {
+      final tasksInList =
+          taskVM.tasks.where((task) => task.list?.id == list.id).toList();
+      final completedTasks =
+          tasksInList.where((task) => task.isDone == true).length;
 
       return Container(
         decoration: BoxDecoration(
@@ -35,8 +38,11 @@ class ListItem extends StatelessWidget {
         ),
         child: InkWell(
           onTap: () {
-            Navigator.push(context,
-                PageTransition(type: PageTransitionType.fade, child: TasksForListPage(list: list)));
+            Navigator.push(
+                context,
+                PageTransition(
+                    type: PageTransitionType.fade,
+                    child: TasksForListPage(list: list)));
           },
           borderRadius: BorderRadius.circular(12),
           child: Container(
@@ -51,12 +57,16 @@ class ListItem extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppTheme.primary.withAlpha(50),
+                        color: list.listColor != null
+                            ? ListService.getColorFromString(list.listColor).withAlpha(50)
+                            : AppTheme.primary.withAlpha(50),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         ListService.getIcon(list.iconCode),
-                        color: AppTheme.primary,
+                        color: list.listColor != null
+                            ? ListService.getColorFromString(list.listColor)
+                            : AppTheme.primary,
                       ),
                     ),
                     // PopupMenuButton for actions
@@ -64,7 +74,8 @@ class ListItem extends StatelessWidget {
                       PopupMenuButton(
                         icon: Icon(
                           Icons.more_vert,
-                          color: AppTheme.primary.withAlpha(200),
+                          color: list.listColor != null
+                              ? ListService.getColorFromString(list.listColor) :AppTheme.primary,
                           size: 20,
                         ),
                         shape: RoundedRectangleBorder(
@@ -105,21 +116,26 @@ class ListItem extends StatelessWidget {
                                         'Are you sure you want to delete the list? All tasks in this list will be moved to General list'),
                                     actions: [
                                       InkWell(
-                                        onTap: () => Navigator.of(context).pop(),
-                                        child:  Text('Cancel'),
+                                        onTap: () =>
+                                            Navigator.of(context).pop(),
+                                        child: Text('Cancel'),
                                       ),
                                       const SizedBox(width: 5),
-                                      FilledButton(onPressed: ()async{
-                                        final nav = Navigator.of(context);
-                                        final deleted =await listVM.deleteList(list, taskVM);
-                                        if(deleted){
-                                          showToast(title: 'List Deleted');
-                                          nav.pop();
-                                        }
-                                      }, child: Text('Delete'))
+                                      FilledButton(
+                                          onPressed: () async {
+                                            final nav = Navigator.of(context);
+                                            final deleted = await listVM
+                                                .deleteList(list, taskVM);
+                                            if (deleted) {
+                                              showToast(title: 'List Deleted');
+                                              nav.pop();
+                                            }
+                                          },
+                                          child: Text('Delete'))
                                     ],
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10)),
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
                                   );
                                 },
                               );
@@ -171,6 +187,8 @@ class ListItem extends StatelessWidget {
                     value: completedTasks / tasksInList.length,
                     backgroundColor: AppTheme.background100,
                     valueColor: AlwaysStoppedAnimation(
+                      list.listColor != null
+                          ? ListService.getColorFromString(list.listColor) :
                       AppTheme.primary,
                     ),
                     borderRadius: BorderRadius.circular(2),

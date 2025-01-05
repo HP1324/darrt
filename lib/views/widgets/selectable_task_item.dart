@@ -160,7 +160,8 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                     ? ListService.getIcon(widget.task.list!.iconCode)
                                     : Iconsax.folder_2,
                                 size: 14,
-                                color: AppTheme.primary.withAlpha(160),
+                                color: widget.task.list?.listColor != null
+                                    ? ListService.getColorFromString(widget.task.list?.listColor) :AppTheme.primary.withAlpha(160),
                               ),
                               const SizedBox(width: 4),
                               Expanded(

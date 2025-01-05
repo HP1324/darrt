@@ -8,7 +8,6 @@ class Task {
     this.title,
     this.isDone = false,
     this.list,
-    this.listIconCode,
     DateTime? createdAt,
     this.dueDate,
     this.finishedAt,
@@ -22,7 +21,6 @@ class Task {
   int? id;
   String? title;
   ListModel? list;
-  String? listIconCode; // New field for list icon code
   bool? isDone;
   DateTime? createdAt;
   DateTime? dueDate;
@@ -53,7 +51,6 @@ class Task {
         title: title ?? this.title,
         isDone: isDone ?? this.isDone,
         list: list ?? this.list,
-        listIconCode: listIconCode ?? this.listIconCode,
         createdAt: createdAt ?? this.createdAt,
         dueDate: dueDate ?? this.dueDate,
         finishedAt: finishedAt ?? this.finishedAt,
@@ -76,7 +73,6 @@ class Task {
              'listName': ${list?.name},
              'icon_code': ${list?.iconCode},
            } ,
-           'listIconCode': $listIconCode,
            'createdAt': $createdAt,
            'dueDate': $dueDate,
            'finishedAt': $finishedAt,
@@ -97,7 +93,6 @@ class Task {
         title == other.title &&
         isDone == other.isDone &&
         list == other.list &&
-        listIconCode == other.listIconCode &&
         createdAt == other.createdAt &&
         dueDate == other.dueDate &&
         finishedAt == other.finishedAt &&
@@ -114,7 +109,6 @@ class Task {
     title,
     isDone,
     list,
-    listIconCode,
     createdAt,
     dueDate,
     finishedAt,
@@ -142,6 +136,7 @@ class Task {
     'list_id': list?.id,
     'list_name': list?.name,
     'list_icon_code': list?.iconCode,
+    'list_color' : list?.listColor,
     'createdAt': createdAt != null
         ? createdAt!.toIso8601String()
         : DateTime.now().toIso8601String(),
@@ -167,6 +162,7 @@ class Task {
         id: json['list_id'],
         name: json['list_name'],
         iconCode: json['list_icon_code'],
+        listColor: json['list_color'],
       ),// Parse listIconCode from JSON
       createdAt: DateTime.parse(json['createdAt']),
       dueDate:

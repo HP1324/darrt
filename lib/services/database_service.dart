@@ -5,7 +5,8 @@ class DatabaseService {
   static const createListsTable = """ CREATE TABLE lists(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
-      icon_code TEXT DEFAULT 'folder'
+      icon_code TEXT DEFAULT 'folder',
+      list_color TEXT
       )
      """;
   static const createTasksTable = """CREATE TABLE tasks (
@@ -15,6 +16,7 @@ class DatabaseService {
         list_id INTEGER DEFAULT 1,
         list_name TEXT,
         list_icon_code TEXT,
+        list_color TEXT,
         createdAt TEXT,
         dueDate TEXT,
         finishedAt TEXT,
@@ -37,7 +39,8 @@ class DatabaseService {
         low_tasks INTEGER NOT NULL
       )
     """;
-  static const createDefaultLists ="""INSERT INTO lists (name, icon_code) VALUES
+  static const createDefaultLists =
+      """INSERT INTO lists (name, icon_code) VALUES
   ('General','folder'),
 ('Sports', 'football'),
 ('Health', 'heart'),

@@ -308,6 +308,39 @@ class ListService {
     'bucket': FontAwesomeIcons.bucket,
   };
 
+  static const Map<String, Color> listColors = {
+    'primary' : Color(0xFF6B4EFF),
+    'red': Color(0xFFE57373),
+    'pink': Color(0xFFF06292),
+    'purple': Color(0xFFBA68C8),
+    'deepPurple': Color(0xFF9575CD),
+    'indigo': Color(0xFF7986CB),
+    'blue': Color(0xFF64B5F6),
+    'lightBlue': Color(0xFF4FC3F7),
+    'cyan': Color(0xFF4DD0E1),
+    'teal': Color(0xFF4DB6AC),
+    'green': Color(0xFF81C784),
+    'lightGreen': Color(0xFFAED581),
+    'orange': Color(0xFFFFB74D),
+    'deepOrange': Color(0xFFFF8A65),
+    'brown': Color(0xFFA1887F),
+    'blueGrey': Color(0xFF90A4AE),
+  };
+
+  static Color getColorFromString(String? colorKey) {
+    if (colorKey == null) return Colors.grey;
+    return listColors[colorKey] ?? Colors.grey;
+  }
+
+  static String? getStringFromColor(Color color) {
+    return listColors.entries
+        .firstWhere(
+          (element) => element.value == color,
+          orElse: () => const MapEntry('grey', Colors.grey),
+        )
+        .key;
+  }
+
   static IconData getIcon(String? code) {
     // logger.d('Getting icon for code: $code');
     if (code == null) {
