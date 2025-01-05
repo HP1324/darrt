@@ -14,6 +14,7 @@ class ListViewModel extends ChangeNotifier {
   ListModel? currentList = ListModel(iconCode: 'folder');
   set name(String name) => currentList!.name = name;
   set iconCode(String iconCode) => currentList!.iconCode = iconCode;
+
   String? selectedIcon = 'folder'; // Default icon
 
   void _refreshLists() async {

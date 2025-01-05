@@ -215,9 +215,9 @@ class NewListPage extends StatelessWidget {
                                       ),
                                       borderRadius: BorderRadius.circular(15),
                                     ),
-                                    child: const Center(
+                                    child:  Center(
                                       child: Text(
-                                        'Create List',
+                                        editMode! ? 'Edit List' :'Create List',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 18,
