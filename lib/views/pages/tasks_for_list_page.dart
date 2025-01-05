@@ -134,13 +134,7 @@ class _TasksForListPageState extends State<TasksForListPage> {
       ),
       body: Consumer<TaskViewModel>(
         builder: (context, taskVM, _) {
-          final tasksInList = widget.list.id == -1
-              ? taskVM.tasks.where((task) => 
-                  task.list == null ||
-                  task.list?.id == null ||
-                  task.list?.name == null
-                ).toList()
-              : taskVM.tasks
+          final tasksInList =  taskVM.tasks
                   .where((task) => task.list?.id == widget.list.id)
                   .toList();
 

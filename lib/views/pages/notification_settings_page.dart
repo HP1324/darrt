@@ -151,26 +151,4 @@ class _TimeOption extends StatelessWidget {
   }
 }
 
-// TextButton(
-// onPressed: () {
-// AwesomeNotifications().requestPermissionToSendNotifications();
-// AwesomeNotifications().createNotification(
-// content: NotificationContent(
-// id: 1,
-// channelKey: 'task_notif',
-// title: 'Test notification',
-// body: 'This is test notification body',
-// actionType: ActionType.Default,
-// notificationLayout: NotificationLayout.Default,
-// category: NotificationCategory.Reminder,
-// wakeUpScreen: true,
-// ),
-// schedule: NotificationCalendar.fromDate(
-// date: DateTime.now().add(Duration(minutes: 2)),
-// allowWhileIdle: true,
-// preciseAlarm: true,
-// repeats: true,
-// ),
-// );
-// },
-// child: Text('Test notification')),
+

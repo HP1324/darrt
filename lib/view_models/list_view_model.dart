@@ -11,13 +11,6 @@ class ListViewModel extends ChangeNotifier {
   }
   List<ListModel> lists = [];
   final listScrollController = ScrollController();
-
-  // General list for tasks without a specific list
-  final generalList = ListModel(
-    id: -1, // Special ID for general list
-    name: 'General',
-    iconCode: 'folder',
-  );
   ListModel? currentList = ListModel(iconCode: 'folder');
   set name(String name) => currentList!.name = name;
   set iconCode(String iconCode) => currentList!.iconCode = iconCode;
@@ -25,10 +18,7 @@ class ListViewModel extends ChangeNotifier {
 
   void _refreshLists() async {
     lists = await ListService.getLists();
-    // Always ensure General list is first in the list
-    if (!lists.any((c) => c.id == generalList.id)) {
-      lists.insert(0, generalList);
-    }
+
     if (kDebugMode) {
       debugPrint(lists.toString());
     }
@@ -36,7 +26,6 @@ class ListViewModel extends ChangeNotifier {
   }
 
   Future<bool> addNewList() async {
-    //TODO: fix new list not showing in the lists page
     logger.d('AddNewList() called');
     if (currentList!.isValid()) {
     logger.d('currentList is valid');
@@ -50,8 +39,6 @@ class ListViewModel extends ChangeNotifier {
   }
 
   Future<bool> deleteList(ListModel list, TaskViewModel taskVM) async {
-    if (list.id == -1) return false; // Prevent deletion of General list
-
     int rowsAffected = await ListService.deleteList(list.id!);
     if (rowsAffected > 0) {
       lists.removeWhere((c) => c.id == list.id);

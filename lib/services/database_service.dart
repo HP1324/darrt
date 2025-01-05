@@ -37,8 +37,8 @@ class DatabaseService {
         low_tasks INTEGER NOT NULL
       )
     """;
-  static const createDefaultLists =
-      """INSERT INTO lists (name, icon_code) VALUES
+  static const createDefaultLists ="""INSERT INTO lists (name, icon_code) VALUES
+  ('General','folder'),
 ('Sports', 'football'),
 ('Health', 'heart'),
 ('Work', 'briefcase'),

@@ -181,7 +181,7 @@ class TaskTextField extends StatelessWidget {
                 child: CustomTextField(
                   controller: titleController,
                   isMaxLinesNull: true,
-                  isAutoFocus: false,
+                  autoFocus: false,
                   fillColor: Colors.transparent,
                   hintText: widget.editMode
                       ? 'What needs changing?'
@@ -329,7 +329,7 @@ class AddToListButton extends StatelessWidget {
                                     ? AppTheme.background100
                                     : Colors.transparent,
                                 margin: const EdgeInsets.symmetric(vertical: 4),
-                                child: RadioListTile<ListModel>(
+                                child: RadioListTile(
                                   activeColor: AppTheme.primary,
                                   value: items[index],
                                   groupValue: lvm.selectedList,

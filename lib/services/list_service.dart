@@ -25,7 +25,7 @@ class ListService {
     int id = 0;
     try {
       id = await database.insert('lists', list.toJson());
-    }catch (e){
+    } catch (e) {
       logger.e('an Exception or Error is thrown when adding list to database ${e.toString()}');
     }
     return id;
@@ -33,18 +33,21 @@ class ListService {
 
   static Future<int> deleteList(int id) async {
     final database = await DatabaseService.openDb();
+    int rowsAffected = 0;
+    try {
+      // Begin transaction to ensure data consistency
+      await database.transaction((txn) async {
+        // First update all tasks in this list to set list to null
+        await txn.update('tasks', {'list_id': 1}, where: 'list_id = ?', whereArgs: [id]);
 
-    // Begin transaction to ensure data consistency
-    await database.transaction((txn) async {
-      // First update all tasks in this list to set list to null
-      await txn.update('tasks', {'list_id': null, 'list_name': null},
-          where: 'list_id = ?', whereArgs: [id]);
+        // Then delete the list
+        rowsAffected = await txn.delete('lists', where: 'id = ?', whereArgs: [id]);
+      });
+    } catch (e) {
+      logger.e('An Exception or Error is thrown while deleting the list: ${e.toString()}');
+    }
 
-      // Then delete the list
-      await txn.delete('lists', where: 'id = ?', whereArgs: [id]);
-    });
-
-    return 1; // Return success
+    return rowsAffected; // Return success
   }
 
   static ListModel? getListById(int id) {
@@ -59,6 +62,14 @@ class ListService {
     return lm;
   }
 
+  static Future<ListModel?> getGeneralList() async {
+    final db = await DatabaseService.openDb();
+    final generalListMap = await db.query('lists', where: 'id = ?', whereArgs: [1]);
+    ListModel? generalListModel;
+    generalListModel = ListModel.fromJson(generalListMap.first);
+    return generalListModel;
+  }
+
   static Future<int> editList(ListModel list) async {
     final database = await DatabaseService.openDb();
     int rowsAffected = 0;
@@ -69,7 +80,7 @@ class ListService {
         where: 'id = ?',
         whereArgs: [list.id],
       );
-    }catch  (e){
+    } catch (e) {
       logger.e('an Exception or Error is thrown when editing a list in database ${e.toString()}');
     }
     return rowsAffected;
@@ -172,7 +183,7 @@ class ListService {
     'tools': FontAwesomeIcons.screwdriverWrench,
     'paint_roller': FontAwesomeIcons.paintRoller,
     'scissors': FontAwesomeIcons.scissors,
-    'people' : FontAwesomeIcons.handshake,
+    'people': FontAwesomeIcons.handshake,
     'robot': FontAwesomeIcons.robot,
     'plant': FontAwesomeIcons.seedling,
     'basketball': FontAwesomeIcons.basketball,
@@ -220,7 +231,6 @@ class ListService {
     'lock': FontAwesomeIcons.lock,
     'unlock': FontAwesomeIcons.unlock,
     'check': FontAwesomeIcons.check,
-
   };
 
   static IconData getIcon(String? code) {

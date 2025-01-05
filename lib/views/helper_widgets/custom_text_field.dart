@@ -7,7 +7,7 @@ class CustomTextField extends StatelessWidget {
       required this.controller,
       this.focusNode,
       required this.isMaxLinesNull,
-      required this.isAutoFocus,
+      required this.autoFocus,
       required this.hintText,
       this.fillColor,
        this.xPadding,
@@ -16,10 +16,10 @@ class CustomTextField extends StatelessWidget {
         this.onChanged,
       this.onSubmitted});
 
-  final dynamic controller;
+  final TextEditingController controller;
   final FocusNode? focusNode;
   final bool isMaxLinesNull;
-  final bool isAutoFocus;
+  final bool autoFocus;
   final String hintText;
   final Color? fillColor;
   double? xPadding;
@@ -35,14 +35,14 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         textInputAction: TextInputAction.done,
         maxLines: isMaxLinesNull ? null : 1,
-        autofocus: isAutoFocus,
+        autofocus: autoFocus,
         cursorColor: AppTheme.primary,
         decoration: InputDecoration(
           contentPadding: contentPadding ?? const EdgeInsets.symmetric(vertical: 15, horizontal: 8),
           filled: true,
           fillColor: fillColor ?? AppTheme.background100,
           hintText: hintText,
-          hintStyle: TextStyle(color: AppTheme.primary.withOpacity(0.6), fontSize: 16),
+          hintStyle: TextStyle(color: AppTheme.primary.withAlpha(155), fontSize: 16),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: BorderSide.none),
         ),
         onSubmitted: onSubmitted,

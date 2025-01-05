@@ -50,7 +50,7 @@ class TaskView extends StatelessWidget {
                 title: 'Due Date',
                 subtitle: task.dueDate == null
                     ? 'Not scheduled'
-                    : "${formatDateTime(task.dueDate!)}\n${task.isDone! ? 'Task Finished' : (task.dueDate!.isBefore(DateTime.now()) ? 'Task Overdue' : (task.isNotifyEnabled! ? 'Notify on ${formatDateTime(task.notifyTime!.add(const Duration(seconds: 20)))}' : 'Notification Disabled'))}",
+                    : "${formatDateTime(task.dueDate!)}\n${task.isDone! ? 'Task Finished' : (task.dueDate!.isBefore(DateTime.now()) ? 'Task Overdue' : (task.isNotifyEnabled! ? 'Notify on ${formatDateTime(task.notifyTime!.add(const Duration(seconds: 35)))}' : 'Notification Disabled'))}",
 
               ),
               DetailItem(

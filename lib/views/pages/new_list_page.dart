@@ -5,7 +5,6 @@ import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/views/helper_widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
-import 'package:toastification/toastification.dart';
 import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/views/widgets/icon_picker_dialog.dart';
 
@@ -116,13 +115,13 @@ class NewListPage extends StatelessWidget {
                                 child: CustomTextField(
                                   controller: textController,
                                   isMaxLinesNull: true,
-                                  isAutoFocus: true,
+                                  autoFocus: true,
                                   hintText: 'e.g., Work, Shopping, Personal',
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 20,
                                     vertical: 15,
                                   ),
-                                  onChanged: (value){
+                                  onChanged: (value) {
                                     lvm.name = textController.text;
                                   },
                                 ),
@@ -191,8 +190,11 @@ class NewListPage extends StatelessWidget {
                                     final nav = Navigator.of(context);
                                     if (!editMode!) {
                                       final success = await lvm.addNewList();
+                                      final scrollController = lvm.listScrollController;
                                       if (success) {
                                         showToast(title: 'List added');
+                                        scrollController
+                                            .animateTo(scrollController.position.maxScrollExtent,duration: Duration(milliseconds: 500),curve: Curves.easeOut);
                                         nav.pop();
                                       }
                                     } else {

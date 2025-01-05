@@ -118,7 +118,7 @@ class _ListsPageState extends State<ListsPage> {
                         child: CustomTextField(
                           controller: _searchController,
                           isMaxLinesNull: false,
-                          isAutoFocus: false,
+                          autoFocus: false,
                           hintText: 'Search lists...',
                           fillColor: Colors.white,
                           contentPadding: const EdgeInsets.symmetric(
@@ -165,154 +165,19 @@ class _ListsPageState extends State<ListsPage> {
                   : SliverGrid(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        mainAxisSpacing: 8,
+                        mainAxisSpacing: 6,
                         crossAxisSpacing: 8,
-                        childAspectRatio: 0.85,
+                        childAspectRatio: 0.95,
                       ),
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           final list = filteredLists[index];
-                          return ListItem(
-                            list: list,
-                            // onEdit: () {
-                            //   final textController = TextEditingController(text: list.name);
-                            //   showModalBottomSheet(
-                            //     context: context,
-                            //     isScrollControlled: true,
-                            //     backgroundColor: Colors.transparent,
-                            //     builder: (context) => Container(
-                            //       padding: EdgeInsets.only(
-                            //         bottom: MediaQuery.of(context).viewInsets.bottom,
-                            //       ),
-                            //       decoration: const BoxDecoration(
-                            //         color: Colors.white,
-                            //         borderRadius: BorderRadius.vertical(
-                            //           top: Radius.circular(20),
-                            //         ),
-                            //       ),
-                            //       child: Padding(
-                            //         padding: const EdgeInsets.all(20),
-                            //         child: Column(
-                            //           mainAxisSize: MainAxisSize.min,
-                            //           crossAxisAlignment: CrossAxisAlignment.start,
-                            //           children: [
-                            //             const Text(
-                            //               'Edit List Name',
-                            //               style: TextStyle(
-                            //                 fontSize: 20,
-                            //                 fontWeight: FontWeight.bold,
-                            //                 color: AppTheme.primary,
-                            //               ),
-                            //             ),
-                            //             const SizedBox(height: 20),
-                            //             TextField(
-                            //               controller: textController,
-                            //               autofocus: true,
-                            //               decoration: InputDecoration(
-                            //                 hintText: 'Enter list name',
-                            //                 filled: true,
-                            //                 fillColor: AppTheme.background50,
-                            //                 border: OutlineInputBorder(
-                            //                   borderRadius: BorderRadius.circular(10),
-                            //                   borderSide: BorderSide.none,
-                            //                 ),
-                            //               ),
-                            //             ),
-                            //             const SizedBox(height: 20),
-                            //             Row(
-                            //               mainAxisAlignment: MainAxisAlignment.end,
-                            //               children: [
-                            //                 TextButton(
-                            //                   onPressed: () => Navigator.pop(context),
-                            //                   child: const Text('Cancel'),
-                            //                 ),
-                            //                 const SizedBox(width: 10),
-                            //                 ElevatedButton(
-                            //                   onPressed: () {
-                            //                     if (textController.text.trim().isEmpty) {
-                            //                       showToast(
-                            //                         title: 'List name cannot be empty',
-                            //                         type: ToastificationType.error,
-                            //                       );
-                            //                       return;
-                            //                     }
-                            //                     listVM
-                            //                         .editList(list, textController.text)
-                            //                         .then((success) {
-                            //                       if (success) {
-                            //                         showToast(title: 'List name updated');
-                            //                         Navigator.pop(context);
-                            //                       } else {
-                            //                         showToast(
-                            //                           title: 'Failed to update list name',
-                            //                           type: ToastificationType.error,
-                            //                         );
-                            //                       }
-                            //                     });
-                            //                   },
-                            //                   style: ElevatedButton.styleFrom(
-                            //                     backgroundColor: AppTheme.primary,
-                            //                     foregroundColor: Colors.white,
-                            //                   ),
-                            //                   child: const Text('Save'),
-                            //                 ),
-                            //               ],
-                            //             ),
-                            //           ],
-                            //         ),
-                            //       ),
-                            //     ),
-                            //   );
-                            // },
-                            // onDelete: () {
-                            //   showDialog(
-                            //     context: context,
-                            //     builder: (context) => AlertDialog(
-                            //       title: Text('Delete List'),
-                            //       content: Text(
-                            //         'Are you sure you want to delete "${list.name}"? All tasks in this list will be moved to General list.',
-                            //       ),
-                            //       actions: [
-                            //         TextButton(
-                            //           onPressed: () => Navigator.pop(context),
-                            //           child: Text('Cancel'),
-                            //         ),
-                            //         TextButton(
-                            //           onPressed: () {
-                            //             final taskVM =
-                            //                 Provider.of<TaskViewModel>(context, listen: false);
-                            //             listVM.deleteList(list, taskVM).then((deleted) {
-                            //               if (deleted) {
-                            //                 showToast(
-                            //                     title: 'List deleted',
-                            //                     description:
-                            //                         'All tasks have been moved to General list');
-                            //               } else {
-                            //                 showToast(
-                            //                     title: 'Failed to delete list',
-                            //                     description: 'Please try again');
-                            //               }
-                            //             });
-                            //             Navigator.pop(context);
-                            //           },
-                            //           child: Text(
-                            //             'Delete',
-                            //             style: TextStyle(
-                            //               color: AppTheme.error,
-                            //             ),
-                            //           ),
-                            //         ),
-                            //       ],
-                            //     ),
-                            //   );
-                            // },
-                          );
+                          return ListItem(list: list);
                         },
                         childCount: filteredLists.length,
                       ),
                     ),
             ),
-            const SliverPadding(padding: EdgeInsets.only(bottom: 16)),
           ],
         );
       },

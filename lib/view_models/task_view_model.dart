@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
+import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/services/stats_service.dart';
 import 'package:minimaltodo/services/task_service.dart';
 
@@ -39,6 +40,7 @@ class TaskViewModel extends ChangeNotifier {
 
   bool isNewTaskAdded = false;
   Future<bool> addNewTask() async {
+    if(currentTask.list == null) currentTask.list = await ListService.getGeneralList();
     logger.t('Adding task list icon: ${currentTask.list!.iconCode}');
     if (currentTask.isValid()) {
       final id = await TaskService.addTask(currentTask);
@@ -220,7 +222,7 @@ class TaskViewModel extends ChangeNotifier {
     // Update all tasks in the deleted list to have no list
     for (var task in _tasks) {
       if (task.list?.id == listId) {
-        task.list = null;
+        task.list = ListModel(id: 1, name: 'General');
       }
     }
     notifyListeners();
@@ -238,7 +240,7 @@ class TaskViewModel extends ChangeNotifier {
     var notifTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
     logger.d('task due date: ${currentTask.dueDate}, notifyTime: ${notifTime}');
     if(notifTime.isAfter(DateTime.now())) {
-      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes, seconds: 20));
+      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes, seconds: 35));
     }else{
       selectedMinutes = 0;
       showToast(title: 'This time has gone');
