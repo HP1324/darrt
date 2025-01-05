@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/services/list_service.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/global_utils.dart';
@@ -32,6 +33,7 @@ class TaskView extends StatelessWidget {
               ),
               DetailItem(
                 icon: ListService.getIcon(task.list!.iconCode),
+                list: task.list,
                 title: 'List',
                 subtitle: task.list!.name ?? 'General (not added to a list)',
               ),
@@ -87,10 +89,11 @@ class TaskView extends StatelessWidget {
 }
 
 class DetailItem extends StatelessWidget {
-  const DetailItem({super.key, required this.icon, required this.title, required this.subtitle});
+  const DetailItem({super.key, required this.icon, required this.title, required this.subtitle,this.list});
   final IconData icon;
   final String title;
   final String subtitle;
+  final ListModel? list;
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +102,7 @@ class DetailItem extends StatelessWidget {
     return Card(
       elevation: 0,
       child: ListTile(
-        leading: Icon(icon),
+        leading: Icon(icon, color : list != null && list?.name != 'General' ? ListService.getColorFromString(list!.listColor): ListService.getColorFromString('primary')),
         title: Text(
           title,
           style: titleStyle,

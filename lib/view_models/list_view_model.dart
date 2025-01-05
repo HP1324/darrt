@@ -70,6 +70,8 @@ class ListViewModel extends ChangeNotifier {
 
   void resetList() {
     selectedList = null;
+    selectedIcon = 'folder';
+    selectedColor = 'primary';
     notifyListeners();
   }
 

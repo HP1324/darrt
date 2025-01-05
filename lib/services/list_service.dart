@@ -324,7 +324,7 @@ class ListService {
     'orange': Color(0xFFFFB74D),
     'deepOrange': Color(0xFFFF8A65),
     'brown': Color(0xFFA1887F),
-    'blueGrey': Color(0xFF90A4AE),
+    'blueGr*ey': Color(0xFF90A4AE),
   };
 
   static Color getColorFromString(String? colorKey) {

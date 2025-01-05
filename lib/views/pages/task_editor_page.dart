@@ -333,7 +333,7 @@ class AddToListButton extends StatelessWidget {
                                 child: RadioListTile(
                                   activeColor: AppTheme.primary,
                                   value: items[index],
-                                  groupValue: lvm.selectedList,
+                                  groupValue: tvm.currentTask.list ?? items[0],
                                   title: Text(
                                     items[index].name!,
                                     style: TextStyle(
@@ -345,8 +345,7 @@ class AddToListButton extends StatelessWidget {
                                   onChanged: (selected) {
                                     lvm.updateChosenList(selected!);
                                     tvm.list = lvm.selectedList!;
-                                    logger.d(
-                                        'chosen list: ${lvm.selectedList!.name}, icon: ${lvm.selectedList!.iconCode}');
+                                    logger.d('chosen list: ${lvm.selectedList!.name}, icon: ${lvm.selectedList!.iconCode}');
                                   },
                                 ),
                               );
