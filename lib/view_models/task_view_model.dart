@@ -265,4 +265,10 @@ class TaskViewModel extends ChangeNotifier {
     }
       notifyListeners();
   }
+
+  void updateTaskListAfterEdit(ListModel list)async{
+    final tasksForCurrentList = tasks.where((t)=>t.list!.id == list.id).toList();
+    final results = await TaskService.editTaskListAfterEdit(tasksForCurrentList,list);
+    _refreshTasks();
+  }
 }

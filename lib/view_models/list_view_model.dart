@@ -4,6 +4,7 @@ import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
+import 'package:minimaltodo/views/pages/single_task_view.dart';
 
 class ListViewModel extends ChangeNotifier {
   ListViewModel() {
@@ -86,7 +87,7 @@ class ListViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateSelectedColor(String listColor){
+  void updateSelectedColor(String listColor,TaskViewModel taskVM){
     selectedColor = listColor;
     currentList!.listColor = listColor;
     notifyListeners();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/database_service.dart';
@@ -38,11 +39,13 @@ class TaskService {
 
     var changes = 0;
     try {
-      changes =
-          await database.update('tasks', {'isDone': isDone, 'finishedAt':finishedAt?.toIso8601String()}, where: 'id = ?', whereArgs: [id]);
+      changes = await database.update(
+          'tasks', {'isDone': isDone, 'finishedAt': finishedAt?.toIso8601String()},
+          where: 'id = ?', whereArgs: [id]);
       logger.d('Successfully updated task status: current status: $isDone');
-    } catch (exception,stacktrace) {
-      logger.e('Something went wrong when updating task status: ${exception.toString()}, Error type: ${exception.runtimeType}');
+    } catch (exception, stacktrace) {
+      logger.e(
+          'Something went wrong when updating task status: ${exception.toString()}, Error type: ${exception.runtimeType}');
       logger.t('This is stacktrace\n: ${stacktrace.toString()}');
     }
     return changes;
@@ -53,6 +56,27 @@ class TaskService {
     final result =
         await database.update('tasks', newTask, where: 'id = ?', whereArgs: [newTask['id']]);
     return result;
+  }
+
+  static Future<List<bool>> editTaskListAfterEdit(List<Task> tasks, ListModel list) async {
+    final database = await DatabaseService.openDb();
+    List<bool> results= [];
+    try {
+      await database.transaction((txn) async {
+        for (var task in tasks) {
+          final listMap = {'list_name' : list.name,
+            'list_icon_code' : list.iconCode,
+            'list_color' : list.listColor };
+          final changes = await txn.update(
+              'tasks', listMap, where: 'id = ? AND list_id = ?',
+              whereArgs: [task.id, list.id]);
+          changes > 0 ? results.add(true) : results.add(false);
+        }
+      });
+    }catch(e){
+      logger.e('An Exception or Error occurred while editing task list colors in database: ${e.toString()}');
+    }
+    return results;
   }
 
   static Future<int> deleteTask(int id) async {
@@ -71,7 +95,8 @@ class TaskService {
     int isNotifyEnabled = newValue ? 1 : 0;
     int changes = 0;
     try {
-      changes = await db.update('tasks', {'isNotifyEnabled': isNotifyEnabled}, where: 'id = ?', whereArgs: [id]);
+      changes = await db.update('tasks', {'isNotifyEnabled': isNotifyEnabled},
+          where: 'id = ?', whereArgs: [id]);
       return changes;
     } catch (e, stacktrace) {
       logger.e('Failed to update notification status: ${e.toString()}');
@@ -80,9 +105,9 @@ class TaskService {
     return changes;
   }
 
-  static Future<List<Task>> filterTasks(int filterFlag)async{
+  static Future<List<Task>> filterTasks(int filterFlag) async {
     final db = await DatabaseService.openDb();
-    var taskMaps = await db.query('tasks',where: 'isDone = ?', whereArgs: [filterFlag]);
+    var taskMaps = await db.query('tasks', where: 'isDone = ?', whereArgs: [filterFlag]);
     return List.generate(taskMaps.length, (index) {
       return Task.fromJson(taskMaps[index]);
     });

@@ -3,6 +3,7 @@ import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
+import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/helper_widgets/custom_text_field.dart';
 import 'package:minimaltodo/views/widgets/color_picker_dialog.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ class NewListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lvm = Provider.of<ListViewModel>(context, listen: false);
+    final tvm = Provider.of<TaskViewModel>(context, listen: false);
     if (editMode!) {
       lvm.currentList = listToEdit!;
     }
@@ -27,6 +29,7 @@ class NewListPage extends StatelessWidget {
         logger.i('Pop called');
         if(editMode!){
           final edited = await lvm.editList();
+          tvm.updateTaskListAfterEdit(listToEdit!);
           if(edited){
             showToast(title: 'Task Edited');
           }
@@ -286,6 +289,7 @@ class NewListPage extends StatelessWidget {
                                         final edited = await lvm.editList();
                                         if (edited) {
                                           showToast(title: 'List edited');
+                                          tvm.updateTaskListAfterEdit(listToEdit!);
                                           nav.pop();
                                         }
                                       }
