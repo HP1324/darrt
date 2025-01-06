@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoNavigationBarBackButton;
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
@@ -70,6 +71,7 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       backgroundColor: AppTheme.background50,
       appBar: AppBar(
+        leading: CupertinoNavigationBarBackButton(color: Colors.white,),
         title: TextField(
           controller: _searchController,
           autofocus: true,

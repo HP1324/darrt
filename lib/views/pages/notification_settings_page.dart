@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/notification_service.dart';
@@ -19,7 +20,9 @@ class _TaskNotificationSettingsPageState extends State<TaskNotificationSettingsP
 
         },
         child: Scaffold(
-          appBar: AppBar(title: const Text('Notification Settings', style: TextStyle(fontSize: 20))),
+          appBar: AppBar(
+            leading: CupertinoNavigationBarBackButton(color: Colors.white,),
+              title: const Text('Notification Settings', style: TextStyle(fontSize: 20))),
           body: Column(
             children: [
               Padding(

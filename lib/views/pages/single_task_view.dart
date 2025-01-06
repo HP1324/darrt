@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoNavigationBarBackButton;
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/services/list_service.dart';
@@ -17,7 +18,10 @@ class TaskView extends StatelessWidget {
   Widget build(BuildContext context) {
     task.printTask();
     return Scaffold(
-      appBar: AppBar(title: Text('${task.title}')),
+      appBar: AppBar(
+          leading: CupertinoNavigationBarBackButton(color: Colors.white),
+          title: Text('${task.title}')
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Consumer2<TaskViewModel, ListViewModel>(builder: (_, tvm, cvm, __) {
