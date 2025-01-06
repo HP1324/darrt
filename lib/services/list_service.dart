@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/database_service.dart';
+import 'package:minimaltodo/theme/app_theme.dart';
 
 class ListService {
   static Future<List<ListModel>> getLists() async {
@@ -328,8 +329,8 @@ class ListService {
   };
 
   static Color getColorFromString(String? colorKey) {
-    if (colorKey == null) return Colors.grey;
-    return listColors[colorKey] ?? Colors.grey;
+    if (colorKey == null || colorKey == 'primary') return AppTheme.primary;
+    return listColors[colorKey] ?? AppTheme.primary;
   }
 
   static String? getStringFromColor(Color color) {

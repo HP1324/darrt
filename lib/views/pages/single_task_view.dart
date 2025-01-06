@@ -106,7 +106,7 @@ class DetailItem extends StatelessWidget {
     return Card(
       elevation: 0,
       child: ListTile(
-        leading: Icon(icon, color : list != null && list?.name != 'General' ? ListService.getColorFromString(list!.listColor): ListService.getColorFromString('primary')),
+        leading: Icon(icon, color : list != null  ? ListService.getColorFromString(list!.listColor): ListService.getColorFromString('primary')),
         title: Text(
           title,
           style: titleStyle,
