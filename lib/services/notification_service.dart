@@ -20,7 +20,7 @@ class NotificationService {
           channelKey: 'task_notif',
           channelName: 'task_notifications',
           channelDescription: 'Channel used to notify users about their tasks with simple notification',
-          importance: NotificationImportance.High,
+          importance: NotificationImportance.Max,
           playSound: true,
           defaultRingtoneType: DefaultRingtoneType.Notification,
           enableLights: true,
@@ -54,7 +54,7 @@ class NotificationService {
     Map<String, dynamic> taskJson = jsonDecode(taskJsonString);
     Task taskObject = Task.fromJson(taskJson);
     taskObject.printTask();
-    navigatorKey.currentState
+    SimpleTodo.navigatorKey.currentState
         ?.push(MaterialPageRoute(builder: (_) => TaskView(task: taskObject)));
     debugPrint('onActionReceivedMethod() ended.....');
   }

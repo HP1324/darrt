@@ -26,9 +26,16 @@ void main() async {
   runApp(const SimpleTodo());
 }
 
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-class SimpleTodo extends StatelessWidget {
+
+class SimpleTodo extends StatefulWidget {
   const SimpleTodo({super.key});
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  @override
+  State<SimpleTodo> createState() => _SimpleTodoState();
+}
+
+class _SimpleTodoState extends State<SimpleTodo> {
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +52,7 @@ class SimpleTodo extends StatelessWidget {
       ],
       child: ToastificationWrapper(
         child: MaterialApp(
+          navigatorKey: SimpleTodo.navigatorKey,
           theme: AppTheme.lightMode,
           debugShowCheckedModeBanner: false,
           title: 'MinimalTodo',
