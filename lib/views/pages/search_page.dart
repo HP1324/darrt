@@ -7,7 +7,7 @@ import 'package:minimaltodo/views/widgets/task_item.dart';
 import 'package:provider/provider.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({Key? key}) : super(key: key);
+  const SearchPage({super.key});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -100,13 +100,11 @@ class _SearchPageState extends State<SearchPage> {
       body: Consumer<TaskViewModel>(
         builder: (context, taskVM, _) {
           // Get all categories including 'General'
-          final allLists = ['General']..addAll(
-            taskVM.tasks
+          final allLists = ['General', ...taskVM.tasks
                 .map((task) => task.list?.name)
                 .where((name) => name != null && name != 'General')
                 .toSet()
-                .cast<String>()
-          );
+                .cast<String>()];
 
           final filteredTasks = _filterTasks(taskVM.tasks);
 
@@ -191,14 +189,14 @@ class _SearchPageState extends State<SearchPage> {
                             Icon(
                               Icons.search_off,
                               size: 64,
-                              color: AppTheme.primary.withOpacity(0.5),
+                              color: AppTheme.primary.withAlpha(128),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               'No tasks found',
                               style: TextStyle(
                                 fontSize: 18,
-                                color: AppTheme.primary.withOpacity(0.7),
+                                color: AppTheme.primary.withAlpha(185),
                               ),
                             ),
                           ],

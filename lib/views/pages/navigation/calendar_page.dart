@@ -23,7 +23,7 @@ class _CalendarPageState extends State<CalendarPage> {
   final int _maxWeeksOffset = 100;
   final Duration _animationDuration = const Duration(milliseconds: 300);
   final Curve _animationCurve = Curves.easeInOut;
-  Set<int> _selectedTaskIds = {};
+  final Set<int> _selectedTaskIds = {};
   bool _isSelectionMode = false;
 
   void _toggleTaskSelection(Task task) {

@@ -4,7 +4,7 @@ import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
-import 'package:minimaltodo/views/helper_widgets/custom_text_field.dart';
+import 'package:minimaltodo/views/widgets/custom_text_field.dart';
 import 'package:minimaltodo/views/widgets/color_picker_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:minimaltodo/services/list_service.dart';
@@ -176,7 +176,7 @@ class NewListPage extends StatelessWidget {
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
                                           color:
-                                              AppTheme.primary.withOpacity(0.1),
+                                              AppTheme.primary.withAlpha(50),
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Icon(
@@ -237,7 +237,7 @@ class NewListPage extends StatelessWidget {
                                               ? ListService.listColors[
                                                       listVM.selectedColor]!
                                                   .withAlpha(50)
-                                              : AppTheme.primary.withOpacity(0.1),
+                                              : AppTheme.primary.withAlpha(50),
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Icon(

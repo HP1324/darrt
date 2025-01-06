@@ -60,7 +60,7 @@ class TaskViewModel extends ChangeNotifier {
 
   bool isNewTaskAdded = false;
   Future<bool> addNewTask() async {
-    if (currentTask.list == null) currentTask.list = await ListService.getGeneralList();
+    currentTask.list ??= await ListService.getGeneralList();
     logger.t('Adding task list icon: ${currentTask.list!.iconCode}');
     if (currentTask.isValid()) {
       final id = await TaskService.addTask(currentTask);
@@ -258,7 +258,7 @@ class TaskViewModel extends ChangeNotifier {
   void updateNotifyTime(int minutes) {
     selectedMinutes = minutes;
     var notifTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
-    logger.d('task due date: ${currentTask.dueDate}, notifyTime: ${notifTime}');
+    logger.d('task due date: ${currentTask.dueDate}, notifyTime: $notifTime');
     if (notifTime.isAfter(DateTime.now())) {
       currentTask.notifyTime =
           currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes, seconds: 35));

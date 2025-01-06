@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/global_utils.dart';
-import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/new_list_page.dart';
-import 'package:minimaltodo/views/pages/tasks_for_list_page.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:toastification/toastification.dart';
-import 'package:minimaltodo/views/helper_widgets/custom_text_field.dart';
+import 'package:minimaltodo/views/widgets/custom_text_field.dart';
 import 'package:minimaltodo/views/widgets/list_item.dart';
 
 class ListsPage extends StatefulWidget {

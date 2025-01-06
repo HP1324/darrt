@@ -14,7 +14,7 @@ class FinishedTasksPage extends StatefulWidget {
 }
 
 class _FinishedTasksPageState extends State<FinishedTasksPage> {
-  Set<int> _selectedTaskIds = {};
+  final Set<int> _selectedTaskIds = {};
   bool _isSelectionMode = false;
 
   void _toggleTaskSelection(Task task) {

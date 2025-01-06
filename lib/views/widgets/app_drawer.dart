@@ -22,7 +22,7 @@ class AppDrawer extends StatelessWidget {
                 end: Alignment.bottomRight,
                 colors: [
                   AppTheme.primary,
-                  AppTheme.primary.withOpacity(0.8),
+                  AppTheme.primary.withAlpha(200),
                 ],
               ),
             ),

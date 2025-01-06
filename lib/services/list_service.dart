@@ -282,7 +282,7 @@ class ListService {
     'egg': FontAwesomeIcons.egg,
     'mug_hot': FontAwesomeIcons.mugHot,
     'wine_glass': FontAwesomeIcons.wineGlass,
-    'beer': FontAwesomeIcons.beer,
+    'beer': FontAwesomeIcons.beerMugEmpty,
     'shirt_running': FontAwesomeIcons.personRunning,
     'swimming': FontAwesomeIcons.personSwimming,
     'skiing': FontAwesomeIcons.personSkiing,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
@@ -20,7 +19,7 @@ class TasksForListPage extends StatefulWidget {
 }
 
 class _TasksForListPageState extends State<TasksForListPage> {
-  Set<int> _selectedTaskIds = {};
+  final Set<int> _selectedTaskIds = {};
   bool _isSelectionMode = false;
 
   void _toggleTaskSelection(Task task) {

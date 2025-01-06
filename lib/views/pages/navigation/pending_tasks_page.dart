@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
-import 'package:minimaltodo/views/helper_widgets/empty_list_placeholder.dart';
+import 'package:minimaltodo/views/widgets/empty_list_placeholder.dart';
 import 'package:minimaltodo/views/widgets/task_item.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -16,7 +16,7 @@ class PendingTasksPage extends StatefulWidget {
 }
 
 class _PendingTasksPageState extends State<PendingTasksPage> {
-  Set<int> _selectedTaskIds = {};
+  final Set<int> _selectedTaskIds = {};
   bool _isSelectionMode = false;
 
   void _toggleTaskSelection(Task task) {

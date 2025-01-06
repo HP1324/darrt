@@ -3,11 +3,10 @@ import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
-import 'package:minimaltodo/views/pages/single_task_view.dart';
 import 'package:provider/provider.dart';
 
 class ColorPickerDialog extends StatelessWidget {
-  const ColorPickerDialog({Key? key}) : super(key: key);
+  const ColorPickerDialog({super.key});
 
   @override
   Widget build(BuildContext context) {

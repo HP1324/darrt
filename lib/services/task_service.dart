@@ -9,7 +9,6 @@ class TaskService {
   static Future<List<Task>> getTasks() async {
     final database = await DatabaseService.openDb();
     final List<Map<String, dynamic>> taskMaps = await database.query('tasks');
-    taskMaps.forEach(print);
     return List.generate(taskMaps.length, (index) {
       return Task.fromJson(taskMaps[index]);
     });

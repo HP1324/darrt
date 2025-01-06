@@ -9,11 +9,10 @@ import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
-import 'package:minimaltodo/view_models/duedate_view_model.dart';
 import 'package:minimaltodo/view_models/priority_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/new_list_page.dart';
-import 'package:minimaltodo/views/helper_widgets/custom_text_field.dart';
+import 'package:minimaltodo/views/widgets/custom_text_field.dart';
 import 'package:minimaltodo/views/pages/notification_settings_page.dart';
 import 'package:provider/provider.dart';
 
@@ -101,10 +100,11 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                 showToast(title: 'Task edited');
               }
             }
-            if (isNotifEnabled!)
+            if (isNotifEnabled!) {
               await NotificationService.createTaskNotification(tvm.currentTask);
-            else
+            } else {
               await NotificationService.removeTaskNotification(tvm.currentTask);
+            }
           },
           shape: const CircleBorder(),
           child: const Icon(Icons.done),
@@ -139,7 +139,7 @@ class TaskTextField extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary.withOpacity(0.3),
+            color: AppTheme.primary.withAlpha(100),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -171,7 +171,7 @@ class TaskTextField extends StatelessWidget {
                 color: AppTheme.background100,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withAlpha(60),
                   width: 1.5,
                 ),
               ),
@@ -435,7 +435,7 @@ class AddToListButton extends StatelessWidget {
               ],
             ),
             Consumer<TaskViewModel>(builder: (_, tvm, __) {
-              debugPrint('Chosen list in consumer' + '${tvm.currentTask.list?.name ?? 'General'}');
+              debugPrint('Chosen list in consumer ${tvm.currentTask.list?.name ?? 'General'}');
               return Text(
                 tvm.currentTask.list?.name ?? 'General',
                 style: TextStyle(fontSize: Theme.of(context).textTheme.labelLarge!.fontSize),

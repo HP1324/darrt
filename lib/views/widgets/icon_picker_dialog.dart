@@ -5,7 +5,7 @@ import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:provider/provider.dart';
 
 class IconPickerDialog extends StatelessWidget {
-  const IconPickerDialog({Key? key}) : super(key: key);
+  const IconPickerDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,7 @@ class IconPickerDialog extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? AppTheme.primary.withOpacity(0.1)
+                                ? AppTheme.primary.withAlpha(50)
                                 : Colors.transparent,
                             border: Border.all(
                               color: isSelected

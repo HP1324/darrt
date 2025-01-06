@@ -65,7 +65,7 @@ class AppTheme {
       if (states.contains(WidgetState.selected)) {
         return primary;
       }
-      return secondaryLight.withOpacity(0.1);
+      return secondaryLight.withAlpha(50);
     }),
   );
 
@@ -110,7 +110,6 @@ class AppTheme {
       primary: primary,
       secondary: secondary,
       surface: surface,
-      background: background50,
       error: error,
     ),
     appBarTheme: _appBarTheme,
@@ -136,11 +135,11 @@ class AppTheme {
       fontWeight: FontWeight.bold,
     ),
     bodyLarge: TextStyle(
-      color: primary.withOpacity(0.87),
+      color: primary.withAlpha(222),
       fontSize: 16,
     ),
     bodyMedium: TextStyle(
-      color: primary.withOpacity(0.87),
+      color: primary.withAlpha(222),
       fontSize: 14,
     ),
   );
@@ -208,14 +207,14 @@ class AppTheme {
   );
 
   static final _listTileTheme = ListTileThemeData(
-    selectedTileColor: primary.withOpacity(0.1),
+    selectedTileColor: primary.withAlpha(50),
     selectedColor: primary,
     iconColor: primary,
-    textColor: primary.withOpacity(0.87),
+    textColor: primary.withAlpha(222),
   );
 
   static final _dropdownMenuTheme = DropdownMenuThemeData(
-    textStyle: TextStyle(color: primary.withOpacity(0.87)),
+    textStyle: TextStyle(color: primary.withAlpha(222)),
     menuStyle: MenuStyle(
       backgroundColor: WidgetStatePropertyAll(surface),
       elevation: const WidgetStatePropertyAll(8),

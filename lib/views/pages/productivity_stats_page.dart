@@ -496,7 +496,7 @@ class ProductivityStatsPage extends StatelessWidget {
                                   ),
                                   belowBarData: BarAreaData(
                                     show: true,
-                                    color: Colors.blue[600]!.withOpacity(0.15),
+                                    color: Colors.blue[600]!.withAlpha(40),
                                   ),
                                 ),
                                 // Completed Tasks Line
@@ -524,7 +524,7 @@ class ProductivityStatsPage extends StatelessWidget {
                                   ),
                                   belowBarData: BarAreaData(
                                     show: true,
-                                    color: Colors.green[600]!.withOpacity(0.15),
+                                    color: Colors.green[600]!.withAlpha(40),
                                   ),
                                 ),
                               ],
@@ -726,7 +726,7 @@ class ProductivityStatsPage extends StatelessWidget {
                                   ),
                                   belowBarData: BarAreaData(
                                     show: true,
-                                    color: Colors.blue[600]!.withOpacity(0.15),
+                                    color: Colors.blue[600]!.withAlpha(40),
                                   ),
                                 ),
                                 // Completed Tasks Line
@@ -754,7 +754,7 @@ class ProductivityStatsPage extends StatelessWidget {
                                   ),
                                   belowBarData: BarAreaData(
                                     show: true,
-                                    color: Colors.green[600]!.withOpacity(0.15),
+                                    color: Colors.green[600]!.withAlpha(40),
                                   ),
                                 ),
                               ],
