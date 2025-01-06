@@ -461,7 +461,7 @@ class DateTimePickerButton extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Consumer2<TaskViewModel, DuedateViewModel>(builder: (_, tvm, nvm, __) {
+          child: Consumer<TaskViewModel>(builder: (_, tvm, __) {
             return InkWell(
               onTap: () {
                 showDatePicker(
@@ -473,11 +473,8 @@ class DateTimePickerButton extends StatelessWidget {
                     showTimePicker(context: context, initialTime: TimeOfDay.now())
                         .then((selectedTime) {
                       if (selectedTime != null) {
-                        nvm.updateDateTime(selectedDate, selectedTime);
-                        if (nvm.notifyAt != null) {
-                          tvm.dueDate = nvm.notifyAt;
-                          showToast(title: 'Task scheduled!', alignment: Alignment.center);
-                        } else {
+                        final dueDateChanged=tvm.updateDueDate(selectedDate, selectedTime);
+                        if (!dueDateChanged) {
                           showToast(
                               title: 'Invalid date or time',
                               bgColor: Colors.red.shade400,
@@ -490,7 +487,6 @@ class DateTimePickerButton extends StatelessWidget {
                 });
               },
               child: Container(
-                // height: 70,
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
                   color: AppTheme.background100,
@@ -533,11 +529,8 @@ class DateTimePickerButton extends StatelessWidget {
         ),
         IconButton(
             onPressed: () {
-              final dateVM = Provider.of<DuedateViewModel>(context, listen: false);
               final taskVM = Provider.of<TaskViewModel>(context, listen: false);
-              dateVM.removeDueDate();
               taskVM.removeDueDate();
-              showToast(title: 'Due date removed', alignment: Alignment.center);
             },
             icon: const Icon(
               Icons.close,

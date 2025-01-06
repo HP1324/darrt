@@ -44,10 +44,6 @@ class _SimpleTodoState extends State<SimpleTodo> {
         ChangeNotifierProvider(create: (_) => TaskViewModel()),
         ChangeNotifierProvider(create: (_) => ListViewModel()),
         ChangeNotifierProvider(create: (_) => PriorityViewModel()),
-        ChangeNotifierProvider(
-          create: (_) => DuedateViewModel(),
-          lazy: true,
-        ),
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
       ],
       child: ToastificationWrapper(

@@ -15,13 +15,14 @@ class _TaskNotificationSettingsPageState extends State<TaskNotificationSettingsP
   @override
   Widget build(BuildContext context) {
     return Consumer<TaskViewModel>(builder: (context, tvm, _) {
+      logger.d('Selected notif time: ${tvm.selectedMinutes}');
       return PopScope(
-        onPopInvokedWithResult: (_,__){
-
-        },
+        onPopInvokedWithResult: (_, __) {},
         child: Scaffold(
           appBar: AppBar(
-            leading: CupertinoNavigationBarBackButton(color: Colors.white,),
+              leading: CupertinoNavigationBarBackButton(
+                color: Colors.white,
+              ),
               title: const Text('Notification Settings', style: TextStyle(fontSize: 20))),
           body: Column(
             children: [
@@ -86,6 +87,9 @@ class _TaskNotificationSettingsPageState extends State<TaskNotificationSettingsP
                           _TimeOption(minutes: 30, label: '30 min'),
                           _TimeOption(minutes: 45, label: '45 min'),
                           _TimeOption(minutes: 60, label: '1 hour'),
+                          _TimeOption(minutes: 120, label: '2 hour'),
+                          _TimeOption(minutes: 180, label: '3 hour'),
+                          _TimeOption(minutes: 240, label: '4 hour'),
                         ],
                       ),
                     ],
@@ -96,12 +100,6 @@ class _TaskNotificationSettingsPageState extends State<TaskNotificationSettingsP
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {
-              if (!tvm.currentTask.isNotifyEnabled!) {
-                tvm.resetNotifSettings();
-              } else {
-                showToast(
-                    title: 'Notification set on ${formatDateTime(tvm.currentTask.notifyTime!)}');
-              }
               Navigator.pop(context);
               tvm.currentTask.printTask();
             },
@@ -153,5 +151,3 @@ class _TimeOption extends StatelessWidget {
     );
   }
 }
-
-

@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
@@ -27,12 +25,34 @@ class TaskViewModel extends ChangeNotifier {
 
   set priority(String priority) => currentTask.priority = priority;
   set title(String title) => currentTask.title = title;
-  set dueDate(DateTime? dueDate) => currentTask.dueDate = dueDate;
+  set dueDate(DateTime? dueDate) {
+    currentTask.dueDate = dueDate;
+    //Changing notifyTime here to avoid null issues and also when user returns back from notification settings page, there is a chance to change the dueDate back, so to update the notify time according to the new dueDate, we have to add the following line:
+    currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
+    notifyListeners();
+  }
+
   void removeDueDate() {
     currentTask.dueDate = null;
     notifyListeners();
   }
-
+  bool updateDueDate(DateTime date, TimeOfDay time) {
+    final taskDueDate = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+        0 //seconds
+    );
+    if(isValidDateTime(taskDueDate)){
+      currentTask.dueDate = taskDueDate;
+      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
+      notifyListeners();
+      return true;
+    }
+    return false;
+  }
   _refreshTasks() async {
     _tasks = await TaskService.getTasks();
     notifyListeners();
@@ -40,7 +60,7 @@ class TaskViewModel extends ChangeNotifier {
 
   bool isNewTaskAdded = false;
   Future<bool> addNewTask() async {
-    if(currentTask.list == null) currentTask.list = await ListService.getGeneralList();
+    if (currentTask.list == null) currentTask.list = await ListService.getGeneralList();
     logger.t('Adding task list icon: ${currentTask.list!.iconCode}');
     if (currentTask.isValid()) {
       final id = await TaskService.addTask(currentTask);
@@ -235,40 +255,44 @@ class TaskViewModel extends ChangeNotifier {
 
   int selectedMinutes = 0;
 
-  void updateNotifyTime(int minutes){
-      selectedMinutes = minutes;
+  void updateNotifyTime(int minutes) {
+    selectedMinutes = minutes;
     var notifTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
     logger.d('task due date: ${currentTask.dueDate}, notifyTime: ${notifTime}');
-    if(notifTime.isAfter(DateTime.now())) {
-      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes, seconds: 35));
-    }else{
+    if (notifTime.isAfter(DateTime.now())) {
+      currentTask.notifyTime =
+          currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes, seconds: 35));
+    } else {
       selectedMinutes = 0;
       showToast(title: 'This time has gone');
     }
     notifyListeners();
   }
-  void resetNotifSettings(){
+
+  void resetNotifSettings() {
     currentTask.notifyTime = null;
     currentTask.notifType = null;
     selectedMinutes = 0;
     notifyListeners();
   }
-  void resetSelectedMinutes(){
+
+  void resetSelectedMinutes() {
     selectedMinutes = 0;
     notifyListeners();
   }
-  void setNotifConfigInUI(){
-    if(currentTask.notifyTime != null) {
-      selectedMinutes =currentTask.dueDate!.difference(currentTask.notifyTime!).inMinutes;
-    }else{
+
+  void setNotifConfigInUI() {
+    if (currentTask.notifyTime != null) {
+      selectedMinutes = currentTask.dueDate!.difference(currentTask.notifyTime!).inMinutes;
+    } else {
       selectedMinutes = 0;
     }
-      notifyListeners();
+    notifyListeners();
   }
 
-  void updateTaskListAfterEdit(ListModel list)async{
-    final tasksForCurrentList = tasks.where((t)=>t.list!.id == list.id).toList();
-    final results = await TaskService.editTaskListAfterEdit(tasksForCurrentList,list);
+  void updateTaskListAfterEdit(ListModel list) async {
+    final tasksForCurrentList = tasks.where((t) => t.list!.id == list.id).toList();
+    final results = await TaskService.editTaskListAfterEdit(tasksForCurrentList, list);
     _refreshTasks();
   }
 }
