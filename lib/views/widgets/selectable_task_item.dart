@@ -147,7 +147,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  formatDate(widget.task.dueDate!),
+                                  formatTime(widget.task.dueDate!),
                                   style: TextStyle(
                                     fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
                                     color: isUrgent ? Colors.red.shade400 : AppTheme.primary.withAlpha(160),
