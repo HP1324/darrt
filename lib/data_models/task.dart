@@ -128,7 +128,12 @@ class Task {
       return false;
     }
   }
-
+  bool isOverdue(){
+    if(dueDate!.isBefore(DateTime.now()) && !isDone!){
+      return true;
+    }
+    return false;
+  }
   // Convert Task to JSON
   Map<String, dynamic> toJson() => {
     'id': id,
