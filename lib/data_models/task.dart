@@ -8,7 +8,7 @@ class Task {
     this.title,
     this.isDone = false,
     this.list,
-    DateTime? createdAt,
+    this.createdAt,
     this.dueDate,
     this.finishedAt,
     this.isNotifyEnabled = false,
@@ -16,7 +16,7 @@ class Task {
     this.notifType = 'notif',
     this.priority = 'Low',
     this.isRepeating = false,
-  }) : createdAt = DateTime.now();
+  });
 
   int? id;
   String? title;
@@ -137,9 +137,7 @@ class Task {
     'list_name': list?.name,
     'list_icon_code': list?.iconCode,
     'list_color' : list?.listColor,
-    'createdAt': createdAt != null
-        ? createdAt!.toIso8601String()
-        : DateTime.now().toIso8601String(),
+    'createdAt': DateTime.now().toIso8601String(),
     'dueDate': dueDate != null
         ? dueDate!.toIso8601String()
         : DateTime.now().toIso8601String(),

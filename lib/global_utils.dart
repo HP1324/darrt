@@ -45,10 +45,11 @@ bool isValidDateTime(DateTime notifyAt) {
 
 ///Takes a [DateTime] object and return formatted string as '12 Nov 12:00 AM'
 ///if the [notifyAt.year] is next year, it will return 12 Nov 2025 12:00 AM, with explicit year
-String formatDateTime(DateTime notifyAt) {
+String formatDateTime(DateTime dateTime) {
   final now = DateTime.now();
-  String format = notifyAt.year > now.year ? 'dd MMM yyyy' : 'dd MMM';
-  return DateFormat(format).add_jm().format(notifyAt);
+  logger.d('DateTime $dateTime');
+  String format = dateTime.year > now.year ? 'dd MMM yyyy' : 'dd MMM';
+  return DateFormat(format).add_jm().format(dateTime);
 }
 
 String formatTime(DateTime notifyAt){
