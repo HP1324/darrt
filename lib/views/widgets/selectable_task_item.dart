@@ -154,24 +154,6 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                if (widget.task.isOverdue())
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red.shade50,
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(color: Colors.red.shade200),
-                                    ),
-                                    child: Text(
-                                      'Overdue',
-                                      style: TextStyle(
-                                        color: Colors.red.shade500,
-                                        fontSize: Theme.of(context).textTheme.labelSmall!.fontSize! * 0.85 ,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                const SizedBox(width: 5),
                               ],
                               Icon(
                                 widget.task.list?.iconCode != null

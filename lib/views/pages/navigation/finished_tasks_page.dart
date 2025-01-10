@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
@@ -66,7 +67,8 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
         List<Task> tasks = tvm.tasks;
         List<Task> finished = tasks
             .where((task) => task.isDone ?? false)
-            .toList();
+            .toList()
+          ..sort((a, b) => b.finishedAt!.compareTo(a.finishedAt!)); // Sort by newest first
 
         if (finished.isEmpty) {
           return const Center(
@@ -79,6 +81,21 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
             ),
           );
         }
+
+        // Group tasks by completion date
+        final groupedTasks = <DateTime, List<Task>>{};
+        for (var task in finished) {
+          final date = task.finishedAt!;
+          final dateOnly = DateTime(date.year, date.month, date.day);
+          if (!groupedTasks.containsKey(dateOnly)) {
+            groupedTasks[dateOnly] = [];
+          }
+          groupedTasks[dateOnly]!.add(task);
+        }
+
+        // Sort dates in reverse order (newest first)
+        final sortedDates = groupedTasks.keys.toList()
+          ..sort((a, b) => b.compareTo(a));
 
         return Column(
           children: [
@@ -121,8 +138,7 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
                               TextButton(
                                 onPressed: () {
                                   for (var id in _selectedTaskIds) {
-                                    final task =
-                                        tasks.firstWhere((t) => t.id == id);
+                                    final task = tasks.firstWhere((t) => t.id == id);
                                     tvm.deleteTask(task);
                                   }
                                   _clearSelection();
@@ -140,11 +156,43 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
                 ),
               ),
             Expanded(
-              child: ListView.builder(
-                itemCount: finished.length,
-                itemBuilder: (context, index) {
-                  return _buildTaskItem(finished[index]);
-                },
+              child: ListView(
+                children: [
+                  ...sortedDates.map((date) {
+                    final tasksForDate = groupedTasks[date]!;
+                    String dateTitle;
+                    final now = DateTime.now();
+                    if (date.year == now.year &&
+                        date.month == now.month &&
+                        date.day == now.day) {
+                      dateTitle = 'Today';
+                    } else if (date.year == now.year &&
+                        date.month == now.month &&
+                        date.day == now.subtract(const Duration(days: 1)).day) {
+                      dateTitle = 'Yesterday';
+                    } else {
+                      dateTitle = DateFormat('E, MMMM d, y').format(date);
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            dateTitle,
+                            style: TextStyle(
+                              fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.primary,
+                            ),
+                          ),
+                        ),
+                        ...tasksForDate.map((task) => _buildTaskItem(task)),
+                        const SizedBox(height: 8),
+                      ],
+                    );
+                  }),
+                ],
               ),
             ),
           ],
