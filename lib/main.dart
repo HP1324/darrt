@@ -20,9 +20,9 @@ import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
 void main() async {
-  GetStorage.init();
+  await GetStorage.init();
   WidgetsFlutterBinding.ensureInitialized();
-  NotificationService.initNotifications();
+  await NotificationService.initNotifications();
   runApp(const SimpleTodo());
 }
 
