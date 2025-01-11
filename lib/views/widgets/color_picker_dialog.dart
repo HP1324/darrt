@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
+import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:provider/provider.dart';
@@ -51,8 +52,8 @@ class ColorPickerDialog extends StatelessWidget {
             Container(
               height: MediaQuery.of(context).size.height * 0.4,
               padding: const EdgeInsets.all(16),
-              child: Consumer2<ListViewModel,TaskViewModel>(
-                builder: (context, listVM,taskVM, _) {
+              child: Consumer3<ListViewModel,TaskViewModel,GeneralViewModel>(
+                builder: (context, listVM,taskVM,generalVM, _) {
                   return GridView.builder(
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
@@ -72,6 +73,7 @@ class ColorPickerDialog extends StatelessWidget {
                         onTap: () {
                           listVM.updateSelectedColor(colorKey,taskVM );
                           Navigator.pop(context);
+                          generalVM.textFieldNode.unfocus();
                         },
                         child: Container(
                           decoration: BoxDecoration(

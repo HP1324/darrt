@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
+import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/widgets/custom_text_field.dart';
@@ -24,13 +25,13 @@ class NewListPage extends StatelessWidget {
       lvm.currentList = listToEdit!;
     }
     return PopScope(
-      onPopInvokedWithResult: (_,__)async{
+      onPopInvokedWithResult: (_, __) async {
         //Not matter user presses FAB or the back button, the list will be edited regardless
         logger.i('Pop called');
-        if(editMode!){
+        if (editMode!) {
           final edited = await lvm.editList();
           tvm.updateTaskListAfterEdit(listToEdit!);
-          if(edited){
+          if (edited) {
             showToast(title: 'List Edited');
           }
         }
@@ -46,8 +47,7 @@ class NewListPage extends StatelessWidget {
               children: [
                 AppBar(
                   leading: IconButton(
-                    icon: Icon(Icons.arrow_back_ios_new,
-                        color: AppTheme.background50),
+                    icon: Icon(Icons.arrow_back_ios_new, color: AppTheme.background50),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   title: Text(
@@ -157,31 +157,27 @@ class NewListPage extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                child: Consumer<ListViewModel>(
-                                  builder: (context, listVM, _) {
+                                child: Consumer2<ListViewModel, GeneralViewModel>(
+                                  builder: (context, listVM, generalVM, _) {
                                     return ListTile(
                                       onTap: () async {
-                                        FocusScope.of(context).unfocus();
-                                        await Future.delayed(
-                                            const Duration(milliseconds: 100));
+                                        generalVM.textFieldNode.unfocus();
+                                        await Future.delayed(const Duration(milliseconds: 100));
                                         if (context.mounted) {
                                           showDialog(
                                             context: context,
-                                            builder: (_) =>
-                                                const IconPickerDialog(),
+                                            builder: (_) => const IconPickerDialog(),
                                           );
                                         }
                                       },
                                       leading: Container(
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color:
-                                              AppTheme.primary.withAlpha(50),
+                                          color: AppTheme.primary.withAlpha(50),
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Icon(
-                                          ListService.getIcon(
-                                              listVM.selectedIcon),
+                                          ListService.getIcon(listVM.selectedIcon),
                                           color: AppTheme.primary,
                                         ),
                                       ),
@@ -215,18 +211,16 @@ class NewListPage extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                child: Consumer<ListViewModel>(
-                                  builder: (context, listVM, _) {
+                                child: Consumer2<ListViewModel, GeneralViewModel>(
+                                  builder: (context, listVM, generalVM, _) {
                                     return ListTile(
                                       onTap: () async {
-                                        FocusScope.of(context).unfocus();
-                                        await Future.delayed(
-                                            const Duration(milliseconds: 100));
+                                        generalVM.textFieldNode.unfocus();
+                                        await Future.delayed(const Duration(milliseconds: 100));
                                         if (context.mounted) {
                                           showDialog(
                                             context: context,
-                                            builder: (_) =>
-                                                const ColorPickerDialog(),
+                                            builder: (_) => const ColorPickerDialog(),
                                           );
                                         }
                                       },
@@ -234,8 +228,7 @@ class NewListPage extends StatelessWidget {
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
                                           color: listVM.selectedColor != null
-                                              ? ListService.listColors[
-                                                      listVM.selectedColor]!
+                                              ? ListService.listColors[listVM.selectedColor]!
                                                   .withAlpha(50)
                                               : AppTheme.primary.withAlpha(50),
                                           borderRadius: BorderRadius.circular(8),
@@ -243,8 +236,7 @@ class NewListPage extends StatelessWidget {
                                         child: Icon(
                                           Icons.color_lens,
                                           color: listVM.selectedColor != null
-                                              ? ListService.listColors[
-                                                  listVM.selectedColor]
+                                              ? ListService.listColors[listVM.selectedColor]
                                               : AppTheme.primary,
                                         ),
                                       ),
@@ -273,15 +265,12 @@ class NewListPage extends StatelessWidget {
                                       final nav = Navigator.of(context);
                                       if (!editMode!) {
                                         final success = await lvm.addNewList();
-                                        final scrollController =
-                                            lvm.listScrollController;
+                                        final scrollController = lvm.listScrollController;
                                         if (success) {
                                           showToast(title: 'List added');
                                           scrollController.animateTo(
-                                              scrollController
-                                                  .position.maxScrollExtent,
-                                              duration:
-                                                  Duration(milliseconds: 500),
+                                              scrollController.position.maxScrollExtent,
+                                              duration: Duration(milliseconds: 500),
                                               curve: Curves.easeOut);
                                           nav.pop();
                                         }
@@ -300,10 +289,7 @@ class NewListPage extends StatelessWidget {
                                       height: 55,
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
-                                          colors: [
-                                            AppTheme.primary,
-                                            AppTheme.secondary
-                                          ],
+                                          colors: [AppTheme.primary, AppTheme.secondary],
                                         ),
                                         borderRadius: BorderRadius.circular(15),
                                       ),
