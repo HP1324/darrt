@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
@@ -44,6 +45,7 @@ class _SimpleTodoState extends State<SimpleTodo> {
         ChangeNotifierProvider(create: (_) => ListViewModel()),
         ChangeNotifierProvider(create: (_) => PriorityViewModel()),
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
+        ChangeNotifierProvider(create: (_) => GeneralViewModel()),
       ],
       child: ToastificationWrapper(
         child: MaterialApp(
