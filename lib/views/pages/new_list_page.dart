@@ -31,7 +31,7 @@ class NewListPage extends StatelessWidget {
           final edited = await lvm.editList();
           tvm.updateTaskListAfterEdit(listToEdit!);
           if(edited){
-            showToast(title: 'Task Edited');
+            showToast(title: 'List Edited');
           }
         }
       },
