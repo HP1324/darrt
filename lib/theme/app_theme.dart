@@ -38,6 +38,7 @@ class AppTheme {
 
   // Date Picker Theme
   static final _datePickerTheme = DatePickerThemeData(
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
     backgroundColor: background50,
     surfaceTintColor: primary,
     headerBackgroundColor: primary,
@@ -59,14 +60,15 @@ class AppTheme {
       if (states.contains(WidgetState.selected)) {
         return Colors.white;
       }
-      return secondary;
+      return primary;
     }),
     todayBackgroundColor: WidgetStateColor.resolveWith((states) {
       if (states.contains(WidgetState.selected)) {
         return primary;
       }
-      return secondaryLight.withAlpha(50);
+      return primaryLight.withAlpha(50);
     }),
+    
   );
 
   // Time Picker Theme
