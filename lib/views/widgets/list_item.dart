@@ -162,7 +162,7 @@ class _ListItemState extends State<ListItem> {
                         );
                       },
 
-                      child: Icon(Icons.more_horiz),
+                      child: Icon(Icons.more_horiz,size: 14),
                     ),
                   ],
                 ),
