@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
+import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/new_list_page.dart';
@@ -29,8 +30,8 @@ class _ListsPageState extends State<ListsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<ListViewModel, TaskViewModel>(
-      builder: (context, listVM, taskVM, _) {
+    return Consumer3<ListViewModel, TaskViewModel,GeneralViewModel>(
+      builder: (context, listVM, taskVM,generalVM, _) {
         final lists = listVM.lists;
 
         // Filter lists based on search query
@@ -65,6 +66,9 @@ class _ListsPageState extends State<ListsPage> {
                               if (!_showSearch) {
                                 _searchController.clear();
                                 _searchQuery = '';
+                                generalVM.textFieldNode.unfocus();
+                              }else{
+                                generalVM.textFieldNode.requestFocus();
                               }
                             });
                           },

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
+import 'package:minimaltodo/view_models/general_view_model.dart';
+import 'package:provider/provider.dart' show Consumer;
 //ignore: must_be_immutable
 class CustomTextField extends StatelessWidget {
   CustomTextField(
@@ -31,22 +33,27 @@ class CustomTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding:  EdgeInsets.symmetric(horizontal: xPadding ?? 0 , vertical: yPadding ?? 0),
-      child: TextField(
-        controller: controller,
-        textInputAction: TextInputAction.done,
-        maxLines: isMaxLinesNull ? null : 1,
-        autofocus: autoFocus,
-        cursorColor: AppTheme.primary,
-        decoration: InputDecoration(
-          contentPadding: contentPadding ?? const EdgeInsets.symmetric(vertical: 15, horizontal: 8),
-          filled: true,
-          fillColor: fillColor ?? AppTheme.background100,
-          hintText: hintText,
-          hintStyle: TextStyle(color: AppTheme.primary.withAlpha(155), fontSize: 16),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: BorderSide.none),
-        ),
-        onSubmitted: onSubmitted,
-        onChanged : onChanged,
+      child: Consumer<GeneralViewModel>(
+        builder: (context,gvm, _) {
+          return TextField(
+            focusNode: gvm.textFieldNode,
+            controller: controller,
+            textInputAction: TextInputAction.done,
+            maxLines: isMaxLinesNull ? null : 1,
+            autofocus: autoFocus,
+            cursorColor: AppTheme.primary,
+            decoration: InputDecoration(
+              contentPadding: contentPadding ?? const EdgeInsets.symmetric(vertical: 15, horizontal: 8),
+              filled: true,
+              fillColor: fillColor ?? AppTheme.background100,
+              hintText: hintText,
+              hintStyle: TextStyle(color: AppTheme.primary.withAlpha(155), fontSize: 16),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: BorderSide.none),
+            ),
+            onSubmitted: onSubmitted,
+            onChanged : onChanged,
+          );
+        }
       ),
     );
   }

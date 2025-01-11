@@ -2,6 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/services/list_service.dart';
+import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/services/notification_service.dart';
@@ -180,7 +181,7 @@ class TaskTextField extends StatelessWidget {
                 child: CustomTextField(
                   controller: titleController,
                   isMaxLinesNull: true,
-                  autoFocus: false,
+                  autoFocus: true,
                   fillColor: Colors.transparent,
                   hintText:
                       widget.editMode ? 'What needs changing?' : 'What\'s on your to-do list?',
@@ -264,6 +265,8 @@ class AddToListButton extends StatelessWidget {
     return InkWell(
       splashColor: AppTheme.primary,
       onTap: () {
+        final gvm = Provider.of<GeneralViewModel>(context, listen: false);
+        gvm.textFieldNode.unfocus();
         showModalBottomSheet(
           backgroundColor: Colors.transparent,
           useRootNavigator: true,
@@ -461,7 +464,7 @@ class DateTimePickerButton extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Consumer<TaskViewModel>(builder: (_, tvm, __) {
+          child: Consumer2<TaskViewModel,GeneralViewModel>(builder: (_, tvm,gvm, __) {
             return InkWell(
               onTap: () {
                 showDatePicker(
@@ -484,6 +487,7 @@ class DateTimePickerButton extends StatelessWidget {
                       }
                     });
                   }
+                  gvm.textFieldNode.unfocus();
                 });
               },
               child: Container(
