@@ -52,9 +52,8 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
         appBar: AppBar(
-          leading: CupertinoNavigationBarBackButton(color: Colors.white),
+          leading: CupertinoNavigationBarBackButton(),
           title: widget.editMode
               ? Text(
                   widget.taskToEdit!.title!,
@@ -236,9 +235,9 @@ class SetPriorityWidget extends StatelessWidget {
                         child: ChoiceChip(
                           label: Text(pvm.priorities[index]),
                           selected: pvm.currentValue == index,
-                          color: pvm.setChipColor(index),
-                          labelStyle: TextStyle(color: pvm.setLabelColor(index)),
-                          checkmarkColor: Colors.white,
+                          // color: pvm.setChipColor(index),
+                          // labelStyle: TextStyle(color: pvm.setLabelColor(index)),
+                          // checkmarkColor: Colors.white,
                           onSelected: (selected) {
                             pvm.updatePriority(selected, index);
                             tvm.priority = pvm.currentPriority!;

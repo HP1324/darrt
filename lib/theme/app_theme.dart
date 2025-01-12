@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 abstract final class AppTheme {
   // The defined light theme.
   static ThemeData light = FlexThemeData.light(
-    scheme: FlexScheme.amber,
+    scheme: FlexScheme.deepPurple,
     subThemesData: const FlexSubThemesData(
       inputDecoratorIsFilled: true,
       alignedDropdown: true,
@@ -37,7 +37,7 @@ abstract final class AppTheme {
   );
   // The defined dark theme.
   static ThemeData dark = FlexThemeData.dark(
-    scheme: FlexScheme.cyanM3,
+    scheme: FlexScheme.deepPurple,
     subThemesData: const FlexSubThemesData(
       blendOnColors: true,
       inputDecoratorIsFilled: true,

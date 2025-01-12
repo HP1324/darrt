@@ -41,14 +41,14 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
-          color: widget.isSelected ? Theme.of(context).colorScheme.primary.withAlpha(60) : Colors.white,
+          color: widget.isSelected ? Theme.of(context).colorScheme.primary.withAlpha(60) : Theme.of(context).colorScheme.surface.withAlpha(100),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: widget.isSelected
                 ? Theme.of(context).colorScheme.primary
                 : isUrgent && !widget.task.isDone!
                     ? Colors.red.shade200
-                    : Theme.of(context).colorScheme.surface,
+                    : Theme.of(context).colorScheme.secondaryContainer,
             width: widget.isSelected ? 2 : 1,
           ),
         ),

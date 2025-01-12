@@ -19,7 +19,7 @@ class TaskView extends StatelessWidget {
     task.printTask();
     return Scaffold(
       appBar: AppBar(
-          leading: CupertinoNavigationBarBackButton(color: Colors.white),
+          leading: CupertinoNavigationBarBackButton(),
           title: Text('${task.title}')
       ),
       body: Padding(
@@ -101,10 +101,11 @@ class DetailItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleStyle = TextStyle(fontSize: Theme.of(context).textTheme.titleLarge!.fontSize);
-    final subtitleStyle = TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize);
+    final titleStyle = TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,fontWeight: FontWeight.bold);
+    final subtitleStyle = TextStyle(fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,fontWeight: FontWeight.w500);
     return Card(
       elevation: 0,
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: ListTile(
         leading: Icon(icon, color : list != null  ? ListService.getColorFromString(list!.listColor): ListService.getColorFromString('primary')),
         title: Text(

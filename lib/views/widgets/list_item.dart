@@ -35,6 +35,7 @@ class _ListItemState extends State<ListItem> {
           : Theme.of(context).colorScheme.primary;
 
       return Card(
+        color: Theme.of(context).colorScheme.surface,
         elevation: 0,
         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         shape: RoundedRectangleBorder(
@@ -86,7 +87,7 @@ class _ListItemState extends State<ListItem> {
                     InkWell(
                       key: _popupKey,
                       onTap: (){
-                        //Had to calculate the InkWell's position because showMenu does not give direct control for placing the popup menu under the button directly. So I calculated the InkWell's position on the screen and passed it as arguments to RelativeRect.fromLTRB().
+                        //Had to calculate the InkWell's position because showMenu does not give direct control for placing the popup menu under the button directly. So I calculated the InkWell's position on the screen and passed it as arguments to RelativeRect.9fromLTRB().
                         final RenderBox renderBox = _popupKey.currentContext!.findRenderObject() as RenderBox;
                         final position = renderBox.localToGlobal(Offset.zero);
                         final size = renderBox.size;

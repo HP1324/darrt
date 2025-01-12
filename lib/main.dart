@@ -26,7 +26,6 @@ void main() async {
   runApp(const SimpleTodo());
 }
 
-
 class SimpleTodo extends StatefulWidget {
   const SimpleTodo({super.key});
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -36,7 +35,6 @@ class SimpleTodo extends StatefulWidget {
 }
 
 class _SimpleTodoState extends State<SimpleTodo> {
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -71,7 +69,6 @@ class Home extends StatelessWidget {
       child: Consumer<NavigationViewModel>(builder: (context, navVM, _) {
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.onPrimary,
             elevation: 0,
             title: Text(
               'MinimalTodo',
@@ -84,7 +81,10 @@ class Home extends StatelessWidget {
             centerTitle: true,
             actions: [
               IconButton(
-                icon: Icon(Icons.search, color: Theme.of(context).colorScheme.primary),
+                icon: Icon(
+                  Icons.search,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -102,7 +102,9 @@ class Home extends StatelessWidget {
             const ListsPage()
           ][navVM.selectedDestination],
           floatingActionButton: _FloatingActionButtonWidget(context: context),
-          bottomNavigationBar: _BottomNavBarWidget(navVM: navVM,),
+          bottomNavigationBar: _BottomNavBarWidget(
+            navVM: navVM,
+          ),
         );
       }),
     );
@@ -156,17 +158,14 @@ class _FloatingActionButtonWidget extends StatelessWidget {
         elevation: 6,
         child: const Icon(
           Icons.add,
-          color: Color(0xffffffff),
         ),
       ),
     );
   }
 }
 
-
-
 class _BottomNavBarItem extends StatelessWidget {
-  const _BottomNavBarItem({ required this.icon, required this.label});
+  const _BottomNavBarItem({required this.icon, required this.label});
   final IconData icon;
   final String label;
 
@@ -185,7 +184,7 @@ class _BottomNavBarItem extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 6),
               label: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
-                transitionBuilder: (child,animation) {
+                transitionBuilder: (child, animation) {
                   return ScaleTransition(
                     scale: animation,
                     child: child,
@@ -194,7 +193,7 @@ class _BottomNavBarItem extends StatelessWidget {
                 child: Text(
                   pendingCount.toString(),
                   key: ValueKey<int>(pendingCount),
-                  style:  TextStyle(
+                  style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -208,7 +207,7 @@ class _BottomNavBarItem extends StatelessWidget {
         },
       );
     }
-    
+
     return NavigationDestination(
       icon: Icon(icon),
       label: label,

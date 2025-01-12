@@ -77,7 +77,7 @@ class _ListsPageState extends State<ListsPage> {
                             color: _showSearch ? Colors.red : Theme.of(context).colorScheme.primary,
                           ),
                           style: IconButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                            backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
                             foregroundColor: Theme.of(context).colorScheme.primary,
                           ),
                         ),
@@ -94,7 +94,7 @@ class _ListsPageState extends State<ListsPage> {
                           },
                           icon: const Icon(Iconsax.add),
                           style: IconButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                            backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
                             foregroundColor: Theme.of(context).colorScheme.primary,
                           ),
                         ),

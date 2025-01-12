@@ -3,7 +3,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/widgets/task_item.dart';
 import 'package:provider/provider.dart';
@@ -67,8 +66,7 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Consumer<TaskViewModel>(
       builder: (context, taskVM, _) {
-        final scheduledTasks =
-            taskVM.tasks.where((task) => task.dueDate != null).toList();
+        final scheduledTasks =taskVM.tasks.where((task) => task.dueDate != null).toList();
 
         return Scaffold(
           appBar: _isSelectionMode
@@ -97,15 +95,13 @@ class _CalendarPageState extends State<CalendarPage> {
                               TextButton(
                                 onPressed: () {
                                   for (var id in _selectedTaskIds) {
-                                    final task = taskVM.tasks
-                                        .firstWhere((t) => t.id == id);
+                                    final task = taskVM.tasks.firstWhere((t) => t.id == id);
                                     taskVM.deleteTask(task);
                                   }
                                   _clearSelection();
                                   Navigator.pop(context);
                                 },
-                                child: const Text('Delete',
-                                    style: TextStyle(color: Colors.red)),
+                                child: const Text('Delete',style: TextStyle(color: Colors.red)),
                               ),
                             ],
                           ),
@@ -118,16 +114,13 @@ class _CalendarPageState extends State<CalendarPage> {
           body: Column(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant,
-                ),
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 15),
                 child: Text(
                   DateFormat('MMMM yyyy').format(_selectedDate),
                   style: TextStyle(
                     fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),
@@ -178,16 +171,13 @@ class _CalendarPageState extends State<CalendarPage> {
                             width: 48,
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
-                              color:
-                                  isSelected ? Theme.of(context).colorScheme.primary : Colors.white,
+                              color:isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: isSelected
-                                    ? Theme.of(context).colorScheme.primary
-                                    : isToday
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context).colorScheme.surface,
-                                width: isSelected || isToday ? 2 : 1,
+                                color:
+                                     Theme.of(context).colorScheme.primary,
+
+                                width: isSelected || isToday ? 1.2 : 0.3,
                               ),
                               boxShadow: isSelected
                                   ? [
@@ -226,8 +216,8 @@ class _CalendarPageState extends State<CalendarPage> {
                                     color: isSelected
                                         ? Colors.white.withAlpha(25)
                                         : isToday
-                                            ? Theme.of(context).colorScheme.primary.withAlpha(15)
-                                            : Theme.of(context).colorScheme.surface,
+                                            ? Theme.of(context).colorScheme.surfaceContainer
+                                            : Theme.of(context).colorScheme.surfaceContainerLow,
                                   ),
                                   child: Center(
                                     child: Text(
