@@ -25,7 +25,7 @@ class ColorPickerDialog extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [AppTheme.primary, AppTheme.secondary],
+                  colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
                 ),
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(20)),

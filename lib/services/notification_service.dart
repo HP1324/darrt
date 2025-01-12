@@ -159,7 +159,7 @@ class NotificationService {
                 },
                 child: Container(
                   padding: const EdgeInsets.all(8),
-                  color: AppTheme.background50,
+                  color: Theme.of(context).colorScheme.surfaceVariant,
                   child: const Row(
                     children: [
                       Text('Go to notification settings'),

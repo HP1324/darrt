@@ -17,9 +17,9 @@ class _TaskSelectionPageState extends State<TaskSelectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background50,
+      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
       appBar: AppBar(
-        backgroundColor: AppTheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         title: Text(
           _selectedTaskIds.isEmpty 
               ? 'Select Tasks' 

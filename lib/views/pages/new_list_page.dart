@@ -41,20 +41,20 @@ class NewListPage extends StatelessWidget {
         body: Stack(
           children: [
             Container(
-              color: AppTheme.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
             Column(
               children: [
                 AppBar(
                   leading: IconButton(
-                    icon: Icon(Icons.arrow_back_ios_new, color: AppTheme.background50),
+                    icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.surfaceVariant),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   title: Text(
                     'Create New List',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.background50,
+                      color: Theme.of(context).colorScheme.surfaceVariant,
                     ),
                   ),
                   centerTitle: true,
@@ -76,7 +76,7 @@ class NewListPage extends StatelessWidget {
                           begin: Alignment.topCenter,
                           end: Alignment.center,
                           colors: [
-                            AppTheme.background50,
+                            Theme.of(context).colorScheme.surfaceVariant,
                             Colors.white,
                           ],
                           stops: const [0.0, 0.8],
@@ -96,12 +96,12 @@ class NewListPage extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const SizedBox(height: 20),
-                              const Text(
+                              Text(
                                 'List Name',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: AppTheme.primary,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -173,24 +173,24 @@ class NewListPage extends StatelessWidget {
                                       leading: Container(
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color: AppTheme.primary.withAlpha(50),
+                                          color: Theme.of(context).colorScheme.primary.withAlpha(50),
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Icon(
                                           ListService.getIcon(listVM.selectedIcon),
-                                          color: AppTheme.primary,
+                                          color: Theme.of(context).colorScheme.primary,
                                         ),
                                       ),
-                                      title: const Text(
+                                      title:  Text(
                                         'Choose Icon',
                                         style: TextStyle(
-                                          color: AppTheme.primary,
+                                          color: Theme.of(context).colorScheme.primary,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      trailing: const Icon(
+                                      trailing:  Icon(
                                         Icons.chevron_right,
-                                        color: AppTheme.primary,
+                                        color: Theme.of(context).colorScheme.primary,
                                       ),
                                     );
                                   },
@@ -230,26 +230,26 @@ class NewListPage extends StatelessWidget {
                                           color: listVM.selectedColor != null
                                               ? ListService.listColors[listVM.selectedColor]!
                                                   .withAlpha(50)
-                                              : AppTheme.primary.withAlpha(50),
+                                              : Theme.of(context).colorScheme.primary.withAlpha(50),
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Icon(
                                           Icons.color_lens,
                                           color: listVM.selectedColor != null
                                               ? ListService.listColors[listVM.selectedColor]
-                                              : AppTheme.primary,
+                                              : Theme.of(context).colorScheme.primary,
                                         ),
                                       ),
-                                      title: const Text(
+                                      title:  Text(
                                         'Choose Color',
                                         style: TextStyle(
-                                          color: AppTheme.primary,
+                                          color: Theme.of(context).colorScheme.primary,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      trailing: const Icon(
+                                      trailing:  Icon(
                                         Icons.chevron_right,
-                                        color: AppTheme.primary,
+                                        color: Theme.of(context).colorScheme.primary,
                                       ),
                                     );
                                   },
@@ -289,7 +289,7 @@ class NewListPage extends StatelessWidget {
                                       height: 55,
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
-                                          colors: [AppTheme.primary, AppTheme.secondary],
+                                          colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
                                         ),
                                         borderRadius: BorderRadius.circular(15),
                                       ),

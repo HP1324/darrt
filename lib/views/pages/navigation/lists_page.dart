@@ -74,11 +74,11 @@ class _ListsPageState extends State<ListsPage> {
                           },
                           icon: Icon(
                             _showSearch ? Icons.close : Iconsax.search_normal,
-                            color: _showSearch ? AppTheme.error : AppTheme.primary,
+                            color: _showSearch ? Colors.red : Theme.of(context).colorScheme.primary,
                           ),
                           style: IconButton.styleFrom(
-                            backgroundColor: AppTheme.background50,
-                            foregroundColor: AppTheme.primary,
+                            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                            foregroundColor: Theme.of(context).colorScheme.primary,
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -94,8 +94,8 @@ class _ListsPageState extends State<ListsPage> {
                           },
                           icon: const Icon(Iconsax.add),
                           style: IconButton.styleFrom(
-                            backgroundColor: AppTheme.background50,
-                            foregroundColor: AppTheme.primary,
+                            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                            foregroundColor: Theme.of(context).colorScheme.primary,
                           ),
                         ),
                       ],

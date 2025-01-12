@@ -129,7 +129,7 @@ class TaskViewButton extends StatelessWidget {
         height: 50,
         decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [AppTheme.primary, AppTheme.secondary],
+              colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
             ),
             borderRadius: BorderRadius.circular(9)),
         child: Center(child: Text(label, style: TextStyle(fontSize: 23, color: Colors.white))),

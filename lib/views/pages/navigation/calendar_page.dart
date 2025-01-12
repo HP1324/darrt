@@ -73,7 +73,7 @@ class _CalendarPageState extends State<CalendarPage> {
         return Scaffold(
           appBar: _isSelectionMode
               ? AppBar(
-                  backgroundColor: AppTheme.primary,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   leading: IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: _clearSelection,
@@ -120,14 +120,14 @@ class _CalendarPageState extends State<CalendarPage> {
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: AppTheme.background50,
+                  color: Theme.of(context).colorScheme.surfaceVariant,
                 ),
                 child: Text(
                   DateFormat('MMMM yyyy').format(_selectedDate),
                   style: TextStyle(
                     fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.primary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),
@@ -179,20 +179,20 @@ class _CalendarPageState extends State<CalendarPage> {
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
                               color:
-                                  isSelected ? AppTheme.primary : Colors.white,
+                                  isSelected ? Theme.of(context).colorScheme.primary : Colors.white,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: isSelected
-                                    ? AppTheme.primary
+                                    ? Theme.of(context).colorScheme.primary
                                     : isToday
-                                        ? AppTheme.primary
-                                        : AppTheme.background200,
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context).colorScheme.surface,
                                 width: isSelected || isToday ? 2 : 1,
                               ),
                               boxShadow: isSelected
                                   ? [
                                       BoxShadow(
-                                        color: AppTheme.primary.withAlpha(50),
+                                        color: Theme.of(context).colorScheme.primary.withAlpha(50),
                                         blurRadius: 8,
                                         offset: const Offset(0, 4),
                                       ),
@@ -214,7 +214,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                     color: isSelected
                                         ? Colors.white
                                         : isToday
-                                            ? AppTheme.primary
+                                            ? Theme.of(context).colorScheme.primary
                                             : Colors.black87,
                                   ),
                                 ),
@@ -226,8 +226,8 @@ class _CalendarPageState extends State<CalendarPage> {
                                     color: isSelected
                                         ? Colors.white.withAlpha(25)
                                         : isToday
-                                            ? AppTheme.primary.withAlpha(15)
-                                            : AppTheme.background100,
+                                            ? Theme.of(context).colorScheme.primary.withAlpha(15)
+                                            : Theme.of(context).colorScheme.surface,
                                   ),
                                   child: Center(
                                     child: Text(
@@ -241,7 +241,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                         color: isSelected
                                             ? Colors.white
                                             : isToday
-                                                ? AppTheme.primary
+                                                ? Theme.of(context).colorScheme.primary
                                                 : Colors.black87,
                                       ),
                                     ),

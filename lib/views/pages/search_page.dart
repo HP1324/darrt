@@ -69,7 +69,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background50,
+      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
       appBar: AppBar(
         leading: CupertinoNavigationBarBackButton(color: Colors.white,),
         title: TextField(
@@ -82,7 +82,7 @@ class _SearchPageState extends State<SearchPage> {
             hintStyle: TextStyle(color: Colors.white),
             border: InputBorder.none,
             suffixIcon: IconButton(
-              icon: const Icon(Icons.filter_list, color: AppTheme.primary),
+              icon: Icon(Icons.filter_list, color: Theme.of(context).colorScheme.primary),
               onPressed: () {
                 setState(() {
                   _showFilters = !_showFilters;
@@ -117,12 +117,12 @@ class _SearchPageState extends State<SearchPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                       Text(
                         'Filter by:',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: AppTheme.primary,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -189,14 +189,14 @@ class _SearchPageState extends State<SearchPage> {
                             Icon(
                               Icons.search_off,
                               size: 64,
-                              color: AppTheme.primary.withAlpha(128),
+                              color: Theme.of(context).colorScheme.primary.withAlpha(128),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               'No tasks found',
                               style: TextStyle(
                                 fontSize: 18,
-                                color: AppTheme.primary.withAlpha(185),
+                                color: Theme.of(context).colorScheme.primary.withAlpha(185),
                               ),
                             ),
                           ],

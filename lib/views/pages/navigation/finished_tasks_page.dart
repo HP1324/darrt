@@ -101,7 +101,7 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
           children: [
             if (_isSelectionMode)
               Container(
-                color: AppTheme.primary,
+                color: Theme.of(context).colorScheme.primary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 8,
@@ -183,7 +183,7 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
                             style: TextStyle(
                               fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
                               fontWeight: FontWeight.bold,
-                              color: AppTheme.primary,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         ),

@@ -52,7 +52,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppTheme.background50,
+        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
         appBar: AppBar(
           leading: CupertinoNavigationBarBackButton(color: Colors.white),
           title: widget.editMode
@@ -129,18 +129,18 @@ class TaskTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppTheme.primary,
-            AppTheme.secondary,
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.secondary,
           ],
         ),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary.withAlpha(100),
+            color: Theme.of(context).colorScheme.primary.withAlpha(100),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -169,7 +169,7 @@ class TaskTextField extends StatelessWidget {
             const SizedBox(height: 12),
             Container(
               decoration: BoxDecoration(
-                color: AppTheme.background100,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: Colors.white.withAlpha(60),
@@ -211,7 +211,7 @@ class SetPriorityWidget extends StatelessWidget {
         return Container(
           padding: EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppTheme.background100,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
@@ -220,7 +220,7 @@ class SetPriorityWidget extends StatelessWidget {
               Text(
                 'Set a priority',
                 style: TextStyle(
-                  color: AppTheme.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
                 ),
               ),
@@ -263,7 +263,7 @@ class AddToListButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      splashColor: AppTheme.primary,
+      splashColor: Theme.of(context).colorScheme.primary,
       onTap: () {
         final gvm = Provider.of<GeneralViewModel>(context, listen: false);
         gvm.textFieldNode.unfocus();
@@ -273,12 +273,12 @@ class AddToListButton extends StatelessWidget {
           context: context,
           builder: (_) {
             return Container(
-              decoration: const BoxDecoration(
+              decoration:  BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppTheme.background50,
+                    Theme.of(context).colorScheme.surfaceVariant,
                     Colors.white,
                   ],
                 ),
@@ -295,22 +295,23 @@ class AddToListButton extends StatelessWidget {
                           ),
                           type: PageTransitionType.leftToRightWithFade));
                     },
-                    title: const Text(
+                    title: Text(
                       'Create New List',
                       style: TextStyle(
-                        color: AppTheme.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     leading: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppTheme.background100,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.add, color: AppTheme.primary),
+                      child: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
                     ),
-                    trailing: const Icon(Icons.list_alt, color: AppTheme.primary),
+                    trailing:
+                        Icon(Icons.list_alt, color: Theme.of(context).colorScheme.primary),
                   ),
                   Expanded(
                     child: Consumer2<ListViewModel, TaskViewModel>(
@@ -327,13 +328,13 @@ class AddToListButton extends StatelessWidget {
                               return Card(
                                 elevation: 0,
                                 color: (tvm.currentTask.list ?? items[0]) == items[index]
-                                    ? AppTheme.background100
+                                    ? Theme.of(context).colorScheme.surface
                                     : Colors.transparent,
                                 margin: const EdgeInsets.symmetric(vertical: 4),
                                 child: RadioListTile(
                                   activeColor: items[index].listColor != null
                                       ? ListService.getColorFromString(items[index].listColor!)
-                                      : AppTheme.primary,
+                                      : Theme.of(context).colorScheme.primary,
                                   value: items[index],
                                   groupValue: tvm.currentTask.list ?? items[0],
                                   title: Row(
@@ -345,7 +346,7 @@ class AddToListButton extends StatelessWidget {
                                               ? ListService.getColorFromString(
                                                       items[index].listColor!)
                                                   .withAlpha(50)
-                                              : AppTheme.primary.withAlpha(50),
+                                              : Theme.of(context).colorScheme.primary.withAlpha(50),
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Icon(
@@ -353,7 +354,7 @@ class AddToListButton extends StatelessWidget {
                                           color: items[index].listColor != null
                                               ? ListService.getColorFromString(
                                                   items[index].listColor!)
-                                              : AppTheme.primary,
+                                              : Theme.of(context).colorScheme.primary,
                                           size: 20,
                                         ),
                                       ),
@@ -388,7 +389,7 @@ class AddToListButton extends StatelessWidget {
                     child: SizedBox(
                       width: double.infinity,
                       child: CupertinoButton(
-                        color: AppTheme.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         borderRadius: BorderRadius.circular(12),
                         onPressed: () {
                           Navigator.of(context).pop();
@@ -413,7 +414,7 @@ class AddToListButton extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: AppTheme.background100,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -423,17 +424,17 @@ class AddToListButton extends StatelessWidget {
               children: [
                 Icon(
                   CupertinoIcons.folder,
-                  color: AppTheme.primary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 Text(
                   'Add to a list',
                   style: TextStyle(
                       fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
-                      color: AppTheme.primary),
+                      color: Theme.of(context).colorScheme.primary),
                 ),
                 Icon(
                   CupertinoIcons.chevron_right,
-                  color: AppTheme.primary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ],
             ),
@@ -464,7 +465,7 @@ class DateTimePickerButton extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Consumer2<TaskViewModel,GeneralViewModel>(builder: (_, tvm,gvm, __) {
+          child: Consumer2<TaskViewModel, GeneralViewModel>(builder: (_, tvm, gvm, __) {
             return InkWell(
               onTap: () {
                 showDatePicker(
@@ -476,7 +477,7 @@ class DateTimePickerButton extends StatelessWidget {
                     showTimePicker(context: context, initialTime: TimeOfDay.now())
                         .then((selectedTime) {
                       if (selectedTime != null) {
-                        final dueDateChanged=tvm.updateDueDate(selectedDate, selectedTime);
+                        final dueDateChanged = tvm.updateDueDate(selectedDate, selectedTime);
                         if (!dueDateChanged) {
                           showToast(
                               title: 'Invalid date or time',
@@ -493,7 +494,7 @@ class DateTimePickerButton extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: AppTheme.background100,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Padding(
@@ -506,17 +507,17 @@ class DateTimePickerButton extends StatelessWidget {
                         children: [
                           Icon(
                             Icons.calendar_month,
-                            color: AppTheme.primary,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                           Text(
                             'Set due date',
                             style: TextStyle(
-                                color: AppTheme.primary,
+                                color: Theme.of(context).colorScheme.primary,
                                 fontSize: Theme.of(context).textTheme.titleMedium!.fontSize),
                           ),
                           Icon(
                             CupertinoIcons.chevron_right,
-                            color: AppTheme.primary,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ],
                       ),
@@ -558,7 +559,7 @@ class GotoNotificationSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration:
-          BoxDecoration(color: AppTheme.background100, borderRadius: BorderRadius.circular(10)),
+          BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(10)),
       child: Consumer<TaskViewModel>(builder: (_, taskVM, __) {
         return ListTile(
             onTap: () {

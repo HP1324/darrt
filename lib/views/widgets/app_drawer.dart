@@ -21,8 +21,8 @@ class AppDrawer extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppTheme.primary,
-                  AppTheme.primary.withAlpha(200),
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.primary.withAlpha(200),
                 ],
               ),
             ),

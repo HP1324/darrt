@@ -32,7 +32,7 @@ class _ListItemState extends State<ListItem> {
 
       final listColor = widget.list.listColor != null
           ? ListService.getColorFromString(widget.list.listColor)
-          : AppTheme.primary;
+          : Theme.of(context).colorScheme.primary;
 
       return Card(
         elevation: 0,
@@ -172,7 +172,7 @@ class _ListItemState extends State<ListItem> {
                     height: 4,
                     child: LinearProgressIndicator(
                       value: completedTasks / tasksInList.length,
-                      backgroundColor: AppTheme.background100,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
                       valueColor: AlwaysStoppedAnimation(listColor),
                     ),
                   ),

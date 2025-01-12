@@ -24,7 +24,7 @@ showToast({
     showIcon: false,
     description: description != null ?  Text(description) : null,
     backgroundColor: bgColor ?? Colors.white,
-    foregroundColor: fgColor ?? AppTheme.primary,
+    // foregroundColor: fgColor ?? AppTheme.primaryColor,
     showProgressBar: false,
     animationDuration: const Duration(milliseconds: 300),
     alignment: alignment,

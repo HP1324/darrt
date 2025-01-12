@@ -329,8 +329,8 @@ class ListService {
   };
 
   static Color getColorFromString(String? colorKey) {
-    if (colorKey == null || colorKey == 'primary') return AppTheme.primary;
-    return listColors[colorKey] ?? AppTheme.primary;
+    if (colorKey == null || colorKey == 'primary') return AppTheme.light.primaryColor;
+    return listColors[colorKey] ?? AppTheme.light.primaryColor;
   }
 
   static String? getStringFromColor(Color color) {

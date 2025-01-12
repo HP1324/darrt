@@ -50,7 +50,8 @@ class _SimpleTodoState extends State<SimpleTodo> {
       child: ToastificationWrapper(
         child: MaterialApp(
           navigatorKey: SimpleTodo.navigatorKey,
-          theme: AppTheme.lightMode,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
           debugShowCheckedModeBanner: false,
           title: 'MinimalTodo',
           home: const Home(),
@@ -70,20 +71,20 @@ class Home extends StatelessWidget {
       child: Consumer<NavigationViewModel>(builder: (context, navVM, _) {
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: AppTheme.primary,
+            backgroundColor: Theme.of(context).colorScheme.onPrimary,
             elevation: 0,
-            title:const Text(
+            title: Text(
               'MinimalTodo',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.background50,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             centerTitle: true,
             actions: [
               IconButton(
-                icon: const Icon(Icons.search, color: AppTheme.background50),
+                icon: Icon(Icons.search, color: Theme.of(context).colorScheme.primary),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -178,7 +179,7 @@ class _BottomNavBarItem extends StatelessWidget {
           return NavigationDestination(
             icon: Badge(
               isLabelVisible: pendingCount > 0,
-              backgroundColor: AppTheme.background50,
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
               offset: const Offset(8, -4),
               largeSize: 20,
               padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -193,8 +194,8 @@ class _BottomNavBarItem extends StatelessWidget {
                 child: Text(
                   pendingCount.toString(),
                   key: ValueKey<int>(pendingCount),
-                  style: const TextStyle(
-                    color: AppTheme.primary,
+                  style:  TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
