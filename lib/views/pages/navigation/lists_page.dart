@@ -54,7 +54,6 @@ class _ListsPageState extends State<ListsPage> {
                       style: TextStyle(
                         fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
                       ),
                     ),
                     Row(
@@ -74,11 +73,7 @@ class _ListsPageState extends State<ListsPage> {
                           },
                           icon: Icon(
                             _showSearch ? Icons.close : Iconsax.search_normal,
-                            color: _showSearch ? Colors.red : Theme.of(context).colorScheme.primary,
-                          ),
-                          style: IconButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                            foregroundColor: Theme.of(context).colorScheme.primary,
+                            color: _showSearch ? Colors.red : null,
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -93,10 +88,6 @@ class _ListsPageState extends State<ListsPage> {
                             );
                           },
                           icon: const Icon(Iconsax.add),
-                          style: IconButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                            foregroundColor: Theme.of(context).colorScheme.primary,
-                          ),
                         ),
                       ],
                     ),
@@ -117,7 +108,6 @@ class _ListsPageState extends State<ListsPage> {
                       isMaxLinesNull: false,
                       autoFocus: false,
                       hintText: 'Search lists...',
-                      fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 15,
@@ -144,14 +134,12 @@ class _ListsPageState extends State<ListsPage> {
                         Icon(
                           Iconsax.search_normal,
                           size: 48,
-                          color: Colors.grey[400],
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'No lists found',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.grey[600],
                           ),
                         ),
                       ],

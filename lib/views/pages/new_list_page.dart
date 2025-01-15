@@ -37,29 +37,19 @@ class NewListPage extends StatelessWidget {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: Stack(
           children: [
-            Container(
-              color: Theme.of(context).colorScheme.primary,
-            ),
             Column(
               children: [
                 AppBar(
-                  leading: IconButton(
-                    icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.surfaceVariant),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
                   title: Text(
                     'Create New List',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.surfaceVariant,
                     ),
                   ),
                   centerTitle: true,
                   elevation: 0,
-                  backgroundColor: Colors.transparent,
                 ),
                 Expanded(
                   child: Container(
@@ -71,17 +61,6 @@ class NewListPage extends StatelessWidget {
                       ),
                     ),
                     child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.center,
-                          colors: [
-                            Theme.of(context).colorScheme.surfaceVariant,
-                            Colors.white,
-                          ],
-                          stops: const [0.0, 0.8],
-                        ),
-                      ),
                       child: SafeArea(
                         child: SingleChildScrollView(
                           physics: const ClampingScrollPhysics(),

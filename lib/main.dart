@@ -1,7 +1,9 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
+import 'package:minimaltodo/view_models/theme_view_model.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
@@ -47,9 +49,13 @@ class _SimpleTodoState extends State<SimpleTodo> {
       ],
       child: ToastificationWrapper(
         child: MaterialApp(
+          // Color(0xFF6B4EFF)
           navigatorKey: SimpleTodo.navigatorKey,
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
+          theme: FlexColorScheme.light(colors: FlexSchemeColor.from(primary: ThemeColors.mauve.color),surfaceMode: FlexSurfaceMode.highBackgroundLowScaffold)
+              .toTheme,
+          darkTheme: FlexColorScheme.dark(colors: FlexSchemeColor.from(primary: ThemeColors.mauve.color),surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,)
+              .toTheme,
+          themeMode: ThemeMode.light,
           debugShowCheckedModeBanner: false,
           title: 'MinimalTodo',
           home: const Home(),
@@ -75,7 +81,6 @@ class Home extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             centerTitle: true,
@@ -83,7 +88,6 @@ class Home extends StatelessWidget {
               IconButton(
                 icon: Icon(
                   Icons.search,
-                  color: Theme.of(context).colorScheme.primary,
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -175,10 +179,13 @@ class _BottomNavBarItem extends StatelessWidget {
       return Consumer<TaskViewModel>(
         builder: (context, taskVM, child) {
           final pendingCount = taskVM.tasks.where((task) => !task.isDone!).length;
+          final colorScheme = Theme.of(context).colorScheme;
+
           return NavigationDestination(
             icon: Badge(
               isLabelVisible: pendingCount > 0,
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              // Use secondary container for better theme adaptation
+              backgroundColor: colorScheme.secondaryContainer,
               offset: const Offset(8, -4),
               largeSize: 20,
               padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -194,7 +201,7 @@ class _BottomNavBarItem extends StatelessWidget {
                   pendingCount.toString(),
                   key: ValueKey<int>(pendingCount),
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: colorScheme.onSecondaryContainer,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
@@ -203,13 +210,47 @@ class _BottomNavBarItem extends StatelessWidget {
               child: Icon(icon),
             ),
             label: label,
+            selectedIcon: Badge(
+              isLabelVisible: pendingCount > 0,
+              // When selected, use primary container for better distinction
+              backgroundColor: colorScheme.primaryContainer,
+              offset: const Offset(8, -4),
+              largeSize: 20,
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              label: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (child, animation) {
+                  return ScaleTransition(
+                    scale: animation,
+                    child: child,
+                  );
+                },
+                child: Text(
+                  pendingCount.toString(),
+                  key: ValueKey<int>(pendingCount),
+                  style: TextStyle(
+                    color: colorScheme.onPrimaryContainer,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              child: Icon(
+                icon
+              ),
+            ),
           );
         },
       );
     }
 
     return NavigationDestination(
-      icon: Icon(icon),
+      icon: Icon(
+        icon,
+      ),
+      selectedIcon: Icon(
+        icon,
+      ),
       label: label,
     );
   }

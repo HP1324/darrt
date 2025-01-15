@@ -48,7 +48,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                 ? Theme.of(context).colorScheme.primary
                 : isUrgent && !widget.task.isDone!
                     ? Colors.red.shade200
-                    : Theme.of(context).colorScheme.secondaryContainer,
+                    : Theme.of(context).colorScheme.primary.withAlpha(100),
             width: widget.isSelected ? 2 : 1,
           ),
         ),
@@ -70,8 +70,6 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        activeColor: Theme.of(context).colorScheme.primary,
-                        checkColor: Colors.white,
                         value: _isChecked,
                         onChanged: (value) {
                           if (widget.onStatusChanged != null) {
@@ -79,7 +77,6 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                               _isChecked = value!;
                             });
                             widget.onStatusChanged!(value ?? false);
-                            showToast(title: value ?? false ? 'Task finished' : 'Task marked pending');
                           }
                         },
                       ),
@@ -110,7 +107,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                     decorationThickness: 2,
                                     color: widget.task.isDone!
                                         ? Colors.grey
-                                        : Colors.black87,
+                                        : null,
                                   ),
                                 ),
                               ),
@@ -121,14 +118,14 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                   Icon(
                                     Icons.flag_outlined,
                                     size: 14,
-                                    color: isUrgent ? Colors.red.shade400 : Theme.of(context).colorScheme.primary.withAlpha(135),
+                                    color: isUrgent ? Colors.red.shade400 : null,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     widget.task.priority!,
                                     style: TextStyle(
                                       fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-                                      color: isUrgent ? Colors.red.shade400 : Theme.of(context).colorScheme.primary.withAlpha(135),
+                                      color: isUrgent ? Colors.red.shade400 : null,
                                     ),
                                   ),
                                 ],
@@ -143,14 +140,14 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                 Icon(
                                   Icons.access_time_rounded,
                                   size: 14,
-                                  color: isUrgent ? Colors.red.shade400 : Theme.of(context).colorScheme.primary.withAlpha(170),
+                                  color: isUrgent ? Colors.red.shade400 : null,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   formatTime(widget.task.dueDate!),
                                   style: TextStyle(
                                     fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-                                    color: isUrgent ? Colors.red.shade400 : Theme.of(context).colorScheme.primary.withAlpha(160),
+                                    color: isUrgent ? Colors.red.shade400 : null,
                                   ),
                                 ),
                                 const SizedBox(width: 12),
@@ -161,7 +158,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                     : Iconsax.folder_2,
                                 size: 14,
                                 color: widget.task.list?.listColor != null
-                                    ? ListService.getColorFromString(widget.task.list?.listColor) :Theme.of(context).colorScheme.primary.withAlpha(160),
+                                    ? ListService.getColorFromString(widget.task.list?.listColor) :null,
                               ),
                               const SizedBox(width: 4),
                               Expanded(
@@ -170,7 +167,6 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-                                    color: Theme.of(context).colorScheme.primary.withAlpha(160),
                                   ),
                                 ),
                               ),

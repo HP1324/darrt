@@ -71,7 +71,6 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
       appBar: AppBar(
-        leading: CupertinoNavigationBarBackButton(color: Colors.white,),
         title: TextField(
           controller: _searchController,
           autofocus: true,
@@ -79,10 +78,9 @@ class _SearchPageState extends State<SearchPage> {
           cursorColor: Colors.white,
           decoration: InputDecoration(
             hintText: 'Search tasks...',
-            hintStyle: TextStyle(color: Colors.white),
             border: InputBorder.none,
             suffixIcon: IconButton(
-              icon: Icon(Icons.filter_list, color: Theme.of(context).colorScheme.primary),
+              icon: Icon(Icons.filter_list),
               onPressed: () {
                 setState(() {
                   _showFilters = !_showFilters;

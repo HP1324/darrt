@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart' show CupertinoNavigationBarBackButton;
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/services/list_service.dart';
 import 'package:page_transition/page_transition.dart';
@@ -18,10 +19,19 @@ class TaskView extends StatelessWidget {
   Widget build(BuildContext context) {
     task.printTask();
     return Scaffold(
-      appBar: AppBar(
-          leading: CupertinoNavigationBarBackButton(),
-          title: Text('${task.title}')
-      ),
+      appBar: AppBar(title: Text('${task.title}')),
+      floatingActionButton: TaskViewButton(
+          label: 'Edit',
+          onTap: () {
+            Navigator.push(
+                context,
+                PageTransition(
+                    child: TaskEditorPage(
+                      editMode: true,
+                      taskToEdit: task,
+                    ),
+                    type: PageTransitionType.fade));
+          },),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Consumer2<TaskViewModel, ListViewModel>(builder: (_, tvm, cvm, __) {
@@ -57,33 +67,13 @@ class TaskView extends StatelessWidget {
                 subtitle: task.dueDate == null
                     ? 'Not scheduled'
                     : "${formatDateTime(task.dueDate!)}\n${task.isDone! ? 'Task Finished' : (task.dueDate!.isBefore(DateTime.now()) ? 'Task Overdue' : (task.isNotifyEnabled! ? 'Notify on ${formatDateTime(task.notifyTime!.add(const Duration(seconds: 35)))}' : 'Notification Disabled'))}",
-
               ),
               DetailItem(
                 icon: Icons.task_alt,
                 title: 'Finished',
-                subtitle: task.finishedAt != null
-                    ? formatDateTime(task.finishedAt!)
-                    : 'Not finished yet',
+                subtitle:
+                    task.finishedAt != null ? formatDateTime(task.finishedAt!) : 'Not finished yet',
               ),
-              gap,
-              Row(
-                children: [
-                  Expanded(
-                      child: TaskViewButton(
-                          label: 'Edit',
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                PageTransition(
-                                    child: TaskEditorPage(
-                                      editMode: true,
-                                      taskToEdit: task,
-                                    ),
-                                    type: PageTransitionType.fade));
-                          })),
-                ],
-              )
             ],
           );
         }),
@@ -93,7 +83,8 @@ class TaskView extends StatelessWidget {
 }
 
 class DetailItem extends StatelessWidget {
-  const DetailItem({super.key, required this.icon, required this.title, required this.subtitle,this.list});
+  const DetailItem(
+      {super.key, required this.icon, required this.title, required this.subtitle, this.list});
   final IconData icon;
   final String title;
   final String subtitle;
@@ -101,17 +92,19 @@ class DetailItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleStyle = TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,fontWeight: FontWeight.bold);
-    final subtitleStyle = TextStyle(fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,fontWeight: FontWeight.w500);
+    final titleStyle = TextStyle(
+        fontSize: Theme.of(context).textTheme.titleMedium!.fontSize, fontWeight: FontWeight.bold);
+    final subtitleStyle = TextStyle(
+        fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500);
     return Card(
       elevation: 0,
       color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: ListTile(
-        leading: Icon(icon, color : list != null  ? ListService.getColorFromString(list!.listColor): ListService.getColorFromString('primary')),
-        title: Text(
-          title,
-          style: titleStyle,
+        leading: Icon(
+          icon,
+          color: list != null ? ListService.getColorFromString(list!.listColor) : null,
         ),
+        title: Text(title, style: titleStyle),
         subtitle: Text(subtitle, style: subtitleStyle),
       ),
     );
@@ -124,17 +117,9 @@ class TaskViewButton extends StatelessWidget {
   final String label;
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        height: 50,
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
-            ),
-            borderRadius: BorderRadius.circular(9)),
-        child: Center(child: Text(label, style: TextStyle(fontSize: 23, color: Colors.white))),
-      ),
+    return FloatingActionButton(
+      onPressed: onTap,
+      child: Icon(Iconsax.edit),
     );
   }
 }
