@@ -118,7 +118,7 @@ class Home extends StatelessWidget {
                     activeColor: Theme.of(context).colorScheme.primary,
                     value: themeVM.isDarkMode,
                     onChanged: (newValue) {
-                      themeVM.toggleDark(newValue);
+                      themeVM.toggleDarkMode(newValue);
                     },
                   ),
                 );

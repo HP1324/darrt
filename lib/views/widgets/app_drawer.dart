@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/theme_view_model.dart';
 import 'package:minimaltodo/views/pages/productivity_stats_page.dart';
+import 'package:minimaltodo/views/pages/theme_settings_page.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -68,7 +70,19 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Profile'),
             onTap: () {
               Navigator.pop(context);
-              // Add navigation logic here if needed
+            },
+          ),
+          ListTile(
+            leading: const Icon(Iconsax.profile_2user),
+            title: const Text('Customize Theme'),
+            onTap: () {
+              Navigator.push(
+                context,
+                PageTransition(
+                  type: PageTransitionType.fade,
+                  child: ThemeSettingsPage(),
+                ),
+              );
             },
           ),
           ListTile(
