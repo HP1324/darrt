@@ -2,6 +2,7 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:minimaltodo/theme_colors.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/view_models/theme_view_model.dart';
 import 'package:page_transition/page_transition.dart';
@@ -23,7 +24,6 @@ import 'package:toastification/toastification.dart';
 
 void main() async {
   await GetStorage.init();
-  WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.initNotifications();
   runApp(const SimpleTodo());
 }
@@ -46,19 +46,27 @@ class _SimpleTodoState extends State<SimpleTodo> {
         ChangeNotifierProvider(create: (_) => PriorityViewModel()),
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
         ChangeNotifierProvider(create: (_) => GeneralViewModel()),
+        ChangeNotifierProvider(create: (_) => ThemeViewModel()),
       ],
       child: ToastificationWrapper(
-        child: MaterialApp(
-          // Color(0xFF6B4EFF)
-          navigatorKey: SimpleTodo.navigatorKey,
-          theme: FlexColorScheme.light(colors: FlexSchemeColor.from(primary: ThemeColors.mauve.color),surfaceMode: FlexSurfaceMode.highBackgroundLowScaffold)
-              .toTheme,
-          darkTheme: FlexColorScheme.dark(colors: FlexSchemeColor.from(primary: ThemeColors.mauve.color),surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,)
-              .toTheme,
-          themeMode: ThemeMode.light,
-          debugShowCheckedModeBanner: false,
-          title: 'MinimalTodo',
-          home: const Home(),
+        child: Consumer<ThemeViewModel>(
+          builder: (context,themeVM,_) {
+            return MaterialApp(
+              // Color(0xFF6B4EFF)
+              navigatorKey: SimpleTodo.navigatorKey,
+              theme: FlexColorScheme.light(colors: themeVM.selectedScheme).toTheme,
+              darkTheme: FlexColorScheme.dark(colors: themeVM.selectedScheme, surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+                blendLevel: 12, // Reduces contrast by blending colors more subtly
+                appBarStyle: FlexAppBarStyle.background,
+                darkIsTrueBlack: false, // Prevents pure black
+                scaffoldBackground: Color(0xff131313)
+              ).toTheme,
+              themeMode:themeVM.themeMode,
+              debugShowCheckedModeBanner: false,
+              title: 'MinimalTodo',
+              home: const Home(),
+            );
+          }
         ),
       ),
     );
@@ -96,6 +104,25 @@ class Home extends StatelessWidget {
                   );
                 },
               ),
+              Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
+                return Transform.scale(
+                  scale: 0.6,
+                  child: Switch(
+                    thumbIcon: WidgetStateProperty.resolveWith((states){
+                      if(states.contains(WidgetState.selected)){
+                        return Icon(Icons.dark_mode);
+                      }
+                      return Icon(Icons.light_mode);
+                    }),
+                    inactiveThumbColor: Theme.of(context).colorScheme.onSurface.withAlpha(140),
+                    activeColor: Theme.of(context).colorScheme.primary,
+                    value: themeVM.isDarkMode,
+                    onChanged: (newValue) {
+                      themeVM.toggleDark(newValue);
+                    },
+                  ),
+                );
+              }),
             ],
           ),
           drawer: const AppDrawer(),

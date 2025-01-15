@@ -1,4 +1,7 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
@@ -55,7 +58,6 @@ class NewListPage extends StatelessWidget {
                   child: Container(
                     width: double.infinity,
                     decoration: const BoxDecoration(
-                      color: Colors.white,
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(30),
                       ),
@@ -80,7 +82,6 @@ class NewListPage extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -88,7 +89,6 @@ class NewListPage extends StatelessWidget {
                                 'Create a new list to organize your tasks better',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.grey,
                                 ),
                               ),
                               const SizedBox(height: 20),
@@ -125,16 +125,7 @@ class NewListPage extends StatelessWidget {
                               Container(
                                 margin: const EdgeInsets.only(top: 20),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
                                   borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withAlpha(50),
-                                      spreadRadius: 1,
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 1),
-                                    ),
-                                  ],
                                 ),
                                 child: Consumer2<ListViewModel, GeneralViewModel>(
                                   builder: (context, listVM, generalVM, _) {
@@ -157,19 +148,16 @@ class NewListPage extends StatelessWidget {
                                         ),
                                         child: Icon(
                                           ListService.getIcon(listVM.selectedIcon),
-                                          color: Theme.of(context).colorScheme.primary,
                                         ),
                                       ),
                                       title:  Text(
                                         'Choose Icon',
                                         style: TextStyle(
-                                          color: Theme.of(context).colorScheme.primary,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
                                       trailing:  Icon(
                                         Icons.chevron_right,
-                                        color: Theme.of(context).colorScheme.primary,
                                       ),
                                     );
                                   },
@@ -179,16 +167,7 @@ class NewListPage extends StatelessWidget {
                               Container(
                                 margin: const EdgeInsets.only(top: 20),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
                                   borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withAlpha(50),
-                                      spreadRadius: 1,
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 1),
-                                    ),
-                                  ],
                                 ),
                                 child: Consumer2<ListViewModel, GeneralViewModel>(
                                   builder: (context, listVM, generalVM, _) {
@@ -216,76 +195,24 @@ class NewListPage extends StatelessWidget {
                                           Icons.color_lens,
                                           color: listVM.selectedColor != null
                                               ? ListService.listColors[listVM.selectedColor]
-                                              : Theme.of(context).colorScheme.primary,
+                                              : null,
                                         ),
                                       ),
                                       title:  Text(
                                         'Choose Color',
                                         style: TextStyle(
-                                          color: Theme.of(context).colorScheme.primary,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
                                       trailing:  Icon(
                                         Icons.chevron_right,
-                                        color: Theme.of(context).colorScheme.primary,
                                       ),
                                     );
                                   },
                                 ),
                               ),
                               const SizedBox(height: 40),
-                              Hero(
-                                tag: 'save_button',
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () async {
-                                      final nav = Navigator.of(context);
-                                      if (!editMode!) {
-                                        final success = await lvm.addNewList();
-                                        final scrollController = lvm.listScrollController;
-                                        if (success) {
-                                          showToast(title: 'List added');
-                                          scrollController.animateTo(
-                                              scrollController.position.maxScrollExtent,
-                                              duration: Duration(milliseconds: 500),
-                                              curve: Curves.easeOut);
-                                          nav.pop();
-                                        }
-                                      } else {
-                                        final edited = await lvm.editList();
-                                        if (edited) {
-                                          showToast(title: 'List edited');
-                                          tvm.updateTaskListAfterEdit(listToEdit!);
-                                          nav.pop();
-                                        }
-                                      }
-                                    },
-                                    child: Container(
-                                      margin: const EdgeInsets.only(bottom: 20),
-                                      width: double.infinity,
-                                      height: 55,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
-                                        ),
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          editMode! ? 'Edit List' : 'Create List',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+
                             ],
                           ),
                         ),
@@ -297,7 +224,31 @@ class NewListPage extends StatelessWidget {
             ),
           ],
         ),
+        floatingActionButton:  FloatingActionButton(
+          onPressed: () async {
+            final nav = Navigator.of(context);
+            if (!editMode!) {
+              final success = await lvm.addNewList();
+              final scrollController = lvm.listScrollController;
+              if (success) {
+                scrollController.animateTo(
+                    scrollController.position.maxScrollExtent,
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.easeOut);
+                nav.pop();
+              }
+            } else {
+              final edited = await lvm.editList();
+              if (edited) {
+                tvm.updateTaskListAfterEdit(listToEdit!);
+                nav.pop();
+              }
+            }
+          },
+          child: Icon(Icons.done)
+        ),
       ),
+
     );
   }
 }

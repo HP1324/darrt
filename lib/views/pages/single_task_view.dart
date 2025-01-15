@@ -19,7 +19,7 @@ class TaskView extends StatelessWidget {
   Widget build(BuildContext context) {
     task.printTask();
     return Scaffold(
-      appBar: AppBar(title: Text('${task.title}')),
+      appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.surfaceBright,title: Text('${task.title}')),
       floatingActionButton: TaskViewButton(
           label: 'Edit',
           onTap: () {

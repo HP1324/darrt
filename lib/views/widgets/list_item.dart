@@ -35,6 +35,7 @@ class _ListItemState extends State<ListItem> {
           : Theme.of(context).colorScheme.primary;
 
       return Card(
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
         elevation: 0,
         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         shape: RoundedRectangleBorder(

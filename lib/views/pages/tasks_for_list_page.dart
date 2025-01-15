@@ -67,9 +67,8 @@ class _TasksForListPageState extends State<TasksForListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.surfaceBright,
         elevation: 0,
         leading: _isSelectionMode 
             ? IconButton(
@@ -83,7 +82,6 @@ class _TasksForListPageState extends State<TasksForListPage> {
                 style:  TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.surfaceVariant,
                 ),
               )
             : Text(
@@ -91,7 +89,6 @@ class _TasksForListPageState extends State<TasksForListPage> {
                 style:  TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.surfaceVariant,
                 ),
               ),
         centerTitle: true,
@@ -158,7 +155,6 @@ class _TasksForListPageState extends State<TasksForListPage> {
                   Text(
                     'No Tasks Yet',
                     style: TextStyle(
-                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -167,7 +163,6 @@ class _TasksForListPageState extends State<TasksForListPage> {
                   const Text(
                     'This list is empty',
                     style: TextStyle(
-                      fontSize: 16,
                       color: Colors.black54,
                     ),
                   ),
@@ -205,9 +200,8 @@ class _TasksForListPageState extends State<TasksForListPage> {
                     child: Text(
                       DateFormat('E, MMMM d, y').format(date),
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),

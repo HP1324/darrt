@@ -1,24 +1,28 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-enum ThemeColors{
-  deepTeal,
-  lavendarBlush,
-  peach,
-  mauve
-}
-extension ThemeColorsExtension on ThemeColors{
-  Color get color {
-    switch(this){
-      case ThemeColors.deepTeal:
-        return Color(0xFF00574B);
-      case ThemeColors.lavendarBlush:
-        return Color(0xFFBA68C8);
-      case ThemeColors.peach:
-        return Color(0xFFFFCBA4);
-      case ThemeColors.mauve:
-        return Color(0xFF9B7E8E);
+import 'package:get_storage/get_storage.dart';
+import 'package:minimaltodo/theme_colors.dart';
+
+class ThemeViewModel extends ChangeNotifier{
+  FlexSchemeColor selectedScheme =  FlexSchemeColor.from(primary: ThemeColors.deepTeal.color);
+  final _storage = GetStorage();
+  bool _isDarkMode = false;
+
+  ThemeViewModel() {
+    _isDarkMode = _storage.read('isDarkMode') ?? false;
+  }
+
+  bool get isDarkMode => _isDarkMode;
+  ThemeMode get themeMode => _isDarkMode ? ThemeMode.dark : ThemeMode.light;
+
+  Future<void> toggleDark(bool newValue) async {
+    try {
+      await _storage.write('isDarkMode', newValue);
+      _isDarkMode = newValue;
+      notifyListeners();
+    } catch (e) {
+      // Handle storage errors
+      print('Failed to save theme preference: $e');
     }
   }
-}
-class ThemeViewModel extends ChangeNotifier{
-
 }
