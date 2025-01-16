@@ -12,19 +12,23 @@ class ThemeSettingsPage extends StatelessWidget {
       builder: (context, themeVM, _) {
         return Scaffold(
           appBar: AppBar(
-            backgroundColor:Theme.of(context).colorScheme.inversePrimary ,
-            title: const Text('Customize Theme'),
+            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            title: const Text('Theme Colors'),
+            elevation: 0,
           ),
           body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Theme Colors',
-                  style: Theme.of(context).textTheme.titleLarge,
+                  'Select Your Theme Color',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.3,
+                  ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 _buildColorGrid(themeVM),
               ],
             ),
@@ -34,15 +38,14 @@ class ThemeSettingsPage extends StatelessWidget {
     );
   }
 
-
   Widget _buildColorGrid(ThemeViewModel themeVM) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
+        crossAxisCount: 5,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
         childAspectRatio: 1,
       ),
       itemCount: ThemeColors.values.length,
@@ -75,26 +78,50 @@ class _ColorOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: isSelected
-                ? Theme.of(context).colorScheme.primary
-                : Colors.transparent,
-            width: 3,
-          ),
-          boxShadow: [
-            if (isSelected)
-              BoxShadow(
-                color: color.withOpacity(0.4),
-                blurRadius: 8,
-                spreadRadius: 2,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            height: 50,
+            width: 50,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onBackground
+                    : Colors.transparent,
+                width: 2,
               ),
-          ],
-        ),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.3),
+                  blurRadius: isSelected ? 6 : 0,
+                  spreadRadius: isSelected ? 1 : 0,
+                ),
+              ],
+            ),
+          ),
+          if (isSelected)
+            Container(
+              height: 20,
+              width: 20,
+              decoration: BoxDecoration(
+                color: color.computeLuminance() > 0.5
+                    ? Colors.black.withOpacity(0.5)
+                    : Colors.white.withOpacity(0.8),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.check,
+                size: 14,
+                color: color.computeLuminance() > 0.5
+                    ? Colors.white
+                    : Colors.black,
+              ),
+            ),
+        ],
       ),
     );
   }
