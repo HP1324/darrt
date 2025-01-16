@@ -87,31 +87,26 @@ class _PendingTasksPageState extends State<PendingTasksPage> {
       }
 
       // Sort dates
-      final sortedDates = groupedTasks.keys.toList()
-        ..sort((a, b) => a.compareTo(b));
+      final sortedDates = groupedTasks.keys.toList()..sort((a, b) => a.compareTo(b));
 
       return Column(
         children: [
           if (_isSelectionMode)
             Container(
-              color: AppTheme.primary,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: const Icon(Icons.close),
                     onPressed: _clearSelection,
                   ),
                   Text(
                     '${_selectedTaskIds.length} selected',
-                    style:  TextStyle(
-                      fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
-                      color: Colors.white,
-                    ),
+                    style: TextStyle(fontSize: Theme.of(context).textTheme.labelLarge!.fontSize),
                   ),
                   const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.white),
+                    icon: const Icon(Icons.delete),
                     onPressed: () {
                       showDialog(
                         context: context,
@@ -153,7 +148,7 @@ class _PendingTasksPageState extends State<PendingTasksPage> {
                     child: Text(
                       'Overdue',
                       style: TextStyle(
-                        fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+                        fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
                         fontWeight: FontWeight.bold,
                         color: Colors.red,
                       ),
@@ -169,7 +164,9 @@ class _PendingTasksPageState extends State<PendingTasksPage> {
                   final now = DateTime.now();
                   if (date.year == now.year && date.month == now.month && date.day == now.day) {
                     dateTitle = 'Today';
-                  } else if (date.year == now.year && date.month == now.month && date.day == now.add(const Duration(days: 1)).day) {
+                  } else if (date.year == now.year &&
+                      date.month == now.month &&
+                      date.day == now.add(const Duration(days: 1)).day) {
                     dateTitle = 'Tomorrow';
                   } else {
                     dateTitle = DateFormat('E, MMMM d, y').format(date);
@@ -182,9 +179,8 @@ class _PendingTasksPageState extends State<PendingTasksPage> {
                         child: Text(
                           dateTitle,
                           style: TextStyle(
-                            fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+                            fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
                             fontWeight: FontWeight.bold,
-                            color: AppTheme.primary,
                           ),
                         ),
                       ),

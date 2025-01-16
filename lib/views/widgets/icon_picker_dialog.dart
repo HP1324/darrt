@@ -24,7 +24,7 @@ class IconPickerDialog extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [AppTheme.primary, AppTheme.secondary],
+                  colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
                 ),
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(20)),
@@ -75,11 +75,11 @@ class IconPickerDialog extends StatelessWidget {
                         child: Container(
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? AppTheme.primary.withAlpha(50)
+                                ? Theme.of(context).colorScheme.primary.withAlpha(50)
                                 : Colors.transparent,
                             border: Border.all(
                               color: isSelected
-                                  ? AppTheme.primary
+                                  ? Theme.of(context).colorScheme.primary
                                   : Colors.grey.shade300,
                               width: isSelected ? 2 : 1,
                             ),
@@ -88,7 +88,7 @@ class IconPickerDialog extends StatelessWidget {
                           child: Icon(
                             icon,
                             color: isSelected
-                                ? AppTheme.primary
+                                ? Theme.of(context).colorScheme.primary
                                 : Colors.grey.shade700,
                           ),
                         ),

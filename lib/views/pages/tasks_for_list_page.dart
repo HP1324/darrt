@@ -67,9 +67,8 @@ class _TasksForListPageState extends State<TasksForListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background50,
       appBar: AppBar(
-        backgroundColor: AppTheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.surfaceBright,
         elevation: 0,
         leading: _isSelectionMode 
             ? IconButton(
@@ -80,18 +79,16 @@ class _TasksForListPageState extends State<TasksForListPage> {
         title: _isSelectionMode
             ? Text(
                 '${_selectedTaskIds.length} selected',
-                style: const TextStyle(
+                style:  TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.background50,
                 ),
               )
             : Text(
                 widget.list.name ?? 'Unnamed List',
-                style: const TextStyle(
+                style:  TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.background50,
                 ),
               ),
         centerTitle: true,
@@ -145,29 +142,27 @@ class _TasksForListPageState extends State<TasksForListPage> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppTheme.background100,
+                      color: Theme.of(context).colorScheme.surface,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       ListService.getIcon(widget.list.iconCode),
                       size: 48,
-                      color: AppTheme.primary.withAlpha(170),
+                      color: Theme.of(context).colorScheme.primary.withAlpha(170),
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'No Tasks Yet',
                     style: TextStyle(
-                      fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.primary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   const SizedBox(height: 8),
                   const Text(
                     'This list is empty',
                     style: TextStyle(
-                      fontSize: 16,
                       color: Colors.black54,
                     ),
                   ),
@@ -204,10 +199,9 @@ class _TasksForListPageState extends State<TasksForListPage> {
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
                       DateFormat('E, MMMM d, y').format(date),
-                      style: const TextStyle(
-                        fontSize: 18,
+                      style: TextStyle(
+                        fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
                         fontWeight: FontWeight.bold,
-                        color: AppTheme.primary,
                       ),
                     ),
                   ),

@@ -13,17 +13,17 @@ class ProductivityStatsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppTheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
-        title: const Text(
+        title:  Text(
           'Productivity Stats',
           style: TextStyle(
-            color: AppTheme.background50,
+            color: Theme.of(context).colorScheme.surfaceVariant,
             fontWeight: FontWeight.bold,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.background50),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.surfaceVariant),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -171,7 +171,7 @@ class ProductivityStatsPage extends StatelessWidget {
                                 value: tasksCompletedToday,
                                 total: todaysTasks.length,
                                 label: 'Completed Today',
-                                color: AppTheme.primary,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -809,7 +809,7 @@ class ProductivityStatsPage extends StatelessWidget {
                           icon: Iconsax.task_square,
                           label: 'Total Tasks',
                           value: totalTasks.toString(),
-                          color: AppTheme.primary,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                         const Divider(height: 24),
                         _StatItem(
@@ -830,7 +830,7 @@ class ProductivityStatsPage extends StatelessWidget {
                           icon: Iconsax.chart_success,
                           label: 'Completion Rate',
                           value: '$completionRate%',
-                          color: AppTheme.primary,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ],
                     ),

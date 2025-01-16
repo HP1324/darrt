@@ -18,7 +18,7 @@ class _EmptyListPlaceholderState extends State<EmptyListPlaceholder> {
     return Icon(
       Icons.note_alt_outlined,
       size: 140,
-      color: AppTheme.background200,
+      color:Theme.of(context).colorScheme.surface,
     );
   }
 }
