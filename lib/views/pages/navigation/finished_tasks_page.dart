@@ -65,9 +65,7 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
     return Consumer<TaskViewModel>(
       builder: (context, tvm, _) {
         List<Task> tasks = tvm.tasks;
-        List<Task> finished = tasks
-            .where((task) => task.isDone ?? false)
-            .toList()
+        List<Task> finished = tasks.where((task) => task.isDone ?? false).toList()
           ..sort((a, b) => b.finishedAt!.compareTo(a.finishedAt!)); // Sort by newest first
 
         if (finished.isEmpty) {
@@ -76,7 +74,6 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
               'No finished tasks yet',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey,
               ),
             ),
           );
@@ -94,14 +91,12 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
         }
 
         // Sort dates in reverse order (newest first)
-        final sortedDates = groupedTasks.keys.toList()
-          ..sort((a, b) => b.compareTo(a));
+        final sortedDates = groupedTasks.keys.toList()..sort((a, b) => b.compareTo(a));
 
         return Column(
           children: [
             if (_isSelectionMode)
               Container(
-                color: AppTheme.primary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 8,
@@ -109,27 +104,22 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
+                      icon: const Icon(Icons.close),
                       onPressed: _clearSelection,
                     ),
                     Text(
                       '${_selectedTaskIds.length} selected',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
+                      style: const TextStyle(fontSize: 16),
                     ),
                     const Spacer(),
                     IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.white),
+                      icon: const Icon(Icons.delete),
                       onPressed: () {
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
                             title: const Text('Delete Tasks'),
-                            content: Text(
-                              'Delete ${_selectedTaskIds.length} tasks?',
-                            ),
+                            content: Text('Delete ${_selectedTaskIds.length} tasks?'),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context),
@@ -162,9 +152,7 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
                     final tasksForDate = groupedTasks[date]!;
                     String dateTitle;
                     final now = DateTime.now();
-                    if (date.year == now.year &&
-                        date.month == now.month &&
-                        date.day == now.day) {
+                    if (date.year == now.year && date.month == now.month && date.day == now.day) {
                       dateTitle = 'Today';
                     } else if (date.year == now.year &&
                         date.month == now.month &&
@@ -181,9 +169,8 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
                           child: Text(
                             dateTitle,
                             style: TextStyle(
-                              fontSize: Theme.of(context).textTheme.titleLarge!.fontSize,
+                              fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
                               fontWeight: FontWeight.bold,
-                              color: AppTheme.primary,
                             ),
                           ),
                         ),

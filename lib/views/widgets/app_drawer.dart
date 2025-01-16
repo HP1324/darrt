@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
+import 'package:minimaltodo/view_models/theme_view_model.dart';
 import 'package:minimaltodo/views/pages/productivity_stats_page.dart';
+import 'package:minimaltodo/views/pages/theme_settings_page.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -11,7 +16,7 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final dateFormat = DateFormat('EEEE, d MMMM yyyy');
-    
+
     return Drawer(
       child: Column(
         children: [
@@ -21,8 +26,8 @@ class AppDrawer extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppTheme.primary,
-                  AppTheme.primary.withAlpha(200),
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.primary.withAlpha(200),
                 ],
               ),
             ),
@@ -65,7 +70,19 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Profile'),
             onTap: () {
               Navigator.pop(context);
-              // Add navigation logic here if needed
+            },
+          ),
+          ListTile(
+            leading: const Icon(Iconsax.profile_2user),
+            title: const Text('Customize Theme'),
+            onTap: () {
+              Navigator.push(
+                context,
+                PageTransition(
+                  type: PageTransitionType.fade,
+                  child: ThemeSettingsPage(),
+                ),
+              );
             },
           ),
           ListTile(
@@ -81,7 +98,6 @@ class AppDrawer extends StatelessWidget {
               );
             },
           ),
-
           ListTile(
             leading: const Icon(Iconsax.notification),
             title: const Text('Notifications'),

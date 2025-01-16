@@ -310,7 +310,7 @@ class ListService {
   };
 
   static const Map<String, Color> listColors = {
-    'primary' : Color(0xFF6B4EFF),
+    'primary' : Color(0xFF4A80F0),
     'red': Color(0xFFE57373),
     'pink': Color(0xFFF06292),
     'purple': Color(0xFFBA68C8),
@@ -329,8 +329,8 @@ class ListService {
   };
 
   static Color getColorFromString(String? colorKey) {
-    if (colorKey == null || colorKey == 'primary') return AppTheme.primary;
-    return listColors[colorKey] ?? AppTheme.primary;
+    if (colorKey == null || colorKey == 'primary') return AppTheme.light.primaryColor;
+    return listColors[colorKey] ?? AppTheme.light.primaryColor;
   }
 
   static String? getStringFromColor(Color color) {

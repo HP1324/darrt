@@ -18,7 +18,7 @@ class PriorityViewModel extends ChangeNotifier{
     notifyListeners();
   }
   WidgetStateProperty<Color?> setChipColor(int index){
-    return WidgetStatePropertyAll(chipColor = currentValue == index ? AppTheme.primary : AppTheme.background100);
+    return WidgetStatePropertyAll(chipColor = currentValue == index ? AppTheme.light.primaryColor : AppTheme.light.primaryColor);
   }
   Color setLabelColor(int index){
     return currentValue == index ? Colors.white : Colors.black;

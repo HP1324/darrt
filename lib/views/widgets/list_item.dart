@@ -32,14 +32,14 @@ class _ListItemState extends State<ListItem> {
 
       final listColor = widget.list.listColor != null
           ? ListService.getColorFromString(widget.list.listColor)
-          : AppTheme.primary;
+          : Theme.of(context).colorScheme.primary;
 
       return Card(
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
         elevation: 0,
         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         shape: RoundedRectangleBorder(
-            side: BorderSide(color: Theme.of(context).primaryColor, width: 0.2),
-            borderRadius: BorderRadius.circular(10)),
+            side: BorderSide(width: 0.2), borderRadius: BorderRadius.circular(10)),
         child: InkWell(
           onTap: () {
             Navigator.push(
@@ -76,94 +76,92 @@ class _ListItemState extends State<ListItem> {
                       child: Text(
                         widget.list.name ?? 'Unnamed List',
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    if(widget.list.id != 1)
-                    InkWell(
-                      key: _popupKey,
-                      onTap: (){
-                        //Had to calculate the InkWell's position because showMenu does not give direct control for placing the popup menu under the button directly. So I calculated the InkWell's position on the screen and passed it as arguments to RelativeRect.fromLTRB().
-                        final RenderBox renderBox = _popupKey.currentContext!.findRenderObject() as RenderBox;
-                        final position = renderBox.localToGlobal(Offset.zero);
-                        final size = renderBox.size;
-                        showMenu(
+                    if (widget.list.id != 1)
+                      InkWell(
+                        key: _popupKey,
+                        onTap: () {
+                          //Had to calculate the InkWell's position because showMenu does not give direct control for placing the popup menu under the button directly. So I calculated the InkWell's position on the screen and passed it as arguments to RelativeRect.9fromLTRB().
+                          final RenderBox renderBox =
+                              _popupKey.currentContext!.findRenderObject() as RenderBox;
+                          final position = renderBox.localToGlobal(Offset.zero);
+                          final size = renderBox.size;
+                          showMenu(
                             context: context,
-                            position: RelativeRect.fromLTRB( position.dx, // Left
+                            position: RelativeRect.fromLTRB(
+                              position.dx, // Left
                               position.dy + size.height, // Top (below the button)
                               position.dx + size.width, // Right
-                              position.dy,),
+                              position.dy,
+                            ),
                             items: [
-                          PopupMenuItem(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                PageTransition(
-                                  type: PageTransitionType.fade,
-                                  child: NewListPage(
-                                    editMode: true,
-                                    listToEdit: widget.list,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit, color: listColor, size: 20),
-                                const SizedBox(width: 8),
-                                const Text('Edit'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  content: const Text(
-                                      'Are you sure you want to delete the list? All tasks in this list will be moved to the General list.'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.of(context).pop(),
-                                      child: const Text('Cancel'),
+                              PopupMenuItem(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    PageTransition(
+                                      type: PageTransitionType.fade,
+                                      child: NewListPage(
+                                        editMode: true,
+                                        listToEdit: widget.list,
+                                      ),
                                     ),
-                                    FilledButton(
-                                      onPressed: () async {
-                                        final nav = Navigator.of(context);
-                                        final deleted =
-                                        await listVM.deleteList(widget.list, taskVM);
-                                        if (deleted) {
-                                          showToast(title: 'List Deleted');
-                                          nav.pop();
-                                        }
-                                      },
-                                      child: const Text('Delete'),
-                                    ),
+                                  );
+                                },
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.edit, color: listColor, size: 20),
+                                    const SizedBox(width: 8),
+                                    const Text('Edit'),
                                   ],
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
                                 ),
-                              );
-                            },
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete, color: Colors.red, size: 20),
-                                const SizedBox(width: 8),
-                                const Text('Delete', style: TextStyle(color: Colors.red)),
-                              ],
-                            ),
-                          ),
-
-                        ],
-                        );
-                      },
-
-                      child: Icon(Icons.more_horiz,size: 14),
-                    ),
+                              ),
+                              PopupMenuItem(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      content: const Text(
+                                          'Are you sure you want to delete the list? All tasks in this list will be moved to the General list.'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.of(context).pop(),
+                                          child: const Text('Cancel'),
+                                        ),
+                                        FilledButton(
+                                          onPressed: () async {
+                                            final nav = Navigator.of(context);
+                                            final deleted =
+                                                await listVM.deleteList(widget.list, taskVM);
+                                            if (deleted) {
+                                              showToast(title: 'List Deleted');
+                                              nav.pop();
+                                            }
+                                          },
+                                          child: const Text('Delete'),
+                                        ),
+                                      ],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.delete, color: Colors.red, size: 20),
+                                    const SizedBox(width: 8),
+                                    const Text('Delete', style: TextStyle(color: Colors.red)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                        child: Icon(Icons.more_horiz, size: 14),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -172,7 +170,7 @@ class _ListItemState extends State<ListItem> {
                     height: 4,
                     child: LinearProgressIndicator(
                       value: completedTasks / tasksInList.length,
-                      backgroundColor: AppTheme.background100,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
                       valueColor: AlwaysStoppedAnimation(listColor),
                     ),
                   ),
@@ -181,10 +179,7 @@ class _ListItemState extends State<ListItem> {
                 const SizedBox(height: 4),
                 Text(
                   '$completedTasks/${tasksInList.length}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.black54,
-                  ),
+                  style: TextStyle(fontSize: 12),
                 ),
               ],
             ),
