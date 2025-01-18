@@ -66,7 +66,8 @@ class NotificationService {
       String taskPayload = jsonEncode(taskJson);
       logger.d('is notification allowed ${await _notif.isNotificationAllowed()}');
       await _notif.createNotification(
-        content: task.notifType!.toLowerCase() == 'notif' ? NotificationContent(
+        content: task.notifType!.toLowerCase() == 'notif' ?
+        NotificationContent(
           id: task.id!,
           channelKey: 'task_notif',
           title: 'Task Due at ${formatTime(task.dueDate!)}',
@@ -78,6 +79,7 @@ class NotificationService {
           notificationLayout: NotificationLayout.Default,
           category: NotificationCategory.Reminder,
           wakeUpScreen: true,
+          criticalAlert: true,
         ) : NotificationContent(
           id: task.id!,
           channelKey: 'task_alarm',
@@ -90,6 +92,7 @@ class NotificationService {
           notificationLayout: NotificationLayout.Default,
           category: NotificationCategory.Alarm,
           wakeUpScreen: true,
+          criticalAlert: true,
         ),
         schedule: NotificationCalendar.fromDate(
           date: task.notifyTime!,

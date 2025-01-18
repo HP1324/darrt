@@ -2,12 +2,10 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:minimaltodo/theme_colors.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/view_models/theme_view_model.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/services/notification_service.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
 import 'package:minimaltodo/view_models/navigation_view_model.dart';
 import 'package:minimaltodo/view_models/priority_view_model.dart';
@@ -49,25 +47,25 @@ class _SimpleTodoState extends State<SimpleTodo> {
         ChangeNotifierProvider(create: (_) => ThemeViewModel()),
       ],
       child: ToastificationWrapper(
-        child: Consumer<ThemeViewModel>(
-          builder: (context,themeVM,_) {
-            return MaterialApp(
-              // Color(0xFF6B4EFF)
-              navigatorKey: SimpleTodo.navigatorKey,
-              theme: FlexColorScheme.light(colors: themeVM.selectedScheme).toTheme,
-              darkTheme: FlexColorScheme.dark(colors: themeVM.selectedScheme, surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-                blendLevel: 12, // Reduces contrast by blending colors more subtly
-                appBarStyle: FlexAppBarStyle.background,
-                darkIsTrueBlack: false, // Prevents pure black
-                scaffoldBackground: Color(0xff131313)
-              ).toTheme,
-              themeMode:themeVM.themeMode,
-              debugShowCheckedModeBanner: false,
-              title: 'MinimalTodo',
-              home: const Home(),
-            );
-          }
-        ),
+        child: Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
+          return MaterialApp(
+            // Color(0xFF6B4EFF)
+            navigatorKey: SimpleTodo.navigatorKey,
+            theme: FlexColorScheme.light(colors: themeVM.selectedScheme).toTheme,
+            darkTheme: FlexColorScheme.dark(
+                    colors: themeVM.selectedScheme.toDark(),
+                    surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+                    blendLevel: 12, // Reduces contrast by blending colors more subtly
+                    appBarStyle: FlexAppBarStyle.background,
+                    darkIsTrueBlack: false, // Prevents pure black
+                    scaffoldBackground: Color(0xff131313))
+                .toTheme,
+            themeMode: themeVM.themeMode,
+            debugShowCheckedModeBanner: false,
+            title: 'MinimalTodo',
+            home: const Home(),
+          );
+        }),
       ),
     );
   }
@@ -82,49 +80,7 @@ class Home extends StatelessWidget {
       top: false,
       child: Consumer<NavigationViewModel>(builder: (context, navVM, _) {
         return Scaffold(
-          appBar: AppBar(
-            elevation: 0,
-            title: Text(
-              'MinimalTodo',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            centerTitle: true,
-            actions: [
-              IconButton(
-                icon: Icon(
-                  Icons.search,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SearchPage()),
-                  );
-                },
-              ),
-              Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
-                return Transform.scale(
-                  scale: 0.6,
-                  child: Switch(
-                    thumbIcon: WidgetStateProperty.resolveWith((states){
-                      if(states.contains(WidgetState.selected)){
-                        return Icon(Icons.dark_mode);
-                      }
-                      return Icon(Icons.light_mode);
-                    }),
-                    inactiveThumbColor: Theme.of(context).colorScheme.onSurface.withAlpha(140),
-                    activeColor: Theme.of(context).colorScheme.primary,
-                    value: themeVM.isDarkMode,
-                    onChanged: (newValue) {
-                      themeVM.toggleDarkMode(newValue);
-                    },
-                  ),
-                );
-              }),
-            ],
-          ),
+          appBar: _AppBar(),
           drawer: const AppDrawer(),
           body: [
             const CalendarPage(),
@@ -132,43 +88,81 @@ class Home extends StatelessWidget {
             const FinishedTasksPage(),
             const ListsPage()
           ][navVM.selectedDestination],
-          floatingActionButton: _FloatingActionButtonWidget(context: context),
-          bottomNavigationBar: _BottomNavBarWidget(
-            navVM: navVM,
-          ),
+          floatingActionButton: _FloatingActionButtonWidget(),
+          bottomNavigationBar: _BottomNavBarWidget(),
         );
       }),
     );
   }
 }
 
-class _BottomNavBarWidget extends StatelessWidget {
-  const _BottomNavBarWidget({
-    required this.navVM,
-  });
-  final NavigationViewModel navVM;
+class _AppBar extends StatelessWidget implements PreferredSizeWidget{
+  const _AppBar({super.key});
   @override
-  Widget build(BuildContext context) {
-    return NavigationBar(
-      selectedIndex: navVM.selectedDestination,
-      onDestinationSelected: navVM.onDestinationSelected,
-      height: MediaQuery.sizeOf(context).height * 0.095,
-      destinations: const [
-        _BottomNavBarItem(icon: Iconsax.calendar_tick, label: 'Calendar'),
-        _BottomNavBarItem(icon: Icons.pending_actions, label: 'Pending'),
-        _BottomNavBarItem(icon: Iconsax.verify, label: 'Finished'),
-        _BottomNavBarItem(icon: Iconsax.element_3, label: 'Lists'),
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  @override
+  AppBar build(BuildContext context) {
+    return AppBar(
+      elevation: 0,
+      title: Text('MinimalTodo', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      centerTitle: true,
+      actions: [
+        IconButton(
+          icon: Icon(Icons.search),
+          onPressed: () {
+            Navigator.push(
+              context,
+              PageTransition(type: PageTransitionType.fade, child: const SearchPage()),
+            );
+          },
+        ),
+        Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
+          return Transform.scale(
+            scale: 0.6,
+            child: Switch(
+              thumbIcon: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return Icon(Icons.dark_mode);
+                }
+                return Icon(Icons.light_mode);
+              }),
+              inactiveThumbColor: Theme.of(context).colorScheme.onSurface.withAlpha(140),
+              activeColor: Theme.of(context).colorScheme.primary,
+              value: themeVM.isDarkMode,
+              onChanged: (newValue) {
+                themeVM.toggleDarkMode(newValue);
+              },
+            ),
+          );
+        }),
       ],
     );
   }
 }
 
-class _FloatingActionButtonWidget extends StatelessWidget {
-  const _FloatingActionButtonWidget({
-    required this.context,
-  });
+class _BottomNavBarWidget extends StatelessWidget {
+  const _BottomNavBarWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<NavigationViewModel>(builder: (context, navVM, _) {
+      return NavigationBar(
+        backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(13),
+        selectedIndex: navVM.selectedDestination,
+        onDestinationSelected: navVM.onDestinationSelected,
+        height: MediaQuery.sizeOf(context).height * 0.115,
+        destinations: const [
+          _BottomNavBarItem(icon: Iconsax.calendar_tick, label: 'Calendar'),
+          _BottomNavBarItem(icon: Icons.pending_actions, label: 'Pending'),
+          _BottomNavBarItem(icon: Iconsax.verify, label: 'Finished'),
+          _BottomNavBarItem(icon: Iconsax.element_3, label: 'Lists'),
+        ],
+      );
+    });
+  }
+}
 
-  final BuildContext context;
+class _FloatingActionButtonWidget extends StatelessWidget {
+  const _FloatingActionButtonWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -179,17 +173,13 @@ class _FloatingActionButtonWidget extends StatelessWidget {
           Navigator.of(context).push(
             PageTransition(
               type: PageTransitionType.fade,
-              child: TaskEditorPage(
-                editMode: false,
-              ),
+              child: TaskEditorPage(editMode: false),
             ),
           );
         },
         tooltip: 'Add Task',
         elevation: 6,
-        child: const Icon(
-          Icons.add,
-        ),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -247,10 +237,7 @@ class _BottomNavBarItem extends StatelessWidget {
               label: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 transitionBuilder: (child, animation) {
-                  return ScaleTransition(
-                    scale: animation,
-                    child: child,
-                  );
+                  return ScaleTransition(scale: animation, child: child);
                 },
                 child: Text(
                   pendingCount.toString(),
@@ -262,23 +249,13 @@ class _BottomNavBarItem extends StatelessWidget {
                   ),
                 ),
               ),
-              child: Icon(
-                icon
-              ),
+              child: Icon(icon),
             ),
           );
         },
       );
     }
 
-    return NavigationDestination(
-      icon: Icon(
-        icon,
-      ),
-      selectedIcon: Icon(
-        icon,
-      ),
-      label: label,
-    );
+    return NavigationDestination(icon: Icon(icon), selectedIcon: Icon(icon), label: label);
   }
 }

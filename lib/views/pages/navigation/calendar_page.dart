@@ -83,117 +83,101 @@ class _CalendarPageState extends State<CalendarPage> {
             .where((task) => task.dueDate != null)
             .toList();
 
-        return Scaffold(
-          appBar: _isSelectionMode
-              ? AppBar(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            leading: IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: _clearSelection,
-            ),
-            title: Text('${_selectedTaskIds.length} selected'),
-            actions: [
-              IconButton(
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if(_isSelectionMode)
+                ListTile(
+              leading: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: _clearSelection,
+              ),
+              title: Text('${_selectedTaskIds.length} selected'),
+              trailing: IconButton(
                 icon: const Icon(Icons.delete),
                 onPressed: () => _deleteSelectedTasks(taskVM),
               ),
-            ],
-          )
-              : null,
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: Text(
-                  DateFormat('MMMM yyyy').format(_selectedDate),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
+              child: Text(
+                DateFormat('EEE, d MMM, yyyy').format(_selectedDate),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              ScrollableDateBar(
-                initialDate: _selectedDate,
-                onDateSelected: (date) {
-                  setState(() => _selectedDate = date);
-                },
-              ),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.only(top: 8),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        'Tasks for ${DateFormat('MMMM d').format(_selectedDate)}',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onBackground,
-                        ),
-                      ),
-                    ),
-                    Builder(
-                      builder: (context) {
-                        final tasksForSelectedDate = scheduledTasks.where((task) {
-                          final taskDate = task.dueDate!;
-                          return taskDate.year == _selectedDate.year &&
-                              taskDate.month == _selectedDate.month &&
-                              taskDate.day == _selectedDate.day;
-                        }).toList();
+            ),
+            ScrollableDateBar(
+              initialDate: _selectedDate,
+              onDateSelected: (date) {
+                setState(() => _selectedDate = date);
+              },
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.only(top: 16),
+                children: [
+                  Builder(
+                    builder: (context) {
+                      final tasksForSelectedDate = scheduledTasks.where((task) {
+                        final taskDate = task.dueDate!;
+                        return taskDate.year == _selectedDate.year &&
+                            taskDate.month == _selectedDate.month &&
+                            taskDate.day == _selectedDate.day;
+                      }).toList();
 
-                        if (tasksForSelectedDate.isEmpty) {
-                          return Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(32.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Iconsax.calendar_1,
-                                    size: 64,
-                                    color: Theme.of(context).colorScheme.outline,
+                      if (tasksForSelectedDate.isEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(32.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Iconsax.calendar_1,
+                                  size: 64,
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No tasks scheduled for this day',
+                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.w500,
                                   ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'No tasks scheduled for this day',
-                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Tap the + button to add a new task',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Tap the + button to add a new task',
-                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          );
-                        }
-
-                        return Column(
-                          children: tasksForSelectedDate
-                              .map((task) => TaskItem(
-                            key: ValueKey('${task.id}_${task.isDone}'),
-                            task: task,
-                            isSelected: _selectedTaskIds.contains(task.id),
-                            isSelectionMode: _isSelectionMode,
-                            onLongPress: () => _toggleTaskSelection(task),
-                            onSelect: (selected) =>
-                                _toggleTaskSelection(task),
-                          ))
-                              .toList(),
+                          ),
                         );
-                      },
-                    ),
-                  ],
-                ),
+                      }
+
+                      return Column(
+                        children: tasksForSelectedDate
+                            .map((task) => TaskItem(
+                          key: ValueKey('${task.id}_${task.isDone}'),
+                          task: task,
+                          isSelected: _selectedTaskIds.contains(task.id),
+                          isSelectionMode: _isSelectionMode,
+                          onLongPress: () => _toggleTaskSelection(task),
+                          onSelect: (selected) =>
+                              _toggleTaskSelection(task),
+                        ))
+                            .toList(),
+                      );
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
@@ -278,7 +262,7 @@ class _ScrollableDateBarState extends State<ScrollableDateBar> {
                   ? colorScheme.primary
                   : isToday
                   ? colorScheme.primaryContainer
-                  : colorScheme.surface,
+                  : colorScheme.primary.withAlpha(15),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -300,10 +284,10 @@ class _ScrollableDateBarState extends State<ScrollableDateBar> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: isSelected
-                          ? colorScheme.primaryContainer.withOpacity(0.3)
+                          ? colorScheme.primaryContainer.withAlpha(100)
                           : isToday
-                          ? colorScheme.primary.withOpacity(0.2)
-                          : colorScheme.secondaryContainer.withOpacity(0.2),
+                          ? colorScheme.primary.withAlpha(100)
+                          : colorScheme.secondaryContainer.withAlpha(30),
                     ),
                     child: Center(
                       child: Text(

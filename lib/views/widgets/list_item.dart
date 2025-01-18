@@ -31,7 +31,7 @@ class _ListItemState extends State<ListItem> {
       final completedTasks = tasksInList.where((task) => task.isDone == true).length;
 
       final listColor = widget.list.listColor != null
-          ? ListService.getColorFromString(widget.list.listColor)
+          ? ListService.getColorFromString(context,widget.list.listColor)
           : Theme.of(context).colorScheme.primary;
 
       return Card(

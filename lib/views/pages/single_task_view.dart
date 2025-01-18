@@ -102,7 +102,7 @@ class DetailItem extends StatelessWidget {
       child: ListTile(
         leading: Icon(
           icon,
-          color: list != null ? ListService.getColorFromString(list!.listColor) : null,
+          color: list != null ? ListService.getColorFromString(context,list!.listColor) : null,
         ),
         title: Text(title, style: titleStyle),
         subtitle: Text(subtitle, style: subtitleStyle),
