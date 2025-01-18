@@ -20,9 +20,7 @@ class _TaskNotificationSettingsPageState extends State<TaskNotificationSettingsP
         onPopInvokedWithResult: (_, __) {},
         child: Scaffold(
           appBar: AppBar(
-              leading: CupertinoNavigationBarBackButton(
-                color: Colors.white,
-              ),
+              leading: BackButton(),
               title: const Text('Notification Settings', style: TextStyle(fontSize: 20))),
           body: Column(
             children: [
@@ -31,10 +29,7 @@ class _TaskNotificationSettingsPageState extends State<TaskNotificationSettingsP
                 child: SwitchListTile(
                   title: const Text(
                     "Enable notification",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   value: tvm.currentTask.isNotifyEnabled!,
                   onChanged: (value) async {
@@ -54,14 +49,6 @@ class _TaskNotificationSettingsPageState extends State<TaskNotificationSettingsP
                   decoration: BoxDecoration(
                     border: Border.all(color: Theme.of(context).primaryColor.withAlpha(100)),
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withAlpha(30),
-                        spreadRadius: 1,
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
                   ),
                   padding: const EdgeInsets.all(16),
                   child: const Column(
@@ -69,10 +56,7 @@ class _TaskNotificationSettingsPageState extends State<TaskNotificationSettingsP
                     children: [
                       Text(
                         'Notify me before',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                       SizedBox(height: 12),
                       Wrap(
@@ -127,7 +111,7 @@ class _TimeOption extends StatelessWidget {
       builder: (context, tvm, _) {
         final isSelected = tvm.selectedMinutes == minutes;
         return Material(
-          color: isSelected ? Theme.of(context).primaryColor : Colors.grey[200],
+          color: isSelected ? Theme.of(context).primaryColor : null,
           borderRadius: BorderRadius.circular(20),
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
@@ -137,13 +121,7 @@ class _TimeOption extends StatelessWidget {
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.grey[700],
-                  fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-                ),
-              ),
+              child: Text(label),
             ),
           ),
         );

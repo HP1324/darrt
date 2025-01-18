@@ -1,6 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:page_transition/page_transition.dart';
@@ -53,6 +54,8 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
       },
       child: Scaffold(
         appBar: AppBar(
+          leading: BackButton(),
+          backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(25),
           title: widget.editMode
               ? Text(
                   widget.taskToEdit!.title!,
@@ -70,9 +73,9 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
               spacing: 30,
               children: [
                 TaskTextField(titleController: titleController, widget: widget),
-                const SetPriorityWidget(),
                 const AddToListButton(),
                 DateTimePickerButton(mounted: mounted),
+                const SetPriorityWidget(),
                 GotoNotificationSettings(widget: widget),
               ],
             ),
@@ -125,20 +128,24 @@ class TaskTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      spacing: 10,
       children: [
-        const SizedBox(height: 12),
-        CustomTextField(
-          controller: titleController,
-          isMaxLinesNull: true,
-          autoFocus: true,
-          hintText:widget.editMode ? 'What needs changing?' : 'What\'s on your to-do list?',
-          fillColor: Theme.of(context).colorScheme.surfaceContainer,
-          onChanged: (_) {
-            final tvm = Provider.of<TaskViewModel>(context, listen: false);
-            tvm.title = titleController.text;
-          },
+        Icon(Icons.assignment_outlined),
+        Expanded(
+          child: TextField(
+            controller: titleController,
+            maxLines: null,
+            autofocus: true,
+            decoration: InputDecoration(
+              hintText: widget.editMode ? 'What needs changing?' : 'What\'s on your to-do list?',
+              // fillColor: Theme.of(context).colorScheme.surfaceContainer,
+            ),
+            onChanged: (_) {
+              final tvm = Provider.of<TaskViewModel>(context, listen: false);
+              tvm.title = titleController.text;
+            },
+          ),
         ),
       ],
     );
@@ -217,7 +224,6 @@ class AddToListButton extends StatelessWidget {
           builder: (_) {
             return Container(
               decoration: BoxDecoration(
-
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: Column(
@@ -278,7 +284,8 @@ class AddToListButton extends StatelessWidget {
                                           ListService.getIcon(items[index].iconCode),
                                           color: items[index].listColor != null
                                               ? ListService.getColorFromString(
-                                                  items[index].listColor!) : null,
+                                                  context, items[index].listColor!)
+                                              : null,
                                           size: 20,
                                         ),
                                       ),
@@ -321,8 +328,9 @@ class AddToListButton extends StatelessWidget {
                         child: Text(
                           'Done',
                           style: TextStyle(
-                              fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
-                              fontWeight: FontWeight.bold,),
+                            fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -334,6 +342,7 @@ class AddToListButton extends StatelessWidget {
         );
       },
       child: Container(
+        width: MediaQuery.sizeOf(context).width * 0.5,
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surfaceContainerLow,
@@ -342,11 +351,8 @@ class AddToListButton extends StatelessWidget {
         child: Column(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  CupertinoIcons.folder,
-                ),
                 Text(
                   'Add to a list',
                   style: TextStyle(
@@ -354,7 +360,7 @@ class AddToListButton extends StatelessWidget {
                   ),
                 ),
                 Icon(
-                  CupertinoIcons.chevron_right,
+                  Icons.chevron_right,
                 ),
               ],
             ),
@@ -426,7 +432,7 @@ class DateTimePickerButton extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Icon(
-                            Icons.calendar_month,
+                            Icons.calendar_month
                           ),
                           Text(
                             'Set due date',
@@ -475,7 +481,9 @@ class GotoNotificationSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Theme.of(context).colorScheme.surfaceContainerLow),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Theme.of(context).colorScheme.surfaceContainerLow),
       child: Consumer<TaskViewModel>(builder: (_, taskVM, __) {
         return ListTile(
             onTap: () {

@@ -16,50 +16,23 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final dateFormat = DateFormat('EEEE, d MMMM yyyy');
-
+    //TODO: add random quote feature in DrawerHeader
     return Drawer(
       child: Column(
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Theme.of(context).colorScheme.primary,
-                  Theme.of(context).colorScheme.primary.withAlpha(200),
-                ],
-              ),
-            ),
+            decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withAlpha(30)),
             child: SizedBox(
               width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.white24,
-                    child: Icon(
-                      Iconsax.task_square,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                  ),
-                  const Text(
-                    'MinimalTodo',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  const Text('MinimalTodo',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   Text(
                     dateFormat.format(now),
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
+                    style: const TextStyle(fontSize: 14),
                   ),
                 ],
               ),
@@ -73,7 +46,7 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Iconsax.profile_2user),
+            leading: const Icon(Icons.color_lens_outlined),
             title: const Text('Customize Theme'),
             onTap: () {
               Navigator.push(
@@ -103,7 +76,6 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Notifications'),
             onTap: () {
               Navigator.pop(context);
-              // Add navigation logic here if needed
             },
           ),
           const Divider(),
@@ -121,7 +93,6 @@ class AppDrawer extends StatelessWidget {
             child: Text(
               'Version 1.0.0',
               style: TextStyle(
-                color: Colors.grey[600],
                 fontSize: 12,
               ),
             ),

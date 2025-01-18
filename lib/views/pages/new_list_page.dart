@@ -45,12 +45,8 @@ class NewListPage extends StatelessWidget {
             Column(
               children: [
                 AppBar(
-                  title: Text(
-                    'Create New List',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  leading: BackButton(),
+                  title: Text('Create New List', style: TextStyle(fontWeight: FontWeight.bold)),
                   centerTitle: true,
                   elevation: 0,
                 ),
@@ -58,9 +54,7 @@ class NewListPage extends StatelessWidget {
                   child: Container(
                     width: double.infinity,
                     decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(30),
-                      ),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                     ),
                     child: Container(
                       child: SafeArea(
@@ -143,20 +137,21 @@ class NewListPage extends StatelessWidget {
                                       leading: Container(
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color: Theme.of(context).colorScheme.primary.withAlpha(50),
+                                          color:
+                                              Theme.of(context).colorScheme.primary.withAlpha(50),
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Icon(
                                           ListService.getIcon(listVM.selectedIcon),
                                         ),
                                       ),
-                                      title:  Text(
+                                      title: Text(
                                         'Choose Icon',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      trailing:  Icon(
+                                      trailing: Icon(
                                         Icons.chevron_right,
                                       ),
                                     );
@@ -198,13 +193,13 @@ class NewListPage extends StatelessWidget {
                                               : null,
                                         ),
                                       ),
-                                      title:  Text(
+                                      title: Text(
                                         'Choose Color',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      trailing:  Icon(
+                                      trailing: Icon(
                                         Icons.chevron_right,
                                       ),
                                     );
@@ -212,7 +207,6 @@ class NewListPage extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 40),
-
                             ],
                           ),
                         ),
@@ -224,31 +218,27 @@ class NewListPage extends StatelessWidget {
             ),
           ],
         ),
-        floatingActionButton:  FloatingActionButton(
-          onPressed: () async {
-            final nav = Navigator.of(context);
-            if (!editMode!) {
-              final success = await lvm.addNewList();
-              final scrollController = lvm.listScrollController;
-              if (success) {
-                scrollController.animateTo(
-                    scrollController.position.maxScrollExtent,
-                    duration: Duration(milliseconds: 500),
-                    curve: Curves.easeOut);
-                nav.pop();
+        floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              final nav = Navigator.of(context);
+              if (!editMode!) {
+                final success = await lvm.addNewList();
+                final scrollController = lvm.listScrollController;
+                if (success) {
+                  scrollController.animateTo(scrollController.position.maxScrollExtent,
+                      duration: Duration(milliseconds: 500), curve: Curves.easeOut);
+                  nav.pop();
+                }
+              } else {
+                final edited = await lvm.editList();
+                if (edited) {
+                  tvm.updateTaskListAfterEdit(listToEdit!);
+                  nav.pop();
+                }
               }
-            } else {
-              final edited = await lvm.editList();
-              if (edited) {
-                tvm.updateTaskListAfterEdit(listToEdit!);
-                nav.pop();
-              }
-            }
-          },
-          child: Icon(Icons.done)
-        ),
+            },
+            child: Icon(Icons.done)),
       ),
-
     );
   }
 }

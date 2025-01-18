@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart' show CupertinoNavigationBarBackButton;
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/task.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/widgets/task_item.dart';
 import 'package:provider/provider.dart';
@@ -33,9 +31,11 @@ class _SearchPageState extends State<SearchPage> {
       // Title, Priority and List search
       if (_searchQuery.isNotEmpty) {
         bool matchesTitle = task.title?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
-        bool matchesPriority = task.priority?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
-        bool matchesList = task.list?.name?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
-        
+        bool matchesPriority =
+            task.priority?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
+        bool matchesList =
+            task.list?.name?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
+
         if (!matchesTitle && !matchesPriority && !matchesList) {
           return false;
         }
@@ -69,13 +69,11 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
       appBar: AppBar(
+        leading: BackButton(),
         title: TextField(
           controller: _searchController,
           autofocus: true,
-          style: const TextStyle(color: Colors.white),
-          cursorColor: Colors.white,
           decoration: InputDecoration(
             hintText: 'Search tasks...',
             border: InputBorder.none,
@@ -98,11 +96,14 @@ class _SearchPageState extends State<SearchPage> {
       body: Consumer<TaskViewModel>(
         builder: (context, taskVM, _) {
           // Get all categories including 'General'
-          final allLists = ['General', ...taskVM.tasks
+          final allLists = [
+            'General',
+            ...taskVM.tasks
                 .map((task) => task.list?.name)
                 .where((name) => name != null && name != 'General')
                 .toSet()
-                .cast<String>()];
+                .cast<String>()
+          ];
 
           final filteredTasks = _filterTasks(taskVM.tasks);
 
@@ -111,47 +112,51 @@ class _SearchPageState extends State<SearchPage> {
               if (_showFilters) ...[
                 Container(
                   padding: const EdgeInsets.all(16),
-                  color: Colors.white,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                       Text(
+                      Text(
                         'Filter by:',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                       const SizedBox(height: 8),
                       // list Filter
-                      Wrap(
-                        spacing: 8,
-                        children: [
-                          FilterChip(
-                            label: const Text('All Categories'),
-                            selected: _selectedList == null,
-                            onSelected: (selected) {
-                              setState(() {
-                                _selectedList = null;
-                              });
-                            },
-                          ),
-                          ...allLists.map((list) => FilterChip(
+                      SizedBox(
+                        height: MediaQuery.sizeOf(context).height * 0.1,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            FilterChip(
+                              label: const Text('All Categories'),
+                              selected: _selectedList == null,
+                              onSelected: (selected) {
+                                setState(() {
+                                  _selectedList = null;
+                                });
+                              },
+                            ),
+                            ...allLists.map(
+                              (list) => FilterChip(
                                 label: Text(list),
                                 selected: _selectedList == list,
                                 onSelected: (selected) {
-                                  setState(() {
-                                    _selectedList = selected ? list : null;
-                                  });
+                                  setState(
+                                    () {
+                                      _selectedList = selected ? list : null;
+                                    },
+                                  );
                                 },
-                              )),
-                        ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 8),
-                      // Priority Filter
                       Wrap(
-                        spacing: 8,
+                        spacing: 7,
                         children: [
                           FilterChip(
                             label: const Text('All Priorities'),
@@ -176,27 +181,16 @@ class _SearchPageState extends State<SearchPage> {
                     ],
                   ),
                 ),
-                const Divider(height: 1),
               ],
               Expanded(
                 child: filteredTasks.isEmpty
                     ? Center(
                         child: Column(
+                          spacing: 14,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.search_off,
-                              size: 64,
-                              color: Theme.of(context).colorScheme.primary.withAlpha(128),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No tasks found',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Theme.of(context).colorScheme.primary.withAlpha(185),
-                              ),
-                            ),
+                            Icon(Icons.search_off, size: 64),
+                            Text('No tasks found', style: TextStyle(fontSize: 18)),
                           ],
                         ),
                       )

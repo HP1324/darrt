@@ -46,10 +46,8 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
           border: Border.all(
             color: widget.isSelected
                 ? Theme.of(context).colorScheme.primary
-                : isUrgent && !widget.task.isDone!
-                    ? Colors.red.shade200
-                    : Theme.of(context).colorScheme.primary.withAlpha(100),
-            width: widget.isSelected ? 2 : 1,
+                : Theme.of(context).colorScheme.primary.withAlpha(80),
+            width: widget.isSelected ? 2 : 0.5,
           ),
         ),
         child: Material(
@@ -64,7 +62,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: Transform.scale(
-                      scale: 1.1,
+                      scale:1.1,
                       child: Checkbox(
                         key: ValueKey('selection_${widget.task.id}'),
                         shape: RoundedRectangleBorder(
@@ -103,10 +101,10 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                     decoration: widget.task.isDone!
                                         ? TextDecoration.lineThrough
                                         : null,
-                                    decorationColor: Colors.grey,
+                                    decorationColor: Theme.of(context).colorScheme.outline,
                                     decorationThickness: 2,
                                     color: widget.task.isDone!
-                                        ? Colors.grey
+                                        ? Theme.of(context).colorScheme.outline
                                         : null,
                                   ),
                                 ),
@@ -158,7 +156,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                     : Iconsax.folder_2,
                                 size: 14,
                                 color: widget.task.list?.listColor != null
-                                    ? ListService.getColorFromString(widget.task.list?.listColor) :null,
+                                    ? ListService.getColorFromString(context,widget.task.list?.listColor) :null,
                               ),
                               const SizedBox(width: 4),
                               Expanded(
