@@ -35,11 +35,11 @@ class _ListItemState extends State<ListItem> {
           : Theme.of(context).colorScheme.primary;
 
       return Card(
-        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
         elevation: 0,
         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         shape: RoundedRectangleBorder(
-            side: BorderSide(width: 0.2), borderRadius: BorderRadius.circular(10)),
+            side: BorderSide(width: 0.1), borderRadius: BorderRadius.circular(10)),
         child: InkWell(
           onTap: () {
             Navigator.push(

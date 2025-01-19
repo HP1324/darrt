@@ -68,9 +68,9 @@ class _TasksForListPageState extends State<TasksForListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surfaceBright,
+        backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(30),
         elevation: 0,
-        leading: _isSelectionMode 
+        leading: _isSelectionMode
             ? IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: _clearSelection,
@@ -79,14 +79,14 @@ class _TasksForListPageState extends State<TasksForListPage> {
         title: _isSelectionMode
             ? Text(
                 '${_selectedTaskIds.length} selected',
-                style:  TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               )
             : Text(
                 widget.list.name ?? 'Unnamed List',
-                style:  TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -116,7 +116,7 @@ class _TasksForListPageState extends State<TasksForListPage> {
                               }
                               _clearSelection();
                               Navigator.pop(context);
-                              showToast(title:'Tasks deleted');
+                              showToast(title: 'Tasks deleted');
                             },
                             child: const Text('Delete'),
                           ),
@@ -130,49 +130,26 @@ class _TasksForListPageState extends State<TasksForListPage> {
       ),
       body: Consumer<TaskViewModel>(
         builder: (context, taskVM, _) {
-          final tasksInList =  taskVM.tasks
-                  .where((task) => task.list?.id == widget.list.id)
-                  .toList();
+          final tasksInList =
+              taskVM.tasks.where((task) => task.list?.id == widget.list.id).toList();
 
           if (tasksInList.isEmpty) {
             return Center(
               child: Column(
+                spacing: 15,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      ListService.getIcon(widget.list.iconCode),
-                      size: 48,
-                      color: Theme.of(context).colorScheme.primary.withAlpha(170),
-                    ),
+                  Icon(
+                    ListService.getIcon(widget.list.iconCode),
+                    size: 48,
+                    color: ListService.getColorFromString(context, widget.list.listColor),
                   ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'No Tasks Yet',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'This list is empty',
-                    style: TextStyle(
-                      color: Colors.black54,
-                    ),
-                  ),
+                  Text('No Tasks Yet',style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             );
           }
-
-          // Group tasks by date
-          final groupedTasks = <DateTime, List<Task>>{};
+          final groupedTasks = {};
           for (var task in tasksInList) {
             final date = task.dueDate ?? task.createdAt ?? DateTime.now();
             final dateOnly = DateTime(date.year, date.month, date.day);
@@ -183,8 +160,7 @@ class _TasksForListPageState extends State<TasksForListPage> {
           }
 
           // Sort dates
-          final sortedDates = groupedTasks.keys.toList()
-            ..sort((a, b) => a.compareTo(b));
+          final sortedDates = groupedTasks.keys.toList()..sort((a, b) => a.compareTo(b));
 
           return ListView.builder(
             itemCount: sortedDates.length,
