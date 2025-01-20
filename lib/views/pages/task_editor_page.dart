@@ -67,14 +67,13 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
           padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
           child: SingleChildScrollView(
             child: Column(
-              spacing: 30,
+              spacing: 40,
               children: [
                 TaskTextField(titleController: titleController, widget: widget),
                 Row(
-
                   children: [
-                    Flexible(flex: 2,child: const AddToListButton()),
-                    Flexible(flex: 3,child: const SetPriorityWidget()),
+                    Flexible(flex: 2, child: const AddToListButton()),
+                    Flexible(flex: 3, child: const SetPriorityWidget()),
                   ],
                 ),
                 DateTimePickerButton(mounted: mounted),
@@ -94,8 +93,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
               if (success) {
                 navigator.pop();
                 showToast(title: 'Task Added');
-                logger.d(
-                    'Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
+                logger.d('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
               }
             } else {
               final changes = await tvm.editTask();
@@ -162,18 +160,209 @@ class SetPriorityWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.flag_outlined),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'Priority',
+                      style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+                Consumer2<PriorityViewModel, TaskViewModel>(
+                  builder: (_, pvm, tvm, __) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              pvm.navigatePriority(false);
+                              tvm.priority = pvm.currentPriority;
+                            },
+                            child: Icon(
+                              Icons.chevron_left,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                pvm.currentPriority,
+                                style: TextStyle(
+                                  fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              pvm.navigatePriority(true);
+                              tvm.priority = pvm.currentPriority;
+                            },
+                            child: Icon(
+                              Icons.chevron_right,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class AddToListButton extends StatelessWidget {
+  const AddToListButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        final gvm = Provider.of<GeneralViewModel>(context, listen: false);
+        gvm.textFieldNode.unfocus();
+        showModalBottomSheet(
+          useRootNavigator: true,
+          context: context,
+          builder: (_) {
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 8),
+                  ListTile(
+                    onTap: () {
+                      Navigator.of(context).push(PageTransition(child: NewListPage(editMode: false), type: PageTransitionType.leftToRightWithFade));
+                    },
+                    title: Text(
+                      'Create New List',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.add),
+                    ),
+                    trailing: Icon(Icons.list_alt),
+                  ),
+                  Expanded(
+                    child: Consumer2<ListViewModel, TaskViewModel>(
+                      builder: (_, lvm, tvm, __) {
+                        List<ListModel> items = lvm.lists;
+                        return Scrollbar(
+                          thickness: 8,
+                          radius: const Radius.circular(4),
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            controller: lvm.listScrollController,
+                            itemCount: items.length,
+                            itemBuilder: (_, index) {
+                              return Card(
+                                elevation: 0,
+                                color:
+                                    (tvm.currentTask.list ?? items[0]) == items[index] ? Theme.of(context).colorScheme.surface : Colors.transparent,
+                                margin: const EdgeInsets.symmetric(vertical: 4),
+                                child: RadioListTile(
+                                  value: items[index],
+                                  groupValue: tvm.currentTask.list ?? items[0],
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Icon(
+                                          ListService.getIcon(items[index].iconCode),
+                                          color: items[index].listColor != null
+                                              ? ListService.getColorFromString(context, items[index].listColor!)
+                                              : null,
+                                          size: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        items[index].name!,
+                                        style: TextStyle(
+                                          fontWeight: (tvm.currentTask.list ?? items[0]) == items[index] ? FontWeight.bold : FontWeight.normal,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onChanged: (selected) {
+                                    lvm.updateChosenList(selected!);
+                                    tvm.list = selected;
+                                    logger.d('chosen list: ${selected.name}, icon: ${selected.iconCode}');
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          showToast(title: 'Added to the list');
+                        },
+                        child: Text(
+                          'Done',
+                          style: TextStyle(
+                            fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 5),
-            child: Icon(
-              Icons.flag_outlined,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+          Icon(
+            Icons.folder_outlined,
+            color: Theme.of(context).colorScheme.primary,
           ),
+          const SizedBox(width: 8),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -190,55 +379,29 @@ class SetPriorityWidget extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        'Priority',
+                        'Category',
                         style: TextStyle(
                           fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+                      Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 22,
+                      ),
                     ],
                   ),
-                  Consumer2<PriorityViewModel, TaskViewModel>(
-                    builder: (_, pvm, tvm, __) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Left Arrow
-                          IconButton(
-                            onPressed: () {
-                              pvm.navigatePriority(false);
-                              tvm.priority = pvm.currentPriority;
-                            },
-                            icon: Icon(
-                              Icons.chevron_left,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            padding: EdgeInsets.zero,
-                            visualDensity: VisualDensity.compact,
+                  Consumer<TaskViewModel>(
+                    builder: (_, tvm, __) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Text(
+                          tvm.currentTask.list?.name ?? 'General',
+                          style: TextStyle(
+                            fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
+                            fontWeight: FontWeight.w400,
                           ),
-                          // Priority Text
-                          Text(
-                            pvm.currentPriority,
-                            style: TextStyle(
-                              fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          // Right Arrow
-                          IconButton(
-                            onPressed: () {
-                              pvm.navigatePriority(true);
-                              tvm.priority = pvm.currentPriority;
-                            },
-                            icon: Icon(
-                              Icons.chevron_right,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            visualDensity: VisualDensity.compact,
-                          ),
-                        ],
+                        ),
                       );
                     },
                   ),
@@ -247,196 +410,6 @@ class SetPriorityWidget extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class AddToListButton extends StatelessWidget {
-  const AddToListButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: InkWell(
-        onTap: () {
-          final gvm = Provider.of<GeneralViewModel>(context, listen: false);
-          gvm.textFieldNode.unfocus();
-          showModalBottomSheet(
-            useRootNavigator: true,
-            context: context,
-            builder: (_) {
-              return Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 8),
-                    ListTile(
-                      onTap: () {
-                        Navigator.of(context).push(PageTransition(
-                            child: NewListPage(editMode: false),
-                            type: PageTransitionType.leftToRightWithFade));
-                      },
-                      title: Text(
-                        'Create New List',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      leading: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(Icons.add),
-                      ),
-                      trailing: Icon(Icons.list_alt),
-                    ),
-                    Expanded(
-                      child: Consumer2<ListViewModel, TaskViewModel>(
-                        builder: (_, lvm, tvm, __) {
-                          List<ListModel> items = lvm.lists;
-                          return Scrollbar(
-                            thickness: 8,
-                            radius: const Radius.circular(4),
-                            child: ListView.builder(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                              controller: lvm.listScrollController,
-                              itemCount: items.length,
-                              itemBuilder: (_, index) {
-                                return Card(
-                                  elevation: 0,
-                                  color: (tvm.currentTask.list ?? items[0]) == items[index]
-                                      ? Theme.of(context).colorScheme.surface
-                                      : Colors.transparent,
-                                  margin: const EdgeInsets.symmetric(vertical: 4),
-                                  child: RadioListTile(
-                                    value: items[index],
-                                    groupValue: tvm.currentTask.list ?? items[0],
-                                    title: Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: Icon(
-                                            ListService.getIcon(items[index].iconCode),
-                                            color: items[index].listColor != null
-                                                ? ListService.getColorFromString(
-                                                context, items[index].listColor!)
-                                                : null,
-                                            size: 20,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Text(
-                                          items[index].name!,
-                                          style: TextStyle(
-                                            fontWeight:
-                                            (tvm.currentTask.list ?? items[0]) ==
-                                                items[index]
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    onChanged: (selected) {
-                                      lvm.updateChosenList(selected!);
-                                      tvm.list = selected;
-                                      logger.d(
-                                          'chosen list: ${selected.name}, icon: ${selected.iconCode}');
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: FilledButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            showToast(title: 'Added to the list');
-                          },
-                          child: Text(
-                            'Done',
-                            style: TextStyle(
-                              fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        },
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(Icons.folder_outlined,color:Theme.of(context).colorScheme.primary),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.only(bottom: 4),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 1.5,
-                    ),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'Category',
-                          style: TextStyle(
-                            fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                        Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          size: 22,
-                        ),
-                      ],
-                    ),
-                    Consumer<TaskViewModel>(
-                      builder: (_, tvm, __) {
-                        logger.d('Chosen list in consumer ${tvm.currentTask.list?.name ?? 'General'}');
-                        return Text(
-                          tvm.currentTask.list?.name ?? 'General',
-                          style: TextStyle(
-                            fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -458,22 +431,14 @@ class DateTimePickerButton extends StatelessWidget {
           child: Consumer2<TaskViewModel, GeneralViewModel>(builder: (_, tvm, gvm, __) {
             return InkWell(
               onTap: () {
-                showDatePicker(
-                        context: context,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 18250)))
+                showDatePicker(context: context, firstDate: DateTime.now(), lastDate: DateTime.now().add(const Duration(days: 18250)))
                     .then((selectedDate) {
                   if (selectedDate != null && mounted) {
-                    showTimePicker(context: context, initialTime: TimeOfDay.now())
-                        .then((selectedTime) {
+                    showTimePicker(context: context, initialTime: TimeOfDay.now()).then((selectedTime) {
                       if (selectedTime != null) {
                         final dueDateChanged = tvm.updateDueDate(selectedDate, selectedTime);
                         if (!dueDateChanged) {
-                          showToast(
-                              title: 'Invalid date or time',
-                              bgColor: Colors.red.shade400,
-                              fgColor: Colors.white,
-                              alignment: Alignment.center);
+                          showToast(title: 'Invalid date or time', bgColor: Colors.red.shade400, fgColor: Colors.white, alignment: Alignment.center);
                         }
                       }
                     });
@@ -498,8 +463,7 @@ class DateTimePickerButton extends StatelessWidget {
                           Icon(Icons.calendar_month),
                           Text(
                             'Set due date',
-                            style: TextStyle(
-                                fontSize: Theme.of(context).textTheme.titleMedium!.fontSize),
+                            style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize),
                           ),
                           Icon(
                             CupertinoIcons.chevron_right,
@@ -543,24 +507,15 @@ class GotoNotificationSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Theme.of(context).colorScheme.surfaceContainerLow),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Theme.of(context).colorScheme.surfaceContainerLow),
       child: Consumer<TaskViewModel>(builder: (_, taskVM, __) {
         return ListTile(
             onTap: () {
               if (taskVM.currentTask.dueDate != null) {
-                Navigator.push(
-                    context,
-                    PageTransition(
-                        child: TaskNotificationSettingsPage(), type: PageTransitionType.fade));
+                Navigator.push(context, PageTransition(child: TaskNotificationSettingsPage(), type: PageTransitionType.fade));
                 taskVM.setNotifConfigInUI();
               } else {
-                showToast(
-                    title: 'Please set a due date first',
-                    fgColor: Colors.white,
-                    bgColor: Colors.red,
-                    alignment: Alignment.center);
+                showToast(title: 'Please set a due date first', fgColor: Colors.white, bgColor: Colors.red, alignment: Alignment.center);
               }
             },
             title: Text(
