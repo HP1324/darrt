@@ -42,7 +42,7 @@ class NotificationService {
 
       await _notif.setListeners(onActionReceivedMethod: onActionReceivedMethod);
     }else{
-      showToast(title: 'Notification permission is required to send notifications',bgColor: Colors.red,fgColor: Colors.white, alignment: Alignment.center);
+      showToast(title: 'Notification permission is required to send notifications', alignment: Alignment.center);
     }
   }
 
