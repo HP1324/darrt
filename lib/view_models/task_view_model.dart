@@ -31,7 +31,18 @@ class TaskViewModel extends ChangeNotifier {
     currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
     notifyListeners();
   }
+  set time(TimeOfDay time){
+    final DateTime now = currentTask.dueDate ?? DateTime.now();
 
+    dueDate = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
+    );
+    notifyListeners();
+  }
   void removeDueDate() {
     currentTask.dueDate = null;
     notifyListeners();
@@ -77,8 +88,6 @@ class TaskViewModel extends ChangeNotifier {
     }
     showToast(
         title: 'Please enter a task first',
-        bgColor: Colors.red,
-        fgColor: Colors.white,
         alignment: Alignment.center);
     return false;
   }
@@ -255,18 +264,22 @@ class TaskViewModel extends ChangeNotifier {
 
   int selectedMinutes = 0;
 
-  void updateNotifyTime(int minutes) {
+  bool updateNotifyTime(int minutes) {
     selectedMinutes = minutes;
     var notifTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
     logger.d('task due date: ${currentTask.dueDate}, notifyTime: $notifTime');
     if (notifTime.isAfter(DateTime.now())) {
       currentTask.notifyTime =
           currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes, seconds: 35));
+
+      notifyListeners();
+      return true;
     } else {
       selectedMinutes = 0;
-      showToast(title: 'This time has gone');
+
+      notifyListeners();
+      return false;
     }
-    notifyListeners();
   }
 
   void resetNotifSettings() {
