@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart' show CupertinoNavigationBarBackButton;
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:minimaltodo/app_router.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/services/list_service.dart';
 import 'package:page_transition/page_transition.dart';
@@ -23,14 +24,7 @@ class TaskView extends StatelessWidget {
       floatingActionButton: TaskViewButton(
           label: 'Edit',
           onTap: () {
-            Navigator.push(
-                context,
-                PageTransition(
-                    child: TaskEditorPage(
-                      editMode: true,
-                      taskToEdit: task,
-                    ),
-                    type: PageTransitionType.fade));
+            AppRouter.to(context,child: TaskEditorPage(editMode: true,taskToEdit: task,));
           },),
       body: Padding(
         padding: const EdgeInsets.all(8.0),

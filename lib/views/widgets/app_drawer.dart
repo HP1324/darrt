@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:minimaltodo/app_router.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/theme_view_model.dart';
 import 'package:minimaltodo/views/pages/productivity_stats_page.dart';
@@ -48,28 +49,12 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.color_lens_outlined),
             title: const Text('Customize Theme'),
-            onTap: () {
-              Navigator.push(
-                context,
-                PageTransition(
-                  type: PageTransitionType.fade,
-                  child: ThemeSettingsPage(),
-                ),
-              );
-            },
+            onTap: () => AppRouter.to(context, child: ThemeSettingsPage()),
           ),
           ListTile(
             leading: const Icon(Iconsax.chart_2),
             title: const Text('Productivity Stats'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProductivityStatsPage(),
-                ),
-              );
-            },
+            onTap: () => AppRouter.to(context, child: ProductivityStatsPage()),
           ),
           ListTile(
             leading: const Icon(Iconsax.notification),

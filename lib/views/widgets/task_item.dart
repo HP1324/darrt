@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/app_router.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
@@ -23,13 +24,7 @@ class TaskItem extends StatelessWidget {
   final Function(bool)? onSelect;
 
   void _navigateToTaskDetails(BuildContext context) {
-    Navigator.push(
-      context,
-      PageTransition(
-        type: PageTransitionType.fade,
-        child: TaskView(task: task),
-      ),
-    );
+    AppRouter.to(context, child: TaskView(task: task));
   }
 
   @override

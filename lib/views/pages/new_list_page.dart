@@ -99,10 +99,6 @@ class _NewListPageState extends State<NewListPage> {
                       autofocus: true,
                       decoration: InputDecoration(
                         hintText: 'e.g., Work, Shopping, Personal',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 15,
