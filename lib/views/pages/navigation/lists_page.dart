@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/app_router.dart';
 import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
@@ -21,10 +22,11 @@ class _ListsPageState extends State<ListsPage> {
   bool _showSearch = false;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-
+  FocusNode _focusNode = FocusNode();
   @override
   void dispose() {
     _searchController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -65,9 +67,9 @@ class _ListsPageState extends State<ListsPage> {
                               if (!_showSearch) {
                                 _searchController.clear();
                                 _searchQuery = '';
-                                generalVM.textFieldNode.unfocus();
+                                _focusNode.unfocus();
                               }else{
-                                generalVM.textFieldNode.requestFocus();
+                                _focusNode.requestFocus();
                               }
                             });
                           },
@@ -78,15 +80,7 @@ class _ListsPageState extends State<ListsPage> {
                         ),
                         const SizedBox(width: 8),
                         IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              PageTransition(
-                                type: PageTransitionType.fade,
-                                child: NewListPage(editMode: false),
-                              ),
-                            );
-                          },
+                          onPressed: () => AppRouter.to(context, child: NewListPage(editMode: false)),
                           icon: const Icon(Iconsax.add),
                         ),
                       ],
@@ -105,6 +99,7 @@ class _ListsPageState extends State<ListsPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: CustomTextField(
                       controller: _searchController,
+                      focusNode: _focusNode,
                       isMaxLinesNull: false,
                       autoFocus: false,
                       hintText: 'Search lists...',

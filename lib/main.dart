@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:minimaltodo/app_router.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/view_models/theme_view_model.dart';
 import 'package:page_transition/page_transition.dart';
@@ -109,12 +110,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         IconButton(
           icon: Icon(Icons.search),
-          onPressed: () {
-            Navigator.push(
-              context,
-              PageTransition(type: PageTransitionType.fade, child: const SearchPage()),
-            );
-          },
+          onPressed: () => AppRouter.to(context, child: SearchPage()),
         ),
         Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
           return Transform.scale(
@@ -151,7 +147,7 @@ class _BottomNavBarWidget extends StatelessWidget {
         selectedIndex: navVM.selectedDestination,
         onDestinationSelected: (selected) {
           if (selected == 4) {
-            Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: Scaffold()));
+            AppRouter.to(context,child: Scaffold(), type: PageTransitionType.rightToLeft);
           } else {
             navVM.onDestinationSelected(selected);
           }
@@ -176,15 +172,10 @@ class _FloatingActionButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10.0),
+      padding: const EdgeInsets.only(bottom: 16.0),
       child: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(
-            PageTransition(
-              type: PageTransitionType.fade,
-              child: TaskEditorPage(editMode: false),
-            ),
-          );
+          AppRouter.to(context,child: TaskEditorPage(editMode: false));
         },
         tooltip: 'Add Task',
         elevation: 6,

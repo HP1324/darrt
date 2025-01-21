@@ -36,7 +36,7 @@ class CustomTextField extends StatelessWidget {
       child: Consumer<GeneralViewModel>(
         builder: (context,gvm, _) {
           return TextField(
-            focusNode: gvm.textFieldNode,
+            focusNode: focusNode,
             controller: controller,
             textInputAction: TextInputAction.done,
             maxLines: isMaxLinesNull ? null : 1,

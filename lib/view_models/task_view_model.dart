@@ -35,7 +35,7 @@ class TaskViewModel extends ChangeNotifier {
     currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
     notifyListeners();
   }
-
+  TextEditingController titleController = TextEditingController();
   set time(TimeOfDay time) {
     final DateTime now = currentTask.dueDate ?? DateTime.now();
 
@@ -202,7 +202,6 @@ class TaskViewModel extends ChangeNotifier {
     await StatsService.updateStats(dateKey, stats);
   }
 
-
   List<Task> finishedTasks = [];
   List<Task> pendingTasks = [];
   void filterTasks(int filterFlag) async {
@@ -272,8 +271,8 @@ class TaskViewModel extends ChangeNotifier {
     _refreshTasks();
   }
 
-  List<String> priorities = ["Urgent",  "High", "Medium", "Low"];
-  int currentValue = 3;  // Default to Low
+  List<String> priorities = ["Urgent", "High", "Medium", "Low"];
+  int currentValue = 3; // Default to Low
 
   void navigatePriority(bool isNext) {
     if (isNext) {
@@ -281,9 +280,8 @@ class TaskViewModel extends ChangeNotifier {
     } else {
       currentValue = (currentValue - 1 + priorities.length) % priorities.length;
     }
-  currentTask.priority = priorities[currentValue];
+    currentTask.priority = priorities[currentValue];
     notifyListeners();
   }
-
 
 }

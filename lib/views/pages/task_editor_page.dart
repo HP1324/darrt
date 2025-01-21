@@ -1,7 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/app_router.dart';
 import 'package:minimaltodo/services/list_service.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:page_transition/page_transition.dart';
@@ -10,10 +9,8 @@ import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/view_models/list_view_model.dart';
-import 'package:minimaltodo/view_models/priority_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/new_list_page.dart';
-import 'package:minimaltodo/views/pages/notification_settings_page.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
@@ -33,7 +30,6 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
   void initState() {
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +68,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
               return Column(
                 spacing: 50,
                 children: [
-                  TaskTextField(titleController: titleController, widget: widget),
+                  TaskTextField(editMode: widget.editMode),
                   Row(
                     children: [
                       Flexible(flex: 2, child: const AddToListButton()),
@@ -92,72 +88,62 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
             }),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            final navigator = Navigator.of(context);
-            final isNotifEnabled = tvm.currentTask.isNotifyEnabled;
-            if (!widget.editMode) {
-              tvm.currentTask.printTask();
-              final success = await tvm.addNewTask();
-              logger.d('Task added: $success');
-              if (success) {
-                navigator.pop();
-                showToast(title: 'Task Added');
-                logger.d('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
-              }
-            } else {
-              final changes = await tvm.editTask();
-              if (changes > 0) {
-                navigator.pop();
-                showToast(title: 'Task edited');
-              }
-            }
-            if (isNotifEnabled!) {
-              await NotificationService.createTaskNotification(tvm.currentTask);
-            } else {
-              await NotificationService.removeTaskNotification(tvm.currentTask);
-            }
-          },
-          shape: const CircleBorder(),
-          child: const Icon(Icons.done),
-        ),
+        floatingActionButton:
+             FloatingActionButton(
+              onPressed: () async {
+                final navigator = Navigator.of(context);
+                final isNotifEnabled = tvm.currentTask.isNotifyEnabled;
+                tvm.title = tvm.titleController.text;
+                if (!widget.editMode) {
+                  tvm.currentTask.printTask();
+                  final success = await tvm.addNewTask();
+                  logger.d('Task added: $success');
+                  if (success) {
+                    navigator.pop();
+                    showToast(title: 'Task Added');
+                    logger.d('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
+                  }
+                } else {
+                  final changes = await tvm.editTask();
+                  if (changes > 0) {
+                    navigator.pop();
+                    showToast(title: 'Task edited');
+                  }
+                }
+                if (isNotifEnabled!) {
+                  await NotificationService.createTaskNotification(tvm.currentTask);
+                } else {
+                  await NotificationService.removeTaskNotification(tvm.currentTask);
+                }
+                tvm.titleController.clear();
+              },
+              shape: const CircleBorder(),
+              child: const Icon(Icons.done),
+             ),
       ),
     );
   }
 }
 
 class TaskTextField extends StatelessWidget {
-  const TaskTextField({
-    super.key,
-    required this.titleController,
-    required this.widget,
-  });
-
-  final TextEditingController titleController;
-  final TaskEditorPage widget;
-
+  const TaskTextField({super.key, required this.editMode});
+  final bool editMode;
   @override
   Widget build(BuildContext context) {
     return Row(
       spacing: 10,
       children: [
-        Icon(
-          Icons.assignment_outlined,
-          size: 19,
-        ),
+        Icon(Icons.assignment_outlined, size: 19),
         Expanded(
-          child: Consumer2<GeneralViewModel,TaskViewModel>(builder: (context, gvm,taskVM, _) {
+          child: Consumer2<GeneralViewModel, TaskViewModel>(builder: (context, generalVM, taskVM, _) {
             return TextField(
-              focusNode: gvm.textFieldNode,
-              controller: titleController,
+              focusNode: generalVM.textFieldNode,
+              controller: taskVM.titleController,
               maxLines: null,
               autofocus: true,
               decoration: InputDecoration(
-                hintText: widget.editMode ? 'What needs changing?' : 'What\'s on your to-do list?',
+                hintText: editMode ? taskVM.currentTask.title : 'What\'s on your to-do list?',
               ),
-              onChanged: (_) {
-                taskVM.title = titleController.text;
-              },
             );
           }),
         ),
@@ -244,9 +230,7 @@ class _ListSelectionBottomSheetState extends State<_ListSelectionBottomSheet> {
         children: [
           const SizedBox(height: 8),
           ListTile(
-            onTap: () {
-              Navigator.push(context, PageTransition(child: NewListPage(editMode: false), type: PageTransitionType.leftToRight));
-            },
+            onTap: () => AppRouter.to(context, child: NewListPage(editMode: false),type: PageTransitionType.rightToLeft),
             title: Text('Create New List', style: TextStyle(fontWeight: FontWeight.w500)),
             leading: Container(
               padding: const EdgeInsets.all(8),

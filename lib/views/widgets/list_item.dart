@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/app_router.dart';
 import 'package:minimaltodo/data_models/list_model.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/list_service.dart';
@@ -40,16 +41,8 @@ class _ListItemState extends State<ListItem> {
         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         shape: RoundedRectangleBorder(
             side: BorderSide(width: 0.1), borderRadius: BorderRadius.circular(10)),
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              PageTransition(
-                type: PageTransitionType.fade,
-                child: TasksForListPage(list: widget.list),
-              ),
-            );
-          },
+        child:  InkWell(
+          onTap: () => AppRouter.to(context, child: TasksForListPage(list: widget.list)),
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
@@ -98,18 +91,7 @@ class _ListItemState extends State<ListItem> {
                             ),
                             items: [
                               PopupMenuItem(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    PageTransition(
-                                      type: PageTransitionType.fade,
-                                      child: NewListPage(
-                                        editMode: true,
-                                        listToEdit: widget.list,
-                                      ),
-                                    ),
-                                  );
-                                },
+                                onTap: () => AppRouter.to(context, child: NewListPage(editMode: true,listToEdit: widget.list,)),
                                 child: Row(
                                   children: [
                                     Icon(Icons.edit, color: listColor, size: 20),
@@ -122,7 +104,7 @@ class _ListItemState extends State<ListItem> {
                                 onTap: () {
                                   showDialog(
                                     context: context,
-                                    builder: (context) => AlertDialog(
+                                    builder: (conztext) => AlertDialog(
                                       content: const Text(
                                           'Are you sure you want to delete the list? All tasks in this list will be moved to the General list.'),
                                       actions: [
