@@ -9,22 +9,13 @@ class PriorityViewModel extends ChangeNotifier{
 
   void navigatePriority(bool isNext) {
     if (isNext) {
-      // Go to next priority (right)
       currentValue = (currentValue + 1) % priorities.length;
     } else {
-      // Go to previous priority (left)
       currentValue = (currentValue - 1 + priorities.length) % priorities.length;
     }
+
     notifyListeners();
   }
-  // void resetPriority(){
-  //   currentValue = 3;
-  //   notifyListeners();
-  // }
-  // WidgetStateProperty<Color?> setChipColor(int index){
-  //   return WidgetStatePropertyAll(chipColor = currentValue == index ? AppTheme.light.primaryColor : AppTheme.light.primaryColor);
-  // }
-  Color setLabelColor(int index){
-    return currentValue == index ? Colors.white : Colors.black;
-  }
+
+
 }

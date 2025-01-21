@@ -23,7 +23,11 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  set priority(String priority) => currentTask.priority = priority;
+  set priority(String priority) {
+    currentTask.priority = priority;
+    notifyListeners();
+  }
+
   set title(String title) => currentTask.title = title;
   set dueDate(DateTime? dueDate) {
     currentTask.dueDate = dueDate;
@@ -31,7 +35,8 @@ class TaskViewModel extends ChangeNotifier {
     currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
     notifyListeners();
   }
-  set time(TimeOfDay time){
+
+  set time(TimeOfDay time) {
     final DateTime now = currentTask.dueDate ?? DateTime.now();
 
     dueDate = DateTime(
@@ -43,20 +48,16 @@ class TaskViewModel extends ChangeNotifier {
     );
     notifyListeners();
   }
+
   void removeDueDate() {
     currentTask.dueDate = null;
     notifyListeners();
   }
+
   bool updateDueDate(DateTime date, TimeOfDay time) {
-    final taskDueDate = DateTime(
-        date.year,
-        date.month,
-        date.day,
-        time.hour,
-        time.minute,
-        0 //seconds
-    );
-    if(isValidDateTime(taskDueDate)){
+    final taskDueDate = DateTime(date.year, date.month, date.day, time.hour, time.minute, 0 //seconds
+        );
+    if (isValidDateTime(taskDueDate)) {
       currentTask.dueDate = taskDueDate;
       currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
       notifyListeners();
@@ -64,6 +65,7 @@ class TaskViewModel extends ChangeNotifier {
     }
     return false;
   }
+
   _refreshTasks() async {
     _tasks = await TaskService.getTasks();
     notifyListeners();
@@ -86,9 +88,7 @@ class TaskViewModel extends ChangeNotifier {
       isNewTaskAdded = true;
       return true;
     }
-    showToast(
-        title: 'Please enter a task first',
-        alignment: Alignment.center);
+    showToast(title: 'Please enter a task first', alignment: Alignment.center);
     return false;
   }
 
@@ -124,8 +124,7 @@ class TaskViewModel extends ChangeNotifier {
     await Future.delayed(Duration(milliseconds: 900));
     var changesMade = 0;
     task.isDone = updatedStatus;
-    changesMade =
-        await TaskService.toggleDone(task.id!, updatedStatus, task.isDone! ? DateTime.now() : null);
+    changesMade = await TaskService.toggleDone(task.id!, updatedStatus, task.isDone! ? DateTime.now() : null);
     _refreshTasks();
     return changesMade;
   }
@@ -203,41 +202,6 @@ class TaskViewModel extends ChangeNotifier {
     await StatsService.updateStats(dateKey, stats);
   }
 
-  // The following part filters tasks done or undone
-  Map<String, bool> doneUndone = {
-    'Finished': false,
-    'Pending': false,
-  };
-
-  ///This [filterFlag] variable is managing three states of filtering
-  /// 0 = All tasks
-  /// 1 = Tasks done
-  /// 2 = Tasks not done
-  int filterFlag = 0;
-
-  void toggleSelected(String label, bool value) {
-    ///This line makes sure that only one of the chips is getting selected. all the ///other selected chips will
-    ///be set to false with the use of [updateAll] method
-    doneUndone.updateAll((k, v) => k == label ? value : false);
-    notifyListeners();
-    _setFilterFlag(label);
-  }
-
-  ///This function manages the value of [filterFlag] variable based on the value of [label]
-  void _setFilterFlag(String label) async {
-    ///Checking if no chip is currently selected in order to show all tasks again by setting [filterDone]
-    /// to [zero]. For this I have used [every] method from [abstract mixin class Iterable] which checks whether or
-    /// not a certain object is set
-    /// to a certain value. if all are false then [filterDone] is zero which will show all tasks again.
-    bool allFalse = doneUndone.values.every((value) => !value);
-    filterFlag = allFalse
-        ? 0
-        : label == 'Finished'
-            ? 1
-            : 2;
-    debugPrint('filter: $filterFlag');
-    _refreshTasks();
-  }
 
   List<Task> finishedTasks = [];
   List<Task> pendingTasks = [];
@@ -269,8 +233,7 @@ class TaskViewModel extends ChangeNotifier {
     var notifTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
     logger.d('task due date: ${currentTask.dueDate}, notifyTime: $notifTime');
     if (notifTime.isAfter(DateTime.now())) {
-      currentTask.notifyTime =
-          currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes, seconds: 35));
+      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes, seconds: 35));
 
       notifyListeners();
       return true;
@@ -308,4 +271,19 @@ class TaskViewModel extends ChangeNotifier {
     final results = await TaskService.editTaskListAfterEdit(tasksForCurrentList, list);
     _refreshTasks();
   }
+
+  List<String> priorities = ["Urgent",  "High", "Medium", "Low"];
+  int currentValue = 3;  // Default to Low
+
+  void navigatePriority(bool isNext) {
+    if (isNext) {
+      currentValue = (currentValue + 1) % priorities.length;
+    } else {
+      currentValue = (currentValue - 1 + priorities.length) % priorities.length;
+    }
+  currentTask.priority = priorities[currentValue];
+    notifyListeners();
+  }
+
+
 }

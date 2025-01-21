@@ -1,5 +1,6 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
@@ -23,7 +24,17 @@ import 'package:toastification/toastification.dart';
 void main() async {
   await GetStorage.init();
   await NotificationService.initNotifications();
-  runApp(const SimpleTodo());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => TaskViewModel()),
+      ChangeNotifierProvider(create: (_) => ListViewModel()),
+      ChangeNotifierProvider(create: (_) => PriorityViewModel()),
+      ChangeNotifierProvider(create: (_) => NavigationViewModel()),
+      ChangeNotifierProvider(create: (_) => GeneralViewModel()),
+      ChangeNotifierProvider(create: (_) => ThemeViewModel()),
+    ],
+    child: const SimpleTodo(),
+  ));
 }
 
 class SimpleTodo extends StatefulWidget {
@@ -37,36 +48,25 @@ class SimpleTodo extends StatefulWidget {
 class _SimpleTodoState extends State<SimpleTodo> {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => TaskViewModel()),
-        ChangeNotifierProvider(create: (_) => ListViewModel()),
-        ChangeNotifierProvider(create: (_) => PriorityViewModel()),
-        ChangeNotifierProvider(create: (_) => NavigationViewModel()),
-        ChangeNotifierProvider(create: (_) => GeneralViewModel()),
-        ChangeNotifierProvider(create: (_) => ThemeViewModel()),
-      ],
-      child: ToastificationWrapper(
-        child: Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
-          return MaterialApp(
-            // Color(0xFF6B4EFF)
-            navigatorKey: SimpleTodo.navigatorKey,
-            theme: FlexColorScheme.light(colors: themeVM.selectedScheme).toTheme,
-            darkTheme: FlexColorScheme.dark(
-                    colors: themeVM.selectedScheme.toDark(),
-                    surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-                    blendLevel: 12, // Reduces contrast by blending colors more subtly
-                    appBarStyle: FlexAppBarStyle.background,
-                    darkIsTrueBlack: false, // Prevents pure black
-                    scaffoldBackground: Color(0xff131313))
-                .toTheme,
-            themeMode: themeVM.themeMode,
-            debugShowCheckedModeBanner: false,
-            title: 'MinimalTodo',
-            home: const Home(),
-          );
-        }),
-      ),
+    return ToastificationWrapper(
+      child: Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
+        return MaterialApp(
+          navigatorKey: SimpleTodo.navigatorKey,
+          theme: FlexColorScheme.light(colors: themeVM.selectedScheme).toTheme,
+          darkTheme: FlexColorScheme.dark(
+                  colors: themeVM.selectedScheme.toDark(),
+                  surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+                  blendLevel: 12, // Reduces contrast by blending colors more subtly
+                  appBarStyle: FlexAppBarStyle.background,
+                  darkIsTrueBlack: false, // Prevents pure black
+                  scaffoldBackground: Color(0xff131313))
+              .toTheme,
+          themeMode: themeVM.themeMode,
+          debugShowCheckedModeBanner: false,
+          title: 'MinimalTodo',
+          home: const Home(),
+        );
+      }),
     );
   }
 }
@@ -86,7 +86,7 @@ class Home extends StatelessWidget {
             const CalendarPage(),
             const PendingTasksPage(),
             const FinishedTasksPage(),
-            const ListsPage()
+            const ListsPage(),
           ][navVM.selectedDestination],
           floatingActionButton: _FloatingActionButtonWidget(),
           bottomNavigationBar: _BottomNavBarWidget(),
@@ -96,7 +96,7 @@ class Home extends StatelessWidget {
   }
 }
 
-class _AppBar extends StatelessWidget implements PreferredSizeWidget{
+class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   const _AppBar({super.key});
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -146,15 +146,24 @@ class _BottomNavBarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<NavigationViewModel>(builder: (context, navVM, _) {
       return NavigationBar(
-        backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(13),
+        elevation: 5,
+        backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(15),
         selectedIndex: navVM.selectedDestination,
-        onDestinationSelected: navVM.onDestinationSelected,
+        onDestinationSelected: (selected) {
+          if (selected == 4) {
+            Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: Scaffold()));
+          } else {
+            navVM.onDestinationSelected(selected);
+          }
+        },
+        indicatorColor: Theme.of(context).colorScheme.primary.withAlpha(220),
         height: MediaQuery.sizeOf(context).height * 0.115,
-        destinations: const [
+        destinations: [
           _BottomNavBarItem(icon: Iconsax.calendar_tick, label: 'Calendar'),
           _BottomNavBarItem(icon: Icons.pending_actions, label: 'Pending'),
           _BottomNavBarItem(icon: Iconsax.verify, label: 'Finished'),
           _BottomNavBarItem(icon: Iconsax.element_3, label: 'Lists'),
+          _BottomNavBarItem(icon: FontAwesomeIcons.noteSticky, label: 'Notes'),
         ],
       );
     });
@@ -192,6 +201,9 @@ class _BottomNavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (label == 'Notes') {
+      return NavigationDestination(icon: Icon(icon), selectedIcon: Icon(icon), label: label);
+    }
     if (label == 'Pending') {
       return Consumer<TaskViewModel>(
         builder: (context, taskVM, child) {

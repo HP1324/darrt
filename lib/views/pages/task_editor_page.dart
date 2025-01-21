@@ -34,6 +34,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
     super.initState();
   }
 
+
   @override
   Widget build(BuildContext context) {
     logger.d('Build called');
@@ -124,6 +125,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
     );
   }
 }
+
 class TaskTextField extends StatelessWidget {
   const TaskTextField({
     super.key,
@@ -144,7 +146,7 @@ class TaskTextField extends StatelessWidget {
           size: 19,
         ),
         Expanded(
-          child: Consumer<GeneralViewModel>(builder: (context, gvm, _) {
+          child: Consumer2<GeneralViewModel,TaskViewModel>(builder: (context, gvm,taskVM, _) {
             return TextField(
               focusNode: gvm.textFieldNode,
               controller: titleController,
@@ -154,8 +156,7 @@ class TaskTextField extends StatelessWidget {
                 hintText: widget.editMode ? 'What needs changing?' : 'What\'s on your to-do list?',
               ),
               onChanged: (_) {
-                final tvm = Provider.of<TaskViewModel>(context, listen: false);
-                tvm.title = titleController.text;
+                taskVM.title = titleController.text;
               },
             );
           }),
@@ -164,6 +165,7 @@ class TaskTextField extends StatelessWidget {
     );
   }
 }
+
 class AddToListButton extends StatelessWidget {
   const AddToListButton({super.key});
 
@@ -174,111 +176,9 @@ class AddToListButton extends StatelessWidget {
         final gvm = Provider.of<GeneralViewModel>(context, listen: false);
         gvm.textFieldNode.unfocus();
         showModalBottomSheet(
-          useRootNavigator: true,
           context: context,
           builder: (_) {
-            return Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Column(
-                children: [
-                  const SizedBox(height: 8),
-                  ListTile(
-                    onTap: () {
-                      Navigator.of(context).push(PageTransition(child: NewListPage(editMode: false), type: PageTransitionType.leftToRightWithFade));
-                    },
-                    title: Text(
-                      'Create New List',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    leading: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(Icons.add),
-                    ),
-                    trailing: Icon(Icons.list_alt),
-                  ),
-                  Expanded(
-                    child: Consumer2<ListViewModel, TaskViewModel>(
-                      builder: (_, lvm, tvm, __) {
-                        List<ListModel> items = lvm.lists;
-                        return Scrollbar(
-                          thickness: 8,
-                          radius: const Radius.circular(4),
-                          child: ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            controller: lvm.listScrollController,
-                            itemCount: items.length,
-                            itemBuilder: (_, index) {
-                              return Card(
-                                elevation: 0,
-                                color:
-                                (tvm.currentTask.list ?? items[0]) == items[index] ? Theme.of(context).colorScheme.surface : Colors.transparent,
-                                margin: const EdgeInsets.symmetric(vertical: 4),
-                                child: RadioListTile(
-                                  value: items[index],
-                                  groupValue: tvm.currentTask.list ?? items[0],
-                                  title: Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Icon(
-                                          ListService.getIcon(items[index].iconCode),
-                                          color: items[index].listColor != null
-                                              ? ListService.getColorFromString(context, items[index].listColor!)
-                                              : null,
-                                          size: 20,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Text(
-                                        items[index].name!,
-                                        style: TextStyle(
-                                          fontWeight: (tvm.currentTask.list ?? items[0]) == items[index] ? FontWeight.bold : FontWeight.normal,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  onChanged: (selected) {
-                                    lvm.updateChosenList(selected!);
-                                    tvm.list = selected;
-                                    logger.d('chosen list: ${selected.name}, icon: ${selected.iconCode}');
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: Text(
-                          'Done',
-                          style: TextStyle(
-                            fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
+            return _ListSelectionBottomSheet();
           },
         );
       },
@@ -290,9 +190,7 @@ class AddToListButton extends StatelessWidget {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0.5),
-                ),
+                border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0.5)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,7 +198,7 @@ class AddToListButton extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        'Category',
+                        'List',
                         style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize, fontWeight: FontWeight.w500),
                       ),
                       Icon(Icons.keyboard_arrow_down_rounded, size: 22),
@@ -329,6 +227,112 @@ class AddToListButton extends StatelessWidget {
     );
   }
 }
+
+class _ListSelectionBottomSheet extends StatefulWidget {
+  const _ListSelectionBottomSheet();
+
+  @override
+  State<_ListSelectionBottomSheet> createState() => _ListSelectionBottomSheetState();
+}
+
+class _ListSelectionBottomSheetState extends State<_ListSelectionBottomSheet> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      child: Column(
+        children: [
+          const SizedBox(height: 8),
+          ListTile(
+            onTap: () {
+              Navigator.push(context, PageTransition(child: NewListPage(editMode: false), type: PageTransitionType.leftToRight));
+            },
+            title: Text('Create New List', style: TextStyle(fontWeight: FontWeight.w500)),
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.add),
+            ),
+            trailing: Icon(Icons.list_alt),
+          ),
+          Expanded(
+            child: Consumer2<ListViewModel, TaskViewModel>(
+              builder: (_, lvm, tvm, __) {
+                List<ListModel> items = lvm.lists;
+                return Scrollbar(
+                  thickness: 8,
+                  radius: const Radius.circular(4),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    controller: lvm.listScrollController,
+                    itemCount: items.length,
+                    itemBuilder: (_, index) {
+                      return Card(
+                        elevation: 0,
+                        color: (tvm.currentTask.list ?? items[0]) == items[index] ? Theme.of(context).colorScheme.surface : Colors.transparent,
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        child: RadioListTile(
+                          value: items[index],
+                          groupValue: tvm.currentTask.list ?? items[0],
+                          title: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  ListService.getIcon(items[index].iconCode),
+                                  color: items[index].listColor != null ? ListService.getColorFromString(context, items[index].listColor!) : null,
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                items[index].name!,
+                                style: TextStyle(
+                                  fontWeight: (tvm.currentTask.list ?? items[0]) == items[index] ? FontWeight.bold : FontWeight.normal,
+                                ),
+                              ),
+                            ],
+                          ),
+                          onChanged: (selected) {
+                            lvm.updateChosenList(selected!);
+                            tvm.list = selected;
+                            logger.d('chosen list: ${selected.name}, icon: ${selected.iconCode}');
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'Done',
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class SetPriorityWidget extends StatelessWidget {
   const SetPriorityWidget({super.key});
 
@@ -357,17 +361,14 @@ class SetPriorityWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                Consumer2<PriorityViewModel, TaskViewModel>(
-                  builder: (_, pvm, tvm, __) {
+                Consumer<TaskViewModel>(
+                  builder: (context, taskVM, __) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Row(
                         children: [
                           GestureDetector(
-                            onTap: () {
-                              pvm.navigatePriority(false);
-                              tvm.priority = pvm.currentPriority;
-                            },
+                            onTap: () => taskVM.navigatePriority(false),
                             child: Icon(
                               Icons.chevron_left,
                               color: Theme.of(context).colorScheme.primary,
@@ -376,23 +377,14 @@ class SetPriorityWidget extends StatelessWidget {
                           Expanded(
                             child: Center(
                               child: Text(
-                                pvm.currentPriority,
-                                style: TextStyle(
-                                  fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
-                                  fontWeight: FontWeight.w400,
-                                ),
+                                taskVM.currentTask.priority!,
+                                style: TextStyle(fontSize: Theme.of(context).textTheme.labelLarge!.fontSize, fontWeight: FontWeight.w400),
                               ),
                             ),
                           ),
                           GestureDetector(
-                            onTap: () {
-                              pvm.navigatePriority(true);
-                              tvm.priority = pvm.currentPriority;
-                            },
-                            child: Icon(
-                              Icons.chevron_right,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
+                            onTap: () => taskVM.navigatePriority(true),
+                            child: Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.primary),
                           ),
                         ],
                       ),
@@ -407,6 +399,7 @@ class SetPriorityWidget extends StatelessWidget {
     );
   }
 }
+
 class SetDateWidget extends StatelessWidget {
   const SetDateWidget({super.key});
 
@@ -475,6 +468,7 @@ class SetDateWidget extends StatelessWidget {
     });
   }
 }
+
 class SetTimeWidget extends StatelessWidget {
   const SetTimeWidget({super.key});
 
@@ -543,6 +537,7 @@ class SetTimeWidget extends StatelessWidget {
     });
   }
 }
+
 class NotificationSwitch extends StatelessWidget {
   const NotificationSwitch({super.key});
 
@@ -551,7 +546,8 @@ class NotificationSwitch extends StatelessWidget {
     return Consumer<TaskViewModel>(builder: (context, taskVM, _) {
       return SwitchListTile(
         activeColor: Theme.of(context).colorScheme.primary,
-        title:  Text("Enable notification", style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize, fontWeight: FontWeight.w500)),
+        title:
+            Text("Enable notification", style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize, fontWeight: FontWeight.w500)),
         value: taskVM.currentTask.isNotifyEnabled!,
         onChanged: (value) async {
           if (await NotificationService.managePermission(context)) {
@@ -564,6 +560,7 @@ class NotificationSwitch extends StatelessWidget {
     });
   }
 }
+
 class NotificationOptionsWidget extends StatelessWidget {
   const NotificationOptionsWidget({super.key});
 
@@ -606,6 +603,7 @@ class NotificationOptionsWidget extends StatelessWidget {
     );
   }
 }
+
 class _TimeOption extends StatelessWidget {
   const _TimeOption({
     required this.minutes,
