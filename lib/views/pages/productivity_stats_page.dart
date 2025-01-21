@@ -13,18 +13,12 @@ class ProductivityStatsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        leading: BackButton(),
+        backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(15),
         elevation: 0,
-        title:  Text(
+        title: Text(
           'Productivity Stats',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.surfaceVariant,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.surfaceVariant),
-          onPressed: () => Navigator.pop(context),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Consumer<TaskViewModel>(
@@ -32,9 +26,7 @@ class ProductivityStatsPage extends StatelessWidget {
           final totalTasks = taskVM.tasks.length;
           final completedTasks = taskVM.tasks.where((task) => task.isDone!).length;
           final pendingTasks = totalTasks - completedTasks;
-          final completionRate = totalTasks > 0 
-              ? (completedTasks / totalTasks * 100).toStringAsFixed(1) 
-              : '0.0';
+          final completionRate = totalTasks > 0 ? (completedTasks / totalTasks * 100).toStringAsFixed(1) : '0.0';
 
           // Calculate tasks by priority
           final urgentPriorityTasks = taskVM.tasks.where((task) => task.priority == 'Urgent').length;
@@ -49,40 +41,38 @@ class ProductivityStatsPage extends StatelessWidget {
 
           // Calculate tasks completed today
           final today = DateTime.now();
-          final todaysTasks = taskVM.tasks.where((task) => 
-            task.dueDate != null &&
-            task.dueDate!.year == today.year &&
-            task.dueDate!.month == today.month &&
-            task.dueDate!.day == today.day
-          ).toList();
-          
-          final tasksCompletedToday = todaysTasks.where((task) => 
-            task.isDone! && 
-            task.finishedAt != null &&
-            task.finishedAt!.year == today.year &&
-            task.finishedAt!.month == today.month &&
-            task.finishedAt!.day == today.day
-          ).length;
+          final todaysTasks = taskVM.tasks
+              .where((task) =>
+                  task.dueDate != null && task.dueDate!.year == today.year && task.dueDate!.month == today.month && task.dueDate!.day == today.day)
+              .toList();
+
+          final tasksCompletedToday = todaysTasks
+              .where((task) =>
+                  task.isDone! &&
+                  task.finishedAt != null &&
+                  task.finishedAt!.year == today.year &&
+                  task.finishedAt!.month == today.month &&
+                  task.finishedAt!.day == today.day)
+              .length;
 
           // Calculate weekly progress
           final List<Map<String, dynamic>> weeklyData = [];
           for (int i = 6; i >= 0; i--) {
             final date = DateTime.now().subtract(Duration(days: i));
-            final tasksForDay = taskVM.tasks.where((task) => 
-              task.dueDate != null &&
-              task.dueDate!.year == date.year &&
-              task.dueDate!.month == date.month &&
-              task.dueDate!.day == date.day
-            ).toList();
-            
-            final completedTasks = tasksForDay.where((task) => 
-              task.isDone! && 
-              task.finishedAt != null &&
-              task.finishedAt!.year == date.year &&
-              task.finishedAt!.month == date.month &&
-              task.finishedAt!.day == date.day
-            ).length;
-            
+            final tasksForDay = taskVM.tasks
+                .where((task) =>
+                    task.dueDate != null && task.dueDate!.year == date.year && task.dueDate!.month == date.month && task.dueDate!.day == date.day)
+                .toList();
+
+            final completedTasks = tasksForDay
+                .where((task) =>
+                    task.isDone! &&
+                    task.finishedAt != null &&
+                    task.finishedAt!.year == date.year &&
+                    task.finishedAt!.month == date.month &&
+                    task.finishedAt!.day == date.day)
+                .length;
+
             weeklyData.add({
               'date': date,
               'total': tasksForDay.length,
@@ -91,30 +81,26 @@ class ProductivityStatsPage extends StatelessWidget {
           }
 
           // Find max tasks for weekly chart scaling
-          final maxWeeklyTasks = weeklyData
-              .map((data) => data['total'] as int)
-              .reduce((curr, next) => curr > next ? curr : next)
-              .toDouble();
+          final maxWeeklyTasks = weeklyData.map((data) => data['total'] as int).reduce((curr, next) => curr > next ? curr : next).toDouble();
 
           // Calculate monthly progress
           final List<Map<String, dynamic>> monthlyData = [];
           for (int i = 29; i >= 0; i--) {
             final date = DateTime.now().subtract(Duration(days: i));
-            final tasksForDay = taskVM.tasks.where((task) => 
-              task.dueDate != null &&
-              task.dueDate!.year == date.year &&
-              task.dueDate!.month == date.month &&
-              task.dueDate!.day == date.day
-            ).toList();
-            
-            final completedTasks = tasksForDay.where((task) => 
-              task.isDone! && 
-              task.finishedAt != null &&
-              task.finishedAt!.year == date.year &&
-              task.finishedAt!.month == date.month &&
-              task.finishedAt!.day == date.day
-            ).length;
-            
+            final tasksForDay = taskVM.tasks
+                .where((task) =>
+                    task.dueDate != null && task.dueDate!.year == date.year && task.dueDate!.month == date.month && task.dueDate!.day == date.day)
+                .toList();
+
+            final completedTasks = tasksForDay
+                .where((task) =>
+                    task.isDone! &&
+                    task.finishedAt != null &&
+                    task.finishedAt!.year == date.year &&
+                    task.finishedAt!.month == date.month &&
+                    task.finishedAt!.day == date.day)
+                .length;
+
             monthlyData.add({
               'date': date,
               'total': tasksForDay.length,
@@ -123,10 +109,7 @@ class ProductivityStatsPage extends StatelessWidget {
           }
 
           // Find max tasks for monthly chart scaling
-          final maxMonthlyTasks = monthlyData
-              .map((data) => data['total'] as int)
-              .reduce((curr, next) => curr > next ? curr : next)
-              .toDouble();
+          final maxMonthlyTasks = monthlyData.map((data) => data['total'] as int).reduce((curr, next) => curr > next ? curr : next).toDouble();
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -149,17 +132,11 @@ class ProductivityStatsPage extends StatelessWidget {
                           children: [
                             const Text(
                               "Today's Progress",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             Text(
                               DateFormat('MMM d, yyyy').format(today),
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 16,
-                              ),
+                              style: TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
@@ -171,7 +148,6 @@ class ProductivityStatsPage extends StatelessWidget {
                                 value: tasksCompletedToday,
                                 total: todaysTasks.length,
                                 label: 'Completed Today',
-                                color: Theme.of(context).colorScheme.primary,
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -180,7 +156,6 @@ class ProductivityStatsPage extends StatelessWidget {
                                 value: completedTasks,
                                 total: totalTasks,
                                 label: 'Overall Progress',
-                                color: Colors.green,
                               ),
                             ),
                           ],
@@ -225,12 +200,17 @@ class ProductivityStatsPage extends StatelessWidget {
                                         tooltipBgColor: Colors.grey[800]!,
                                         getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                           String priority;
-                                          switch(group.x) {
-                                            case 0: priority = 'Urgent';
-                                            case 1: priority = 'High';
-                                            case 2: priority = 'Medium';
-                                            case 3: priority = 'Low';
-                                            default: priority = '';
+                                          switch (group.x) {
+                                            case 0:
+                                              priority = 'Urgent';
+                                            case 1:
+                                              priority = 'High';
+                                            case 2:
+                                              priority = 'Medium';
+                                            case 3:
+                                              priority = 'Low';
+                                            default:
+                                              priority = '';
                                           }
                                           return BarTooltipItem(
                                             '$priority\n${rod.toY.toInt()} tasks',
@@ -251,7 +231,7 @@ class ProductivityStatsPage extends StatelessWidget {
                                           getTitlesWidget: (value, meta) {
                                             String text = '';
                                             Color color = Colors.black;
-                                            switch(value.toInt()) {
+                                            switch (value.toInt()) {
                                               case 0:
                                                 text = 'Urgent';
                                                 color = Colors.red;
@@ -849,13 +829,11 @@ class _CircularProgressIndicator extends StatelessWidget {
   final int value;
   final int total;
   final String label;
-  final Color color;
 
   const _CircularProgressIndicator({
     required this.value,
     required this.total,
     required this.label,
-    required this.color,
   });
 
   @override
@@ -874,8 +852,6 @@ class _CircularProgressIndicator extends StatelessWidget {
                 height: 120,
                 child: CircularProgressIndicator(
                   value: percentage,
-                  backgroundColor: Colors.grey[200],
-                  valueColor: AlwaysStoppedAnimation<Color>(color),
                   strokeWidth: 8,
                 ),
               ),
@@ -887,7 +863,6 @@ class _CircularProgressIndicator extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: color,
                     ),
                   ),
                   Text(

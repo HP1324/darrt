@@ -166,17 +166,12 @@ class Task {
         name: json['list_name'],
         iconCode: json['list_icon_code'],
         listColor: json['list_color'],
-      ),// Parse listIconCode from JSON
+      ),
       createdAt: DateTime.parse(json['createdAt']),
-      dueDate:
-      json['dueDate'] != null ? DateTime.parse(json['dueDate']) : null,
-      finishedAt: json['finishedAt'] != null
-          ? DateTime.parse(json['finishedAt'])
-          : null,
+      dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : null,
+      finishedAt: json['finishedAt'] != null ? DateTime.parse(json['finishedAt']) : null,
       isNotifyEnabled: json['isNotifyEnabled'] == 1,
-      notifyTime: json['notifyTime'] != null
-          ? DateTime.parse(json['notifyTime'])
-          : null,
+      notifyTime: json['notifyTime'] != null ? DateTime.parse(json['notifyTime']) : null,
       notifType: json['notifType'],
       priority: json['priority'],
       isRepeating: json['isRepeating'] == 1,

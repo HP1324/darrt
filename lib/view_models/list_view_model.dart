@@ -17,6 +17,8 @@ class ListViewModel extends ChangeNotifier {
   set listColor(String listColor) => currentList!.listColor  = listColor;
   String? selectedIcon = 'folder'; // Default icon
   String? selectedColor;
+  FocusNode newListTextFieldNode = FocusNode();
+
   void _refreshLists() async {
     lists = await ListService.getLists();
 
