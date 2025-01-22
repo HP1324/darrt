@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:minimaltodo/data_models/list_model.dart';
+import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/global_utils.dart';
 
 class Task {
@@ -7,7 +7,7 @@ class Task {
     this.id,
     this.title,
     this.isDone = false,
-    this.list,
+    this.category,
     this.createdAt,
     this.dueDate,
     this.finishedAt,
@@ -20,7 +20,7 @@ class Task {
 
   int? id;
   String? title;
-  ListModel? list;
+  CategoryModel? category;
   bool? isDone;
   DateTime? createdAt;
   DateTime? dueDate;
@@ -35,8 +35,7 @@ class Task {
     int? id,
     String? title,
     bool? isDone,
-    ListModel? list,
-    String? listIconCode,
+    CategoryModel? category,
     DateTime? createdAt,
     DateTime? dueDate,
     DateTime? finishedAt,
@@ -50,7 +49,7 @@ class Task {
         id: id ?? this.id,
         title: title ?? this.title,
         isDone: isDone ?? this.isDone,
-        list: list ?? this.list,
+        category: category ?? this.category,
         createdAt: createdAt ?? this.createdAt,
         dueDate: dueDate ?? this.dueDate,
         finishedAt: finishedAt ?? this.finishedAt,
@@ -69,9 +68,10 @@ class Task {
            'title': $title,
            'isDone': $isDone,
            'list': {
-             'listId' : ${list?.id},
-             'listName': ${list?.name},
-             'icon_code': ${list?.iconCode},
+             'categoryId' : ${category?.id},
+             'categoryName': ${category?.name},
+             'icon_code': ${category?.iconCode},
+             'categoryColor': ${category?.color},
            } ,
            'createdAt': $createdAt,
            'dueDate': $dueDate,
@@ -92,7 +92,7 @@ class Task {
         id == other.id &&
         title == other.title &&
         isDone == other.isDone &&
-        list == other.list &&
+        category == other.category &&
         createdAt == other.createdAt &&
         dueDate == other.dueDate &&
         finishedAt == other.finishedAt &&
@@ -108,7 +108,7 @@ class Task {
     id,
     title,
     isDone,
-    list,
+    category,
     createdAt,
     dueDate,
     finishedAt,
@@ -138,10 +138,10 @@ class Task {
   Map<String, dynamic> toJson() => {
     'id': id,
     'title': title,
-    'list_id': list?.id,
-    'list_name': list?.name,
-    'list_icon_code': list?.iconCode,
-    'list_color' : list?.listColor,
+    'categoryId': category?.id,
+    'categoryName': category?.name,
+    'catIconCode': category?.iconCode,
+    'categoryColor' : category?.color,
     'createdAt': DateTime.now().toIso8601String(),
     'dueDate': dueDate != null
         ? dueDate!.toIso8601String()
@@ -161,11 +161,11 @@ class Task {
       id: json['id'],
       title: json['title'] ?? '',
       isDone: json['isDone'] == 1,
-      list: ListModel(
-        id: json['list_id'],
-        name: json['list_name'],
-        iconCode: json['list_icon_code'],
-        listColor: json['list_color'],
+      category: CategoryModel(
+        id: json['categoryId'],
+        name: json['categoryName'],
+        iconCode: json['catIconCode'],
+        color: json['categoryColor'],
       ),
       createdAt: DateTime.parse(json['createdAt']),
       dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : null,

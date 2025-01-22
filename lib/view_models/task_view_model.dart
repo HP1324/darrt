@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:minimaltodo/data_models/list_model.dart';
+import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
-import 'package:minimaltodo/services/list_service.dart';
+import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/services/stats_service.dart';
 import 'package:minimaltodo/services/task_service.dart';
 
@@ -17,9 +17,9 @@ class TaskViewModel extends ChangeNotifier {
   List<Task> get tasks => _tasks;
   Task currentTask = Task();
 
-  set list(ListModel list) {
+  set list(CategoryModel list) {
     logger.i('current task list icon code: ${list.iconCode}');
-    currentTask.list = list;
+    currentTask.category = list;
     notifyListeners();
   }
 
@@ -73,8 +73,8 @@ class TaskViewModel extends ChangeNotifier {
 
   bool isNewTaskAdded = false;
   Future<bool> addNewTask() async {
-    currentTask.list ??= await ListService.getGeneralList();
-    logger.t('Adding task list icon: ${currentTask.list!.iconCode}');
+    currentTask.category ??= await CategoryService.getGeneralCategory();
+    logger.t('Adding task list icon: ${currentTask.category!.iconCode}');
     if (currentTask.isValid()) {
       final id = await TaskService.addTask(currentTask);
       currentTask.id = id;
@@ -93,7 +93,11 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   Future<int> editTask() async {
-    final changes = await TaskService.editTask(newTask: currentTask.toJson());
+
+    int changes = 0;
+    if(currentTask.isValid()) {
+      changes = await TaskService.editTask(newTask: currentTask.toJson());
+    }
     _refreshTasks();
     return changes;
   }
@@ -213,8 +217,8 @@ class TaskViewModel extends ChangeNotifier {
   void updateTasksAfterListDeletion(int listId) {
     // Update all tasks in the deleted list to have no list
     for (var task in _tasks) {
-      if (task.list?.id == listId) {
-        task.list = ListModel(id: 1, name: 'General');
+      if (task.category?.id == listId) {
+        task.category = CategoryModel(id: 1, name: 'General');
       }
     }
     notifyListeners();
@@ -265,8 +269,8 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTaskListAfterEdit(ListModel list) async {
-    final tasksForCurrentList = tasks.where((t) => t.list!.id == list.id).toList();
+  void updateTaskListAfterEdit(CategoryModel list) async {
+    final tasksForCurrentList = tasks.where((t) => t.category!.id == list.id).toList();
     final results = await TaskService.editTaskListAfterEdit(tasksForCurrentList, list);
     _refreshTasks();
   }

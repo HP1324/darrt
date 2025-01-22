@@ -1,14 +1,14 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app_router.dart';
-import 'package:minimaltodo/services/list_service.dart';
+import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:minimaltodo/data_models/list_model.dart';
+import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
-import 'package:minimaltodo/view_models/list_view_model.dart';
+import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/new_list_page.dart';
 import 'package:provider/provider.dart';
@@ -71,7 +71,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                   TaskTextField(editMode: widget.editMode),
                   Row(
                     children: [
-                      Flexible(flex: 2, child: const AddToListButton()),
+                      Flexible(flex: 2, child: const SetCategoryButton()),
                       Flexible(flex: 3, child: const SetPriorityWidget()),
                     ],
                   ),
@@ -93,7 +93,9 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
               onPressed: () async {
                 final navigator = Navigator.of(context);
                 final isNotifEnabled = tvm.currentTask.isNotifyEnabled;
-                tvm.title = tvm.titleController.text;
+                if(tvm.titleController.text.trim().isNotEmpty) {
+                  tvm.title = tvm.titleController.text;
+                }
                 if (!widget.editMode) {
                   tvm.currentTask.printTask();
                   final success = await tvm.addNewTask();
@@ -135,9 +137,9 @@ class TaskTextField extends StatelessWidget {
       children: [
         Icon(Icons.assignment_outlined, size: 19),
         Expanded(
-          child: Consumer2<GeneralViewModel, TaskViewModel>(builder: (context, generalVM, taskVM, _) {
+          child: Consumer2<GeneralViewModel, TaskViewModel>(builder: (context, generacategoryVM, taskVM, _) {
             return TextField(
-              focusNode: generalVM.textFieldNode,
+              focusNode: generacategoryVM.textFieldNode,
               controller: taskVM.titleController,
               maxLines: null,
               autofocus: true,
@@ -152,8 +154,8 @@ class TaskTextField extends StatelessWidget {
   }
 }
 
-class AddToListButton extends StatelessWidget {
-  const AddToListButton({super.key});
+class SetCategoryButton extends StatelessWidget {
+  const SetCategoryButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +166,7 @@ class AddToListButton extends StatelessWidget {
         showModalBottomSheet(
           context: context,
           builder: (_) {
-            return _ListSelectionBottomSheet();
+            return _CategorySelectionBottomSheet();
           },
         );
       },
@@ -195,7 +197,7 @@ class AddToListButton extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         child: Text(
-                          tvm.currentTask.list?.name ?? 'General',
+                          tvm.currentTask.category?.name ?? 'General',
                           style: TextStyle(
                             fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
                             fontWeight: FontWeight.w400,overflow: TextOverflow.ellipsis
@@ -215,14 +217,14 @@ class AddToListButton extends StatelessWidget {
   }
 }
 
-class _ListSelectionBottomSheet extends StatefulWidget {
-  const _ListSelectionBottomSheet();
+class _CategorySelectionBottomSheet extends StatefulWidget {
+  const _CategorySelectionBottomSheet();
 
   @override
-  State<_ListSelectionBottomSheet> createState() => _ListSelectionBottomSheetState();
+  State<_CategorySelectionBottomSheet> createState() => _CategorySelectionBottomSheetState();
 }
 
-class _ListSelectionBottomSheetState extends State<_ListSelectionBottomSheet> {
+class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -243,20 +245,20 @@ class _ListSelectionBottomSheetState extends State<_ListSelectionBottomSheet> {
             trailing: Icon(Icons.list_alt),
           ),
           Expanded(
-            child: Consumer2<ListViewModel, TaskViewModel>(
-              builder: (_, lvm, tvm, __) {
-                List<ListModel> items = lvm.lists;
+            child: Consumer2<CategoryViewModel, TaskViewModel>(
+              builder: (_, categoryVM, tvm, __) {
+                List<CategoryModel> items = categoryVM.categories;
                 return Scrollbar(
                   thickness: 8,
                   radius: const Radius.circular(4),
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
-                    controller: lvm.listScrollController,
+                    controller: categoryVM.categoryScrollController,
                     itemCount: items.length,
                     itemBuilder: (_, index) {
                       return RadioListTile(
                         value: items[index],
-                        groupValue: tvm.currentTask.list ?? items[0],
+                        groupValue: tvm.currentTask.category ?? items[0],
                         title: Row(
                           children: [
                             Container(
@@ -264,8 +266,8 @@ class _ListSelectionBottomSheetState extends State<_ListSelectionBottomSheet> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
-                                ListService.getIcon(items[index].iconCode),
-                                color: items[index].listColor != null ? ListService.getColorFromString(context, items[index].listColor!) : null,
+                                CategoryService.getIcon(items[index].iconCode),
+                                color: items[index].color != null ? CategoryService.getColorFromString(context, items[index].color!) : null,
                                 size: 20,
                               ),
                             ),
@@ -274,7 +276,7 @@ class _ListSelectionBottomSheetState extends State<_ListSelectionBottomSheet> {
                               child: Text(
                                 items[index].name!,
                                 style: TextStyle(
-                                  fontWeight: (tvm.currentTask.list ?? items[0]) == items[index] ? FontWeight.bold : FontWeight.normal,
+                                  fontWeight: (tvm.currentTask.category ?? items[0]) == items[index] ? FontWeight.bold : FontWeight.normal,
                                   overflow: TextOverflow.ellipsis
                                 ),
                               ),
@@ -282,7 +284,7 @@ class _ListSelectionBottomSheetState extends State<_ListSelectionBottomSheet> {
                           ],
                         ),
                         onChanged: (selected) {
-                          lvm.updateChosenList(selected!);
+                          categoryVM.updateChosenCategory(selected!);
                           tvm.list = selected;
                           logger.d('chosen list: ${selected.name}, icon: ${selected.iconCode}');
                         },

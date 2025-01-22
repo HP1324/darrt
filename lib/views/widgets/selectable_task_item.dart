@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
-import 'package:minimaltodo/services/list_service.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
+import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -151,17 +150,17 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                 const SizedBox(width: 12),
                               ],
                               Icon(
-                                widget.task.list?.iconCode != null
-                                    ? ListService.getIcon(widget.task.list!.iconCode)
+                                widget.task.category?.iconCode != null
+                                    ? CategoryService.getIcon(widget.task.category!.iconCode)
                                     : Iconsax.folder_2,
                                 size: 14,
-                                color: widget.task.list?.listColor != null
-                                    ? ListService.getColorFromString(context,widget.task.list?.listColor) :null,
+                                color: widget.task.category?.color != null
+                                    ? CategoryService.getColorFromString(context,widget.task.category?.color) :null,
                               ),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
-                                  widget.task.list?.name ?? 'General',
+                                  widget.task.category?.name ?? 'General',
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,

@@ -1,6 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
 
 class EmptyListPlaceholder extends StatefulWidget {
   const EmptyListPlaceholder({super.key, this.text = 'No tasks to show'});

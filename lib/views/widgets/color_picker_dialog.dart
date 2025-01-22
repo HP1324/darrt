@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/services/list_service.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
+import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
-import 'package:minimaltodo/view_models/list_view_model.dart';
+import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -12,10 +11,8 @@ class ColorPickerDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.transparent,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -24,9 +21,6 @@ class ColorPickerDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
-                ),
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(20)),
               ),
@@ -35,7 +29,6 @@ class ColorPickerDialog extends StatelessWidget {
                   Text(
                     'Choose a Color',
                     style: TextStyle(
-                      color: Colors.white,
                       fontSize:
                           Theme.of(context).textTheme.titleLarge!.fontSize,
                       fontWeight: FontWeight.bold,
@@ -44,7 +37,7 @@ class ColorPickerDialog extends StatelessWidget {
                   const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: const Icon(Icons.close),
                   ),
                 ],
               ),
@@ -52,8 +45,8 @@ class ColorPickerDialog extends StatelessWidget {
             Container(
               height: MediaQuery.of(context).size.height * 0.4,
               padding: const EdgeInsets.all(16),
-              child: Consumer3<ListViewModel,TaskViewModel,GeneralViewModel>(
-                builder: (context, listVM,taskVM,generalVM, _) {
+              child: Consumer3<CategoryViewModel,TaskViewModel,GeneralViewModel>(
+                builder: (context, categoryVM,taskVM,generacategoryVM, _) {
                   return GridView.builder(
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
@@ -61,19 +54,19 @@ class ColorPickerDialog extends StatelessWidget {
                       mainAxisSpacing: 16,
                       crossAxisSpacing: 16,
                     ),
-                    itemCount: ListService.listColors.length,
+                    itemCount: CategoryService.categoryColors.length,
                     itemBuilder: (context, index) {
                       final colorKey =
-                          ListService.listColors.keys.elementAt(index);
+                          CategoryService.categoryColors.keys.elementAt(index);
                       final color =
-                          ListService.listColors.values.elementAt(index);
-                      final isSelected = listVM.selectedColor == colorKey;
+                          CategoryService.categoryColors.values.elementAt(index);
+                      final isSelected = categoryVM.selectedColor == colorKey;
 
                       return InkWell(
                         onTap: () {
-                          listVM.updateSelectedColor(colorKey,taskVM );
+                          categoryVM.updateSelectedColor(colorKey,taskVM );
                           Navigator.pop(context);
-                          generalVM.textFieldNode.unfocus();
+                          generacategoryVM.textFieldNode.unfocus();
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -81,7 +74,7 @@ class ColorPickerDialog extends StatelessWidget {
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: isSelected
-                                  ? Colors.black
+                                  ? Theme.of(context).colorScheme.primary
                                   : Colors.grey.shade300,
                               width: isSelected ? 2 : 1,
                             ),

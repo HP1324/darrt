@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:minimaltodo/data_models/list_model.dart';
+import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
-import 'package:minimaltodo/services/list_service.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
+import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/widgets/task_item.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:provider/provider.dart';
 
-class TasksForListPage extends StatefulWidget {
-  final ListModel list;
+class TasksForCategoryPage extends StatefulWidget {
+  final CategoryModel list;
 
-  const TasksForListPage({super.key, required this.list});
+  const TasksForCategoryPage({super.key, required this.list});
 
   @override
-  State<TasksForListPage> createState() => _TasksForListPageState();
+  State<TasksForCategoryPage> createState() => _TasksForCategoryPageState();
 }
 
-class _TasksForListPageState extends State<TasksForListPage> {
+class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
   final Set<int> _selectedTaskIds = {};
   bool _isSelectionMode = false;
 
@@ -131,7 +130,7 @@ class _TasksForListPageState extends State<TasksForListPage> {
       body: Consumer<TaskViewModel>(
         builder: (context, taskVM, _) {
           final tasksInList =
-              taskVM.tasks.where((task) => task.list?.id == widget.list.id).toList();
+              taskVM.tasks.where((task) => task.category?.id == widget.list.id).toList();
 
           if (tasksInList.isEmpty) {
             return Center(
@@ -140,9 +139,9 @@ class _TasksForListPageState extends State<TasksForListPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    ListService.getIcon(widget.list.iconCode),
+                    CategoryService.getIcon(widget.list.iconCode),
                     size: 48,
-                    color: ListService.getColorFromString(context, widget.list.listColor),
+                    color: CategoryService.getColorFromString(context, widget.list.color),
                   ),
                   Text('No Tasks Yet',style: TextStyle(fontWeight: FontWeight.bold)),
                 ],

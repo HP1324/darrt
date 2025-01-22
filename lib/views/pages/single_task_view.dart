@@ -1,14 +1,11 @@
-import 'package:flutter/cupertino.dart' show CupertinoNavigationBarBackButton;
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/app_router.dart';
-import 'package:minimaltodo/data_models/list_model.dart';
-import 'package:minimaltodo/services/list_service.dart';
-import 'package:page_transition/page_transition.dart';
+import 'package:minimaltodo/data_models/category_model.dart';
+import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/global_utils.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/data_models/task.dart';
-import 'package:minimaltodo/view_models/list_view_model.dart';
+import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/task_editor_page.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +17,7 @@ class TaskView extends StatelessWidget {
   Widget build(BuildContext context) {
     task.printTask();
     return Scaffold(
-      appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.surfaceBright,title: Text('${task.title}')),
+      appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(30),title: Text('${task.title}')),
       floatingActionButton: TaskViewButton(
           label: 'Edit',
           onTap: () {
@@ -28,7 +25,7 @@ class TaskView extends StatelessWidget {
           },),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Consumer2<TaskViewModel, ListViewModel>(builder: (_, tvm, cvm, __) {
+        child: Consumer2<TaskViewModel, CategoryViewModel>(builder: (_, tvm, cvm, __) {
           debugPrint('Finished At: ${tvm.currentTask.finishedAt}');
 
           task.printTask();
@@ -40,10 +37,10 @@ class TaskView extends StatelessWidget {
                 subtitle: '${task.title}',
               ),
               DetailItem(
-                icon: ListService.getIcon(task.list!.iconCode),
-                list: task.list,
+                icon: CategoryService.getIcon(task.category!.iconCode),
+                list: task.category,
                 title: 'List',
-                subtitle: task.list!.name ?? 'General (not added to a list)',
+                subtitle: task.category!.name ?? 'General (not added to a list)',
               ),
               DetailItem(
                 icon: Icons.flag_outlined,
@@ -82,21 +79,21 @@ class DetailItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final ListModel? list;
+  final CategoryModel? list;
 
   @override
   Widget build(BuildContext context) {
     final titleStyle = TextStyle(
-        fontSize: Theme.of(context).textTheme.titleMedium!.fontSize, fontWeight: FontWeight.bold);
+        fontSize: Theme.of(context).textTheme.titleMedium!.fontSize, fontWeight: FontWeight.bold,color: Theme.of(context).colorScheme.onPrimary.withAlpha(210));
     final subtitleStyle = TextStyle(
-        fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500);
+        fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500,color: Theme.of(context).colorScheme.onPrimary.withAlpha(210));
     return Card(
       elevation: 0,
       color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: ListTile(
         leading: Icon(
           icon,
-          color: list != null ? ListService.getColorFromString(context,list!.listColor) : null,
+          color: list != null ? CategoryService.getColorFromString(context,list!.color) : null,
         ),
         title: Text(title, style: titleStyle),
         subtitle: Text(subtitle, style: subtitleStyle),

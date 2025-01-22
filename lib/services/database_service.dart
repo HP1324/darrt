@@ -2,21 +2,21 @@ import 'package:minimaltodo/global_utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseService {
-  static const createListsTable = """ CREATE TABLE lists(
+  static const createCategoriesTable = """ CREATE TABLE categories(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
       icon_code TEXT DEFAULT 'folder',
-      list_color TEXT
+      color TEXT
       )
      """;
   static const createTasksTable = """CREATE TABLE tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT,
         isDone INTEGER DEFAULT 0,
-        list_id INTEGER DEFAULT 1,
-        list_name TEXT,
-        list_icon_code TEXT,
-        list_color TEXT,
+        categoryId INTEGER DEFAULT 1,
+        categoryName TEXT,
+        catIconCode TEXT,
+        categoryColor TEXT,
         createdAt TEXT,
         dueDate TEXT,
         finishedAt TEXT,
@@ -25,7 +25,7 @@ class DatabaseService {
         notifyTime TEXT,
         priority TEXT DEFAULT 'Low',
         isRepeating INTEGER DEFAULT 0,
-        FOREIGN KEY(list_id) REFERENCES lists (id) ON DELETE SET DEFAULT
+        FOREIGN KEY(categoryId) REFERENCES categories (id) ON DELETE SET DEFAULT
       )
     """;
   static const createStatsTable = """CREATE TABLE stats (
@@ -39,7 +39,7 @@ class DatabaseService {
         low_tasks INTEGER NOT NULL
       )
     """;
-  static const createDefaultLists ="""INSERT INTO lists (name, icon_code) VALUES
+  static const createDefaultCategories ="""INSERT INTO categories (name, icon_code) VALUES
   ('General','folder'),
 ('Sports', 'football'),
 ('Health', 'heart'),
@@ -68,10 +68,10 @@ class DatabaseService {
       version: 1,
       onCreate: (database, version) async {
         await database.transaction((txn) async {
-          await txn.execute(createListsTable);
+          await txn.execute(createCategoriesTable);
           await txn.execute(createTasksTable);
           await txn.execute(createStatsTable);
-          await txn.execute(createDefaultLists);
+          await txn.execute(createDefaultCategories);
         });
       },
       onConfigure: (database) async {

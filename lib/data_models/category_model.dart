@@ -1,27 +1,27 @@
-class ListModel {
+class CategoryModel {
   int? id;
   String? name;
   String? iconCode;
-  String? listColor;
+  String? color;
 
-  ListModel({
+  CategoryModel({
     this.id,
     this.name,
     this.iconCode = 'folder',
-    this.listColor,
+    this.color,
   });
 
-  ListModel copyWith({
+  CategoryModel copyWith({
     int? id,
     String? name,
     String? iconCode,
-    String? listColor,
+    String? color,
   }) =>
-      ListModel(
+      CategoryModel(
         id: id ?? this.id,
         name: name ?? this.name,
         iconCode: iconCode ?? this.iconCode,
-        listColor: listColor ?? this.listColor,
+        color: color ?? this.color,
       );
 
   bool isValid() {
@@ -32,27 +32,27 @@ class ListModel {
 
   @override
   bool operator ==(Object other) {
-    return other is ListModel &&
+    return other is CategoryModel &&
         id == other.id &&
         name == other.name &&
         iconCode == other.iconCode &&
-        listColor == other.listColor;
+        color == other.color;
   }
 
-  factory ListModel.fromJson(Map<String, dynamic> json) => ListModel(
+  factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
         id: json["id"],
         name: json["name"],
         iconCode: json["icon_code"] ?? 'folder',
-        listColor: json["list_color"],
+        color: json["color"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
         "icon_code": iconCode,
-        "list_color": listColor,
+        "color": color,
       };
 
   @override
-  int get hashCode => Object.hash(id, name, iconCode, listColor);
+  int get hashCode => Object.hash(id, name, iconCode, color);
 }

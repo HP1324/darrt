@@ -1,29 +1,28 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/app_router.dart';
 import 'package:minimaltodo/services/notification_controller.dart';
-import 'package:minimaltodo/test_page.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/view_models/theme_view_model.dart';
-import 'package:page_transition/page_transition.dart';
+import 'package:minimaltodo/views/widgets/mini_bottom_nav_bar.dart';
 import 'package:minimaltodo/services/notification_service.dart';
-import 'package:minimaltodo/view_models/list_view_model.dart';
+import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/navigation_view_model.dart';
 import 'package:minimaltodo/view_models/priority_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/navigation/calendar_page.dart';
 import 'package:minimaltodo/views/pages/navigation/finished_tasks_page.dart';
-import 'package:minimaltodo/views/pages/navigation/lists_page.dart';
+import 'package:minimaltodo/views/pages/navigation/categories_page.dart';
 import 'package:minimaltodo/views/pages/navigation/pending_tasks_page.dart';
 import 'package:minimaltodo/views/pages/search_page.dart';
 import 'package:minimaltodo/views/pages/task_editor_page.dart';
 import 'package:minimaltodo/views/widgets/app_drawer.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
+
 void main() async {
   await GetStorage.init();
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +30,7 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => TaskViewModel()),
-      ChangeNotifierProvider(create: (_) => ListViewModel()),
+      ChangeNotifierProvider(create: (_) => CategoryViewModel()),
       ChangeNotifierProvider(create: (_) => PriorityViewModel()),
       ChangeNotifierProvider(create: (_) => NavigationViewModel()),
       ChangeNotifierProvider(create: (_) => GeneralViewModel()),
@@ -52,8 +51,11 @@ class _MinimalTodoState extends State<MinimalTodo> {
   @override
   void initState() {
     super.initState();
-    AwesomeNotifications().setListeners(onActionReceivedMethod: NotificationController.onActionReceivedMethod);
+    AwesomeNotifications().setListeners(
+      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+    );
   }
+
   @override
   Widget build(BuildContext context) {
     return ToastificationWrapper(
@@ -67,7 +69,8 @@ class _MinimalTodoState extends State<MinimalTodo> {
                   blendLevel: 12, // Reduces contrast by blending colors more subtly
                   appBarStyle: FlexAppBarStyle.background,
                   darkIsTrueBlack: false, // Prevents pure black
-                  scaffoldBackground: Color(0xff131313)).toTheme,
+                  scaffoldBackground: Color(0xff131313))
+              .toTheme,
           themeMode: themeVM.themeMode,
           debugShowCheckedModeBanner: false,
           title: 'MinimalTodo',
@@ -86,7 +89,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -99,8 +101,8 @@ class _HomeState extends State<Home> {
             const CalendarPage(),
             const PendingTasksPage(),
             const FinishedTasksPage(),
-            const ListsPage(),
-          ][navVM.selectedDestination],
+            const CategoriesPage(),
+          ][navVM.currentDestination],
           floatingActionButton: _FloatingActionButtonWidget(),
           bottomNavigationBar: _BottomNavBarWidget(),
         );
@@ -153,25 +155,13 @@ class _BottomNavBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<NavigationViewModel>(builder: (context, navVM, _) {
-      return NavigationBar(
-        elevation: 5,
-        backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(15),
-        selectedIndex: navVM.selectedDestination,
-        onDestinationSelected: (selected) {
-          if (selected == 4) {
-            AppRouter.to(context,child: TestPage(), type: PageTransitionType.rightToLeft);
-          } else {
-            navVM.onDestinationSelected(selected);
-          }
-        },
-        indicatorColor: Theme.of(context).colorScheme.primary.withAlpha(220),
-        height: MediaQuery.sizeOf(context).height * 0.095,
-        destinations: [
-          _BottomNavBarItem(icon: Iconsax.calendar_tick, label: 'Calendar'),
-          _BottomNavBarItem(icon: Icons.pending_actions, label: 'Pending'),
-          _BottomNavBarItem(icon: Iconsax.verify, label: 'Finished'),
-          _BottomNavBarItem(icon: Iconsax.element_3, label: 'Lists'),
-          _BottomNavBarItem(icon: FontAwesomeIcons.noteSticky, label: 'Notes'),
+      return MiniBottomNavBar(
+        children: [
+          MiniBottomNavBarItem(icon: Icons.calendar_month, label: 'Calendar', i: 0),
+          MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Pending', i: 1),
+          MiniBottomNavBarItem(icon: Icons.check_circle_outline, label: 'Finished', i: 2),
+          MiniBottomNavBarItem(icon: Iconsax.category, label: 'categories', i: 3),
+          MiniBottomNavBarItem(icon: Iconsax.note, label: 'Notes', i: -1),
         ],
       );
     });
@@ -187,7 +177,7 @@ class _FloatingActionButtonWidget extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 16.0),
       child: FloatingActionButton(
         onPressed: () {
-          AppRouter.to(context,child: TaskEditorPage(editMode: false));
+          AppRouter.to(context, child: TaskEditorPage(editMode: false));
         },
         tooltip: 'Add Task',
         elevation: 6,
@@ -197,56 +187,4 @@ class _FloatingActionButtonWidget extends StatelessWidget {
   }
 }
 
-class _BottomNavBarItem extends StatelessWidget {
-  const _BottomNavBarItem({required this.icon, required this.label});
-  final IconData icon;
-  final String label;
 
-  @override
-  Widget build(BuildContext context) {
-    if (label == 'Notes') {
-      return NavigationDestination(icon: Icon(icon,size: 20,), label: label);
-    }
-    if (label == 'Pending') {
-      return Consumer<TaskViewModel>(
-        builder: (context, taskVM, child) {
-          final pendingCount = taskVM.tasks.where((task) => !task.isDone!).length;
-          final colorScheme = Theme.of(context).colorScheme;
-
-          return NavigationDestination(
-            icon: Badge(
-              isLabelVisible: pendingCount > 0,
-              // Use secondary container for better theme adaptation
-              backgroundColor: colorScheme.secondaryContainer,
-              offset: const Offset(8, -4),
-              largeSize: 20,
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              label: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (child, animation) {
-                  return ScaleTransition(
-                    scale: animation,
-                    child: child,
-                  );
-                },
-                child: Text(
-                  pendingCount.toString(),
-                  key: ValueKey<int>(pendingCount),
-                  style: TextStyle(
-                    color: colorScheme.onSecondaryContainer,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              child: Icon(icon,size: 21,),
-            ),
-            label: label,
-          );
-        },
-      );
-    }
-
-    return NavigationDestination(icon: Icon(icon,size: 21), label: label);
-  }
-}

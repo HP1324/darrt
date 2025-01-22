@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/data_models/list_model.dart';
+import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/global_utils.dart';
-import 'package:minimaltodo/services/list_service.dart';
-import 'package:minimaltodo/view_models/list_view_model.dart';
+import 'package:minimaltodo/services/category_service.dart';
+import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/widgets/color_picker_dialog.dart';
 import 'package:minimaltodo/views/widgets/icon_picker_dialog.dart';
 import 'package:provider/provider.dart';
 
 class NewListPage extends StatefulWidget {
-  const NewListPage({super.key, this.editMode, this.listToEdit});
+  const NewListPage({super.key, required this.editMode, this.listToEdit});
 
-  final bool? editMode;
-  final ListModel? listToEdit;
+  final bool editMode;
+  final CategoryModel? listToEdit;
 
   @override
   State<NewListPage> createState() => _NewListPageState();
@@ -31,18 +31,18 @@ class _NewListPageState extends State<NewListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final lvm = Provider.of<ListViewModel>(context, listen: false);
+    final categoryVM = Provider.of<CategoryViewModel>(context, listen: false);
     final tvm = Provider.of<TaskViewModel>(context, listen: false);
 
     if (widget.editMode!) {
-      lvm.currentList = widget.listToEdit!;
+      categoryVM.currentCategory = widget.listToEdit!;
     }
 
     return PopScope(
       onPopInvokedWithResult: (_, __) async {
         logger.i('Pop called');
         if (widget.editMode!) {
-          final edited = await lvm.editList();
+          final edited = await categoryVM.editCategory();
           tvm.updateTaskListAfterEdit(widget.listToEdit!);
           if (edited) {
             showToast(title: 'List Edited');
@@ -52,7 +52,7 @@ class _NewListPageState extends State<NewListPage> {
       child: Scaffold(
         appBar: AppBar(
           leading: BackButton(),
-          title: Text('Create New List', style: TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(widget.editMode ? widget.listToEdit!.name!:'Create New List', style: TextStyle(fontWeight: FontWeight.bold)),
           centerTitle: true,
           elevation: 0,
         ),
@@ -83,6 +83,7 @@ class _NewListPageState extends State<NewListPage> {
                     ),
                   ),
                   const SizedBox(height: 8),
+                  if(!widget.editMode)...[
                   const Text(
                     'Create a new list to organize your tasks better',
                     style: TextStyle(
@@ -90,6 +91,7 @@ class _NewListPageState extends State<NewListPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  ],
                   Hero(
                     tag: 'list_field',
                     child: TextField(
@@ -105,7 +107,7 @@ class _NewListPageState extends State<NewListPage> {
                         ),
                       ),
                       onChanged: (value) {
-                        lvm.name = textController.text;
+                        categoryVM.name = textController.text;
                       },
                     ),
                   ),
@@ -115,8 +117,8 @@ class _NewListPageState extends State<NewListPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child: Consumer<ListViewModel>(
-                      builder: (context, listVM, _) {
+                    child: Consumer<CategoryViewModel>(
+                      builder: (context, categoryVM, _) {
                         return ListTile(
                           onTap: () async {
                             _focusNode.unfocus();
@@ -135,7 +137,7 @@ class _NewListPageState extends State<NewListPage> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
-                              ListService.getIcon(listVM.selectedIcon),
+                              CategoryService.getIcon(categoryVM.selectedIcon),
                             ),
                           ),
                           title: Text(
@@ -155,8 +157,8 @@ class _NewListPageState extends State<NewListPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child: Consumer<ListViewModel>(
-                      builder: (context, listVM, _) {
+                    child: Consumer<CategoryViewModel>(
+                      builder: (context, categoryVM, _) {
                         return ListTile(
                           onTap: () async {
                             _focusNode.unfocus();
@@ -171,23 +173,19 @@ class _NewListPageState extends State<NewListPage> {
                           leading: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: listVM.selectedColor != null
-                                  ? ListService.listColors[listVM.selectedColor]!.withAlpha(50)
+                              color: categoryVM.selectedColor != null
+                                  ? CategoryService.categoryColors[categoryVM.selectedColor]!.withAlpha(50)
                                   : Theme.of(context).colorScheme.primary.withAlpha(50),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
                               Icons.color_lens,
-                              color: listVM.selectedColor != null
-                                  ? ListService.listColors[listVM.selectedColor]
-                                  : null,
+                              color: categoryVM.selectedColor != null ? CategoryService.categoryColors[categoryVM.selectedColor] : null,
                             ),
                           ),
                           title: Text(
                             'Choose Color',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.w500),
                           ),
                           trailing: Icon(Icons.chevron_right),
                         );
@@ -204,8 +202,8 @@ class _NewListPageState extends State<NewListPage> {
           onPressed: () async {
             final nav = Navigator.of(context);
             if (!widget.editMode!) {
-              final success = await lvm.addNewList();
-              final scrollController = lvm.listScrollController;
+              final success = await categoryVM.addNewCategory();
+              final scrollController = categoryVM.categoryScrollController;
               if (success) {
                 scrollController.animateTo(
                   scrollController.position.maxScrollExtent,
@@ -215,7 +213,7 @@ class _NewListPageState extends State<NewListPage> {
                 nav.pop();
               }
             } else {
-              final edited = await lvm.editList();
+              final edited = await categoryVM.editCategory();
               if (edited) {
                 tvm.updateTaskListAfterEdit(widget.listToEdit!);
                 nav.pop();

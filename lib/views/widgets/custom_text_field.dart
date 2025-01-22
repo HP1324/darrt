@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:provider/provider.dart' show Consumer;
 //ignore: must_be_immutable
