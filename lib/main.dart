@@ -1,9 +1,12 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/app_router.dart';
+import 'package:minimaltodo/services/notification_controller.dart';
+import 'package:minimaltodo/test_page.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/view_models/theme_view_model.dart';
 import 'package:page_transition/page_transition.dart';
@@ -21,9 +24,9 @@ import 'package:minimaltodo/views/pages/task_editor_page.dart';
 import 'package:minimaltodo/views/widgets/app_drawer.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
-
 void main() async {
   await GetStorage.init();
+  WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.initNotifications();
   runApp(MultiProvider(
     providers: [
@@ -34,25 +37,29 @@ void main() async {
       ChangeNotifierProvider(create: (_) => GeneralViewModel()),
       ChangeNotifierProvider(create: (_) => ThemeViewModel()),
     ],
-    child: const SimpleTodo(),
+    child: const MinimalTodo(),
   ));
 }
 
-class SimpleTodo extends StatefulWidget {
-  const SimpleTodo({super.key});
+class MinimalTodo extends StatefulWidget {
+  const MinimalTodo({super.key});
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
   @override
-  State<SimpleTodo> createState() => _SimpleTodoState();
+  State<MinimalTodo> createState() => _MinimalTodoState();
 }
 
-class _SimpleTodoState extends State<SimpleTodo> {
+class _MinimalTodoState extends State<MinimalTodo> {
+  @override
+  void initState() {
+    super.initState();
+    AwesomeNotifications().setListeners(onActionReceivedMethod: NotificationController.onActionReceivedMethod);
+  }
   @override
   Widget build(BuildContext context) {
     return ToastificationWrapper(
       child: Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
         return MaterialApp(
-          navigatorKey: SimpleTodo.navigatorKey,
+          navigatorKey: MinimalTodo.navigatorKey,
           theme: FlexColorScheme.light(colors: themeVM.selectedScheme).toTheme,
           darkTheme: FlexColorScheme.dark(
                   colors: themeVM.selectedScheme.toDark(),
@@ -60,8 +67,7 @@ class _SimpleTodoState extends State<SimpleTodo> {
                   blendLevel: 12, // Reduces contrast by blending colors more subtly
                   appBarStyle: FlexAppBarStyle.background,
                   darkIsTrueBlack: false, // Prevents pure black
-                  scaffoldBackground: Color(0xff131313))
-              .toTheme,
+                  scaffoldBackground: Color(0xff131313)).toTheme,
           themeMode: themeVM.themeMode,
           debugShowCheckedModeBanner: false,
           title: 'MinimalTodo',
@@ -72,8 +78,14 @@ class _SimpleTodoState extends State<SimpleTodo> {
   }
 }
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
@@ -147,13 +159,13 @@ class _BottomNavBarWidget extends StatelessWidget {
         selectedIndex: navVM.selectedDestination,
         onDestinationSelected: (selected) {
           if (selected == 4) {
-            AppRouter.to(context,child: Scaffold(), type: PageTransitionType.rightToLeft);
+            AppRouter.to(context,child: TestPage(), type: PageTransitionType.rightToLeft);
           } else {
             navVM.onDestinationSelected(selected);
           }
         },
         indicatorColor: Theme.of(context).colorScheme.primary.withAlpha(220),
-        height: MediaQuery.sizeOf(context).height * 0.115,
+        height: MediaQuery.sizeOf(context).height * 0.095,
         destinations: [
           _BottomNavBarItem(icon: Iconsax.calendar_tick, label: 'Calendar'),
           _BottomNavBarItem(icon: Icons.pending_actions, label: 'Pending'),
@@ -193,7 +205,7 @@ class _BottomNavBarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (label == 'Notes') {
-      return NavigationDestination(icon: Icon(icon), selectedIcon: Icon(icon), label: label);
+      return NavigationDestination(icon: Icon(icon,size: 20,), label: label);
     }
     if (label == 'Pending') {
       return Consumer<TaskViewModel>(
@@ -227,38 +239,14 @@ class _BottomNavBarItem extends StatelessWidget {
                   ),
                 ),
               ),
-              child: Icon(icon),
+              child: Icon(icon,size: 21,),
             ),
             label: label,
-            selectedIcon: Badge(
-              isLabelVisible: pendingCount > 0,
-              // When selected, use primary container for better distinction
-              backgroundColor: colorScheme.primaryContainer,
-              offset: const Offset(8, -4),
-              largeSize: 20,
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              label: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (child, animation) {
-                  return ScaleTransition(scale: animation, child: child);
-                },
-                child: Text(
-                  pendingCount.toString(),
-                  key: ValueKey<int>(pendingCount),
-                  style: TextStyle(
-                    color: colorScheme.onPrimaryContainer,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              child: Icon(icon),
-            ),
           );
         },
       );
     }
 
-    return NavigationDestination(icon: Icon(icon), selectedIcon: Icon(icon), label: label);
+    return NavigationDestination(icon: Icon(icon,size: 21), label: label);
   }
 }

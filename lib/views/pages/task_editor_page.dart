@@ -198,8 +198,9 @@ class AddToListButton extends StatelessWidget {
                           tvm.currentTask.list?.name ?? 'General',
                           style: TextStyle(
                             fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
-                            fontWeight: FontWeight.w400,
+                            fontWeight: FontWeight.w400,overflow: TextOverflow.ellipsis
                           ),
+                          maxLines: 1,
                         ),
                       );
                     },
@@ -253,41 +254,38 @@ class _ListSelectionBottomSheetState extends State<_ListSelectionBottomSheet> {
                     controller: lvm.listScrollController,
                     itemCount: items.length,
                     itemBuilder: (_, index) {
-                      return Card(
-                        elevation: 0,
-                        color: (tvm.currentTask.list ?? items[0]) == items[index] ? Theme.of(context).colorScheme.surface : Colors.transparent,
-                        margin: const EdgeInsets.symmetric(vertical: 4),
-                        child: RadioListTile(
-                          value: items[index],
-                          groupValue: tvm.currentTask.list ?? items[0],
-                          title: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Icon(
-                                  ListService.getIcon(items[index].iconCode),
-                                  color: items[index].listColor != null ? ListService.getColorFromString(context, items[index].listColor!) : null,
-                                  size: 20,
-                                ),
+                      return RadioListTile(
+                        value: items[index],
+                        groupValue: tvm.currentTask.list ?? items[0],
+                        title: Row(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              const SizedBox(width: 12),
-                              Text(
+                              child: Icon(
+                                ListService.getIcon(items[index].iconCode),
+                                color: items[index].listColor != null ? ListService.getColorFromString(context, items[index].listColor!) : null,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
                                 items[index].name!,
                                 style: TextStyle(
                                   fontWeight: (tvm.currentTask.list ?? items[0]) == items[index] ? FontWeight.bold : FontWeight.normal,
+                                  overflow: TextOverflow.ellipsis
                                 ),
                               ),
-                            ],
-                          ),
-                          onChanged: (selected) {
-                            lvm.updateChosenList(selected!);
-                            tvm.list = selected;
-                            logger.d('chosen list: ${selected.name}, icon: ${selected.iconCode}');
-                          },
+                            ),
+                          ],
                         ),
+                        onChanged: (selected) {
+                          lvm.updateChosenList(selected!);
+                          tvm.list = selected;
+                          logger.d('chosen list: ${selected.name}, icon: ${selected.iconCode}');
+                        },
                       );
                     },
                   ),

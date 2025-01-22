@@ -40,23 +40,10 @@ class NotificationService {
         ),
       ]);
 
-      await _notif.setListeners(onActionReceivedMethod: onActionReceivedMethod);
+      // await _notif.setListeners(onActionReceivedMethod: onActionReceivedMethod);
     }else{
       showToast(title: 'Notification permission is required to send notifications', alignment: Alignment.center);
     }
-  }
-
-  @pragma("vm:entry-point")
-  static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
-    debugPrint('onActionReceivedMethod() started.....');
-    final payload = receivedAction.payload ?? {};
-    String taskJsonString = payload['task']!;
-    Map<String, dynamic> taskJson = jsonDecode(taskJsonString);
-    Task taskObject = Task.fromJson(taskJson);
-    taskObject.printTask();
-    SimpleTodo.navigatorKey.currentState
-        ?.push(MaterialPageRoute(builder: (_) => TaskView(task: taskObject)));
-    debugPrint('onActionReceivedMethod() ended.....');
   }
 
   static Future<void> createTaskNotification(Task task) async {
