@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/services/list_service.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
+import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
-import 'package:minimaltodo/view_models/list_view_model.dart';
+import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:provider/provider.dart';
 
 class IconPickerDialog extends StatelessWidget {
@@ -11,10 +10,8 @@ class IconPickerDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.transparent,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -23,9 +20,7 @@ class IconPickerDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
-                ),
+
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(20)),
               ),
@@ -34,7 +29,6 @@ class IconPickerDialog extends StatelessWidget {
                   Text(
                     'Choose an Icon',
                     style: TextStyle(
-                      color: Colors.white,
                       fontSize:
                           Theme.of(context).textTheme.titleLarge!.fontSize,
                       fontWeight: FontWeight.bold,
@@ -43,7 +37,7 @@ class IconPickerDialog extends StatelessWidget {
                   const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: const Icon(Icons.close),
                   ),
                 ],
               ),
@@ -51,8 +45,8 @@ class IconPickerDialog extends StatelessWidget {
             Container(
               height: MediaQuery.of(context).size.height * 0.5,
               padding: const EdgeInsets.all(16),
-              child: Consumer2<ListViewModel,GeneralViewModel>(
-                builder: (context, listVM,generalVM ,_) {
+              child: Consumer2<CategoryViewModel,GeneralViewModel>(
+                builder: (context, categoryVM,generacategoryVM ,_) {
                   return GridView.builder(
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
@@ -60,23 +54,23 @@ class IconPickerDialog extends StatelessWidget {
                       mainAxisSpacing: 16,
                       crossAxisSpacing: 16,
                     ),
-                    itemCount: ListService.icons.length,
+                    itemCount: CategoryService.icons.length,
                     itemBuilder: (context, index) {
-                      final iconCode = ListService.icons.keys.elementAt(index);
-                      final icon = ListService.icons.values.elementAt(index);
-                      final isSelected = listVM.selectedIcon == iconCode;
+                      final iconCode = CategoryService.icons.keys.elementAt(index);
+                      final icon = CategoryService.icons.values.elementAt(index);
+                      final isSelected = categoryVM.selectedIcon == iconCode;
 
                       return InkWell(
                         onTap: () {
-                          listVM.updateSelectedIcon(iconCode);
+                          categoryVM.updateSelectedIcon(iconCode);
                           Navigator.pop(context);
-                          generalVM.textFieldNode.unfocus();
+                          generacategoryVM.textFieldNode.unfocus();
                         },
                         child: Container(
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? Theme.of(context).colorScheme.primary.withAlpha(50)
-                                : Colors.transparent,
+                                : null,
                             border: Border.all(
                               color: isSelected
                                   ? Theme.of(context).colorScheme.primary
@@ -89,7 +83,7 @@ class IconPickerDialog extends StatelessWidget {
                             icon,
                             color: isSelected
                                 ? Theme.of(context).colorScheme.primary
-                                : Colors.grey.shade700,
+                                : Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       );

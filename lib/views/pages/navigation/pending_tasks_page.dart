@@ -6,7 +6,6 @@ import 'package:minimaltodo/views/widgets/empty_list_placeholder.dart';
 import 'package:minimaltodo/views/widgets/task_item.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
 
 class PendingTasksPage extends StatefulWidget {
   const PendingTasksPage({super.key});

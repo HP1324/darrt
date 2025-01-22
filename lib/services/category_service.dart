@@ -1,48 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:minimaltodo/data_models/list_model.dart';
+import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/database_service.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
 
-class ListService {
-  static Future<List<ListModel>> getLists() async {
+class CategoryService {
+  static Future<List<CategoryModel>> getCategories() async {
     final database = await DatabaseService.openDb();
-    final List<Map<String, dynamic>> listMaps = await database.query('lists');
+    final List<Map<String, dynamic>> categoryMaps = await database.query('categories');
 
-    // Debug: Print all lists and their icon codes
-    for (var map in listMaps) {
+    // Debug: Print all categories and their icon codes
+    for (var map in categoryMaps) {
       logger.d('List: ${map['name']}, Icon code: ${map['icon_code']}');
     }
 
-    return List.generate(listMaps.length, (index) {
-      return ListModel.fromJson(listMaps[index]);
+    return List.generate(categoryMaps.length, (index) {
+      return CategoryModel.fromJson(categoryMaps[index]);
     });
   }
 
-  static Future<int> addList(ListModel list) async {
+  static Future<int> addCategory(CategoryModel category) async {
     final database = await DatabaseService.openDb();
     int id = 0;
     try {
-      id = await database.insert('lists', list.toJson());
+      id = await database.insert('categories', category.toJson());
     } catch (e) {
-      logger.e('an Exception or Error is thrown when adding list to database ${e.toString()}');
+      logger.e('an Exception or Error is thrown when adding category to database ${e.toString()}');
     }
     return id;
   }
 
-  static Future<int> deleteList(int id) async {
+  static Future<int> deleteCategory(int id) async {
     final database = await DatabaseService.openDb();
     int rowsAffected = 0;
     try {
       // Begin transaction to ensure data consistency
       await database.transaction((txn) async {
         // First update all tasks in this list to set list to null
-        await txn.update('tasks', {'list_id': 1}, where: 'list_id = ?', whereArgs: [id]);
+        await txn.update('tasks', {'categoryId': 1}, where: 'categoryId = ?', whereArgs: [id]);
 
         // Then delete the list
-        rowsAffected = await txn.delete('lists', where: 'id = ?', whereArgs: [id]);
+        rowsAffected = await txn.delete('categories', where: 'id = ?', whereArgs: [id]);
       });
     } catch (e) {
       logger.e('An Exception or Error is thrown while deleting the list: ${e.toString()}');
@@ -51,35 +50,35 @@ class ListService {
     return rowsAffected; // Return success
   }
 
-  static ListModel? getListById(int id) {
-    ListModel lm = ListModel();
+  static CategoryModel? getCategoryById(int id) {
+    CategoryModel cm = CategoryModel();
     DatabaseService.openDb().then((db) {
-      db.query('lists', where: 'id = ?', whereArgs: [id]).then((lists) {
-        if (lists.isNotEmpty) {
-          lm = ListModel.fromJson(lists.first);
+      db.query('categories', where: 'id = ?', whereArgs: [id]).then((categories) {
+        if (categories.isNotEmpty) {
+          cm = CategoryModel.fromJson(categories.first);
         }
       });
     });
-    return lm;
+    return cm;
   }
 
-  static Future<ListModel?> getGeneralList() async {
+  static Future<CategoryModel?> getGeneralCategory() async {
     final db = await DatabaseService.openDb();
-    final generalListMap = await db.query('lists', where: 'id = ?', whereArgs: [1]);
-    ListModel? generalListModel;
-    generalListModel = ListModel.fromJson(generalListMap.first);
+    final generalListMap = await db.query('categories', where: 'id = ?', whereArgs: [1]);
+    CategoryModel? generalListModel;
+    generalListModel = CategoryModel.fromJson(generalListMap.first);
     return generalListModel;
   }
 
-  static Future<int> editList(ListModel list) async {
+  static Future<int> editCategory(CategoryModel category) async {
     final database = await DatabaseService.openDb();
     int rowsAffected = 0;
     try {
       rowsAffected = await database.update(
-        'lists',
-        list.toJson(),
+        'categories',
+        category.toJson(),
         where: 'id = ?',
-        whereArgs: [list.id],
+        whereArgs: [category.id],
       );
     } catch (e) {
       logger.e('an Exception or Error is thrown when editing a list in database ${e.toString()}');
@@ -309,7 +308,7 @@ class ListService {
     'bucket': FontAwesomeIcons.bucket,
   };
 
-  static const Map<String, Color> listColors = {
+  static const Map<String, Color> categoryColors = {
     'red': Color(0xFFE57373),
     'pink': Color(0xFFF06292),
     'purple': Color(0xFFBA68C8),
@@ -329,11 +328,11 @@ class ListService {
 
   static Color getColorFromString(BuildContext context,String? colorKey) {
     if (colorKey == null || colorKey == 'primary') return Theme.of(context).colorScheme.primary;
-    return listColors[colorKey] ?? Theme.of(context).colorScheme.primary;
+    return categoryColors[colorKey] ?? Theme.of(context).colorScheme.primary;
   }
 
   static String? getStringFromColor(Color color) {
-    return listColors.entries
+    return categoryColors.entries
         .firstWhere(
           (element) => element.value == color,
           orElse: () => const MapEntry('grey', Colors.grey),

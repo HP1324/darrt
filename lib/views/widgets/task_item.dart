@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app_router.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/single_task_view.dart';
@@ -40,9 +39,7 @@ class TaskItem extends StatelessWidget {
               onSelect!(selected);
             }
           },
-          onTap: isSelectionMode
-              ? () => onSelect?.call(!isSelected)
-              : () => _navigateToTaskDetails(context),
+          onTap: isSelectionMode ? () => onSelect?.call(!isSelected) : () => _navigateToTaskDetails(context),
           onStatusChanged: (isDone) async {
             await taskViewModel.toggleStatus(task, isDone);
           },

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/data_models/list_model.dart';
+import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/database_service.dart';
@@ -57,7 +57,7 @@ class TaskService {
     return result;
   }
 
-  static Future<List<bool>> editTaskListAfterEdit(List<Task> tasks, ListModel list) async {
+  static Future<List<bool>> editTaskListAfterEdit(List<Task> tasks, CategoryModel list) async {
     final database = await DatabaseService.openDb();
     List<bool> results= [];
     try {
@@ -65,7 +65,7 @@ class TaskService {
         for (var task in tasks) {
           final listMap = {'list_name' : list.name,
             'list_icon_code' : list.iconCode,
-            'list_color' : list.listColor };
+            'list_color' : list.color };
           final changes = await txn.update(
               'tasks', listMap, where: 'id = ? AND list_id = ?',
               whereArgs: [task.id, list.id]);

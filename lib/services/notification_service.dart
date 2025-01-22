@@ -5,9 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
-import 'package:minimaltodo/main.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
-import 'package:minimaltodo/views/pages/single_task_view.dart';
 
 class NotificationService {
   static final _notif = AwesomeNotifications();

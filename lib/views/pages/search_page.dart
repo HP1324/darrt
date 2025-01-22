@@ -34,7 +34,7 @@ class _SearchPageState extends State<SearchPage> {
         bool matchesPriority =
             task.priority?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
         bool matchesList =
-            task.list?.name?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
+            task.category?.name?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
 
         if (!matchesTitle && !matchesPriority && !matchesList) {
           return false;
@@ -44,11 +44,11 @@ class _SearchPageState extends State<SearchPage> {
       // list filter
       if (_selectedList != null) {
         if (_selectedList == 'General') {
-          if (task.list != null && task.list!.name != 'General') {
+          if (task.category != null && task.category!.name != 'General') {
             return false;
           }
         } else {
-          if (task.list?.name?.toLowerCase() != _selectedList?.toLowerCase()) {
+          if (task.category?.name?.toLowerCase() != _selectedList?.toLowerCase()) {
             return false;
           }
         }
@@ -96,10 +96,10 @@ class _SearchPageState extends State<SearchPage> {
       body: Consumer<TaskViewModel>(
         builder: (context, taskVM, _) {
           // Get all categories including 'General'
-          final allLists = [
+          final allcategories = [
             'General',
             ...taskVM.tasks
-                .map((task) => task.list?.name)
+                .map((task) => task.category?.name)
                 .where((name) => name != null && name != 'General')
                 .toSet()
                 .cast<String>()
@@ -138,7 +138,7 @@ class _SearchPageState extends State<SearchPage> {
                                 });
                               },
                             ),
-                            ...allLists.map(
+                            ...allcategories.map(
                               (list) => FilterChip(
                                 label: Text(list),
                                 selected: _selectedList == list,

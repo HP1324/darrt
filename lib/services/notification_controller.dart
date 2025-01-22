@@ -10,15 +10,12 @@ class NotificationController{
 
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
-    // debugPrint('onActionReceivedMethod() started.....');
     final payload = receivedAction.payload ?? {};
     String taskJsonString = payload['task']!;
     Map<String, dynamic> taskJson = jsonDecode(taskJsonString);
     Task taskObject = Task.fromJson(taskJson);
-    taskObject.printTask();
 
     MinimalTodo.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => TaskView(task: taskObject)));
-    // debugPrint('onActionReceivedMethod() ended.....');
   }
 
 }

@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/app_router.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
-import 'package:minimaltodo/view_models/theme_view_model.dart';
 import 'package:minimaltodo/views/pages/productivity_stats_page.dart';
 import 'package:minimaltodo/views/pages/theme_settings_page.dart';
-import 'package:page_transition/page_transition.dart';
-import 'package:provider/provider.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});

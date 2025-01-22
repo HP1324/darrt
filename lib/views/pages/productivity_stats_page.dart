@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';

@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app_router.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
-import 'package:minimaltodo/view_models/list_view_model.dart';
+import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/new_list_page.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/views/widgets/custom_text_field.dart';
-import 'package:minimaltodo/views/widgets/list_item.dart';
+import 'package:minimaltodo/views/widgets/category_item.dart';
 
-class ListsPage extends StatefulWidget {
-  const ListsPage({super.key});
+class CategoriesPage extends StatefulWidget {
+  const CategoriesPage({super.key});
 
   @override
-  State<ListsPage> createState() => _ListsPageState();
+  State<CategoriesPage> createState() => _CategoriesPageState();
 }
 
-class _ListsPageState extends State<ListsPage> {
+class _CategoriesPageState extends State<CategoriesPage> {
   bool _showSearch = false;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -32,18 +30,18 @@ class _ListsPageState extends State<ListsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer3<ListViewModel, TaskViewModel,GeneralViewModel>(
-      builder: (context, listVM, taskVM,generalVM, _) {
-        final lists = listVM.lists;
+    return Consumer3<CategoryViewModel, TaskViewModel,GeneralViewModel>(
+      builder: (context, categoryVM, taskVM,generacategoryVM, _) {
+        final categories = categoryVM.categories;
 
-        // Filter lists based on search query
-        final filteredLists = lists.where((list) {
+        // Filter categories based on search query
+        final filteredcategories = categories.where((list) {
           if (_searchQuery.isEmpty) return true;
           return list.name?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
         }).toList();
 
         return SingleChildScrollView(
-          controller: listVM.listScrollController,
+          controller: categoryVM.categoryScrollController,
           child: Column(
             children: [
               Padding(
@@ -52,7 +50,7 @@ class _ListsPageState extends State<ListsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'All Lists',
+                      'All categories',
                       style: TextStyle(
                         fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize,
                         fontWeight: FontWeight.bold,
@@ -102,7 +100,7 @@ class _ListsPageState extends State<ListsPage> {
                       focusNode: _focusNode,
                       isMaxLinesNull: false,
                       autoFocus: false,
-                      hintText: 'Search lists...',
+                      hintText: 'Search categories...',
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 15,
@@ -116,10 +114,10 @@ class _ListsPageState extends State<ListsPage> {
                   ),
                 ),
               ),
-              // Lists Grid
+              // categories Grid
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: filteredLists.isEmpty
+                child: filteredcategories.isEmpty
                     ? SizedBox(
                   height: MediaQuery.of(context).size.height * 0.5,
                   child: Center(
@@ -132,7 +130,7 @@ class _ListsPageState extends State<ListsPage> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No lists found',
+                          'No categories found',
                           style: TextStyle(
                             fontSize: 16,
                           ),
@@ -145,10 +143,10 @@ class _ListsPageState extends State<ListsPage> {
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,mainAxisExtent: 100),
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: filteredLists.length,
+                  itemCount: filteredcategories.length,
                   itemBuilder: (context, index) {
-                    final list = filteredLists[index];
-                    return ListItem(list: list);
+                    final list = filteredcategories[index];
+                    return CategoryItem(list: list);
                   },
                 ),
               ),
