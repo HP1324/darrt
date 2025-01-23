@@ -247,7 +247,10 @@ class TaskViewModel extends ChangeNotifier {
       return false;
     }
   }
-
+  void updateNotificationType(String type) {
+    currentTask.notifType = type;
+    notifyListeners();
+  }
   void resetNotifSettings() {
     currentTask.notifyTime = null;
     currentTask.notifType = null;

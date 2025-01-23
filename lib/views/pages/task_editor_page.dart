@@ -82,46 +82,48 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                     ],
                   ),
                   NotificationSwitch(),
-                  if (taskVM.currentTask.isNotifyEnabled!) NotificationOptionsWidget(),
+                  if (taskVM.currentTask.isNotifyEnabled!) ...[
+                    NotificationTypeSelector(),
+                    NotificationOptionsWidget(),
+                  ],
                 ],
               );
             }),
           ),
         ),
-        floatingActionButton:
-             FloatingActionButton(
-              onPressed: () async {
-                final navigator = Navigator.of(context);
-                final isNotifEnabled = tvm.currentTask.isNotifyEnabled;
-                if(tvm.titleController.text.trim().isNotEmpty) {
-                  tvm.title = tvm.titleController.text;
-                }
-                if (!widget.editMode) {
-                  tvm.currentTask.printTask();
-                  final success = await tvm.addNewTask();
-                  logger.d('Task added: $success');
-                  if (success) {
-                    navigator.pop();
-                    showToast(title: 'Task Added');
-                    logger.d('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
-                  }
-                } else {
-                  final changes = await tvm.editTask();
-                  if (changes > 0) {
-                    navigator.pop();
-                    showToast(title: 'Task edited');
-                  }
-                }
-                if (isNotifEnabled!) {
-                  await NotificationService.createTaskNotification(tvm.currentTask);
-                } else {
-                  await NotificationService.removeTaskNotification(tvm.currentTask);
-                }
-                tvm.titleController.clear();
-              },
-              shape: const CircleBorder(),
-              child: const Icon(Icons.done),
-             ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            final navigator = Navigator.of(context);
+            final isNotifEnabled = tvm.currentTask.isNotifyEnabled;
+            if (tvm.titleController.text.trim().isNotEmpty) {
+              tvm.title = tvm.titleController.text;
+            }
+            if (!widget.editMode) {
+              tvm.currentTask.printTask();
+              final success = await tvm.addNewTask();
+              logger.d('Task added: $success');
+              if (success) {
+                navigator.pop();
+                showToast(title: 'Task Added');
+                logger.d('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
+              }
+            } else {
+              final changes = await tvm.editTask();
+              if (changes > 0) {
+                navigator.pop();
+                showToast(title: 'Task edited');
+              }
+            }
+            if (isNotifEnabled!) {
+              await NotificationService.createTaskNotification(tvm.currentTask);
+            } else {
+              await NotificationService.removeTaskNotification(tvm.currentTask);
+            }
+            tvm.titleController.clear();
+          },
+          shape: const CircleBorder(),
+          child: const Icon(Icons.done),
+        ),
       ),
     );
   }
@@ -199,9 +201,9 @@ class SetCategoryButton extends StatelessWidget {
                         child: Text(
                           tvm.currentTask.category?.name ?? 'General',
                           style: TextStyle(
-                            fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
-                            fontWeight: FontWeight.w400,overflow: TextOverflow.ellipsis
-                          ),
+                              fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
+                              fontWeight: FontWeight.w400,
+                              overflow: TextOverflow.ellipsis),
                           maxLines: 1,
                         ),
                       );
@@ -233,7 +235,7 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
         children: [
           const SizedBox(height: 8),
           ListTile(
-            onTap: () => AppRouter.to(context, child: NewListPage(editMode: false),type: PageTransitionType.rightToLeft),
+            onTap: () => AppRouter.to(context, child: NewListPage(editMode: false), type: PageTransitionType.rightToLeft),
             title: Text('Create New List', style: TextStyle(fontWeight: FontWeight.w500)),
             leading: Container(
               padding: const EdgeInsets.all(8),
@@ -276,9 +278,8 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
                               child: Text(
                                 items[index].name!,
                                 style: TextStyle(
-                                  fontWeight: (tvm.currentTask.category ?? items[0]) == items[index] ? FontWeight.bold : FontWeight.normal,
-                                  overflow: TextOverflow.ellipsis
-                                ),
+                                    fontWeight: (tvm.currentTask.category ?? items[0]) == items[index] ? FontWeight.bold : FontWeight.normal,
+                                    overflow: TextOverflow.ellipsis),
                               ),
                             ),
                           ],
@@ -542,6 +543,51 @@ class NotificationSwitch extends StatelessWidget {
         },
       );
     });
+  }
+}
+
+class NotificationTypeSelector extends StatelessWidget {
+  const NotificationTypeSelector({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<TaskViewModel>(
+      builder: (context, tvm, _) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Notification Type',
+              style: TextStyle(fontSize: Theme.of(context).textTheme.titleMedium!.fontSize, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 10),
+            SegmentedButton(
+              selectedIcon: Icon(
+                Icons.check,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+              style: SegmentedButton.styleFrom(selectedBackgroundColor: Theme.of(context).colorScheme.primary),
+              segments: [
+                ButtonSegment(
+                  value: 'reminder',
+                  label: Text('Soft Reminder'),
+                  icon: Icon(Icons.notifications_none_outlined),
+                ),
+                ButtonSegment(
+                  value: 'alarm',
+                  label: Text('Alarm'),
+                  icon: Icon(Icons.alarm),
+                ),
+              ],
+              selected: {tvm.currentTask.notifType ?? 'reminder'},
+              onSelectionChanged: (newSelection) {
+                tvm.updateNotificationType(newSelection.first);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
