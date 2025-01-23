@@ -66,14 +66,19 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
         List<Task> tasks = tvm.tasks;
         List<Task> finished = tasks.where((task) => task.isDone ?? false).toList()
           ..sort((a, b) => b.finishedAt!.compareTo(a.finishedAt!)); // Sort by newest first
-
+        Color color = Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(100);
         if (finished.isEmpty) {
-          return const Center(
-            child: Text(
-              'No finished tasks yet',
-              style: TextStyle(
-                fontSize: 16,
-              ),
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.check_circle_outline, size: 50,color:color,),
+                const SizedBox(height: 16),
+                Text(
+                  'No finished tasks yet',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500,color: color,),
+                ),
+              ],
             ),
           );
         }
@@ -153,9 +158,7 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
                     final now = DateTime.now();
                     if (date.year == now.year && date.month == now.month && date.day == now.day) {
                       dateTitle = 'Today';
-                    } else if (date.year == now.year &&
-                        date.month == now.month &&
-                        date.day == now.subtract(const Duration(days: 1)).day) {
+                    } else if (date.year == now.year && date.month == now.month && date.day == now.subtract(const Duration(days: 1)).day) {
                       dateTitle = 'Yesterday';
                     } else {
                       dateTitle = DateFormat('E, MMMM d, y').format(date);

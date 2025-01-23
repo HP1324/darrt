@@ -139,9 +139,9 @@ class TaskTextField extends StatelessWidget {
       children: [
         Icon(Icons.assignment_outlined, size: 19),
         Expanded(
-          child: Consumer2<GeneralViewModel, TaskViewModel>(builder: (context, generacategoryVM, taskVM, _) {
+          child: Consumer2<GeneralViewModel, TaskViewModel>(builder: (context, generalVM, taskVM, _) {
             return TextField(
-              focusNode: generacategoryVM.textFieldNode,
+              focusNode: generalVM.textFieldNode,
               controller: taskVM.titleController,
               maxLines: null,
               autofocus: true,

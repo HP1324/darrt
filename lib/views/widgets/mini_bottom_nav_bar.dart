@@ -44,7 +44,7 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
   @override
   Widget build(BuildContext context) {
     Color primary = Theme.of(context).colorScheme.primary;
-    Color onPrimary = Theme.of(context).colorScheme.onSurfaceVariant;
+    Color onSurface = Theme.of(context).colorScheme.onSurface;
     return Consumer<NavigationViewModel>(builder: (context, navVM, _) {
       final isSelected = widget.i == navVM.currentDestination;
       return InkWell(
@@ -65,13 +65,13 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
                 child: Icon(
                   widget.icon,
                   size: 22,
-                  color: isSelected ? primary : onPrimary.withAlpha(150),
+                  color: isSelected ? primary : onSurface.withAlpha(150),
                 )),
             Text(
                 widget.label,
                 style: TextStyle(
                   fontSize: Theme.of(context).textTheme.labelSmall!.fontSize!+1,
-                  color: isSelected ? primary : onPrimary.withAlpha(150),
+                  color: isSelected ? primary : onSurface.withAlpha(150),
                   fontWeight: FontWeight.bold,
                 )),
           ],
