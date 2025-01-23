@@ -160,7 +160,7 @@ class _BottomNavBarWidget extends StatelessWidget {
           MiniBottomNavBarItem(icon: Icons.calendar_month, label: 'Calendar', i: 0),
           MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Pending', i: 1),
           MiniBottomNavBarItem(icon: Icons.check_circle_outline, label: 'Finished', i: 2),
-          MiniBottomNavBarItem(icon: Iconsax.category, label: 'categories', i: 3),
+          MiniBottomNavBarItem(icon: Iconsax.category, label: 'Categories', i: 3),
           MiniBottomNavBarItem(icon: Iconsax.note, label: 'Notes', i: -1),
         ],
       );

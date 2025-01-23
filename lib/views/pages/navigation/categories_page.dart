@@ -30,12 +30,12 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer3<CategoryViewModel, TaskViewModel,GeneralViewModel>(
-      builder: (context, categoryVM, taskVM,generacategoryVM, _) {
+    return Consumer2<CategoryViewModel, TaskViewModel>(
+      builder: (context, categoryVM, taskVM, _) {
         final categories = categoryVM.categories;
 
         // Filter categories based on search query
-        final filteredcategories = categories.where((list) {
+        final filteredCategories = categories.where((list) {
           if (_searchQuery.isEmpty) return true;
           return list.name?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
         }).toList();
@@ -117,7 +117,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
               // categories Grid
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: filteredcategories.isEmpty
+                child: filteredCategories.isEmpty
                     ? SizedBox(
                   height: MediaQuery.of(context).size.height * 0.5,
                   child: Center(
@@ -143,9 +143,9 @@ class _CategoriesPageState extends State<CategoriesPage> {
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,mainAxisExtent: 100),
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: filteredcategories.length,
+                  itemCount: filteredCategories.length,
                   itemBuilder: (context, index) {
-                    final list = filteredcategories[index];
+                    final list = filteredCategories[index];
                     return CategoryItem(list: list);
                   },
                 ),

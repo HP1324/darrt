@@ -65,13 +65,27 @@ class _PendingTasksPageState extends State<PendingTasksPage> {
     return Consumer<TaskViewModel>(builder: (context, tvm, _) {
       List<Task> tasks = tvm.tasks;
       List<Task> pending = tasks.where((task) => !task.isDone!).toList();
-      List<Task> overdue = pending
-          .where((task) => task.dueDate != null && task.dueDate!.isBefore(DateTime.now()))
-          .toList();
+      List<Task> overdue = pending.where((task) => task.dueDate != null && task.dueDate!.isBefore(DateTime.now())).toList();
       pending.removeWhere((task) => overdue.contains(task));
-
+      Color color = Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(100);
       if (pending.isEmpty && overdue.isEmpty) {
-        return const Center(child: EmptyListPlaceholder());
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.assignment_outlined,
+                size: 50,
+                color: color,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No pending tasks',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: color),
+              ),
+            ],
+          ),
+        );
       }
 
       // Group tasks by date
@@ -163,9 +177,7 @@ class _PendingTasksPageState extends State<PendingTasksPage> {
                   final now = DateTime.now();
                   if (date.year == now.year && date.month == now.month && date.day == now.day) {
                     dateTitle = 'Today';
-                  } else if (date.year == now.year &&
-                      date.month == now.month &&
-                      date.day == now.add(const Duration(days: 1)).day) {
+                  } else if (date.year == now.year && date.month == now.month && date.day == now.add(const Duration(days: 1)).day) {
                     dateTitle = 'Tomorrow';
                   } else {
                     dateTitle = DateFormat('E, MMMM d, y').format(date);
