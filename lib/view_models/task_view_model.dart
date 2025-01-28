@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
@@ -226,6 +228,9 @@ class TaskViewModel extends ChangeNotifier {
 
   void toggleNotifSwitch(bool value) {
     currentTask.isNotifyEnabled = value;
+    if(currentTask.isNotifyEnabled!){
+      currentTask.notifyTime = currentTask.dueDate!.subtract( Duration(minutes:selectedMinutes ));
+    }
     notifyListeners();
   }
 
@@ -236,7 +241,7 @@ class TaskViewModel extends ChangeNotifier {
     var notifTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
     logger.d('task due date: ${currentTask.dueDate}, notifyTime: $notifTime');
     if (notifTime.isAfter(DateTime.now())) {
-      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes, seconds: 35));
+      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
 
       notifyListeners();
       return true;
