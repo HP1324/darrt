@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/app_router.dart';
-import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
@@ -17,12 +16,13 @@ class TaskView extends StatelessWidget {
   Widget build(BuildContext context) {
     task.printTask();
     return Scaffold(
-      appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(30),title: Text('${task.title}')),
+      appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(30), title: Text('${task.title}')),
       floatingActionButton: TaskViewButton(
-          label: 'Edit',
-          onTap: () {
-            AppRouter.to(context,child: TaskEditorPage(editMode: true,taskToEdit: task,));
-          },),
+        label: 'Edit',
+        onTap: () {
+          AppRouter.to(context, child: TaskEditorPage(editMode: true, taskToEdit: task));
+        },
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Consumer2<TaskViewModel, CategoryViewModel>(builder: (_, tvm, cvm, __) {
@@ -38,9 +38,8 @@ class TaskView extends StatelessWidget {
               ),
               DetailItem(
                 icon: CategoryService.getIcon(task.category!.iconCode),
-                list: task.category,
                 title: 'List',
-                subtitle: task.category!.name ?? 'General (not added to a list)',
+                subtitle: task.category!.name ?? 'General',
               ),
               DetailItem(
                 icon: Icons.flag_outlined,
@@ -57,13 +56,12 @@ class TaskView extends StatelessWidget {
                 title: 'Due Date',
                 subtitle: task.dueDate == null
                     ? 'Not scheduled'
-                    : "${formatDateTime(task.dueDate!)}\n${task.isDone! ? 'Task Finished' : (task.dueDate!.isBefore(DateTime.now()) ? 'Task Overdue' : (task.isNotifyEnabled! ? 'Notify on ${formatDateTime(task.notifyTime!.add(const Duration(seconds: 35)))}' : 'Notification Disabled'))}",
+                    : "${formatDateTime(task.dueDate!)}\n${task.isDone! ? 'Task Finished' : (task.dueDate!.isBefore(DateTime.now()) ? 'Task Overdue' : (task.isNotifyEnabled! ? 'Notify on ${formatDateTime(task.notifyTime!)}' : 'Notification Disabled'))}",
               ),
               DetailItem(
                 icon: Icons.task_alt,
                 title: 'Finished',
-                subtitle:
-                    task.finishedAt != null ? formatDateTime(task.finishedAt!) : 'Not finished yet',
+                subtitle: task.finishedAt != null ? formatDateTime(task.finishedAt!) : 'Not finished yet',
               ),
             ],
           );
@@ -74,27 +72,26 @@ class TaskView extends StatelessWidget {
 }
 
 class DetailItem extends StatelessWidget {
-  const DetailItem(
-      {super.key, required this.icon, required this.title, required this.subtitle, this.list});
+  const DetailItem({super.key, required this.icon, required this.title, required this.subtitle});
   final IconData icon;
   final String title;
   final String subtitle;
-  final CategoryModel? list;
 
   @override
   Widget build(BuildContext context) {
     final titleStyle = TextStyle(
-        fontSize: Theme.of(context).textTheme.titleMedium!.fontSize, fontWeight: FontWeight.bold,color: Theme.of(context).colorScheme.onPrimary.withAlpha(210));
+        fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
+        fontWeight: FontWeight.bold,
+        color: Theme.of(context).colorScheme.onSurfaceVariant);
     final subtitleStyle = TextStyle(
-        fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500,color: Theme.of(context).colorScheme.onPrimary.withAlpha(210));
+        fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+        fontWeight: FontWeight.w500,
+        color: Theme.of(context).colorScheme.onSurfaceVariant);
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
+      color: Theme.of(context).colorScheme.surfaceContainer,
       child: ListTile(
-        leading: Icon(
-          icon,
-          color: list != null ? CategoryService.getColorFromString(context,list!.color) : null,
-        ),
+        leading: Icon(icon),
         title: Text(title, style: titleStyle),
         subtitle: Text(subtitle, style: subtitleStyle),
       ),
