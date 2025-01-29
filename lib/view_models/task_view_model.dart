@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
@@ -14,7 +15,26 @@ class TaskViewModel extends ChangeNotifier {
     _refreshTasks();
     filterTasks(0);
   }
+// In TaskViewModel
+  void initNewTask() {
+    currentTask = Task(
+        dueDate: DateTime.now(),
+        category: CategoryModel(id: 1, name: 'General'),
+        // isNotifyEnabled: GetStorage().read('notifications') ? true: false,
+        priority: "Low",
+        notifType: "notif",
+    );
+    selectedMinutes = 0;
+    titleController.clear();
+  }
 
+  void initEditTask(Task task) {
+    currentTask = task;
+    titleController.text = task.title ?? '';
+    selectedMinutes = task.dueDate != null && task.notifyTime != null
+        ? task.dueDate!.difference(task.notifyTime!).inMinutes
+        : 0;
+  }
   List<Task> _tasks = [];
   List<Task> get tasks => _tasks;
   Task currentTask = Task();
@@ -52,10 +72,12 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   void removeDueDate() {
-    currentTask.dueDate = null;
+    currentTask.dueDate = DateTime.now();
     notifyListeners();
   }
+  void removeTime(){
 
+  }
   bool updateDueDate(DateTime date, TimeOfDay time) {
     final taskDueDate = DateTime(date.year, date.month, date.day, time.hour, time.minute, 0 //seconds
         );
@@ -254,26 +276,6 @@ class TaskViewModel extends ChangeNotifier {
   }
   void updateNotificationType(String type) {
     currentTask.notifType = type;
-    notifyListeners();
-  }
-  void resetNotifSettings() {
-    currentTask.notifyTime = null;
-    currentTask.notifType = null;
-    selectedMinutes = 0;
-    notifyListeners();
-  }
-
-  void resetSelectedMinutes() {
-    selectedMinutes = 0;
-    notifyListeners();
-  }
-
-  void setNotifConfigInUI() {
-    if (currentTask.notifyTime != null) {
-      selectedMinutes = currentTask.dueDate!.difference(currentTask.notifyTime!).inMinutes;
-    } else {
-      selectedMinutes = 0;
-    }
     notifyListeners();
   }
 

@@ -11,9 +11,10 @@ class ThemeSettingsPage extends StatelessWidget {
     return Consumer<ThemeViewModel>(
       builder: (context, themeVM, _) {
         return Scaffold(
+          // backgroundColor: Colors.transparent,
           appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-            title: const Text('Theme Colors'),
+            backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(50),
+            title: Text('Theme Colors'),
             elevation: 0,
           ),
           body: SingleChildScrollView(
@@ -21,6 +22,8 @@ class ThemeSettingsPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _buildThemeSelector(context, themeVM),
+                const SizedBox(height: 32),
                 Text(
                   'Select Your Theme Color',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -61,6 +64,44 @@ class ThemeSettingsPage extends StatelessWidget {
       },
     );
   }
+  Widget _buildThemeSelector(BuildContext context, ThemeViewModel themeVM) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Theme Mode',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.3,
+          ),
+        ),
+        const SizedBox(height: 12),
+        SegmentedButton<ThemePreference>(
+          segments: const [
+            ButtonSegment<ThemePreference>(
+              value: ThemePreference.system,
+              icon: Icon(Icons.brightness_auto),
+              label: Text('System'),
+            ),
+            ButtonSegment<ThemePreference>(
+              value: ThemePreference.light,
+              icon: Icon(Icons.light_mode),
+              label: Text('Light'),
+            ),
+            ButtonSegment<ThemePreference>(
+              value: ThemePreference.dark,
+              icon: Icon(Icons.dark_mode),
+              label: Text('Dark'),
+            ),
+          ],
+          selected: {themeVM.themePreference},
+          onSelectionChanged: (Set<ThemePreference> newSelection) {
+            themeVM.setThemePreference(newSelection.first);
+          },
+        ),
+      ],
+    );
+  }
 }
 
 class _ColorOption extends StatelessWidget {
@@ -90,13 +131,13 @@ class _ColorOption extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(
                 color: isSelected
-                    ? Theme.of(context).colorScheme.onBackground
+                    ? Theme.of(context).colorScheme.onSurface
                     : Colors.transparent,
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.3),
+                  color: color.withAlpha(78),
                   blurRadius: isSelected ? 6 : 0,
                   spreadRadius: isSelected ? 1 : 0,
                 ),

@@ -257,7 +257,7 @@ class _ScrollableDateBarState extends State<ScrollableDateBar> {
             },
             child: Card(
               margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
-              elevation: isSelected ? 2 : 0,
+              elevation: 0,
               color: isSelected
                   ? colorScheme.primary
                   : isToday

@@ -38,7 +38,7 @@ class TaskView extends StatelessWidget {
               ),
               DetailItem(
                 icon: CategoryService.getIcon(task.category!.iconCode),
-                title: 'List',
+                title: 'Category',
                 subtitle: task.category!.name ?? 'General',
               ),
               DetailItem(
@@ -89,7 +89,7 @@ class DetailItem extends StatelessWidget {
         color: Theme.of(context).colorScheme.onSurfaceVariant);
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceContainer,
+      color: Theme.of(context).colorScheme.primaryContainer.withAlpha(15),
       child: ListTile(
         leading: Icon(icon),
         title: Text(title, style: titleStyle),

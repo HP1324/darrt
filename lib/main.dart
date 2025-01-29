@@ -126,25 +126,6 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
           icon: Icon(Icons.search),
           onPressed: () => AppRouter.to(context, child: SearchPage()),
         ),
-        Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
-          return Transform.scale(
-            scale: 0.6,
-            child: Switch(
-              thumbIcon: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.selected)) {
-                  return Icon(Icons.dark_mode);
-                }
-                return Icon(Icons.light_mode);
-              }),
-              inactiveThumbColor: Theme.of(context).colorScheme.onSurface.withAlpha(140),
-              activeColor: Theme.of(context).colorScheme.primary,
-              value: themeVM.isDarkMode,
-              onChanged: (newValue) {
-                themeVM.toggleDarkMode(newValue);
-              },
-            ),
-          );
-        }),
       ],
     );
   }
@@ -175,13 +156,16 @@ class _FloatingActionButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
-      child: FloatingActionButton(
-        onPressed: () {
-          AppRouter.to(context, child: TaskEditorPage(editMode: false));
-        },
-        tooltip: 'Add Task',
-        elevation: 6,
-        child: const Icon(Icons.add),
+      child: Transform.scale(
+        scale: 0.9,
+        child: FloatingActionButton(
+          onPressed: () {
+            AppRouter.to(context, child: TaskEditorPage(editMode: false));
+          },
+          tooltip: 'Add Task',
+          elevation: 5,
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }

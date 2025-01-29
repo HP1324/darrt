@@ -52,7 +52,7 @@ class _NewListPageState extends State<NewListPage> {
       child: Scaffold(
         appBar: AppBar(
           leading: BackButton(),
-          title: Text(widget.editMode ? widget.listToEdit!.name!:'Create New List', style: TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(widget.editMode ? widget.listToEdit!.name!:'New Category', style: TextStyle(fontWeight: FontWeight.bold)),
           centerTitle: true,
           elevation: 0,
         ),
@@ -76,7 +76,7 @@ class _NewListPageState extends State<NewListPage> {
                 children: [
                   const SizedBox(height: 20),
                   Text(
-                    'List Name',
+                    'Category Name',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -85,7 +85,7 @@ class _NewListPageState extends State<NewListPage> {
                   const SizedBox(height: 8),
                   if(!widget.editMode)...[
                   const Text(
-                    'Create a new list to organize your tasks better',
+                    'Create a new category to organize your tasks better',
                     style: TextStyle(
                       fontSize: 14,
                     ),
@@ -93,7 +93,7 @@ class _NewListPageState extends State<NewListPage> {
                   const SizedBox(height: 20),
                   ],
                   Hero(
-                    tag: 'list_field',
+                    tag: 'category_field',
                     child: TextField(
                       controller: textController,
                       focusNode: _focusNode,

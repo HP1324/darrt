@@ -57,23 +57,23 @@ class TaskService {
     return result;
   }
 
-  static Future<List<bool>> editTaskListAfterEdit(List<Task> tasks, CategoryModel list) async {
+  static Future<List<bool>> editTaskListAfterEdit(List<Task> tasks, CategoryModel category) async {
     final database = await DatabaseService.openDb();
     List<bool> results= [];
     try {
       await database.transaction((txn) async {
         for (var task in tasks) {
-          final listMap = {'list_name' : list.name,
-            'list_icon_code' : list.iconCode,
-            'list_color' : list.color };
+          final categoryMap = {'categoryName' : category.name,
+            'catIonCode' : category.iconCode,
+            'categoryColor' : category.color };
           final changes = await txn.update(
-              'tasks', listMap, where: 'id = ? AND list_id = ?',
-              whereArgs: [task.id, list.id]);
+              'tasks', categoryMap, where: 'id = ? AND categoryId = ?',
+              whereArgs: [task.id, category.id]);
           changes > 0 ? results.add(true) : results.add(false);
         }
       });
     }catch(e){
-      logger.e('An Exception or Error occurred while editing task list colors in database: ${e.toString()}');
+      logger.e('An Exception or Error occurred while editing task category colors in database: ${e.toString()}');
     }
     return results;
   }
