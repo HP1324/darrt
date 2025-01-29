@@ -19,7 +19,7 @@ class _MiniBottomNavBarState extends State<MiniBottomNavBar> {
     return Container(
       height: MediaQuery.sizeOf(context).height * 0.08,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withAlpha(15),
+        color: Theme.of(context).colorScheme.primary.withAlpha(30),
       ),
       child: Center(
         child: Row(
@@ -70,10 +70,9 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
             if (widget.i != -1) {
               navVM.onDestinationChanged(widget.i);
             } else {
-              AppRouter.to(
+              AppRouter.miniTo(
                 context,
                 child: const TestPage(),
-                type: PageTransitionType.rightToLeft,
               );
             }
           },
