@@ -5,26 +5,26 @@ import 'package:toastification/toastification.dart';
 
 ///Show [Snackbar] when adding tasks, deleting them, marking them as done or undone.
 
-showToast({
-  BuildContext? context,
-  Duration? duration = const Duration(milliseconds: 2000),
-  required String title,
-  String? description,
-  AlignmentGeometry? alignment,
-  ToastificationType? type,
-}) {
-  toastification.show(
-    context: context,
-    autoCloseDuration: duration,
-    title: Text(title),
-    showIcon: false,
-    description: description != null ? Text(description) : null,
-    showProgressBar: false,
-    animationDuration: const Duration(milliseconds: 300),
-    alignment: Alignment.bottomCenter,
-    type: type,
-  );
-}
+// showToast({
+//   BuildContext? context,
+//   Duration? duration = const Duration(milliseconds: 2000),
+//   required String title,
+//   String? description,
+//   AlignmentGeometry? alignment,
+//   ToastificationType? type,
+// }) {
+//   toastification.show(
+//     context: context,
+//     autoCloseDuration: duration,
+//     title: Text(title),
+//     showIcon: false,
+//     description: description != null ? Text(description) : null,
+//     showProgressBar: false,
+//     animationDuration: const Duration(milliseconds: 300),
+//     alignment: Alignment.bottomCenter,
+//     type: type,
+//   );
+// }
 
 ///Validates the [notifyAt] object, if it is in only in future, after this minute.
 bool isValidDateTime(DateTime notifyAt) {
