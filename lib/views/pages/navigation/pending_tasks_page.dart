@@ -139,7 +139,7 @@ class _PendingTasksPageState extends State<PendingTasksPage> {
                                 }
                                 _clearSelection();
                                 Navigator.pop(context);
-                                showToast(title: 'Tasks deleted');
+                                // showToast(title: 'Tasks deleted');
                               },
                               child: const Text('Delete'),
                             ),

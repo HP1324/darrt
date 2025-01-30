@@ -141,7 +141,7 @@ class TaskViewModel extends ChangeNotifier {
       isNewTaskAdded = true;
       return true;
     }
-    showToast(title: 'Please enter a task first', alignment: Alignment.center);
+    // showToast(title: 'Please enter a task first', alignment: Alignment.center);
     return false;
   }
 

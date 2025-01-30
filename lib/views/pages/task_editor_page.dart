@@ -111,14 +111,14 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
               logger.d('Task added: $success');
               if (success) {
                 navigator.pop();
-                showToast(title: 'Task Added');
+                // showToast(title: 'Task Added');
                 logger.d('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
               }
             } else {
               final changes = await tvm.editTask();
               if (changes > 0) {
                 navigator.pop();
-                showToast(title: 'Task edited');
+                // showToast(title: 'Task edited');
               }
             }
             if (isNotifEnabled!) {
@@ -687,7 +687,7 @@ class _TimeOption extends StatelessWidget {
             onTap: () {
               final isUpdated = tvm.updateNotifyTime(minutes);
               if (!isUpdated) {
-                showToast(context: context, title: 'This time has gone', type: ToastificationType.warning);
+                // showToast(context: context, title: 'This time has gone', type: ToastificationType.warning);
               }
               logger.d('notify time after selecting it from chips: ${tvm.currentTask.notifyTime}');
             },

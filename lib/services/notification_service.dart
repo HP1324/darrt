@@ -15,7 +15,7 @@ class NotificationService {
       allowed = await _notif.requestPermissionToSendNotifications();
     }
     if (!allowed) {
-      showToast(title: 'Notification permission is required to send notifications', alignment: Alignment.center);
+      // showToast(title: 'Notification permission is required to send notifications', alignment: Alignment.center);
     } else {
       _notif.initialize(null, [
         NotificationChannel(

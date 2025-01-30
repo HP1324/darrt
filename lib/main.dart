@@ -59,26 +59,24 @@ class _MinimalTodoState extends State<MinimalTodo> {
 
   @override
   Widget build(BuildContext context) {
-    return ToastificationWrapper(
-      child: Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
-        return MaterialApp(
-          navigatorKey: MinimalTodo.navigatorKey,
-          theme: FlexColorScheme.light(colors: themeVM.selectedScheme).toTheme,
-          darkTheme: FlexColorScheme.dark(
-                  colors: themeVM.selectedScheme.toDark(),
-                  surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-                  blendLevel: 12, // Reduces contrast by blending colors more subtly
-                  appBarStyle: FlexAppBarStyle.background,
-                  darkIsTrueBlack: false, // Prevents pure black
-                  scaffoldBackground: Color(0xff131313))
-              .toTheme,
-          themeMode: themeVM.themeMode,
-          debugShowCheckedModeBanner: false,
-          title: 'MinimalTodo',
-          home: const Home(),
-        );
-      }),
-    );
+    return Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
+      return MaterialApp(
+        navigatorKey: MinimalTodo.navigatorKey,
+        theme: FlexColorScheme.light(colors: themeVM.selectedScheme).toTheme,
+        darkTheme: FlexColorScheme.dark(
+                colors: themeVM.selectedScheme.toDark(),
+                surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+                blendLevel: 12, // Reduces contrast by blending colors more subtly
+                appBarStyle: FlexAppBarStyle.background,
+                darkIsTrueBlack: false, // Prevents pure black
+                scaffoldBackground: Color(0xff131313))
+            .toTheme,
+        themeMode: themeVM.themeMode,
+        debugShowCheckedModeBanner: false,
+        title: 'MinimalTodo',
+        home: const Home(),
+      );
+    });
   }
 }
 

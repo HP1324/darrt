@@ -137,7 +137,7 @@ class _FinishedTasksPageState extends State<FinishedTasksPage> {
                                   }
                                   _clearSelection();
                                   Navigator.pop(context);
-                                  showToast(title: 'Tasks deleted');
+                                  // showToast(title: 'Tasks deleted');
                                 },
                                 child: const Text('Delete'),
                               ),

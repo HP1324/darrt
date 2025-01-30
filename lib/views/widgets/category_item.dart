@@ -107,7 +107,7 @@ class _CategoryItemState extends State<CategoryItem> {
                                             final nav = Navigator.of(context);
                                             final deleted = await categoryVM.deleteCategory(widget.list, taskVM);
                                             if (deleted) {
-                                              showToast(title: 'List Deleted');
+                                              // showToast(title: 'List Deleted');
                                               nav.pop();
                                             }
                                           },
