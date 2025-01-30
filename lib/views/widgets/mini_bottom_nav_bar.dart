@@ -78,7 +78,7 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
           },
           child: AnimatedScale(
             duration: const Duration(milliseconds: 100),
-            scale: _isPressed ? 0.9 : 1.0,
+            scale: _isPressed ? 0.6 : 1.0,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [

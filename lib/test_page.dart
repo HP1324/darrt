@@ -14,6 +14,7 @@ class _TestPageState extends State<TestPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Test page')),
+      body: CalendarDatePicker(initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 1000)), onDateChanged: (dt){}),
       bottomNavigationBar: MiniBottomNavBar(
         children: [
           MiniBottomNavBarItem(icon: Icons.calendar_month, label: 'Calendar', i: 0),

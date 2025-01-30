@@ -35,6 +35,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => NavigationViewModel()),
       ChangeNotifierProvider(create: (_) => GeneralViewModel()),
       ChangeNotifierProvider(create: (_) => ThemeViewModel()),
+      // ChangeNotifierProvider(create: (_) => CalendarViewModel()),
     ],
     child: const MinimalTodo(),
   ));
@@ -112,7 +113,7 @@ class _HomeState extends State<Home> {
 }
 
 class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar({super.key});
+  const _AppBar();
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
   @override
