@@ -1,6 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app_router.dart';
+import 'package:minimaltodo/logger/mini_logger.dart';
+import 'package:minimaltodo/mini_router.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:page_transition/page_transition.dart';
@@ -36,7 +37,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
   @override
   Widget build(BuildContext context) {
     final tvm = Provider.of<TaskViewModel>(context, listen: false);
-
+    MiniLogger.debug('build called');
     return PopScope(
       onPopInvokedWithResult: (_, __) async {
         if (widget.editMode) {
@@ -109,14 +110,14 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
               logger.d('Task added: $success');
               if (success) {
                 navigator.pop();
-                showToast(title: 'Task Added');
+                // showToast(title: 'Task Added');
                 logger.d('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
               }
             } else {
               final changes = await tvm.editTask();
               if (changes > 0) {
                 navigator.pop();
-                showToast(title: 'Task edited');
+                toastification.show(context: context, title: Text('Task edited'));
               }
             }
             if (isNotifEnabled!) {
@@ -241,7 +242,7 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
         children: [
           const SizedBox(height: 8),
           ListTile(
-            onTap: () => AppRouter.to(context, child: NewListPage(editMode: false), type: PageTransitionType.rightToLeft),
+            onTap: () => MiniRouter.to(context, child: NewListPage(editMode: false), type: PageTransitionType.rightToLeft),
             title: Text('Create New List', style: TextStyle(fontWeight: FontWeight.w500)),
             leading: Container(
               padding: const EdgeInsets.all(8),
@@ -674,7 +675,7 @@ class _TimeOption extends StatelessWidget {
             onTap: () {
               final isUpdated = tvm.updateNotifyTime(minutes);
               if (!isUpdated) {
-                showToast(context: context, title: 'This time has gone', type: ToastificationType.warning);
+                // showToast(context: context, title: 'This time has gone', type: ToastificationType.warning);
               }
               logger.d('notify time after selecting it from chips: ${tvm.currentTask.notifyTime}');
             },

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app_router.dart';
+import 'package:minimaltodo/mini_router.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/single_task_view.dart';
@@ -23,7 +23,7 @@ class TaskItem extends StatelessWidget {
   final Function(bool)? onSelect;
 
   void _navigateToTaskDetails(BuildContext context) {
-    AppRouter.to(context, child: TaskView(task: task));
+    MiniRouter.to(context, child: TaskView(task: task));
   }
 
   @override

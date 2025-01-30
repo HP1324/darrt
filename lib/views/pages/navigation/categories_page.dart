@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app_router.dart';
+import 'package:minimaltodo/mini_router.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
@@ -78,7 +78,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                         ),
                         const SizedBox(width: 8),
                         IconButton(
-                          onPressed: () => AppRouter.to(context, child: NewListPage(editMode: false)),
+                          onPressed: () => MiniRouter.to(context, child: NewListPage(editMode: false)),
                           icon: const Icon(Iconsax.add),
                         ),
                       ],

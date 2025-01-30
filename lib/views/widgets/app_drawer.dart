@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
-import 'package:minimaltodo/app_router.dart';
+import 'package:minimaltodo/mini_router.dart';
 import 'package:minimaltodo/views/pages/productivity_stats_page.dart';
 import 'package:minimaltodo/views/pages/theme_settings_page.dart';
 
@@ -44,7 +44,7 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.color_lens_outlined),
             title: const Text('Customize Theme'),
-            onTap: () { Navigator.pop(context);AppRouter.to(context, child: ThemeSettingsPage());},
+            onTap: () { Navigator.pop(context);MiniRouter.to(context, child: ThemeSettingsPage());},
           ),
           ListTile(
             leading: const Icon(Iconsax.notification),

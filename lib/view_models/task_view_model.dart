@@ -7,6 +7,7 @@ import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/category_service.dart';
+import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/services/stats_service.dart';
 import 'package:minimaltodo/services/task_service.dart';
 
@@ -112,7 +113,7 @@ class TaskViewModel extends ChangeNotifier {
       isNewTaskAdded = true;
       return true;
     }
-    showToast(title: 'Please enter a task first', alignment: Alignment.center);
+    // showToast(title: 'Please enter a task first', alignment: Alignment.center);
     return false;
   }
 
@@ -248,7 +249,8 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleNotifSwitch(bool value) {
+  void toggleNotifSwitch(bool value) async{
+    await NotificationService.initializeNotificationChannels();
     currentTask.isNotifyEnabled = value;
     if(currentTask.isNotifyEnabled!){
       currentTask.notifyTime = currentTask.dueDate!.subtract( Duration(minutes:selectedMinutes ));

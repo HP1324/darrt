@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app_router.dart';
+import 'package:minimaltodo/mini_router.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/category_service.dart';
@@ -37,7 +37,7 @@ class _CategoryItemState extends State<CategoryItem> {
         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         shape: RoundedRectangleBorder(side: BorderSide(width: 0.1), borderRadius: BorderRadius.circular(10)),
         child: InkWell(
-          onTap: () => AppRouter.to(context, child: TasksForCategoryPage(list: widget.list)),
+          onTap: () => MiniRouter.to(context, child: TasksForCategoryPage(list: widget.list)),
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
@@ -81,7 +81,7 @@ class _CategoryItemState extends State<CategoryItem> {
                             ),
                             items: [
                               PopupMenuItem(
-                                onTap: () => AppRouter.to(context, child: NewListPage(editMode: true, listToEdit: widget.list)),
+                                onTap: () => MiniRouter.to(context, child: NewListPage(editMode: true, listToEdit: widget.list)),
                                 child: Row(
                                   children: [
                                     Icon(Icons.edit, color: listColor, size: 20),
@@ -107,7 +107,7 @@ class _CategoryItemState extends State<CategoryItem> {
                                             final nav = Navigator.of(context);
                                             final deleted = await categoryVM.deleteCategory(widget.list, taskVM);
                                             if (deleted) {
-                                              showToast(title: 'List Deleted');
+                                              // showToast(title: 'List Deleted');
                                               nav.pop();
                                             }
                                           },

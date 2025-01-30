@@ -45,7 +45,7 @@ class _NewListPageState extends State<NewListPage> {
           final edited = await categoryVM.editCategory();
           tvm.updateTaskListAfterEdit(widget.listToEdit!);
           if (edited) {
-            showToast(title: 'List Edited');
+            // showToast(title: 'List Edited');
           }
         }
       },

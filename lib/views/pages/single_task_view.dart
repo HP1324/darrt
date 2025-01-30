@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:minimaltodo/app_router.dart';
+import 'package:minimaltodo/mini_router.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
@@ -20,7 +20,7 @@ class TaskView extends StatelessWidget {
       floatingActionButton: TaskViewButton(
         label: 'Edit',
         onTap: () {
-          AppRouter.to(context, child: TaskEditorPage(editMode: true, taskToEdit: task));
+          MiniRouter.to(context, child: TaskEditorPage(editMode: true, taskToEdit: task));
         },
       ),
       body: Padding(
