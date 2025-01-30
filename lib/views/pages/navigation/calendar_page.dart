@@ -207,7 +207,7 @@ class _ScrollableDateBarState extends State<ScrollableDateBar> {
   final double _dateItemWidth = 48.0;
 
   // Generate dates for 2 years before and after
-  late final List<DateTime> _dates = List.generate(
+  final List<DateTime> _dates = List.generate(
     365 * 4, // 4 years worth of dates
         (index) => DateTime.now().subtract(Duration(days: 365 * 2 - index)),
   );

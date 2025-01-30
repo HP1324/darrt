@@ -83,6 +83,8 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                       Flexible(child:  SetTimeWidget(editMode:widget.editMode, task:  widget.editMode ? widget.taskToEdit : null)),
                     ],
                   ),
+
+
                   const SizedBox(height: 30),
                   NotificationSwitch(),
                   const SizedBox(height: 20),
@@ -400,16 +402,25 @@ class SetDateWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<TaskViewModel,GeneralViewModel>(builder: (context, taskVM,generalVM, _) {
       return InkWell(
+        // In SetDateWidget's onTap
         onTap: () async {
           generalVM.textFieldNode.unfocus();
           final selectedDate = await showDatePicker(
             context: context,
             firstDate: DateTime.now().subtract(const Duration(days: 365)),
             lastDate: DateTime.now().add(const Duration(days: 18263)),
-            initialDate: editMode ? task!.dueDate : DateTime.now(),
+            initialDate: taskVM.currentTask.dueDate, // Use current date
           );
-          if(selectedDate != null) {
-            taskVM.dueDate = selectedDate;
+          if (selectedDate != null) {
+            final currentDueDate = taskVM.currentTask.dueDate!;
+            final newDueDate = DateTime(
+              selectedDate.year,
+              selectedDate.month,
+              selectedDate.day,
+              currentDueDate.hour,
+              currentDueDate.minute,
+            );
+            taskVM.dueDate = newDueDate;
           }
         },
         child: Row(
@@ -455,6 +466,8 @@ class SetDateWidget extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if(taskVM.currentTask.dueDate!.isBefore(DateTime.now().subtract(Duration(minutes: 1))))
+                      Align(alignment:Alignment.centerLeft,child: Text('Task Overdue')),
                   ],
                 ),
               ),
@@ -481,7 +494,7 @@ class SetTimeWidget extends StatelessWidget {
             initialTime:TimeOfDay.fromDateTime(taskVM.currentTask.dueDate!),
           );
           if(selectedTime != null) {
-            taskVM.time = selectedTime!;
+            taskVM.time = selectedTime;
           }
           logger.d('DueDate with time: ${taskVM.currentTask.dueDate}');
         },
@@ -524,7 +537,7 @@ class SetTimeWidget extends StatelessWidget {
                         ),
                         InkWell(
                           onTap: () {
-                            // taskVM.removeTime();
+                            taskVM.removeTime();
                           },
                           child: Icon(Icons.close, size: 19),
                         ),

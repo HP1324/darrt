@@ -45,6 +45,12 @@ Feature: Enable and disable notifications for tasks
                 task.isNotifyEnabled = false;
          else
             showToast('Task marked pending');
+            
+            
+### **Notification Handling**
+
+1. Enable notification on NotificationSwitch
+2. When user selects a date check if the notification is on or off, if on, check whether the time is valid for notification or not, if not valid, disable notification, if valid keep the notification enabled and check whether the selected minutes are valid or not, if valid keep them, if not reset to 0.
 
 
 

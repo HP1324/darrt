@@ -1,12 +1,11 @@
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/services/category_service.dart';
+import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/services/stats_service.dart';
 import 'package:minimaltodo/services/task_service.dart';
 
@@ -55,7 +54,7 @@ class TaskViewModel extends ChangeNotifier {
     currentTask.dueDate = dueDate;
     //Changing notifyTime here to avoid null issues and also when user returns back from notification settings page, there is a chance to change the dueDate back, so to update the notify time according to the new dueDate, we have to add the following line:
     currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
-    notifyListeners();
+    updateNotifLogicAfterDueDateUpdate();
   }
   TextEditingController titleController = TextEditingController();
   set time(TimeOfDay time) {
@@ -68,15 +67,45 @@ class TaskViewModel extends ChangeNotifier {
       time.hour,
       time.minute,
     );
+    currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
+   updateNotifLogicAfterDueDateUpdate();
+  }
+  void updateNotifLogicAfterDueDateUpdate(){
+    if(currentTask.dueDate!.isBefore(DateTime.now())){
+      currentTask.isNotifyEnabled = false;
+      if(currentTask.id != null) {
+        currentTask.isNotifyEnabled = false;
+        NotificationService.removeTaskNotification(currentTask);
+      }
+    }
+    if(!currentTask.notifyTime!.isAfter(DateTime.now())){
+      selectedMinutes = 0;
+    }
     notifyListeners();
   }
-
   void removeDueDate() {
-    currentTask.dueDate = DateTime.now();
+    final currentDueDate = currentTask.dueDate!;
+    final now = DateTime.now();
+    currentTask.dueDate = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      currentDueDate.hour,
+      currentDueDate.minute,
+    );
     notifyListeners();
   }
-  void removeTime(){
-
+  void removeTime() {
+    final currentDueDate = currentTask.dueDate!;
+    final now = DateTime.now();
+    currentTask.dueDate = DateTime(
+      currentDueDate.year,
+      currentDueDate.month,
+      currentDueDate.day,
+      now.hour,
+      now.minute,
+    );
+    notifyListeners();
   }
   bool updateDueDate(DateTime date, TimeOfDay time) {
     final taskDueDate = DateTime(date.year, date.month, date.day, time.hour, time.minute, 0 //seconds
@@ -269,7 +298,6 @@ class TaskViewModel extends ChangeNotifier {
       return true;
     } else {
       selectedMinutes = 0;
-
       notifyListeners();
       return false;
     }
