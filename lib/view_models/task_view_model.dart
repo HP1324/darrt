@@ -16,10 +16,10 @@ class TaskViewModel extends ChangeNotifier {
     _refreshTasks();
     filterTasks(0);
   }
-// In TaskViewModel
+///Init the page for new task
   void initNewTask() {
     currentTask = Task(
-        dueDate: DateTime.now(),
+        dueDate: DateTime.now().add(Duration(minutes: 2)),
         category: CategoryModel(id: 1, name: 'General'),
         // isNotifyEnabled: GetStorage().read('notifications') ? true: false,
         priority: "Low",
@@ -40,9 +40,8 @@ class TaskViewModel extends ChangeNotifier {
   List<Task> get tasks => _tasks;
   Task currentTask = Task();
 
-  set list(CategoryModel list) {
-    logger.i('current task list icon code: ${list.iconCode}');
-    currentTask.category = list;
+  set category(CategoryModel category) {
+    currentTask.category = category;
     notifyListeners();
   }
 
@@ -52,10 +51,17 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   set title(String title) => currentTask.title = title;
+  void setDateTime({DateTime? date, TimeOfDay? time}){
+    if(date != null){
+
+    }
+  }
   set dueDate(DateTime? dueDate) {
     currentTask.dueDate = dueDate;
     //Changing notifyTime here to avoid null issues and also when user returns back from notification settings page, there is a chance to change the dueDate back, so to update the notify time according to the new dueDate, we have to add the following line:
-    currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
+    if(currentTask.isNotifyEnabled!) {
+      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
+    }
     notifyListeners();
   }
   TextEditingController titleController = TextEditingController();
@@ -95,6 +101,8 @@ class TaskViewModel extends ChangeNotifier {
     _tasks = await TaskService.getTasks();
     notifyListeners();
   }
+
+  FocusNode titleTextFieldNode = FocusNode();
 
   bool isNewTaskAdded = false;
   Future<bool> addNewTask() async {

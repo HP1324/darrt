@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:minimaltodo/constants/mini_consts.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/logger/mini_logger.dart';
@@ -10,36 +9,49 @@ import 'package:minimaltodo/logger/mini_logger.dart';
 class NotificationService {
   static final _notif = AwesomeNotifications();
 
-  /// Initializes the notification service and ensures proper setup
   static Future<void> initNotifications() async {
     try {
       final box = GetStorage();
       bool permissionGranted = await _notif.isNotificationAllowed();
 
       // Handle first-time permission request
-      if (!permissionGranted && (box.read('first_time') ?? true)) {
+      if (!permissionGranted && (box.read(mFirstTimeNotifPermission) ?? true)) {
+        // Request permission but don't block app initialization
         permissionGranted = await _notif.requestPermissionToSendNotifications();
-        await box.write('first_time', false);
+        await box.write(mFirstTimeNotifPermission, false);
+        await box.write(mNotificationsEnabled, permissionGranted);
         MiniLogger.debug('First time permission request: $permissionGranted');
       }
 
-      // Initialize channels if permission granted
+      // Initialize channels only if permission is granted
       if (permissionGranted) {
         await initializeNotificationChannels();
         MiniLogger.debug('Notification service initialized successfully');
       } else {
-        MiniLogger.debug('Notification permissions not granted');
+        // Store the permission state but allow app to continue
+        await box.write(mNotificationsEnabled, false);
+        MiniLogger.debug('Notifications disabled - app continuing without notification support');
       }
     } catch (e) {
+      // Log error but don't block app initialization
       MiniLogger.error('Failed to initialize notification service: ${e.toString()}');
-      rethrow;
+      await GetStorage().write(mNotificationsEnabled, false);
     }
   }
-
+// Add this helper method to check notification status
+  static Future<bool> isNotificationsEnabled() async {
+    try {
+      final box = GetStorage();
+      return box.read(mNotificationsEnabled) ?? false;
+    } catch (e) {
+      MiniLogger.error('Error checking notification status: ${e.toString()}');
+      return false;
+    }
+  }
   static Future<void> initializeNotificationChannels() async {
     try {
       final box = GetStorage();
-      final bool shouldInitializeChannels = box.read('channels_init') == null || !box.read('channels_init');
+      final bool shouldInitializeChannels = box.read(mChannelsInit) == null || !box.read( mChannelsInit);
 
       if (shouldInitializeChannels) {
         MiniLogger.debug('Initializing notification channels');
@@ -48,7 +60,7 @@ class NotificationService {
           null,
           [
             NotificationChannel(
-              channelKey: 'task_notif',
+              channelKey:  'task_notif',
               channelName: 'task_notifications',
               channelDescription: 'Channel used to notify users about their tasks with simple notification',
               importance: NotificationImportance.Max,
@@ -59,7 +71,7 @@ class NotificationService {
               criticalAlerts: true,
             ),
             NotificationChannel(
-              channelKey: 'task_alarm',
+              channelKey:  'task_alarm',
               channelName: 'task_alarms',
               channelDescription: 'Channel used to notify users about their tasks with alarm',
               importance: NotificationImportance.Max,
@@ -72,7 +84,7 @@ class NotificationService {
           ],
         );
 
-        await box.write('channels_init', isInitialized);
+        await box.write( mChannelsInit, isInitialized);
         MiniLogger.debug('Channels initialized: $isInitialized');
       }
     } catch (e) {
@@ -82,6 +94,11 @@ class NotificationService {
   }
 
   static Future<void> createTaskNotification(Task task) async {
+    // MiniLogger.debug('${task.id}');
+    if (!await isNotificationsEnabled()) {
+      MiniLogger.debug('Skipping notification creation - notifications are disabled');
+      return;
+    }
     MiniLogger.debug('create notification started');
     Map<String, dynamic> taskJson = task.toJson();
     String taskPayload = jsonEncode(taskJson);
@@ -91,43 +108,40 @@ class NotificationService {
       final isCreated = await _notif.createNotification(
         content: task.notifType!.toLowerCase() == 'notif'
             ? NotificationContent(
-          id: task.id!,
-          channelKey: 'task_notif',
-          title: 'Task Due at ${formatTime(task.dueDate!)}',
-          body: task.title,
-          actionType: ActionType.Default,
-          payload: {
-            'task': taskPayload,
-          },
-          notificationLayout: NotificationLayout.Default,
-          category: NotificationCategory.Reminder,
-          wakeUpScreen: true,
-          criticalAlert: true,
-        )
+                id: task.id!,
+                channelKey:  'task_notif',
+                title: 'Task Due at ${formatTime(task.dueDate!)}',
+                body: task.title,
+                actionType: ActionType.Default,
+                payload: {
+                  'task': taskPayload,
+                },
+                notificationLayout: NotificationLayout.Default,
+                category: NotificationCategory.Reminder,
+                wakeUpScreen: true,
+                criticalAlert: true,
+              )
             : NotificationContent(
-          id: task.id!,
-          channelKey: 'task_alarm',
-          title: 'Task Due at ${formatTime(task.dueDate!)}',
-          body: task.title,
-          actionType: ActionType.Default,
-          payload: {
-            'task': taskPayload,
-          },
-          notificationLayout: NotificationLayout.Default,
-          category: NotificationCategory.Alarm,
-          wakeUpScreen: true,
-          criticalAlert: true,
-        ),
+                id: task.id!,
+                channelKey:  'task_alarm',
+                title: 'Task Due at ${formatTime(task.dueDate!)}',
+                body: task.title,
+                actionType: ActionType.Default,
+                payload: {
+                  'task': taskPayload,
+                },
+                notificationLayout: NotificationLayout.Default,
+                category: NotificationCategory.Alarm,
+                wakeUpScreen: true,
+                criticalAlert: true,
+              ),
         schedule: NotificationCalendar.fromDate(
           date: task.notifyTime!,
           allowWhileIdle: true,
           preciseAlarm: true,
         ),
         actionButtons: [
-          NotificationActionButton(
-              key: 'Finished',
-              label: 'Finished',
-              actionType: ActionType.SilentBackgroundAction),
+          NotificationActionButton(key: 'Finished', label: 'Finished', actionType: ActionType.SilentBackgroundAction),
           NotificationActionButton(key: 'Skip', label: 'Skip'),
         ],
       );
@@ -150,62 +164,60 @@ class NotificationService {
     }
   }
 
-  static Future<bool> managePermission(BuildContext context) async {
-    try {
-      bool isAllowed = await _notif.isNotificationAllowed();
-      List<NotificationPermission> lockedPermissions =
-      await _notif.shouldShowRationaleToRequest(channelKey: 'task_notif');
-
-      if (isAllowed) {
-        await initializeNotificationChannels();
-        return true;
-      }
-
-      isAllowed = await showAdaptiveDialog(
-        context: context,
-        builder: (_) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-            title: const Text('Permission required'),
-            content: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.yellow.shade100,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Text(
-                  'Please allow the application to send notifications, otherwise we won\'t be able to remind you about your important tasks.'),
-            ),
-            actions: [
-              InkWell(
-                onTap: () async {
-                  final navigator = Navigator.of(context);
-                  isAllowed = await _notif.requestPermissionToSendNotifications(
-                      channelKey: 'task_notif',
-                      permissions: lockedPermissions);
-                  navigator.pop(isAllowed);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  child: const Row(
-                    children: [
-                      Text('Go to notification settings'),
-                      Icon(CupertinoIcons.chevron_right),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-      ) ??
-          false;
-
-      return isAllowed;
-    } catch (e) {
-      MiniLogger.error('Failed to manage permissions: ${e.toString()}');
-      rethrow;
-    }
-  }
+  // static Future<bool> managePermission(BuildContext context) async {
+  //   try {
+  //     bool isAllowed = await _notif.isNotificationAllowed();
+  //     List<NotificationPermission> lockedPermissions = await _notif.shouldShowRationaleToRequest(channelKey:  mNotifChannel);
+  //
+  //     if (isAllowed) {
+  //       await initializeNotificationChannels();
+  //       return true;
+  //     }
+  //
+  //     isAllowed = await showAdaptiveDialog(
+  //           context: context,
+  //           builder: (_) {
+  //             return AlertDialog(
+  //               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+  //               title: const Text('Permission required'),
+  //               content: Container(
+  //                 padding: const EdgeInsets.all(8),
+  //                 decoration: BoxDecoration(
+  //                   color: Colors.yellow.shade100,
+  //                   borderRadius: BorderRadius.circular(10),
+  //                 ),
+  //                 child: const Text(
+  //                     'Please allow the application to send notifications, otherwise we won\'t be able to remind you about your important tasks.'),
+  //               ),
+  //               actions: [
+  //                 InkWell(
+  //                   onTap: () async {
+  //                     final navigator = Navigator.of(context);
+  //                     isAllowed =
+  //                         await _notif.requestPermissionToSendNotifications(channelKey:  mNotifChannel, permissions: lockedPermissions);
+  //                     navigator.pop(isAllowed);
+  //                   },
+  //                   child: Container(
+  //                     padding: const EdgeInsets.all(8),
+  //                     color: Theme.of(context).colorScheme.surfaceContainerHighest,
+  //                     child: const Row(
+  //                       children: [
+  //                         Text('Go to notification settings'),
+  //                         Icon(CupertinoIcons.chevron_right),
+  //                       ],
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             );
+  //           },
+  //         ) ??
+  //         false;
+  //
+  //     return isAllowed;
+  //   } catch (e) {
+  //     MiniLogger.error('Failed to manage permissions: ${e.toString()}');
+  //     rethrow;
+  //   }
+  // }
 }

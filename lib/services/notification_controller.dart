@@ -6,7 +6,7 @@ import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/main.dart';
 import 'package:minimaltodo/views/pages/single_task_view.dart';
 
-class NotificationController{
+class NotificationActionController{
 
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {

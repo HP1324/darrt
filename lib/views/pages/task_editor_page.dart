@@ -1,5 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:minimaltodo/constants/mini_consts.dart';
 import 'package:minimaltodo/logger/mini_logger.dart';
 import 'package:minimaltodo/mini_router.dart';
 import 'package:minimaltodo/services/category_service.dart';
@@ -293,7 +295,7 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
                         ),
                         onChanged: (selected) {
                           categoryVM.updateChosenCategory(selected!);
-                          tvm.list = selected;
+                          tvm.category = selected;
                           logger.d('chosen list: ${selected.name}, icon: ${selected.iconCode}');
                         },
                       );
@@ -482,9 +484,9 @@ class SetTimeWidget extends StatelessWidget {
             initialTime:TimeOfDay.fromDateTime(taskVM.currentTask.dueDate!),
           );
           if(selectedTime != null) {
-            taskVM.time = selectedTime!;
+            taskVM.time = selectedTime;
           }
-          logger.d('DueDate with time: ${taskVM.currentTask.dueDate}');
+          MiniLogger.debug('DueDate with time: ${taskVM.currentTask.dueDate}');
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -554,14 +556,62 @@ class NotificationSwitch extends StatelessWidget {
             Text("Enable notification", style: TextStyle(fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500)),
         value: taskVM.currentTask.isNotifyEnabled!,
         onChanged: (value) async {
-          if (await NotificationService.managePermission(context)) {
+          final allowed = await AwesomeNotifications().isNotificationAllowed();
+          if(allowed){
             taskVM.toggleNotifSwitch(value);
-            logger.d('isNotifyEnabled: ${taskVM.currentTask.isNotifyEnabled}');
-            logger.d('Notification Time at the time of toggling: ${taskVM.currentTask.notifyTime}');
+          }else{
+            _showNotificationRationale(context, taskVM, value);
           }
+
         },
       );
     });
+  }
+
+  void _showNotificationRationale(BuildContext context, TaskViewModel taskVM, bool value) {
+             if(context.mounted){
+      showAdaptiveDialog(
+        context:  context,
+        builder: (_) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+            title: const Text('Permission required'),
+            content: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                  'Please allow the application to send notifications, otherwise we won\'t be able to remind you about your important tasks.'),
+            ),
+            actions: [
+              InkWell(
+                onTap: () async {
+                  final navigator = Navigator.of(context);
+                  final allowed = await AwesomeNotifications().requestPermissionToSendNotifications();
+                  if(allowed){
+                    taskVM.toggleNotifSwitch(value);
+                    await GetStorage().write(mNotificationsEnabled, allowed);
+                    await NotificationService.initializeNotificationChannels();
+                  }
+                  navigator.pop();
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  child: const Row(
+                    children: [
+                      Text('Go to notification settings'),
+                      Icon(Icons.chevron_right),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }
 
