@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/theme/app_theme.dart';
 
 class PriorityViewModel extends ChangeNotifier{
 

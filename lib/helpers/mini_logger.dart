@@ -1,5 +1,5 @@
 import 'package:logger/logger.dart';
-import 'package:minimaltodo/global_utils.dart';
+import 'package:minimaltodo/helpers/mini_utils.dart';
 
 class MiniLogger {
   static final _logger = Logger();

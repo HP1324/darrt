@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/mini_router.dart';
+import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/test_page.dart';
 import 'package:minimaltodo/view_models/navigation_view_model.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
 class MiniBottomNavBar extends StatefulWidget {
