@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minimaltodo/constants/mini_consts.dart';
+import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/data_models/task.dart';
-import 'package:minimaltodo/global_utils.dart';
-import 'package:minimaltodo/logger/mini_logger.dart';
+import 'package:minimaltodo/helpers/mini_utils.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 
 class NotificationService {
   static final _notif = AwesomeNotifications();
@@ -38,7 +38,7 @@ class NotificationService {
       await GetStorage().write(mNotificationsEnabled, false);
     }
   }
-// Add this helper method to check notification status
+
   static Future<bool> isNotificationsEnabled() async {
     try {
       final box = GetStorage();
@@ -48,6 +48,7 @@ class NotificationService {
       return false;
     }
   }
+
   static Future<void> initializeNotificationChannels() async {
     try {
       final box = GetStorage();
@@ -95,6 +96,9 @@ class NotificationService {
 
   static Future<void> createTaskNotification(Task task) async {
     // MiniLogger.debug('${task.id}');
+    if(task.notifyTime!.isBefore(DateTime.now())){
+      return;
+    }
     if (!await isNotificationsEnabled()) {
       MiniLogger.debug('Skipping notification creation - notifications are disabled');
       return;
@@ -164,60 +168,4 @@ class NotificationService {
     }
   }
 
-  // static Future<bool> managePermission(BuildContext context) async {
-  //   try {
-  //     bool isAllowed = await _notif.isNotificationAllowed();
-  //     List<NotificationPermission> lockedPermissions = await _notif.shouldShowRationaleToRequest(channelKey:  mNotifChannel);
-  //
-  //     if (isAllowed) {
-  //       await initializeNotificationChannels();
-  //       return true;
-  //     }
-  //
-  //     isAllowed = await showAdaptiveDialog(
-  //           context: context,
-  //           builder: (_) {
-  //             return AlertDialog(
-  //               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-  //               title: const Text('Permission required'),
-  //               content: Container(
-  //                 padding: const EdgeInsets.all(8),
-  //                 decoration: BoxDecoration(
-  //                   color: Colors.yellow.shade100,
-  //                   borderRadius: BorderRadius.circular(10),
-  //                 ),
-  //                 child: const Text(
-  //                     'Please allow the application to send notifications, otherwise we won\'t be able to remind you about your important tasks.'),
-  //               ),
-  //               actions: [
-  //                 InkWell(
-  //                   onTap: () async {
-  //                     final navigator = Navigator.of(context);
-  //                     isAllowed =
-  //                         await _notif.requestPermissionToSendNotifications(channelKey:  mNotifChannel, permissions: lockedPermissions);
-  //                     navigator.pop(isAllowed);
-  //                   },
-  //                   child: Container(
-  //                     padding: const EdgeInsets.all(8),
-  //                     color: Theme.of(context).colorScheme.surfaceContainerHighest,
-  //                     child: const Row(
-  //                       children: [
-  //                         Text('Go to notification settings'),
-  //                         Icon(CupertinoIcons.chevron_right),
-  //                       ],
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ],
-  //             );
-  //           },
-  //         ) ??
-  //         false;
-  //
-  //     return isAllowed;
-  //   } catch (e) {
-  //     MiniLogger.error('Failed to manage permissions: ${e.toString()}');
-  //     rethrow;
-  //   }
-  // }
 }

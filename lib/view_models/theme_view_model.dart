@@ -2,7 +2,7 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minimaltodo/global_utils.dart';
+import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/theme_colors.dart';
 
 enum ThemePreference { system, light, dark }

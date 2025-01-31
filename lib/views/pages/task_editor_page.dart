@@ -1,15 +1,15 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minimaltodo/constants/mini_consts.dart';
-import 'package:minimaltodo/logger/mini_logger.dart';
-import 'package:minimaltodo/mini_router.dart';
+import 'package:minimaltodo/helpers/mini_consts.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/services/notification_service.dart';
-import 'package:minimaltodo/global_utils.dart';
+import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
@@ -296,7 +296,6 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
                         onChanged: (selected) {
                           categoryVM.updateChosenCategory(selected!);
                           tvm.category = selected;
-                          logger.d('chosen list: ${selected.name}, icon: ${selected.iconCode}');
                         },
                       );
                     },
@@ -527,7 +526,7 @@ class SetTimeWidget extends StatelessWidget {
                         ),
                         InkWell(
                           onTap: () {
-                            // taskVM.removeTime();
+                             taskVM.removeTime();
                           },
                           child: Icon(Icons.close, size: 19),
                         ),
@@ -639,7 +638,7 @@ class NotificationTypeSelector extends StatelessWidget {
               segments: [
                 ButtonSegment(
                   value: 'notif',
-                  label: Text('Soft Reminder'),
+                  label: Text('Notification'),
                   icon: Icon(Icons.notifications_none_outlined),
                 ),
                 ButtonSegment(
@@ -727,7 +726,6 @@ class _TimeOption extends StatelessWidget {
               if (!isUpdated) {
                 // showToast(context: context, title: 'This time has gone', type: ToastificationType.warning);
               }
-              logger.d('notify time after selecting it from chips: ${tvm.currentTask.notifyTime}');
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),

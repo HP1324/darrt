@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
-import 'package:toastification/toastification.dart';
 
 ///Show [Snackbar] when adding tasks, deleting them, marking them as done or undone.
 

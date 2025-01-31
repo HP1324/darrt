@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/mini_router.dart';
-import 'package:minimaltodo/view_models/general_view_model.dart';
+import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/new_list_page.dart';

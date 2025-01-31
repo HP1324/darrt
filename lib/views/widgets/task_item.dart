@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/mini_router.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/single_task_view.dart';
 import 'package:minimaltodo/views/widgets/selectable_task_item.dart';

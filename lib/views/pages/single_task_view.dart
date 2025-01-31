@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:minimaltodo/mini_router.dart';
+import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/services/category_service.dart';
-import 'package:minimaltodo/global_utils.dart';
+import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
@@ -21,6 +21,7 @@ class TaskView extends StatelessWidget {
         label: 'Edit',
         onTap: () {
           MiniRouter.to(context, child: TaskEditorPage(editMode: true, taskToEdit: task));
+
         },
       ),
       body: Padding(

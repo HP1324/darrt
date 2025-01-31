@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:minimaltodo/mini_router.dart';
+import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/view_models/navigation_view_model.dart';
 import 'package:minimaltodo/views/pages/navigation/calendar_page.dart';
 import 'package:minimaltodo/views/pages/navigation/categories_page.dart';
