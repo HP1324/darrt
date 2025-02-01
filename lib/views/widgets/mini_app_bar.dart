@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_page_transition.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/mini_storage.dart';
+import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/views/pages/navigation/finished_tasks_page.dart';
 import 'package:minimaltodo/views/pages/search_page.dart';
@@ -39,15 +41,13 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   );
                 });
           },
-          icon: Icon(Iconsax.calendar_tick),
+          icon: Icon(Icons.calendar_month_outlined),
         ),
         _MiniAppBarAction(
           key: _popupKey,
           icon: Icon(Icons.more_vert),
           onTap: () {
-            final RenderBox renderBox = _popupKey.currentContext!.findRenderObject() as RenderBox;
-            final position = renderBox.localToGlobal(Offset.zero);
-            final size = renderBox.size;
+            final (position, size) = getPositionAndSize(_popupKey);
             showMenu(
               context: context,
               color: Theme.of(context).colorScheme.onPrimary,

@@ -56,3 +56,16 @@ String formatDateWith(DateTime dateTime, String format) {
 const gap = SizedBox(height: 20, width: 10);
 
 final Logger logger = Logger();
+
+///Had to calculate the InkWell's position because showMenu does not give direct control for placing the popup menu under the button directly. So I calculated the InkWell's position on the screen and passed it as arguments to [RelativeRect.fromLTRB()].
+///Using dart records feature to return position and size both
+(Offset, Size) getPositionAndSize(GlobalKey key){
+  Offset position = Offset.zero;
+  Size size = Size.zero;
+  if(key.currentContext != null) {
+    final RenderBox renderBox = key.currentContext!.findRenderObject() as RenderBox;
+    position = renderBox.localToGlobal(Offset.zero);
+    size = renderBox.size;
+  }
+  return (position, size);
+}

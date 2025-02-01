@@ -42,12 +42,9 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
     final tvm = Provider.of<TaskViewModel>(context, listen: false);
     MiniLogger.debug('build called');
     return PopScope(
-      onPopInvokedWithResult: (_, __) async {
-        if (widget.editMode) {
-          final changes = await tvm.editTask();
-          if (changes > 0) {
-            // showToast(title: 'Task Edited');
-          }
+      onPopInvokedWithResult: (didPop, result){
+        if(widget.editMode) {
+          tvm.resetTask(widget.taskToEdit!);
         }
       },
       child: Scaffold(
@@ -109,11 +106,10 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
             if (!widget.editMode) {
               tvm.currentTask.printTask();
               final success = await tvm.addNewTask();
-              logger.d('Task added: $success');
+              MiniLogger.debug('Task added: $success');
               if (success) {
                 navigator.pop();
-                // showToast(title: 'Task Added');
-                logger.d('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
+                MiniLogger.debug('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
               }
             } else {
               final changes = await tvm.editTask();

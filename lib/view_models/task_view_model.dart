@@ -26,13 +26,18 @@ class TaskViewModel extends ChangeNotifier {
     selectedMinutes = 0;
     titleController.clear();
   }
-
+  void resetTask(Task task){
+    task = taskBeforeEdit;
+    currentTask = taskBeforeEdit;
+    notifyListeners();
+  }
+  Task taskBeforeEdit = Task();
   void initEditTask(Task task) {
+    taskBeforeEdit = task;
     currentTask = task;
     titleController.text = task.title ?? '';
     selectedMinutes = task.dueDate != null && task.notifyTime != null ? task.dueDate!.difference(task.notifyTime!).inMinutes : 0;
   }
-
   //------------------------ PROPERTIES & CONTROLLERS ------------------------//
   List<Task> _tasks = [];
   List<Task> get tasks => _tasks;

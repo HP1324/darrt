@@ -119,6 +119,7 @@ class Task {
     isRepeating,
   );
 
+
   bool isValid() {
     try {
       return title != null && title!.trim().isNotEmpty;
