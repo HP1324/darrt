@@ -4,53 +4,18 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
+import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/views/widgets/task_item.dart';
 
-class CalendarPage extends StatefulWidget {
+class CalendarPage extends StatelessWidget {
   const CalendarPage({super.key});
 
-  @override
-  State<CalendarPage> createState() => _CalendarPageState();
-}
-
-class _CalendarPageState extends State<CalendarPage> {
-  late DateTime _selectedDate;
-  final Set<int> _selectedTaskIds = {};
-  bool _isSelectionMode = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedDate = DateTime.now();
-  }
-
-  void _toggleTaskSelection(Task task) {
-    setState(() {
-      if (_selectedTaskIds.contains(task.id)) {
-        _selectedTaskIds.remove(task.id);
-        if (_selectedTaskIds.isEmpty) {
-          _isSelectionMode = false;
-        }
-      } else {
-        _selectedTaskIds.add(task.id!);
-        _isSelectionMode = true;
-      }
-    });
-  }
-
-  void _clearSelection() {
-    setState(() {
-      _selectedTaskIds.clear();
-      _isSelectionMode = false;
-    });
-  }
-
-  void _deleteSelectedTasks(TaskViewModel taskVM) {
+  void _deleteSelectedTasks(BuildContext context, TaskViewModel taskVM, CalendarViewModel calendarVM) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Tasks'),
-        content: Text('Delete ${_selectedTaskIds.length} tasks?'),
+        content: Text('Delete ${calendarVM.selectedTaskIds.length} tasks?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -58,11 +23,11 @@ class _CalendarPageState extends State<CalendarPage> {
           ),
           TextButton(
             onPressed: () {
-              for (var id in _selectedTaskIds) {
+              for (var id in calendarVM.selectedTaskIds) {
                 final task = taskVM.tasks.firstWhere((t) => t.id == id);
                 taskVM.deleteTask(task);
               }
-              _clearSelection();
+              calendarVM.clearSelection();
               Navigator.pop(context);
             },
             child: const Text(
@@ -77,41 +42,38 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TaskViewModel>(
-      builder: (context, taskVM, _) {
-        final scheduledTasks = taskVM.tasks
-            .where((task) => task.dueDate != null)
-            .toList();
+    return Consumer2<TaskViewModel, CalendarViewModel>(
+      builder: (context, taskVM, calendarVM, _) {
+        final scheduledTasks = taskVM.tasks.where((task) => task.dueDate != null).toList();
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if(_isSelectionMode)
-                ListTile(
-              leading: IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: _clearSelection,
+            if (calendarVM.isSelectionMode)
+              ListTile(
+                leading: IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: calendarVM.clearSelection,
+                ),
+                title: Text('${calendarVM.selectedTaskIds.length} selected'),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () => _deleteSelectedTasks(context, taskVM, calendarVM),
+                ),
               ),
-              title: Text('${_selectedTaskIds.length} selected'),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () => _deleteSelectedTasks(taskVM),
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
               child: Text(
-                DateFormat('EEE, d MMM, yyyy').format(_selectedDate),
+                DateFormat('EEE, d MMM, yyyy').format(calendarVM.selectedDate),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  fontSize: 13,
                 ),
               ),
             ),
             ScrollableDateBar(
-              initialDate: _selectedDate,
-              onDateSelected: (date) {
-                setState(() => _selectedDate = date);
-              },
+              calendarVM: calendarVM,
+              onDateSelected: calendarVM.setSelectedDate,
             ),
             Expanded(
               child: ListView(
@@ -121,9 +83,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     builder: (context) {
                       final tasksForSelectedDate = scheduledTasks.where((task) {
                         final taskDate = task.dueDate!;
-                        return taskDate.year == _selectedDate.year &&
-                            taskDate.month == _selectedDate.month &&
-                            taskDate.day == _selectedDate.day;
+                        return calendarVM.isSameDay(taskDate, calendarVM.selectedDate);
                       }).toList();
 
                       if (tasksForSelectedDate.isEmpty) {
@@ -164,11 +124,10 @@ class _CalendarPageState extends State<CalendarPage> {
                             .map((task) => TaskItem(
                           key: ValueKey('${task.id}_${task.isDone}'),
                           task: task,
-                          isSelected: _selectedTaskIds.contains(task.id),
-                          isSelectionMode: _isSelectionMode,
-                          onLongPress: () => _toggleTaskSelection(task),
-                          onSelect: (selected) =>
-                              _toggleTaskSelection(task),
+                          isSelected: calendarVM.selectedTaskIds.contains(task.id),
+                          isSelectionMode: calendarVM.isSelectionMode,
+                          onLongPress: () => calendarVM.toggleTaskSelection(task),
+                          onSelect: (_) => calendarVM.toggleTaskSelection(task),
                         ))
                             .toList(),
                       );
@@ -184,54 +143,15 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 }
 
-
-class ScrollableDateBar extends StatefulWidget {
-  final DateTime initialDate;
+class ScrollableDateBar extends StatelessWidget {
+  final CalendarViewModel calendarVM;
   final ValueChanged<DateTime> onDateSelected;
-  final ScrollController? scrollController;
 
   const ScrollableDateBar({
     super.key,
-    required this.initialDate,
+    required this.calendarVM,
     required this.onDateSelected,
-    this.scrollController,
   });
-
-  @override
-  State<ScrollableDateBar> createState() => _ScrollableDateBarState();
-}
-
-class _ScrollableDateBarState extends State<ScrollableDateBar> {
-  late ScrollController _scrollController;
-  late DateTime _selectedDate;
-  final double _dateItemWidth = 48.0;
-
-  // Generate dates for 2 years before and after
-  final List<DateTime> _dates = List.generate(
-    365 * 4, // 4 years worth of dates
-        (index) => DateTime.now().subtract(Duration(days: 365 * 2 - index)),
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedDate = widget.initialDate;
-    _scrollController = widget.scrollController ?? ScrollController();
-
-    // Scroll to initial date after layout
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final initialIndex = _dates.indexWhere(
-            (date) => isSameDay(date, widget.initialDate),
-      );
-      if (initialIndex != -1) {
-        _scrollController.jumpTo(initialIndex * _dateItemWidth);
-      }
-    });
-  }
-
-  bool isSameDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -240,21 +160,18 @@ class _ScrollableDateBarState extends State<ScrollableDateBar> {
     return SizedBox(
       height: 80,
       child: ListView.builder(
-        controller: _scrollController,
+        controller: calendarVM.scrollController,
         scrollDirection: Axis.horizontal,
-        itemExtent: _dateItemWidth,
+        itemExtent: calendarVM.dateItemWidth,
         physics: const BouncingScrollPhysics(),
-        itemCount: _dates.length,
+        itemCount: calendarVM.dates.length,
         itemBuilder: (context, index) {
-          final date = _dates[index];
-          final isSelected = isSameDay(date, _selectedDate);
-          final isToday = isSameDay(date, DateTime.now());
+          final date = calendarVM.dates[index];
+          final isSelected = calendarVM.isSameDay(date, calendarVM.selectedDate);
+          final isToday = calendarVM.isSameDay(date, DateTime.now());
 
           return GestureDetector(
-            onTap: () {
-              setState(() => _selectedDate = date);
-              widget.onDateSelected(date);
-            },
+            onTap: () => onDateSelected(date),
             child: Card(
               margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
               elevation: 0,
@@ -310,13 +227,5 @@ class _ScrollableDateBarState extends State<ScrollableDateBar> {
         },
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    if (widget.scrollController == null) {
-      _scrollController.dispose();
-    }
-    super.dispose();
   }
 }

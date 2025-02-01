@@ -1,4 +1,4 @@
-import 'package:minimaltodo/global_utils.dart';
+import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseService {
@@ -62,7 +62,6 @@ class DatabaseService {
 """;
 
   static Future<Database> openDb() async {
-    logger.d('${formatDateTime(DateTime.now())} openDb() called');
     return openDatabase(
       'minimal_todo.db',
       version: 1,

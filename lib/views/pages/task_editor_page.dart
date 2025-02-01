@@ -1,12 +1,16 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app_router.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:minimaltodo/helpers/mini_consts.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/helpers/mini_storage.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/services/notification_service.dart';
-import 'package:minimaltodo/global_utils.dart';
+import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
@@ -36,7 +40,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
   @override
   Widget build(BuildContext context) {
     final tvm = Provider.of<TaskViewModel>(context, listen: false);
-
+    MiniLogger.debug('build called');
     return PopScope(
       onPopInvokedWithResult: (_, __) async {
         if (widget.editMode) {
@@ -67,7 +71,6 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                 builder: (context, taskVM, _) {
               return Column(
                 children: [
-                  const SizedBox(height: 20),
                   TaskTextField(editMode: widget.editMode),
                   const SizedBox(height: 50),
                   Row(
@@ -83,8 +86,6 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                       Flexible(child:  SetTimeWidget(editMode:widget.editMode, task:  widget.editMode ? widget.taskToEdit : null)),
                     ],
                   ),
-
-
                   const SizedBox(height: 30),
                   NotificationSwitch(),
                   const SizedBox(height: 20),
@@ -111,14 +112,14 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
               logger.d('Task added: $success');
               if (success) {
                 navigator.pop();
-                showToast(title: 'Task Added');
+                // showToast(title: 'Task Added');
                 logger.d('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
               }
             } else {
               final changes = await tvm.editTask();
               if (changes > 0) {
                 navigator.pop();
-                showToast(title: 'Task edited');
+                toastification.show(context: context, title: Text('Task edited'));
               }
             }
             if (isNotifEnabled!) {
@@ -243,7 +244,7 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
         children: [
           const SizedBox(height: 8),
           ListTile(
-            onTap: () => AppRouter.to(context, child: NewListPage(editMode: false), type: PageTransitionType.rightToLeft),
+            onTap: () => MiniRouter.to(context, child: NewListPage(editMode: false), type: PageTransitionType.rightToLeft),
             title: Text('Create New List', style: TextStyle(fontWeight: FontWeight.w500)),
             leading: Container(
               padding: const EdgeInsets.all(8),
@@ -294,8 +295,7 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
                         ),
                         onChanged: (selected) {
                           categoryVM.updateChosenCategory(selected!);
-                          tvm.list = selected;
-                          logger.d('chosen list: ${selected.name}, icon: ${selected.iconCode}');
+                          tvm.category = selected;
                         },
                       );
                     },
@@ -402,25 +402,16 @@ class SetDateWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<TaskViewModel,GeneralViewModel>(builder: (context, taskVM,generalVM, _) {
       return InkWell(
-        // In SetDateWidget's onTap
         onTap: () async {
           generalVM.textFieldNode.unfocus();
           final selectedDate = await showDatePicker(
             context: context,
-            firstDate: DateTime.now().subtract(const Duration(days: 365)),
+            firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(const Duration(days: 365)),
             lastDate: DateTime.now().add(const Duration(days: 18263)),
-            initialDate: taskVM.currentTask.dueDate, // Use current date
+            initialDate: editMode ? task!.dueDate : DateTime.now(),
           );
-          if (selectedDate != null) {
-            final currentDueDate = taskVM.currentTask.dueDate!;
-            final newDueDate = DateTime(
-              selectedDate.year,
-              selectedDate.month,
-              selectedDate.day,
-              currentDueDate.hour,
-              currentDueDate.minute,
-            );
-            taskVM.dueDate = newDueDate;
+          if(selectedDate != null) {
+            taskVM.dueDate = selectedDate;
           }
         },
         child: Row(
@@ -466,8 +457,6 @@ class SetDateWidget extends StatelessWidget {
                         ),
                       ],
                     ),
-                    if(taskVM.currentTask.dueDate!.isBefore(DateTime.now().subtract(Duration(minutes: 1))))
-                      Align(alignment:Alignment.centerLeft,child: Text('Task Overdue')),
                   ],
                 ),
               ),
@@ -496,7 +485,7 @@ class SetTimeWidget extends StatelessWidget {
           if(selectedTime != null) {
             taskVM.time = selectedTime;
           }
-          logger.d('DueDate with time: ${taskVM.currentTask.dueDate}');
+          MiniLogger.debug('DueDate with time: ${taskVM.currentTask.dueDate}');
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -537,7 +526,7 @@ class SetTimeWidget extends StatelessWidget {
                         ),
                         InkWell(
                           onTap: () {
-                            taskVM.removeTime();
+                             taskVM.removeTime();
                           },
                           child: Icon(Icons.close, size: 19),
                         ),
@@ -566,14 +555,62 @@ class NotificationSwitch extends StatelessWidget {
             Text("Enable notification", style: TextStyle(fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500)),
         value: taskVM.currentTask.isNotifyEnabled!,
         onChanged: (value) async {
-          if (await NotificationService.managePermission(context)) {
+          final allowed = await AwesomeNotifications().isNotificationAllowed();
+          if(allowed){
             taskVM.toggleNotifSwitch(value);
-            logger.d('isNotifyEnabled: ${taskVM.currentTask.isNotifyEnabled}');
-            logger.d('Notification Time at the time of toggling: ${taskVM.currentTask.notifyTime}');
+          }else{
+            _showNotificationRationale(context, taskVM, value);
           }
+
         },
       );
     });
+  }
+
+  void _showNotificationRationale(BuildContext context, TaskViewModel taskVM, bool value) {
+             if(context.mounted){
+      showAdaptiveDialog(
+        context:  context,
+        builder: (_) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+            title: const Text('Permission required'),
+            content: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                  'Please allow the application to send notifications, otherwise we won\'t be able to remind you about your important tasks.'),
+            ),
+            actions: [
+              InkWell(
+                onTap: () async {
+                  final navigator = Navigator.of(context);
+                  final allowed = await AwesomeNotifications().requestPermissionToSendNotifications();
+                  if(allowed){
+                    taskVM.toggleNotifSwitch(value);
+                    await GetStorage().write(mNotificationsEnabled, allowed);
+                    await NotificationService.initializeNotificationChannels();
+                  }
+                  navigator.pop();
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  child: const Row(
+                    children: [
+                      Text('Go to notification settings'),
+                      Icon(Icons.chevron_right),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }
 
@@ -601,7 +638,7 @@ class NotificationTypeSelector extends StatelessWidget {
               segments: [
                 ButtonSegment(
                   value: 'notif',
-                  label: Text('Soft Reminder'),
+                  label: Text('Notification'),
                   icon: Icon(Icons.notifications_none_outlined),
                 ),
                 ButtonSegment(
@@ -687,9 +724,8 @@ class _TimeOption extends StatelessWidget {
             onTap: () {
               final isUpdated = tvm.updateNotifyTime(minutes);
               if (!isUpdated) {
-                showToast(context: context, title: 'This time has gone', type: ToastificationType.warning);
+                // showToast(context: context, title: 'This time has gone', type: ToastificationType.warning);
               }
-              logger.d('notify time after selecting it from chips: ${tvm.currentTask.notifyTime}');
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
