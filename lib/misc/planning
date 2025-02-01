@@ -21,8 +21,7 @@ Feature: Enable and disable notifications for tasks
 3)Add isNotifyEnabled in DatabaseService, in table migration query
     i.  Change insertion and updation queries accordingly
 
-///TODO: HANDLE NAVIGATION TO THE TASK VIEW WHEN NOTIFICATION IS TAPPED, EVEN WHEN THE APP IS IN BACKGROUND
-///TODO: TERMINATED
+
 
 -> Task marked as finished -> task.isDone = true ->
     if (task.isDone) ->->
@@ -46,6 +45,14 @@ Feature: Enable and disable notifications for tasks
          else
             showToast('Task marked pending');
 
+
+1)Timeline
+2)Repeating task
+3)Settings
+4)Notes
+5)Improve BottomNavBar design
+- Remove drawer. Make app title left of the appbar. add 3 actions in appbar: i)notifications
+  ii)Search,iii)PopupmenuButton
 
 
 
