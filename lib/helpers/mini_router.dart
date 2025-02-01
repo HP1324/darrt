@@ -6,7 +6,7 @@ class MiniRouter{
   static void to(BuildContext context, {required Widget child, PageTransitionType type = PageTransitionType.fade}){
     Navigator.push(context, PageTransition(type: type,child: child));
   }
-  static void miniTo(BuildContext context, {required Widget child, MiniPageTransitionType type = MiniPageTransitionType.jumpFromRight}){
-    MiniPageTransition.push(context: context, page: child,type: type);
+  static void miniTo(BuildContext context, {required Widget child, MiniPageTransitionType type = MiniPageTransitionType.jumpFromRight, Offset? tapPosition}) {
+    MiniPageTransition.push(context: context, page: child,type: type,tapPosition: tapPosition);
   }
 }

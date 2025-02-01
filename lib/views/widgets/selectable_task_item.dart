@@ -61,7 +61,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: Transform.scale(
-                      scale:1.1,
+                      scale:1.0,
                       child: Checkbox(
                         key: ValueKey('selection_${widget.task.id}'),
                         shape: RoundedRectangleBorder(
@@ -97,9 +97,6 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                   style: TextStyle(
                                     fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
                                     fontWeight: FontWeight.w500,
-                                    decoration: widget.task.isDone!
-                                        ? TextDecoration.lineThrough
-                                        : null,
                                     decorationColor: Theme.of(context).colorScheme.outline,
                                     decorationThickness: 2,
                                     color: widget.task.isDone!

@@ -70,7 +70,6 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                 builder: (context, taskVM, _) {
               return Column(
                 children: [
-                  const SizedBox(height: 20),
                   TaskTextField(editMode: widget.editMode),
                   const SizedBox(height: 50),
                   Row(

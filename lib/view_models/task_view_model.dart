@@ -222,6 +222,8 @@ class TaskViewModel extends ChangeNotifier {
     _refreshTasks();
     return changesMade;
   }
+
+
   //----------------------------------------------------------------------//
 
   //------------------------ TASK LIST MANAGEMENT ------------------------//
