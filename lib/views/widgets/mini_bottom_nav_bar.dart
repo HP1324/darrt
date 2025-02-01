@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app_router.dart';
+import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/test_page.dart';
 import 'package:minimaltodo/view_models/navigation_view_model.dart';
-import 'package:page_transition/page_transition.dart';
+import 'package:minimaltodo/views/pages/search_page.dart';
 import 'package:provider/provider.dart';
 
 class MiniBottomNavBar extends StatefulWidget {
@@ -17,9 +17,11 @@ class _MiniBottomNavBarState extends State<MiniBottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.sizeOf(context).height * 0.08,
+      // margin: EdgeInsets.only(right: 20,left: 20,bottom: 7),
+      height: MediaQuery.sizeOf(context).height * 0.075,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withAlpha(30),
+        color: Theme.of(context).colorScheme.primary.withAlpha(20),
+        // borderRadius: BorderRadius.circular(30),
       ),
       child: Center(
         child: Row(
@@ -67,13 +69,16 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
           onTapUp: (_) => setState(() => _isPressed = false),
           onTapCancel: () => setState(() => _isPressed = false),
           onTap: () {
-            if (widget.i != -1) {
-              navVM.onDestinationChanged(widget.i);
-            } else {
-              AppRouter.miniTo(
+            if(widget.i == -1){
+              MiniRouter.to(context, child: SearchPage());
+            }
+            else if (widget.i == -2) {
+              MiniRouter.miniTo(
                 context,
                 child: const TestPage(),
               );
+            } else {
+              navVM.onDestinationChanged(widget.i);
             }
           },
           child: AnimatedScale(

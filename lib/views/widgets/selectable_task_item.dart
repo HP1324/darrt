@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/task.dart';
-import 'package:minimaltodo/global_utils.dart';
+import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:provider/provider.dart';
@@ -61,7 +61,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: Transform.scale(
-                      scale:1.1,
+                      scale:1.0,
                       child: Checkbox(
                         key: ValueKey('selection_${widget.task.id}'),
                         shape: RoundedRectangleBorder(
@@ -97,9 +97,6 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                                   style: TextStyle(
                                     fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
                                     fontWeight: FontWeight.w500,
-                                    decoration: widget.task.isDone!
-                                        ? TextDecoration.lineThrough
-                                        : null,
                                     decorationColor: Theme.of(context).colorScheme.outline,
                                     decorationThickness: 2,
                                     color: widget.task.isDone!

@@ -21,8 +21,7 @@ Feature: Enable and disable notifications for tasks
 3)Add isNotifyEnabled in DatabaseService, in table migration query
     i.  Change insertion and updation queries accordingly
 
-///TODO: HANDLE NAVIGATION TO THE TASK VIEW WHEN NOTIFICATION IS TAPPED, EVEN WHEN THE APP IS IN BACKGROUND
-///TODO: TERMINATED
+
 
 -> Task marked as finished -> task.isDone = true ->
     if (task.isDone) ->->
@@ -52,6 +51,13 @@ Feature: Enable and disable notifications for tasks
 1. Enable notification on NotificationSwitch
 2. When user selects a date check if the notification is on or off, if on, check whether the time is valid for notification or not, if not valid, disable notification, if valid keep the notification enabled and check whether the selected minutes are valid or not, if valid keep them, if not reset to 0.
 
+
+
+TODO: 1)Timeline - PENDING
+TODO: 2)Repeating task - PENDING
+TODO: 3)Settings - PENDING
+TODO: 4)Notes - PENDING
+TODO: 6)Add notification button in appbar to show notifications
 
 
 

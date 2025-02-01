@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/task.dart';
-import 'package:minimaltodo/global_utils.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
-import 'package:minimaltodo/views/widgets/empty_list_placeholder.dart';
 import 'package:minimaltodo/views/widgets/task_item.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -139,7 +137,7 @@ class _PendingTasksPageState extends State<PendingTasksPage> {
                                 }
                                 _clearSelection();
                                 Navigator.pop(context);
-                                showToast(title: 'Tasks deleted');
+                                // showToast(title: 'Tasks deleted');
                               },
                               child: const Text('Delete'),
                             ),
