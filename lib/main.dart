@@ -20,8 +20,8 @@ void main() async {
   MiniLogger.debug('Notification first time: ${GetStorage().read(mFirstTimeNotifPermission)}');
   try {
     WidgetsFlutterBinding.ensureInitialized();
-    runApp(const MinimalTodo());
     await NotificationService.initNotifications();
+    runApp(const MinimalTodo());
   } catch (e) {
     MiniLogger.error('Failed to initialize app: ${e.toString()}');
   }
