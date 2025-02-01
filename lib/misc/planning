@@ -46,13 +46,12 @@ Feature: Enable and disable notifications for tasks
             showToast('Task marked pending');
 
 
-1)Timeline
-2)Repeating task
-3)Settings
-4)Notes
-5)Improve BottomNavBar design
-- Remove drawer. Make app title left of the appbar. add 3 actions in appbar: i)notifications
-  ii)Search,iii)PopupmenuButton
+
+TODO: 1)Timeline - PENDING
+TODO: 2)Repeating task - PENDING
+TODO: 3)Settings - PENDING
+TODO: 4)Notes - PENDING
+TODO: 6)Add notification button in appbar to show notifications
 
 
 

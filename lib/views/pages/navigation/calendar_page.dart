@@ -104,6 +104,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 DateFormat('EEE, d MMM, yyyy').format(_selectedDate),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  fontSize: 13
                 ),
               ),
             ),

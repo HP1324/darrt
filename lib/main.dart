@@ -11,14 +11,12 @@ import 'package:minimaltodo/views/home.dart';
 import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/navigation_view_model.dart';
-import 'package:minimaltodo/view_models/priority_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  await GetStorage.init();
-  MiniLogger.debug('Notification first time: ${GetStorage().read(mFirstTimeNotifPermission)}');
   try {
+    await GetStorage.init();
     WidgetsFlutterBinding.ensureInitialized();
     await NotificationService.initNotifications();
     runApp(const MinimalTodo());
@@ -35,7 +33,6 @@ class MinimalTodo extends StatefulWidget {
 }
 
 class _MinimalTodoState extends State<MinimalTodo> {
-
   @override
   void initState() {
     super.initState();
@@ -50,7 +47,6 @@ class _MinimalTodoState extends State<MinimalTodo> {
       providers: [
         ChangeNotifierProvider(create: (_) => TaskViewModel()),
         ChangeNotifierProvider(create: (_) => CategoryViewModel()),
-        ChangeNotifierProvider(create: (_) => PriorityViewModel()),
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
         ChangeNotifierProvider(create: (_) => GeneralViewModel()),
         ChangeNotifierProvider(create: (_) => ThemeViewModel()),
@@ -60,13 +56,13 @@ class _MinimalTodoState extends State<MinimalTodo> {
           navigatorKey: MinimalTodo.navigatorKey,
           theme: FlexColorScheme.light(colors: themeVM.selectedScheme).toTheme,
           darkTheme: FlexColorScheme.dark(
-                  colors: themeVM.selectedScheme.toDark(),
-                  surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-                  blendLevel: 12, // Reduces contrast by blending colors more subtly
-                  appBarStyle: FlexAppBarStyle.background,
-                  darkIsTrueBlack: false, // Prevents pure black
-                  scaffoldBackground: Color(0xff131313))
-              .toTheme,
+            colors: themeVM.selectedScheme.toDark(),
+            surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+            blendLevel: 40, // Reduces contrast by blending colors more subtly
+            appBarStyle: FlexAppBarStyle.background,
+            darkIsTrueBlack: false, // Prevents pure black
+            // scaffoldBackground: Color(0xff414141),
+          ).toTheme,
           themeMode: themeVM.themeMode,
           debugShowCheckedModeBanner: false,
           title: 'MinimalTodo',
