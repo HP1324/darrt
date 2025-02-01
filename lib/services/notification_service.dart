@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/data_models/task.dart';
@@ -51,43 +52,36 @@ class NotificationService {
 
   static Future<void> initializeNotificationChannels() async {
     try {
-      final box = GetStorage();
-      final bool shouldInitializeChannels = box.read(mChannelsInit) == null || !box.read( mChannelsInit);
+      MiniLogger.debug('Initializing notification channels');
+      final isInitialized = await _notif.initialize(
+        null,
+        [
+          NotificationChannel(
+            channelKey: 'task_notif',
+            channelName: 'task_notifications',
+            channelDescription: 'Channel used to notify users about their tasks with simple notification',
+            importance: NotificationImportance.Max,
+            playSound: true,
+            defaultRingtoneType: DefaultRingtoneType.Notification,
+            enableLights: true,
+            channelShowBadge: true,
+            criticalAlerts: true,
+          ),
+          NotificationChannel(
+            channelKey: 'task_alarm',
+            channelName: 'task_alarms',
+            channelDescription: 'Channel used to notify users about their tasks with alarm',
+            importance: NotificationImportance.Max,
+            playSound: true,
+            defaultRingtoneType: DefaultRingtoneType.Alarm,
+            enableLights: true,
+            channelShowBadge: true,
+            criticalAlerts: true,
+          ),
+        ],
+      );
+      MiniLogger.debug('Channels initialized: $isInitialized');
 
-      if (shouldInitializeChannels) {
-        MiniLogger.debug('Initializing notification channels');
-
-        final isInitialized = await _notif.initialize(
-          null,
-          [
-            NotificationChannel(
-              channelKey:  'task_notif',
-              channelName: 'task_notifications',
-              channelDescription: 'Channel used to notify users about their tasks with simple notification',
-              importance: NotificationImportance.Max,
-              playSound: true,
-              defaultRingtoneType: DefaultRingtoneType.Notification,
-              enableLights: true,
-              channelShowBadge: true,
-              criticalAlerts: true,
-            ),
-            NotificationChannel(
-              channelKey:  'task_alarm',
-              channelName: 'task_alarms',
-              channelDescription: 'Channel used to notify users about their tasks with alarm',
-              importance: NotificationImportance.Max,
-              playSound: true,
-              defaultRingtoneType: DefaultRingtoneType.Alarm,
-              enableLights: true,
-              channelShowBadge: true,
-              criticalAlerts: true,
-            ),
-          ],
-        );
-
-        await box.write( mChannelsInit, isInitialized);
-        MiniLogger.debug('Channels initialized: $isInitialized');
-      }
     } catch (e) {
       MiniLogger.error('Failed to initialize notification channels: ${e.toString()}');
       rethrow;
@@ -96,7 +90,7 @@ class NotificationService {
 
   static Future<void> createTaskNotification(Task task) async {
     // MiniLogger.debug('${task.id}');
-    if(task.notifyTime!.isBefore(DateTime.now())){
+    if (task.notifyTime!.isBefore(DateTime.now())) {
       return;
     }
     if (!await isNotificationsEnabled()) {
@@ -113,7 +107,7 @@ class NotificationService {
         content: task.notifType!.toLowerCase() == 'notif'
             ? NotificationContent(
                 id: task.id!,
-                channelKey:  'task_notif',
+                channelKey: 'task_notif',
                 title: 'Task Due at ${formatTime(task.dueDate!)}',
                 body: task.title,
                 actionType: ActionType.Default,
@@ -127,7 +121,7 @@ class NotificationService {
               )
             : NotificationContent(
                 id: task.id!,
-                channelKey:  'task_alarm',
+                channelKey: 'task_alarm',
                 title: 'Task Due at ${formatTime(task.dueDate!)}',
                 body: task.title,
                 actionType: ActionType.Default,
@@ -145,7 +139,7 @@ class NotificationService {
           preciseAlarm: true,
         ),
         actionButtons: [
-          NotificationActionButton(key: 'Finished', label: 'Finished', actionType: ActionType.SilentBackgroundAction),
+          NotificationActionButton(key: 'Finished', label: 'Finished', actionType: ActionType.SilentBackgroundAction,color: Colors.green),
           NotificationActionButton(key: 'Skip', label: 'Skip'),
         ],
       );
@@ -167,5 +161,4 @@ class NotificationService {
       rethrow;
     }
   }
-
 }
