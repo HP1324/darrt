@@ -1,5 +1,5 @@
 
-
+const mFirstInstallDate = 'first_install_date';
 //Preference constants
 const mFirstTimeInstall = 'first_time_install';
 ///Whether this is first time notification permission is requested

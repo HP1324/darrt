@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:minimaltodo/helpers/mini_storage.dart';
 import 'package:minimaltodo/services/notification_action_controller.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/view_models/theme_view_model.dart';
@@ -17,6 +18,9 @@ import 'package:provider/provider.dart';
 void main() async {
   try {
     await GetStorage.init();
+    if(MiniBox.read(mFirstInstallDate) == null){
+      await MiniBox.write(mFirstInstallDate, DateTime.now().toIso8601String());
+    }
     WidgetsFlutterBinding.ensureInitialized();
     await NotificationService.initNotifications();
     runApp(const MinimalTodo());
@@ -49,6 +53,7 @@ class _MinimalTodoState extends State<MinimalTodo> {
         ChangeNotifierProvider(create: (_) => CategoryViewModel()),
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
         ChangeNotifierProvider(create: (_) => GeneralViewModel()),
+        ChangeNotifierProvider(create: (_) => ThemeViewModel()),
         ChangeNotifierProvider(create: (_) => ThemeViewModel()),
       ],
       child: Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
