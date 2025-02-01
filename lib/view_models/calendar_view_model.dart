@@ -24,6 +24,13 @@ class CalendarViewModel extends ChangeNotifier {
         (index) => initialDate.add(Duration(days: index)),
   );
 
+  CalendarViewModel() {
+    // Initialize scroll position to today's date after frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollToDate(DateTime.now(), animate: false);
+    });
+  }
+
   void setSelectedDate(DateTime date) {
     _selectedDate = date;
     notifyListeners();
@@ -52,15 +59,19 @@ class CalendarViewModel extends ChangeNotifier {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
-  // Function to scroll to a specific date
-  void scrollToDate(DateTime date) {
+  // Updated scrollToDate with animation option
+  void scrollToDate(DateTime date, {bool animate = true}) {
     final index = dates.indexWhere((d) => isSameDay(d, date));
     if (index != -1) {
-      scrollController.animateTo(
-        index * dateItemWidth,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      if (animate) {
+        scrollController.animateTo(
+          index * dateItemWidth,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        scrollController.jumpTo(index * dateItemWidth);
+      }
       setSelectedDate(date);
     }
   }

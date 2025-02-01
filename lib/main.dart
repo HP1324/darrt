@@ -6,6 +6,7 @@ import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_storage.dart';
 import 'package:minimaltodo/services/notification_action_controller.dart';
+import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/view_models/theme_view_model.dart';
 import 'package:minimaltodo/views/home.dart';
@@ -54,7 +55,7 @@ class _MinimalTodoState extends State<MinimalTodo> {
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
         ChangeNotifierProvider(create: (_) => GeneralViewModel()),
         ChangeNotifierProvider(create: (_) => ThemeViewModel()),
-        ChangeNotifierProvider(create: (_) => ThemeViewModel()),
+        ChangeNotifierProvider(create: (_) => CalendarViewModel()),
       ],
       child: Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
         return MaterialApp(
