@@ -4,6 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/helpers/mini_storage.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:page_transition/page_transition.dart';
@@ -405,7 +406,7 @@ class SetDateWidget extends StatelessWidget {
           generalVM.textFieldNode.unfocus();
           final selectedDate = await showDatePicker(
             context: context,
-            firstDate: DateTime.now().subtract(const Duration(days: 365)),
+            firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(const Duration(days: 365)),
             lastDate: DateTime.now().add(const Duration(days: 18263)),
             initialDate: editMode ? task!.dueDate : DateTime.now(),
           );
