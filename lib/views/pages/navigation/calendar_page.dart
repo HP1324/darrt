@@ -2,14 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/views/widgets/task_item.dart';
 
-class CalendarPage extends StatelessWidget {
+class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
+  
+  
+  @override
+  State<CalendarPage> createState() => _CalendarPageState();
+}
 
+class _CalendarPageState extends State<CalendarPage> {
+  
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      context.read<CalendarViewModel>().restoreScrollPosition();
+    });
+  }
+  @override
+  void deactivate() {
+    context.read<CalendarViewModel>().saveScrollPosition();
+    super.deactivate();
+  }
   void _deleteSelectedTasks(BuildContext context, TaskViewModel taskVM, CalendarViewModel calendarVM) {
     showDialog(
       context: context,

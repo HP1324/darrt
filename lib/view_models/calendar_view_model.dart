@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_storage.dart';
 
 class CalendarViewModel extends ChangeNotifier {
@@ -9,26 +10,31 @@ class CalendarViewModel extends ChangeNotifier {
   bool _isSelectionMode = false;
   final ScrollController scrollController = ScrollController();
   final double dateItemWidth = 48.0;
-
+  double? _savedScrollPosition;
   DateTime get selectedDate => _selectedDate;
   Set<int> get selectedTaskIds => _selectedTaskIds;
   bool get isSelectionMode => _isSelectionMode;
 
   // Initialize dates range
-  final DateTime initialDate = DateTime.parse(MiniBox.read(mFirstInstallDate))
-      .subtract(const Duration(days: 365));
+  final DateTime initialDate = DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(const Duration(days: 365));
   final DateTime maxExtentDate = DateTime.now().add(const Duration(days: 18263));
 
   late final List<DateTime> dates = List.generate(
     maxExtentDate.difference(initialDate).inDays + 1,
-        (index) => initialDate.add(Duration(days: index)),
+    (index) => initialDate.add(Duration(days: index)),
   );
-
+  bool _isInitialized = false;
   CalendarViewModel() {
+    MiniLogger.debug('Is scroll controller initialized: $_isInitialized');
     // Initialize scroll position to today's date after frame is rendered
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollToDate(DateTime.now(), animate: false);
-    });
+    if (!_isInitialized) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (scrollController.hasClients) {
+          scrollToDate(DateTime.now(), animate: false);
+        }
+      });
+      _isInitialized = true;
+    }
   }
 
   void setSelectedDate(DateTime date) {
@@ -73,6 +79,16 @@ class CalendarViewModel extends ChangeNotifier {
         scrollController.jumpTo(index * dateItemWidth);
       }
       setSelectedDate(date);
+    }
+  }
+  void saveScrollPosition(){
+    if(scrollController.hasClients){
+      _savedScrollPosition = scrollController.position.pixels;
+    }
+  }
+  void restoreScrollPosition() {
+    if (_savedScrollPosition != null && scrollController.hasClients) {
+      scrollController.jumpTo(_savedScrollPosition!);
     }
   }
 

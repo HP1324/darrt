@@ -3,7 +3,7 @@ import 'package:minimaltodo/helpers/mini_utils.dart';
 
 class MiniLogger {
   static final _logger = Logger();
-  static final _format = 'EEE, dd MMM yyyy HH:mm';
+  static final _format = 'EEE, dd MMM yyyy HH:mm:ss';
   static void error(String message){
     _logger.e('[${formatDateWith(DateTime.now(), _format)}] $message');
   }

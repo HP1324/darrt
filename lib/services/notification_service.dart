@@ -133,13 +133,14 @@ class NotificationService {
                 wakeUpScreen: true,
                 criticalAlert: true,
               ),
-        schedule: NotificationCalendar.fromDate(
+        schedule:  NotificationCalendar.fromDate(
           date: task.notifyTime!,
           allowWhileIdle: true,
           preciseAlarm: true,
         ),
         actionButtons: [
-          NotificationActionButton(key: 'Finished', label: 'Finished', actionType: ActionType.SilentBackgroundAction,color: Colors.green),
+          NotificationActionButton(key: 'Finished', label: 'Finished', actionType: ActionType.SilentBackgroundAction
+          ),
           NotificationActionButton(key: 'Skip', label: 'Skip'),
         ],
       );
