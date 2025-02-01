@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_page_transition.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/helpers/mini_storage.dart';
+import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/views/pages/navigation/finished_tasks_page.dart';
 import 'package:minimaltodo/views/pages/search_page.dart';
+import 'package:provider/provider.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   MiniAppBar({super.key});
@@ -19,7 +23,21 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         _MiniAppBarAction(
           onTap: () {
-
+            showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return Container(
+                    decoration: BoxDecoration(),
+                    child: CalendarDatePicker(
+                        initialDate: null,
+                        firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(Duration(days: 365)),
+                        lastDate: DateTime.now().add(Duration(days: 18263)),
+                        onDateChanged: (selectedDate){
+                            context.read<CalendarViewModel>().scrollToDate(selectedDate);
+                        },
+                      ),
+                  );
+                });
           },
           icon: Icon(Iconsax.calendar_tick),
         ),
