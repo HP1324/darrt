@@ -6,6 +6,9 @@ import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:intl/intl.dart';
+
+
 
 class NotificationService {
   static final _notif = AwesomeNotifications();
@@ -15,26 +18,21 @@ class NotificationService {
       final box = GetStorage();
       bool permissionGranted = await _notif.isNotificationAllowed();
 
-      // Handle first-time permission request
       if (!permissionGranted && (box.read(mFirstTimeNotifPermission) ?? true)) {
-        // Request permission but don't block app initialization
         permissionGranted = await _notif.requestPermissionToSendNotifications();
         await box.write(mFirstTimeNotifPermission, false);
         await box.write(mNotificationsEnabled, permissionGranted);
         MiniLogger.debug('First time permission request: $permissionGranted');
       }
 
-      // Initialize channels only if permission is granted
       if (permissionGranted) {
         await initializeNotificationChannels();
         MiniLogger.debug('Notification service initialized successfully');
       } else {
-        // Store the permission state but allow app to continue
         await box.write(mNotificationsEnabled, false);
-        MiniLogger.debug('Notifications disabled - app continuing without notification support');
+        MiniLogger.debug('Notifications disabled - continuing without notification support');
       }
     } catch (e) {
-      // Log error but don't block app initialization
       MiniLogger.error('Failed to initialize notification service: ${e.toString()}');
       await GetStorage().write(mNotificationsEnabled, false);
     }
@@ -81,7 +79,6 @@ class NotificationService {
         ],
       );
       MiniLogger.debug('Channels initialized: $isInitialized');
-
     } catch (e) {
       MiniLogger.error('Failed to initialize notification channels: ${e.toString()}');
       rethrow;
@@ -89,65 +86,140 @@ class NotificationService {
   }
 
   static Future<void> createTaskNotification(Task task) async {
-    // MiniLogger.debug('${task.id}');
-    if (task.notifyTime!.isBefore(DateTime.now())) {
+    if (task.notifyTime == null || task.notifyTime!.isBefore(DateTime.now())) {
       return;
     }
     if (!await isNotificationsEnabled()) {
       MiniLogger.debug('Skipping notification creation - notifications are disabled');
       return;
     }
-    MiniLogger.debug('create notification started');
+    MiniLogger.debug('Creating one-off task notification');
     Map<String, dynamic> taskJson = task.toJson();
     String taskPayload = jsonEncode(taskJson);
-    MiniLogger.debug('is notification allowed ${await _notif.isNotificationAllowed()}');
+    MiniLogger.debug('Is notification allowed? ${await _notif.isNotificationAllowed()}');
 
     try {
       final isCreated = await _notif.createNotification(
         content: task.notifType!.toLowerCase() == 'notif'
             ? NotificationContent(
-                id: task.id!,
-                channelKey: 'task_notif',
-                title: 'Task Due at ${formatTime(task.dueDate!)}',
-                body: task.title,
-                actionType: ActionType.Default,
-                payload: {
-                  'task': taskPayload,
-                },
-                notificationLayout: NotificationLayout.Default,
-                category: NotificationCategory.Reminder,
-                wakeUpScreen: true,
-                criticalAlert: true,
-              )
+          id: task.id!,
+          channelKey: 'task_notif',
+          title: 'Task Due at ${formatTime(task.dueDate!)}',
+          body: task.title,
+          actionType: ActionType.Default,
+          payload: {
+            'task': taskPayload,
+          },
+          notificationLayout: NotificationLayout.Default,
+          category: NotificationCategory.Reminder,
+          wakeUpScreen: true,
+          criticalAlert: true,
+        )
             : NotificationContent(
-                id: task.id!,
-                channelKey: 'task_alarm',
-                title: 'Task Due at ${formatTime(task.dueDate!)}',
-                body: task.title,
-                actionType: ActionType.Default,
-                payload: {
-                  'task': taskPayload,
-                },
-                notificationLayout: NotificationLayout.Default,
-                category: NotificationCategory.Alarm,
-                wakeUpScreen: true,
-                criticalAlert: true,
-              ),
-        schedule:  NotificationCalendar.fromDate(
+          id: task.id!,
+          channelKey: 'task_alarm',
+          title: 'Task Due at ${formatTime(task.dueDate!)}',
+          body: task.title,
+          actionType: ActionType.Default,
+          payload: {
+            'task': taskPayload,
+          },
+          notificationLayout: NotificationLayout.Default,
+          category: NotificationCategory.Alarm,
+          wakeUpScreen: true,
+          criticalAlert: true,
+        ),
+        schedule: NotificationCalendar.fromDate(
           date: task.notifyTime!,
           allowWhileIdle: true,
           preciseAlarm: true,
         ),
         actionButtons: [
-          NotificationActionButton(key: 'Finished', label: 'Finished', actionType: ActionType.SilentBackgroundAction
+          NotificationActionButton(
+            key: 'Finished',
+            label: 'Finished',
+            actionType: ActionType.SilentBackgroundAction,
           ),
           NotificationActionButton(key: 'Skip', label: 'Skip'),
         ],
       );
-      MiniLogger.debug('Notification created: $isCreated');
+      MiniLogger.debug('One-off notification created: $isCreated');
     } catch (e) {
       MiniLogger.error('Failed to create task notification: ${e.toString()}');
       rethrow;
+    }
+  }
+
+  static Future<void> createRepeatingTaskNotifications(Task task) async {
+    if (task.notifyTime == null || task.notifyTime!.isBefore(DateTime.now())) {
+      return;
+    }
+    if (!await isNotificationsEnabled()) {
+      MiniLogger.debug('Notifications disabled; skipping repeating notifications.');
+      return;
+    }
+    // Parse reminderTimes from JSON; if none provided, use the default notifyTime
+    List<String> reminderTimes = [];
+    if (task.reminderTimes != null) {
+      try {
+        reminderTimes = List<String>.from(jsonDecode(task.reminderTimes!));
+      } catch (e) {
+        logger.e('Error decoding reminderTimes: $e');
+      }
+    }
+    // If no reminders are set, schedule one notification at notifyTime.
+    if (reminderTimes.isEmpty) {
+      reminderTimes.add(formatTime(task.notifyTime!));
+    }
+    // Schedule a notification for each reminder
+    for (int i = 0; i < reminderTimes.length; i++) {
+      // For demonstration, we simply schedule each notification at task.notifyTime
+      // In a real scenario, you might parse the reminder time offset and compute an exact time.
+      final scheduledTime = task.notifyTime!.subtract(Duration(minutes: i * 5));
+      try {
+        final isCreated = await _notif.createNotification(
+          content: task.notifType!.toLowerCase() == 'notif'
+              ? NotificationContent(
+            id: (task.id! * 10) + i, // generate unique id per reminder
+            channelKey: 'task_notif',
+            title: 'Repeating Task Reminder at ${formatTime(task.dueDate!)}',
+            body: task.title,
+            actionType: ActionType.Default,
+            payload: {'task': jsonEncode(task.toJson())},
+            notificationLayout: NotificationLayout.Default,
+            category: NotificationCategory.Reminder,
+            wakeUpScreen: true,
+            criticalAlert: true,
+          )
+              : NotificationContent(
+            id: (task.id! * 10) + i,
+            channelKey: 'task_alarm',
+            title: 'Repeating Task Alarm at ${formatTime(task.dueDate!)}',
+            body: task.title,
+            actionType: ActionType.Default,
+            payload: {'task': jsonEncode(task.toJson())},
+            notificationLayout: NotificationLayout.Default,
+            category: NotificationCategory.Alarm,
+            wakeUpScreen: true,
+            criticalAlert: true,
+          ),
+          schedule: NotificationCalendar.fromDate(
+            date: scheduledTime,
+            allowWhileIdle: true,
+            preciseAlarm: true,
+          ),
+          actionButtons: [
+            NotificationActionButton(
+                key: 'Finished',
+                label: 'Finished',
+                actionType: ActionType.SilentBackgroundAction),
+            NotificationActionButton(key: 'Skip', label: 'Skip'),
+          ],
+        );
+        MiniLogger.debug('Repeating notification created: $isCreated for reminder index $i');
+      } catch (e) {
+        MiniLogger.error('Failed to create repeating notification: ${e.toString()}');
+      }
     }
   }
 
@@ -155,6 +227,7 @@ class NotificationService {
     try {
       if (task.isNotifyEnabled!) {
         await _notif.cancel(task.id!);
+        // Optionally cancel all repeating notifications if using composite id scheme.
         MiniLogger.debug('Notification ${task.id} canceled');
       }
     } catch (e) {

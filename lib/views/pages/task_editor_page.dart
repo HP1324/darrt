@@ -1,6 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
@@ -82,6 +83,26 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                       Flexible(flex: 3, child: const SetPriorityWidget()),
                     ],
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text("Enable Repeat"),
+                      Switch(
+                        value: context.read<TaskViewModel>().isRepeatEnabled,
+                        onChanged: (value) {
+                          setState(() {
+                            context.read<TaskViewModel>().isRepeatEnabled = value;
+                            context.read<TaskViewModel>().currentTask.isRepeating = value;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  if (context.watch<TaskViewModel>().isRepeatEnabled) ...[
+                    const RepeatingConfigWidget(),
+                    const SizedBox(height: 20),
+                    const ReminderTimesWidget(),
+                  ],
                   const SizedBox(height: 50),
                   Row(
                     children: [
@@ -768,6 +789,175 @@ class _TimeOption extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class RepeatingConfigWidget extends StatelessWidget {
+  const RepeatingConfigWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final taskVM = Provider.of<TaskViewModel>(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Start Date Picker
+        ListTile(
+          leading: const Icon(Icons.calendar_today),
+          title: const Text("Start Date"),
+          subtitle: Text(DateFormat.yMd().format(taskVM.taskStartDate)),
+          onTap: () async {
+            DateTime? selected = await showDatePicker(
+              context: context,
+              initialDate: taskVM.taskStartDate,
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2100),
+            );
+            if (selected != null) {
+              taskVM.setTaskStartDate(selected);
+            }
+          },
+        ),
+        // End Date Picker (optional)
+        ListTile(
+          leading: const Icon(Icons.event),
+          title: const Text("End Date (optional)"),
+          subtitle: Text(taskVM.taskEndDate != null
+              ? DateFormat.yMd().format(taskVM.taskEndDate!)
+              : "No end date"),
+          onTap: () async {
+            DateTime? selected = await showDatePicker(
+              context: context,
+              initialDate: taskVM.taskEndDate ?? DateTime.now(),
+              firstDate: taskVM.taskStartDate,
+              lastDate: DateTime(2100),
+            );
+            taskVM.setTaskEndDate(selected);
+          },
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+          child: Text(
+            "Repeat Type:",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+        // Radio List for "Specific days" (Weekly)
+        RadioListTile<String>(
+          title: const Text("Specific days of the week"),
+          value: 'weekly',
+          groupValue: taskVM.repeatType,
+          onChanged: (value) {
+            taskVM.setRepeatType(value!);
+          },
+        ),
+        if (taskVM.repeatType == 'weekly')
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Wrap(
+              spacing: 8,
+              children: List.generate(7, (index) {
+                // index 0 represents Monday (value 1) ... Sunday (7)
+                int weekdayValue = index + 1;
+                bool selected = taskVM.selectedWeekdays.contains(weekdayValue);
+                // Using a fixed date to get weekday abbreviation (adjust as needed)
+                String dayLabel = DateFormat.E().format(DateTime(2020, 1, weekdayValue + 6));
+                return ChoiceChip(
+                  label: Text(dayLabel),
+                  selected: selected,
+                  onSelected: (_) {
+                    taskVM.toggleWeekday(weekdayValue);
+                  },
+                );
+              }),
+            ),
+          ),
+        // Radio for monthly
+        RadioListTile<String>(
+          title: const Text("Once a month"),
+          value: 'monthly',
+          groupValue: taskVM.repeatType,
+          onChanged: (value) {
+            taskVM.setRepeatType(value!);
+          },
+        ),
+        // Radio for yearly
+        RadioListTile<String>(
+          title: const Text("Once a year"),
+          value: 'yearly',
+          groupValue: taskVM.repeatType,
+          onChanged: (value) {
+            taskVM.setRepeatType(value!);
+          },
+        ),
+      ],
+    );
+  }
+}
+
+
+class ReminderTimesWidget extends StatelessWidget {
+  const ReminderTimesWidget({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final taskVM = Provider.of<TaskViewModel>(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SwitchListTile(
+          title: const Text("Enable Reminders"),
+          value: taskVM.currentTask.isNotifyEnabled ?? false,
+          onChanged: (value) {
+            taskVM.toggleNotifSwitch(value);
+          },
+        ),
+        if (taskVM.currentTask.isNotifyEnabled!)
+          ListTile(
+            title: const Text("Reminder Times (max 5)"),
+            trailing: const Icon(Icons.access_time),
+            onTap: () {
+              // Open bottom sheet to add/remove reminder times.
+              showModalBottomSheet(
+                context: context,
+                builder: (ctx) {
+                  return StatefulBuilder(builder: (context, setModalState) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ...taskVM.reminderTimesList.map((time) => ListTile(
+                            title: Text(time.format(context)),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () {
+                                taskVM.removeReminderTime(time);
+                                setModalState(() {});
+                              },
+                            ),
+                          )),
+                          ElevatedButton(
+                            onPressed: () async {
+                              TimeOfDay? selectedTime = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                              );
+                              if (selectedTime != null) {
+                                taskVM.addReminderTime(selectedTime);
+                                setModalState(() {});
+                              }
+                            },
+                            child: const Text("Add Reminder"),
+                          )
+                        ],
+                      ),
+                    );
+                  });
+                },
+              );
+            },
+          ),
+      ],
     );
   }
 }
