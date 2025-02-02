@@ -111,24 +111,26 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                     const RepeatingConfigWidget(),
                     const SizedBox(height: 20),
                     const ReminderTimesWidget(),
-                    const NotificationTypeSelector(), // Add notification type selector for repeating tasks
+                    const NotificationTypeSelector(),
                   ] else ...[
                     // One-time task settings
                     SetDateWidget(
                         editMode: widget.editMode, task: widget.taskToEdit),
-                    if (taskVM.currentTask.dueDate != null) ...[
-                      SetTimeWidget(
-                          editMode: widget.editMode, task: widget.taskToEdit),
-                      SwitchListTile(
-                        title: Text(
-                          'Enable Notification',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        value: taskVM.currentTask.isNotifyEnabled ?? false,
-                        onChanged: (value) => taskVM.toggleNotifSwitch(value),
+                    const SizedBox(height: 8),
+                    SetTimeWidget(
+                        editMode: widget.editMode, task: widget.taskToEdit),
+                    const SizedBox(height: 16),
+                    SwitchListTile(
+                      title: Text(
+                        'Enable Notification',
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      if (taskVM.currentTask.isNotifyEnabled ?? false)
-                        const NotificationTypeSelector(),
+                      value: taskVM.currentTask.isNotifyEnabled ?? false,
+                      onChanged: (value) => taskVM.toggleNotifSwitch(value),
+                    ),
+                    if (taskVM.currentTask.isNotifyEnabled ?? false) ...[
+                      const SizedBox(height: 8),
+                      const NotificationTypeSelector(),
                     ],
                   ],
                 ],
