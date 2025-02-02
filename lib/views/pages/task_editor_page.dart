@@ -76,119 +76,115 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          child: SingleChildScrollView(
-            child: Consumer<TaskViewModel>(builder: (context, taskVM, _) {
-              return Column(
-                children: [
-                  TaskTextField(editMode: widget.editMode),
-                  const SizedBox(height: 50),
-                  Row(
-                    children: [
-                      Flexible(flex: 2, child: const SetCategoryButton()),
-                      Flexible(flex: 3, child: const SetPriorityWidget()),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Card(
-                    elevation: 0,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .surfaceContainerHighest
-                        .withAlpha(30),
-                    child: SegmentedButton<bool>(
-                      segments: const [
-                        ButtonSegment<bool>(
-                          value: false,
-                          label: Text('Single Task'),
-                          icon: Icon(Icons.calendar_today, size: 18),
-                        ),
-                        ButtonSegment<bool>(
-                          value: true,
-                          label: Text('Recurring Task'),
-                          icon: Icon(Icons.repeat, size: 18),
-                        ),
+          child: Scrollbar(
+            thickness: 0.1,
+            child: SingleChildScrollView(
+              child: Consumer<TaskViewModel>(builder: (context, taskVM, _) {
+                return Column(
+                  children: [
+                    TaskTextField(editMode: widget.editMode),
+                    const SizedBox(height: 50),
+                    Row(
+                      children: [
+                        Flexible(flex: 2, child: const SetCategoryButton()),
+                        Flexible(flex: 3, child: const SetPriorityWidget()),
                       ],
-                      selected: {taskVM.isRepeatEnabled},
-                      onSelectionChanged: (Set<bool> selected) {
-                        taskVM.toggleRepeat(selected.first);
-                      },
-                      style: ButtonStyle(
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                    ),
+                    const SizedBox(height: 30),
+                    Card(
+                      elevation: 0,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
+                          .withAlpha(30),
+                      child: SegmentedButton<bool>(
+                        segments: const [
+                          ButtonSegment<bool>(
+                            value: false,
+                            label: Text('Single Task'),
+                            icon: Icon(Icons.calendar_today, size: 18),
+                          ),
+                          ButtonSegment<bool>(
+                            value: true,
+                            label: Text('Recurring Task'),
+                            icon: Icon(Icons.repeat, size: 18),
+                          ),
+                        ],
+                        selected: {taskVM.isRepeatEnabled},
+                        onSelectionChanged: (Set<bool> selected) {
+                          taskVM.toggleRepeat(selected.first);
+                        },
+                        style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.selected)) {
+                                return Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer;
+                              }
+                              return Theme.of(context).colorScheme.surface;
+                            },
+                          ),
+                          foregroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.selected)) {
+                                return Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer;
+                              }
+                              return Theme.of(context).colorScheme.onSurface;
+                            },
                           ),
                         ),
-                        backgroundColor:
-                            MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
-                            if (states.contains(MaterialState.selected)) {
-                              return Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer;
-                            }
-                            return Theme.of(context).colorScheme.surface;
-                          },
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    if (taskVM.isRepeatEnabled) ...[
+                      const RepeatingConfigWidget(),
+                      const SizedBox(height: 20),
+                      SwitchListTile(
+                        title: Text(
+                          'Enable Notifications',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontSize: 14,
+                                  ),
                         ),
-                        foregroundColor:
-                            MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
-                            if (states.contains(MaterialState.selected)) {
-                              return Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer;
-                            }
-                            return Theme.of(context).colorScheme.onSurface;
-                          },
-                        ),
+                        value: taskVM.currentTask.isNotifyEnabled ?? false,
+                        onChanged: (value) => taskVM.toggleNotifSwitch(value),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  if (taskVM.isRepeatEnabled) ...[
-                    const RepeatingConfigWidget(),
-                    const SizedBox(height: 20),
-                    SwitchListTile(
-                      title: Text(
-                        'Enable Notifications',
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontSize: 14,
-                                ),
-                      ),
-                      value: taskVM.currentTask.isNotifyEnabled ?? false,
-                      onChanged: (value) => taskVM.toggleNotifSwitch(value),
-                    ),
-                    if (taskVM.currentTask.isNotifyEnabled ?? false) ...[
-                      const NotificationTypeSelector(),
-                      const SizedBox(height: 16),
-                      const RecurringReminderTimes(),
-                    ],
-                  ] else ...[
-                    // One-time task settings
-                    SetDateWidget(
-                        editMode: widget.editMode, task: widget.taskToEdit),
-                    const SizedBox(height: 8),
-                    SetTimeWidget(
-                        editMode: widget.editMode, task: widget.taskToEdit),
-                    const SizedBox(height: 16),
-                    SwitchListTile(
-                      title: Text(
-                        'Enable Notification',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      value: taskVM.currentTask.isNotifyEnabled ?? false,
-                      onChanged: (value) => taskVM.toggleNotifSwitch(value),
-                    ),
-                    if (taskVM.currentTask.isNotifyEnabled ?? false) ...[
-                      const NotificationTypeSelector(),
+                      if (taskVM.currentTask.isNotifyEnabled ?? false) ...[
+                        const NotificationTypeSelector(),
+                        const SizedBox(height: 16),
+                        const RecurringReminderTimes(),
+                      ],
+                    ] else ...[
+                      // One-time task settings
+                      SetDateWidget(
+                          editMode: widget.editMode, task: widget.taskToEdit),
                       const SizedBox(height: 8),
-                      const NotificationOptionsWidget(),
+                      SetTimeWidget(
+                          editMode: widget.editMode, task: widget.taskToEdit),
+                      const SizedBox(height: 16),
+                      NotificationSwitch(),
+                      if (taskVM.currentTask.isNotifyEnabled ?? false) ...[
+                        const NotificationTypeSelector(),
+                        const SizedBox(height: 8),
+                        const NotificationOptionsWidget(),
+                      ],
                     ],
                   ],
-                ],
-              );
-            }),
+                );
+              }),
+            ),
           ),
         ),
         floatingActionButton: widget.editMode
@@ -786,7 +782,7 @@ class NotificationTypeSelector extends StatelessWidget {
             Text(
               'Notification Type',
               style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
+                  fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
                   fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 10),
@@ -844,8 +840,8 @@ class NotificationOptionsWidget extends StatelessWidget {
           ),
           SizedBox(height: 12),
           Wrap(
-            spacing: 0,
-            runSpacing: 0,
+            spacing: 5,
+            runSpacing: 5,
             runAlignment: WrapAlignment.start,
             children: [
               _TimeOption(minutes: 0, label: 'On time'),
@@ -855,9 +851,9 @@ class NotificationOptionsWidget extends StatelessWidget {
               _TimeOption(minutes: 30, label: '30 min'),
               _TimeOption(minutes: 45, label: '45 min'),
               _TimeOption(minutes: 60, label: '1 hour'),
-              _TimeOption(minutes: 120, label: '2 hour'),
-              _TimeOption(minutes: 180, label: '3 hour'),
-              _TimeOption(minutes: 240, label: '4 hour'),
+              _TimeOption(minutes: 120, label: '2 hours'),
+              _TimeOption(minutes: 180, label: '3 hours'),
+              _TimeOption(minutes: 240, label: '4 hours'),
             ],
           ),
         ],
@@ -967,7 +963,7 @@ class RepeatingConfigWidget extends StatelessWidget {
                     final selected = await showDatePicker(
                       context: context,
                       initialDate: taskVM.taskStartDate,
-                      firstDate: DateTime.now(),
+                      firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(Duration(days: 365)),
                       lastDate: DateTime(2100),
                     );
                     if (selected != null) {
@@ -1163,7 +1159,7 @@ class _RepeatTypeOption extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
         child: Row(
           children: [
-            Radio<String>(
+            Radio(
               value: value,
               groupValue: groupValue,
               onChanged: onChanged,
@@ -1175,7 +1171,7 @@ class _RepeatTypeOption extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: textTheme.bodyLarge?.copyWith(
+                    style: textTheme.bodyMedium?.copyWith(
                       color: isSelected
                           ? colorScheme.primary
                           : colorScheme.onSurface,
