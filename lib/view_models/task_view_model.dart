@@ -24,20 +24,20 @@ class TaskViewModel extends ChangeNotifier {
       priority: "Low",
       notifType: "notif",
       startDate: DateTime.now(),
-      isRepeating: false,
+      isRepeating: false, // Default to single task
       isNotifyEnabled: false,
     );
+
     selectedMinutes = 0;
     titleController.clear();
 
     // Reset repeat and reminder properties
-    isRepeatEnabled = false;
+    isRepeatEnabled = false; // Default to single task
     taskStartDate = DateTime.now();
     taskEndDate = null;
     repeatType = null;
     selectedWeekdays = [];
     reminderTimesList = [];
-    notifyListeners();
   }
 
   void resetTask(Task task) {
@@ -51,14 +51,12 @@ class TaskViewModel extends ChangeNotifier {
     taskBeforeEdit = task;
     currentTask = task;
     titleController.text = task.title ?? '';
-    selectedMinutes =
-        (currentTask.dueDate != null && currentTask.notifyTime != null)
-            ? currentTask.dueDate!.difference(currentTask.notifyTime!).inMinutes
-            : 0;
+
     // Initialize repeating task properties from currentTask
     isRepeatEnabled = currentTask.isRepeating ?? false;
     taskStartDate = currentTask.startDate;
     taskEndDate = currentTask.endDate;
+
     if (currentTask.repeatConfig != null) {
       try {
         Map<String, dynamic> config = jsonDecode(currentTask.repeatConfig!);
@@ -70,27 +68,21 @@ class TaskViewModel extends ChangeNotifier {
         logger.e('Error decoding repeatConfig: $e');
       }
     }
+
+    // Initialize reminder times
     reminderTimesList = [];
     if (currentTask.reminderTimes != null) {
       try {
         List<dynamic> times = jsonDecode(currentTask.reminderTimes!);
-        // Assuming times are stored as "HH:mm" strings. Parse them into TimeOfDay.
-        reminderTimesList = times
-            .map((timeStr) {
-              final parts = (timeStr as String).split(":");
-              if (parts.length == 2) {
-                return TimeOfDay(
-                    hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-              }
-              return null;
-            })
-            .whereType<TimeOfDay>()
-            .toList();
+        reminderTimesList = times.map((timeStr) {
+          final parts = (timeStr as String).split(":");
+          return TimeOfDay(
+              hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+        }).toList();
       } catch (e) {
         logger.e('Error decoding reminderTimes: $e');
       }
     }
-    // notifyListeners();
   }
 
   //------------------------ PROPERTIES & CONTROLLERS ------------------------//
@@ -328,6 +320,23 @@ class TaskViewModel extends ChangeNotifier {
         .toList());
     notifyListeners();
   }
+
+  void updateReminderTime(TimeOfDay oldTime, TimeOfDay newTime) {
+    if (reminderTimesList.contains(newTime)) {
+      return; // Don't update if the new time already exists
+    }
+
+    final index = reminderTimesList.indexOf(oldTime);
+    if (index != -1) {
+      reminderTimesList[index] = newTime;
+      // Update the stored reminder times
+      currentTask.reminderTimes = jsonEncode(reminderTimesList
+          .map((t) =>
+              '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}')
+          .toList());
+      notifyListeners();
+    }
+  }
   //-----------------------------------------------------------------------//
 
   //------------------------ TASK CRUD OPERATIONS ------------------------//
@@ -493,11 +502,13 @@ class TaskViewModel extends ChangeNotifier {
 //----------------------------------------------------------------------//
 
   void toggleRepeat(bool value) {
+    if (isRepeatEnabled == value) return; // No change needed
+
     isRepeatEnabled = value;
     currentTask.isRepeating = value;
 
     if (value) {
-      // When enabling repeat
+      // Switching to recurring task
       taskStartDate = currentTask.dueDate ?? DateTime.now();
       taskEndDate = null;
       repeatType = null;
@@ -508,7 +519,7 @@ class TaskViewModel extends ChangeNotifier {
       currentTask.dueDate = null;
       currentTask.notifyTime = null;
     } else {
-      // When disabling repeat
+      // Switching to single task
       currentTask.dueDate = taskStartDate;
       currentTask.notifyTime = null;
       currentTask.isNotifyEnabled = false;

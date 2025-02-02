@@ -114,9 +114,10 @@ class CalendarViewModel extends ChangeNotifier {
   }
 
   bool _isTaskOccurringOnDate(Task task, DateTime date) {
-    // Check date range
-    if (date.isBefore(task.startDate) ||
-        (task.endDate != null && date.isAfter(task.endDate!))) {
+    // Include start and end dates in the range check
+    if (date.isBefore(task.startDate.subtract(const Duration(days: 1))) ||
+        (task.endDate != null &&
+            date.isAfter(task.endDate!.add(const Duration(days: 1))))) {
       return false;
     }
 

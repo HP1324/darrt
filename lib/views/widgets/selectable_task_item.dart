@@ -143,7 +143,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                           // Info row
                           Row(
                             children: [
-                              if (widget.task.dueDate != null) ...[
+                              if (widget.task.dueDate != null && !widget.task.isRepeating!) ...[
                                 Icon(
                                   Icons.access_time_rounded,
                                   size: 14,
@@ -214,6 +214,4 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
   }
 }
 
-String formatDateTime(DateTime dateTime) {
-  return '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
-}
+
