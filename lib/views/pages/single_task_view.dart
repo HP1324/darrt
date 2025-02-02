@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/main.dart';
 import 'package:minimaltodo/services/category_service.dart';
@@ -28,7 +29,7 @@ class TaskView extends StatelessWidget {
         case 'weekly':
           final dayNames = selectedDays
               .map((day) => DateFormat('EEEE').format(
-                    DateTime(2024, 1, day + 6), // Jan 7, 2024 was a Sunday
+                    DateTime(2024, 1, day + 7), // Jan 7, 2024 was a Sunday
                   ))
               .join(', ');
           return 'Weekly on $dayNames';
@@ -63,7 +64,7 @@ class TaskView extends StatelessWidget {
     }
   }
 
-  String _getReminderTimesDescription(Task task) {
+  String _getReminderTimesDescription(Task task,BuildContext context) {
     if (!(task.isNotifyEnabled ?? false)) return 'Notifications disabled';
     if (task.reminderTimes == null) return 'No reminders set';
 
@@ -75,7 +76,7 @@ class TaskView extends StatelessWidget {
           hour: int.parse(parts[0]),
           minute: int.parse(parts[1]),
         );
-        return time.format(MinimalTodo.navigatorKey.currentContext!);
+        return time.format(context);
       }).join(', ');
     } catch (e) {
       return 'Error reading reminder times';
@@ -86,7 +87,7 @@ class TaskView extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
+    MiniLogger.debug('Start date: ${task.startDate}, End Date: ${task.endDate}');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colorScheme.primary.withAlpha(30),
@@ -137,7 +138,7 @@ class TaskView extends StatelessWidget {
                     ? Icons.alarm
                     : Icons.notifications_outlined,
                 title: 'Reminders',
-                subtitle: _getReminderTimesDescription(task),
+                subtitle: _getReminderTimesDescription(task,context),
               ),
           ] else ...[
             DetailItem(

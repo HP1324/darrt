@@ -24,20 +24,16 @@ class TaskViewModel extends ChangeNotifier {
       priority: "Low",
       notifType: "notif",
       startDate: DateTime.now(),
-      isRepeating: false, // Default to single task
+      isRepeating: false,
       isNotifyEnabled: false,
     );
 
     selectedMinutes = 0;
     titleController.clear();
 
-    // Reset repeat and reminder properties
-    isRepeatEnabled = false; // Default to single task
-    taskStartDate = DateTime.now();
-    taskEndDate = null;
-    repeatType = null;
-    selectedWeekdays = [];
-    reminderTimesList = [];
+    // No need to reset these as they're now handled through currentTask
+    currentTask.repeatConfig = null;
+    currentTask.reminderTimes = null;
   }
 
   void resetTask(Task task) {
@@ -52,37 +48,7 @@ class TaskViewModel extends ChangeNotifier {
     currentTask = task;
     titleController.text = task.title ?? '';
 
-    // Initialize repeating task properties from currentTask
-    isRepeatEnabled = currentTask.isRepeating ?? false;
-    taskStartDate = currentTask.startDate;
-    taskEndDate = currentTask.endDate;
-
-    if (currentTask.repeatConfig != null) {
-      try {
-        Map<String, dynamic> config = jsonDecode(currentTask.repeatConfig!);
-        repeatType = config['repeatType'];
-        if (repeatType == 'weekly' && config['selectedDays'] is List) {
-          selectedWeekdays = List<int>.from(config['selectedDays']);
-        }
-      } catch (e) {
-        logger.e('Error decoding repeatConfig: $e');
-      }
-    }
-
-    // Initialize reminder times
-    reminderTimesList = [];
-    if (currentTask.reminderTimes != null) {
-      try {
-        List<dynamic> times = jsonDecode(currentTask.reminderTimes!);
-        reminderTimesList = times.map((timeStr) {
-          final parts = (timeStr as String).split(":");
-          return TimeOfDay(
-              hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-        }).toList();
-      } catch (e) {
-        logger.e('Error decoding reminderTimes: $e');
-      }
-    }
+    // No need to initialize these separately as they're now handled through getters
   }
 
   //------------------------ PROPERTIES & CONTROLLERS ------------------------//
@@ -97,15 +63,6 @@ class TaskViewModel extends ChangeNotifier {
   List<String> priorities = ["Urgent", "High", "Medium", "Low"];
   int currentValue = 3; // Default to Low Priority
   int selectedMinutes = 0;
-
-  // NEW: Repeating Task & Reminder Properties
-  bool isRepeatEnabled = false;
-  DateTime taskStartDate = DateTime.now();
-  DateTime? taskEndDate; // null means indefinite
-  String? repeatType; // 'weekly', 'monthly', 'yearly'
-  List<int> selectedWeekdays =
-      []; // for weekly repetition (1=Monday,...,7=Sunday)
-  List<TimeOfDay> reminderTimesList = []; // up to 5 reminders
 
   //------------------------ BASIC SETTERS ------------------------//
   set category(CategoryModel category) {
@@ -244,96 +201,106 @@ class TaskViewModel extends ChangeNotifier {
 
   //------------------------ REPEAT & REMINDER HANDLING ------------------------//
   bool isWeekdayValid(int weekday) {
-    if (taskEndDate == null) return true;
+    if (currentTask.endDate == null) return true;
 
     // Calculate the next occurrence of this weekday
-    var date = taskStartDate;
+    var date = currentTask.startDate;
     while (date.weekday != weekday) {
       date = date.add(const Duration(days: 1));
     }
 
     // Check if this weekday occurs between start and end dates
-    return date.isBefore(taskEndDate!) || date.isAtSameMomentAs(taskEndDate!);
+    return date.isBefore(currentTask.endDate!) ||
+        date.isAtSameMomentAs(currentTask.endDate!);
   }
 
   void setTaskStartDate(DateTime date) {
-    taskStartDate = date;
-    // Clear invalid weekdays
-    selectedWeekdays.removeWhere((weekday) => !isWeekdayValid(weekday));
+    currentTask.startDate = date;
+    _updateWeekdayValidity();
     notifyListeners();
   }
 
   void setTaskEndDate(DateTime? date) {
-    taskEndDate = date;
     currentTask.endDate = date;
+    _updateWeekdayValidity();
     notifyListeners();
   }
 
   void setRepeatType(String type) {
-    repeatType = type;
-    // For 'monthly' and 'yearly', selectedWeekdays is not used.
-    Map<String, dynamic> config = {
-      'repeatType': type,
-      'selectedDays': type == 'weekly' ? selectedWeekdays : null,
-    };
-    currentTask.repeatConfig = jsonEncode(config);
-    notifyListeners();
+    try {
+      final config = currentTask.repeatConfig != null
+          ? jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>
+          : <String, dynamic>{};
+
+      config['repeatType'] = type;
+      if (type == 'weekly') {
+        config['selectedDays'] = <int>[];
+      } else {
+        config.remove('selectedDays');
+      }
+
+      currentTask.repeatConfig = jsonEncode(config);
+      notifyListeners();
+    } catch (e) {
+      logger.e('Error setting repeat type: $e');
+    }
   }
 
   void toggleWeekday(int weekday) {
-    if (selectedWeekdays.contains(weekday)) {
-      selectedWeekdays.remove(weekday);
-    } else {
-      selectedWeekdays.add(weekday);
-    }
-    if (repeatType == 'weekly') {
-      Map<String, dynamic> config = {
-        'repeatType': 'weekly',
-        'selectedDays': selectedWeekdays,
-      };
+    if (currentTask.repeatConfig == null) return;
+
+    try {
+      final config =
+          jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
+      if (config['repeatType'] != 'weekly') return;
+
+      var days = List.from(config['selectedDays'] ?? []);
+
+      if (days.contains(weekday)) {
+        days.remove(weekday);
+      } else {
+        days.add(weekday);
+      }
+
+      config['selectedDays'] = days;
       currentTask.repeatConfig = jsonEncode(config);
       notifyListeners();
+    } catch (e) {
+      logger.e('Error toggling weekday: $e');
     }
   }
 
   void addReminderTime(TimeOfDay time) {
-    if (reminderTimesList.length < 5) {
-      reminderTimesList.add(time);
-      // Save as list of strings (using HH:mm format) in currentTask.reminderTimes
-      currentTask.reminderTimes = jsonEncode(reminderTimesList
-          .map((t) =>
-              t.hour.toString().padLeft(2, '0') +
-              ':' +
-              t.minute.toString().padLeft(2, '0'))
-          .toList());
-      notifyListeners();
-    }
+    final times = jsonDecode(currentTask.reminderTimes ?? '[]') as List;
+    if (times.length >= 7) return;
+
+    times.add(time);
+    currentTask.reminderTimes = jsonEncode(times
+        .map((t) =>
+            '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}')
+        .toList());
+    notifyListeners();
   }
 
   void removeReminderTime(TimeOfDay time) {
-    reminderTimesList.remove(time);
-    currentTask.reminderTimes = jsonEncode(reminderTimesList
+    final times = jsonDecode(currentTask.reminderTimes ?? '[]') as List;
+    times.removeWhere((t) => t.hour == time.hour && t.minute == time.minute);
+
+    currentTask.reminderTimes = jsonEncode(times
         .map((t) =>
-            t.hour.toString().padLeft(2, '0') +
-            ':' +
-            t.minute.toString().padLeft(2, '0'))
+            '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}')
         .toList());
     notifyListeners();
   }
 
   void updateReminderTime(TimeOfDay oldTime, TimeOfDay newTime) {
-    if (reminderTimesList.contains(newTime)) {
-      return; // Don't update if the new time already exists
-    }
+    if (currentTask.reminderTimes == null) return;
 
-    final index = reminderTimesList.indexOf(oldTime);
+    final times = jsonDecode(currentTask.reminderTimes!);
+    final index = times.indexOf(oldTime);
     if (index != -1) {
-      reminderTimesList[index] = newTime;
-      // Update the stored reminder times
-      currentTask.reminderTimes = jsonEncode(reminderTimesList
-          .map((t) =>
-              '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}')
-          .toList());
+      times[index] = newTime;
+      currentTask.reminderTimes = jsonEncode(times);
       notifyListeners();
     }
   }
@@ -346,26 +313,19 @@ class TaskViewModel extends ChangeNotifier {
     if (currentTask.isValid()) {
       // Set up repeat configuration if enabled
       if (currentTask.isRepeating!) {
-        currentTask.startDate = taskStartDate;
-        currentTask.endDate = taskEndDate;
-
         // Validate repeat configuration
-        if (repeatType == 'weekly' && selectedWeekdays.isEmpty) {
-          return false; // Can't create weekly task without selected days
-        }
-
-        Map<String, dynamic> config = {
-          'repeatType': repeatType,
-          'selectedDays': repeatType == 'weekly' ? selectedWeekdays : null,
-        };
-        currentTask.repeatConfig = jsonEncode(config);
-
-        // Handle reminder times
-        if (currentTask.isNotifyEnabled! && reminderTimesList.isNotEmpty) {
-          currentTask.reminderTimes = jsonEncode(reminderTimesList
-              .map((t) =>
-                  '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}')
-              .toList());
+        try {
+          if (currentTask.repeatConfig == null) return false;
+          final config =
+              jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
+          if (config['repeatType'] == 'weekly') {
+            final days = List<int>.from(config['selectedDays'] ?? []);
+            if (days.isEmpty)
+              return false; // Can't create weekly task without selected days
+          }
+        } catch (e) {
+          logger.e('Error validating repeat config: $e');
+          return false;
         }
       }
 
@@ -502,38 +462,102 @@ class TaskViewModel extends ChangeNotifier {
 //----------------------------------------------------------------------//
 
   void toggleRepeat(bool value) {
-    if (isRepeatEnabled == value) return; // No change needed
+    if (currentTask.isRepeating == value) return;
 
-    isRepeatEnabled = value;
     currentTask.isRepeating = value;
-
     if (value) {
       // Switching to recurring task
-      taskStartDate = currentTask.dueDate ?? DateTime.now();
-      taskEndDate = null;
-      repeatType = null;
-      selectedWeekdays = [];
-      reminderTimesList = [];
+      currentTask.startDate = currentTask.dueDate ?? DateTime.now();
+      currentTask.endDate = null;
+      currentTask.repeatConfig = jsonEncode({
+        'repeatType': null,
+        'selectedDays': [],
+      });
+      currentTask.reminderTimes = null;
 
       // Clear one-time settings
       currentTask.dueDate = null;
       currentTask.notifyTime = null;
     } else {
       // Switching to single task
-      currentTask.dueDate = taskStartDate;
-      currentTask.notifyTime = null;
-      currentTask.isNotifyEnabled = false;
+      currentTask.dueDate = currentTask.startDate;
+      currentTask.startDate = DateTime.now();
+      currentTask.endDate = null;
       currentTask.repeatConfig = null;
       currentTask.reminderTimes = null;
-
-      // Reset repeat settings
-      taskStartDate = DateTime.now();
-      taskEndDate = null;
-      repeatType = null;
-      selectedWeekdays = [];
-      reminderTimesList = [];
+      currentTask.notifyTime = null;
+      currentTask.isNotifyEnabled = false;
     }
 
     notifyListeners();
+  }
+
+  // Helper getters/setters for repeat configuration
+  bool get isRepeatEnabled => currentTask.isRepeating ?? false;
+
+  DateTime get taskStartDate => currentTask.startDate;
+
+  DateTime? get taskEndDate => currentTask.endDate;
+
+  String? get repeatType {
+    if (currentTask.repeatConfig == null) return null;
+    try {
+      final config =
+          jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
+      return config['repeatType'] as String?;
+    } catch (e) {
+      logger.e('Error decoding repeatType: $e');
+      return null;
+    }
+  }
+
+  List<int> get selectedWeekdays {
+    if (currentTask.repeatConfig == null) return [];
+    try {
+      final config =
+          jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
+      if (config['repeatType'] == 'weekly' && config['selectedDays'] is List) {
+        return List<int>.from(config['selectedDays']);
+      }
+      return [];
+    } catch (e) {
+      logger.e('Error decoding selectedWeekdays: $e');
+      return [];
+    }
+  }
+
+  List<TimeOfDay> get reminderTimesList {
+    if (currentTask.reminderTimes == null) return [];
+    try {
+      final times = jsonDecode(currentTask.reminderTimes!) as List;
+      return times.map((timeStr) {
+        final parts = timeStr.split(':');
+        return TimeOfDay(
+          hour: int.parse(parts[0]),
+          minute: int.parse(parts[1]),
+        );
+      }).toList();
+    } catch (e) {
+      logger.e('Error decoding reminderTimes: $e');
+      return [];
+    }
+  }
+
+  void _updateWeekdayValidity() {
+    if (currentTask.repeatConfig == null) return;
+
+    try {
+      final config =
+          jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
+      if (config['repeatType'] != 'weekly') return;
+
+      var days = List<int>.from(config['selectedDays'] ?? []);
+      days.removeWhere((weekday) => !isWeekdayValid(weekday));
+
+      config['selectedDays'] = days;
+      currentTask.repeatConfig = jsonEncode(config);
+    } catch (e) {
+      logger.e('Error updating weekday validity: $e');
+    }
   }
 }
