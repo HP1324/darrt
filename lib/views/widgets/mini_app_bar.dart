@@ -8,6 +8,7 @@ import 'package:minimaltodo/helpers/mini_storage.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/views/pages/navigation/finished_tasks_page.dart';
+import 'package:minimaltodo/views/pages/navigation/pending_tasks_page.dart';
 import 'package:minimaltodo/views/pages/search_page.dart';
 import 'package:provider/provider.dart';
 
@@ -67,6 +68,12 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   },
                   child: Text('Finished Tasks'),
                 ),
+                // PopupMenuItem(
+                //   onTap: () {
+                //     MiniRouter.to(context, child: PendingTasksPage());
+                //   },
+                //   child: Text('Pending Tasks'),
+                // ),
                 PopupMenuItem(child: Text('Rate Us')),
                 PopupMenuItem(child: Text('Give Feedback')),
                 PopupMenuItem(child: Text('Settings')),
