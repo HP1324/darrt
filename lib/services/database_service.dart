@@ -2,13 +2,15 @@ import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseService {
-  static const createCategoriesTable = """ CREATE TABLE categories(
+  static const createCategoriesTable = """ 
+    CREATE TABLE categories(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
       icon_code TEXT DEFAULT 'folder',
       color TEXT
-      )
-     """;
+    )
+  """;
+
   static const createTasksTable = """CREATE TABLE tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT,
@@ -25,9 +27,14 @@ class DatabaseService {
         notifyTime TEXT,
         priority TEXT DEFAULT 'Low',
         isRepeating INTEGER DEFAULT 0,
+        startDate TEXT NOT NULL,
+        endDate TEXT,
+        repeatConfig TEXT,
+        reminderTimes TEXT,
         FOREIGN KEY(categoryId) REFERENCES categories (id) ON DELETE SET DEFAULT
       )
-    """;
+  """;
+
   static const createStatsTable = """CREATE TABLE stats (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT NOT NULL,
@@ -38,33 +45,34 @@ class DatabaseService {
         medium_tasks INTEGER NOT NULL,
         low_tasks INTEGER NOT NULL
       )
-    """;
-  static const createDefaultCategories ="""INSERT INTO categories (name, icon_code) VALUES
-  ('General','folder'),
-('Sports', 'football'),
-('Health', 'heart'),
-('Work', 'briefcase'),
-('Shopping', 'cart'),
-('Groceries', 'shop'),
-('Books', 'book'),
-('Travel', 'airplane'),
-('Education', 'graduation_cap'),
-('Personal', 'home'),
-('Finance', 'wallet'),
-('Hobbies', 'gamepad'),
-('Fitness', 'dumbbell'),
-('Food', 'utensils'),
-('Friends', 'people'),
-('Family', 'home'),
-('Chores', 'task'),
-('Projects', 'chart'),
-('Entertainment', 'video');
-""";
+  """;
+
+  static const createDefaultCategories = """INSERT INTO categories (name, icon_code) VALUES
+    ('General','folder'),
+    ('Sports', 'football'),
+    ('Health', 'heart'),
+    ('Work', 'briefcase'),
+    ('Shopping', 'cart'),
+    ('Groceries', 'shop'),
+    ('Books', 'book'),
+    ('Travel', 'airplane'),
+    ('Education', 'graduation_cap'),
+    ('Personal', 'home'),
+    ('Finance', 'wallet'),
+    ('Hobbies', 'gamepad'),
+    ('Fitness', 'dumbbell'),
+    ('Food', 'utensils'),
+    ('Friends', 'people'),
+    ('Family', 'home'),
+    ('Chores', 'task'),
+    ('Projects', 'chart'),
+    ('Entertainment', 'video')
+  """;
 
   static Future<Database> openDb() async {
     return openDatabase(
       'minimal_todo.db',
-      version: 1,
+      version: 1, // Increment version if you need to migrate schema
       onCreate: (database, version) async {
         await database.transaction((txn) async {
           await txn.execute(createCategoriesTable);
