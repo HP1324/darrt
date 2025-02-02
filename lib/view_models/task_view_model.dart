@@ -19,12 +19,13 @@ class TaskViewModel extends ChangeNotifier {
 
   void initNewTask() {
     currentTask = Task(
-      dueDate: DateTime.now().add(Duration(minutes: 2)),
+      dueDate: DateTime.now().add(const Duration(minutes: 2)),
       category: CategoryModel(id: 1, name: 'General'),
       priority: "Low",
       notifType: "notif",
-      // Set default repeat values (not repeating by default)
       startDate: DateTime.now(),
+      isRepeating: false,
+      isNotifyEnabled: false,
     );
     selectedMinutes = 0;
     titleController.clear();
@@ -36,7 +37,7 @@ class TaskViewModel extends ChangeNotifier {
     repeatType = null;
     selectedWeekdays = [];
     reminderTimesList = [];
-    // notifyListeners();
+    notifyListeners();
   }
 
   void resetTask(Task task) {
@@ -332,21 +333,47 @@ class TaskViewModel extends ChangeNotifier {
   //------------------------ TASK CRUD OPERATIONS ------------------------//
   Future<bool> addNewTask() async {
     currentTask.category ??= await CategoryService.getGeneralCategory();
-    logger.t('Adding task, list icon: ${currentTask.category!.iconCode}');
+
     if (currentTask.isValid()) {
+      // Set up repeat configuration if enabled
+      if (currentTask.isRepeating!) {
+        currentTask.startDate = taskStartDate;
+        currentTask.endDate = taskEndDate;
+
+        // Validate repeat configuration
+        if (repeatType == 'weekly' && selectedWeekdays.isEmpty) {
+          return false; // Can't create weekly task without selected days
+        }
+
+        Map<String, dynamic> config = {
+          'repeatType': repeatType,
+          'selectedDays': repeatType == 'weekly' ? selectedWeekdays : null,
+        };
+        currentTask.repeatConfig = jsonEncode(config);
+
+        // Handle reminder times
+        if (currentTask.isNotifyEnabled! && reminderTimesList.isNotEmpty) {
+          currentTask.reminderTimes = jsonEncode(reminderTimesList
+              .map((t) =>
+                  '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}')
+              .toList());
+        }
+      }
+
       final id = await TaskService.addTask(currentTask);
       currentTask.id = id;
       _refreshTasks();
-      if (currentTask.dueDate != null) {
-        await _updateStats(currentTask);
+
+      // Schedule notifications
+      if (currentTask.isNotifyEnabled!) {
+        if (currentTask.isRepeating!) {
+          await NotificationService.createRepeatingTaskNotifications(
+              currentTask);
+        } else {
+          await NotificationService.createTaskNotification(currentTask);
+        }
       }
-      isNewTaskAdded = true;
-      // If repeating and notifications enabled, schedule repeating notifications.
-      if (currentTask.isRepeating! && currentTask.isNotifyEnabled!) {
-        await NotificationService.createRepeatingTaskNotifications(currentTask);
-      } else if (currentTask.isNotifyEnabled!) {
-        await NotificationService.createTaskNotification(currentTask);
-      }
+
       return true;
     }
     return false;
@@ -469,13 +496,26 @@ class TaskViewModel extends ChangeNotifier {
     isRepeatEnabled = value;
     currentTask.isRepeating = value;
 
-    // Reset one-time task settings when enabling repeat
     if (value) {
+      // When enabling repeat
+      taskStartDate = currentTask.dueDate ?? DateTime.now();
+      taskEndDate = null;
+      repeatType = null;
+      selectedWeekdays = [];
+      reminderTimesList = [];
+
+      // Clear one-time settings
       currentTask.dueDate = null;
       currentTask.notifyTime = null;
-      currentTask.isNotifyEnabled = false;
     } else {
-      // Reset repeat settings when disabling
+      // When disabling repeat
+      currentTask.dueDate = taskStartDate;
+      currentTask.notifyTime = null;
+      currentTask.isNotifyEnabled = false;
+      currentTask.repeatConfig = null;
+      currentTask.reminderTimes = null;
+
+      // Reset repeat settings
       taskStartDate = DateTime.now();
       taskEndDate = null;
       repeatType = null;

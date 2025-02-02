@@ -3,6 +3,7 @@ import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_storage.dart';
+import 'dart:convert';
 
 class CalendarViewModel extends ChangeNotifier {
   DateTime _selectedDate = DateTime.now();
@@ -16,10 +17,12 @@ class CalendarViewModel extends ChangeNotifier {
   bool get isSelectionMode => _isSelectionMode;
 
   // Initialize dates range
-  final DateTime initialDate = DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(const Duration(days: 365));
-  final DateTime maxExtentDate = DateTime.now().add(const Duration(days: 18263));
+  final DateTime initialDate = DateTime.parse(MiniBox.read(mFirstInstallDate))
+      .subtract(const Duration(days: 365));
+  final DateTime maxExtentDate =
+      DateTime.now().add(const Duration(days: 18263));
 
-  late final List<DateTime> dates = List.generate(
+  late List<DateTime> dates = List.generate(
     maxExtentDate.difference(initialDate).inDays + 1,
     (index) => initialDate.add(Duration(days: index)),
   );
@@ -81,15 +84,74 @@ class CalendarViewModel extends ChangeNotifier {
       setSelectedDate(date);
     }
   }
-  void saveScrollPosition(){
-    if(scrollController.hasClients){
+
+  void saveScrollPosition() {
+    if (scrollController.hasClients) {
       _savedScrollPosition = scrollController.position.pixels;
     }
   }
+
   void restoreScrollPosition() {
     if (_savedScrollPosition != null && scrollController.hasClients) {
       scrollController.jumpTo(_savedScrollPosition!);
     }
+  }
+
+  List<Task> getTasksForDate(DateTime date, List<Task> allTasks) {
+    final List<Task> tasksForDate = [];
+
+    for (var task in allTasks) {
+      if (task.isRepeating ?? false) {
+        if (_isTaskOccurringOnDate(task, date)) {
+          tasksForDate.add(task.copyWith(dueDate: date));
+        }
+      } else if (task.dueDate != null && isSameDay(task.dueDate!, date)) {
+        tasksForDate.add(task);
+      }
+    }
+
+    return tasksForDate;
+  }
+
+  bool _isTaskOccurringOnDate(Task task, DateTime date) {
+    // Check date range
+    if (date.isBefore(task.startDate) ||
+        (task.endDate != null && date.isAfter(task.endDate!))) {
+      return false;
+    }
+
+    try {
+      final config = jsonDecode(task.repeatConfig ?? '{}');
+      final repeatType = config['repeatType'] as String?;
+
+      switch (repeatType) {
+        case 'weekly':
+          final selectedDays = List<int>.from(config['selectedDays'] ?? []);
+          return selectedDays.contains(date.weekday);
+
+        case 'monthly':
+          return date.day == task.startDate.day;
+
+        case 'yearly':
+          return date.day == task.startDate.day &&
+              date.month == task.startDate.month;
+
+        default:
+          return false;
+      }
+    } catch (e) {
+      MiniLogger.error('Error checking task occurrence: $e');
+      return false;
+    }
+  }
+
+  // Update the dates list to include a wider range for repeating tasks
+  void generateDates() {
+    final now = DateTime.now();
+    dates = List.generate(365, (index) {
+      return DateTime(now.year, now.month, now.day).add(Duration(days: index));
+    });
+    notifyListeners();
   }
 
   @override
