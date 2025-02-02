@@ -8,8 +8,6 @@ import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:intl/intl.dart';
 
-
-
 class NotificationService {
   static final _notif = AwesomeNotifications();
 
@@ -30,10 +28,12 @@ class NotificationService {
         MiniLogger.debug('Notification service initialized successfully');
       } else {
         await box.write(mNotificationsEnabled, false);
-        MiniLogger.debug('Notifications disabled - continuing without notification support');
+        MiniLogger.debug(
+            'Notifications disabled - continuing without notification support');
       }
     } catch (e) {
-      MiniLogger.error('Failed to initialize notification service: ${e.toString()}');
+      MiniLogger.error(
+          'Failed to initialize notification service: ${e.toString()}');
       await GetStorage().write(mNotificationsEnabled, false);
     }
   }
@@ -57,7 +57,8 @@ class NotificationService {
           NotificationChannel(
             channelKey: 'task_notif',
             channelName: 'task_notifications',
-            channelDescription: 'Channel used to notify users about their tasks with simple notification',
+            channelDescription:
+                'Channel used to notify users about their tasks with simple notification',
             importance: NotificationImportance.Max,
             playSound: true,
             defaultRingtoneType: DefaultRingtoneType.Notification,
@@ -68,7 +69,8 @@ class NotificationService {
           NotificationChannel(
             channelKey: 'task_alarm',
             channelName: 'task_alarms',
-            channelDescription: 'Channel used to notify users about their tasks with alarm',
+            channelDescription:
+                'Channel used to notify users about their tasks with alarm',
             importance: NotificationImportance.Max,
             playSound: true,
             defaultRingtoneType: DefaultRingtoneType.Alarm,
@@ -80,7 +82,8 @@ class NotificationService {
       );
       MiniLogger.debug('Channels initialized: $isInitialized');
     } catch (e) {
-      MiniLogger.error('Failed to initialize notification channels: ${e.toString()}');
+      MiniLogger.error(
+          'Failed to initialize notification channels: ${e.toString()}');
       rethrow;
     }
   }
@@ -90,45 +93,47 @@ class NotificationService {
       return;
     }
     if (!await isNotificationsEnabled()) {
-      MiniLogger.debug('Skipping notification creation - notifications are disabled');
+      MiniLogger.debug(
+          'Skipping notification creation - notifications are disabled');
       return;
     }
     MiniLogger.debug('Creating one-off task notification');
     Map<String, dynamic> taskJson = task.toJson();
     String taskPayload = jsonEncode(taskJson);
-    MiniLogger.debug('Is notification allowed? ${await _notif.isNotificationAllowed()}');
+    MiniLogger.debug(
+        'Is notification allowed? ${await _notif.isNotificationAllowed()}');
 
     try {
       final isCreated = await _notif.createNotification(
         content: task.notifType!.toLowerCase() == 'notif'
             ? NotificationContent(
-          id: task.id!,
-          channelKey: 'task_notif',
-          title: 'Task Due at ${formatTime(task.dueDate!)}',
-          body: task.title,
-          actionType: ActionType.Default,
-          payload: {
-            'task': taskPayload,
-          },
-          notificationLayout: NotificationLayout.Default,
-          category: NotificationCategory.Reminder,
-          wakeUpScreen: true,
-          criticalAlert: true,
-        )
+                id: task.id!,
+                channelKey: 'task_notif',
+                title: 'Task Due at ${formatTime(task.dueDate!)}',
+                body: task.title,
+                actionType: ActionType.Default,
+                payload: {
+                  'task': taskPayload,
+                },
+                notificationLayout: NotificationLayout.Default,
+                category: NotificationCategory.Reminder,
+                wakeUpScreen: true,
+                criticalAlert: true,
+              )
             : NotificationContent(
-          id: task.id!,
-          channelKey: 'task_alarm',
-          title: 'Task Due at ${formatTime(task.dueDate!)}',
-          body: task.title,
-          actionType: ActionType.Default,
-          payload: {
-            'task': taskPayload,
-          },
-          notificationLayout: NotificationLayout.Default,
-          category: NotificationCategory.Alarm,
-          wakeUpScreen: true,
-          criticalAlert: true,
-        ),
+                id: task.id!,
+                channelKey: 'task_alarm',
+                title: 'Task Due at ${formatTime(task.dueDate!)}',
+                body: task.title,
+                actionType: ActionType.Default,
+                payload: {
+                  'task': taskPayload,
+                },
+                notificationLayout: NotificationLayout.Default,
+                category: NotificationCategory.Alarm,
+                wakeUpScreen: true,
+                criticalAlert: true,
+              ),
         schedule: NotificationCalendar.fromDate(
           date: task.notifyTime!,
           allowWhileIdle: true,
@@ -151,75 +156,235 @@ class NotificationService {
   }
 
   static Future<void> createRepeatingTaskNotifications(Task task) async {
-    if (task.notifyTime == null || task.notifyTime!.isBefore(DateTime.now())) {
-      return;
-    }
     if (!await isNotificationsEnabled()) {
-      MiniLogger.debug('Notifications disabled; skipping repeating notifications.');
+      logger.d('Notifications disabled; skipping repeating notifications.');
       return;
     }
-    // Parse reminderTimes from JSON; if none provided, use the default notifyTime
-    List<String> reminderTimes = [];
-    if (task.reminderTimes != null) {
-      try {
-        reminderTimes = List<String>.from(jsonDecode(task.reminderTimes!));
-      } catch (e) {
-        logger.e('Error decoding reminderTimes: $e');
+
+    try {
+      // Parse repeat configuration
+      final repeatConfig = jsonDecode(task.repeatConfig ?? '{}');
+      final repeatType = repeatConfig['repeatType'] as String?;
+      final selectedDays = repeatConfig['selectedDays'] as List<dynamic>?;
+
+      // Parse reminder times
+      List<TimeOfDay> reminderTimes = [];
+      if (task.reminderTimes != null) {
+        final times = jsonDecode(task.reminderTimes!) as List;
+        reminderTimes = times.map((timeStr) {
+          final parts = (timeStr as String).split(':');
+          return TimeOfDay(
+              hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+        }).toList();
       }
-    }
-    // If no reminders are set, schedule one notification at notifyTime.
-    if (reminderTimes.isEmpty) {
-      reminderTimes.add(formatTime(task.notifyTime!));
-    }
-    // Schedule a notification for each reminder
-    for (int i = 0; i < reminderTimes.length; i++) {
-      // For demonstration, we simply schedule each notification at task.notifyTime
-      // In a real scenario, you might parse the reminder time offset and compute an exact time.
-      final scheduledTime = task.notifyTime!.subtract(Duration(minutes: i * 5));
-      try {
-        final isCreated = await _notif.createNotification(
-          content: task.notifType!.toLowerCase() == 'notif'
-              ? NotificationContent(
-            id: (task.id! * 10) + i, // generate unique id per reminder
-            channelKey: 'task_notif',
-            title: 'Repeating Task Reminder at ${formatTime(task.dueDate!)}',
-            body: task.title,
-            actionType: ActionType.Default,
-            payload: {'task': jsonEncode(task.toJson())},
-            notificationLayout: NotificationLayout.Default,
-            category: NotificationCategory.Reminder,
-            wakeUpScreen: true,
-            criticalAlert: true,
-          )
-              : NotificationContent(
-            id: (task.id! * 10) + i,
-            channelKey: 'task_alarm',
-            title: 'Repeating Task Alarm at ${formatTime(task.dueDate!)}',
-            body: task.title,
-            actionType: ActionType.Default,
-            payload: {'task': jsonEncode(task.toJson())},
-            notificationLayout: NotificationLayout.Default,
-            category: NotificationCategory.Alarm,
-            wakeUpScreen: true,
-            criticalAlert: true,
-          ),
-          schedule: NotificationCalendar.fromDate(
-            date: scheduledTime,
-            allowWhileIdle: true,
-            preciseAlarm: true,
-          ),
-          actionButtons: [
-            NotificationActionButton(
-                key: 'Finished',
-                label: 'Finished',
-                actionType: ActionType.SilentBackgroundAction),
-            NotificationActionButton(key: 'Skip', label: 'Skip'),
-          ],
+
+      // Calculate notification schedule based on repeat type
+      for (var reminderTime in reminderTimes) {
+        final baseDateTime = DateTime(
+          task.startDate.year,
+          task.startDate.month,
+          task.startDate.day,
+          reminderTime.hour,
+          reminderTime.minute,
         );
-        MiniLogger.debug('Repeating notification created: $isCreated for reminder index $i');
-      } catch (e) {
-        MiniLogger.error('Failed to create repeating notification: ${e.toString()}');
+
+        switch (repeatType) {
+          case 'weekly':
+            if (selectedDays != null) {
+              for (final weekday in selectedDays) {
+                await _scheduleWeeklyNotification(
+                  task,
+                  weekday,
+                  reminderTime,
+                  baseDateTime,
+                );
+              }
+            }
+            break;
+
+          case 'monthly':
+            await _scheduleMonthlyNotification(
+              task,
+              reminderTime,
+              baseDateTime,
+            );
+            break;
+
+          case 'yearly':
+            await _scheduleYearlyNotification(
+              task,
+              reminderTime,
+              baseDateTime,
+            );
+            break;
+        }
       }
+    } catch (e) {
+      logger.e('Error scheduling repeating notifications: $e');
+    }
+  }
+
+  static Future<void> _scheduleWeeklyNotification(
+    Task task,
+    int weekday,
+    TimeOfDay reminderTime,
+    DateTime baseDateTime,
+  ) async {
+    try {
+      // Calculate next occurrence of this weekday
+      var notifyDate = baseDateTime;
+      while (notifyDate.weekday != weekday) {
+        notifyDate = notifyDate.add(const Duration(days: 1));
+      }
+
+      // Check if date is within end date if specified
+      if (task.endDate != null && notifyDate.isAfter(task.endDate!)) {
+        return;
+      }
+
+      await _notif.createNotification(
+        content: NotificationContent(
+          id: (task.id! * 1000) + (weekday * 10) + reminderTime.hour,
+          channelKey: task.notifType == 'alarm' ? 'task_alarm' : 'task_notif',
+          title: 'Repeating Task Reminder',
+          body: task.title,
+          notificationLayout: NotificationLayout.Default,
+          category: NotificationCategory.Reminder,
+          wakeUpScreen: true,
+          criticalAlert: true,
+        ),
+        schedule: NotificationCalendar(
+          weekday: weekday,
+          hour: reminderTime.hour,
+          minute: reminderTime.minute,
+          second: 0,
+          millisecond: 0,
+          repeats: true,
+          preciseAlarm: true,
+        ),
+        actionButtons: [
+          NotificationActionButton(
+            key: 'MARK_DONE',
+            label: 'Mark Done',
+            actionType: ActionType.SilentBackgroundAction,
+          ),
+          NotificationActionButton(
+            key: 'SNOOZE',
+            label: 'Snooze',
+            actionType: ActionType.Default,
+          ),
+        ],
+      );
+    } catch (e) {
+      logger.e('Error scheduling weekly notification: $e');
+    }
+  }
+
+  static Future<void> _scheduleMonthlyNotification(
+    Task task,
+    TimeOfDay reminderTime,
+    DateTime baseDateTime,
+  ) async {
+    try {
+      // Calculate next occurrence of this date in the month
+      var notifyDate = baseDateTime;
+
+      // Check if date is within end date if specified
+      if (task.endDate != null && notifyDate.isAfter(task.endDate!)) {
+        return;
+      }
+
+      await _notif.createNotification(
+        content: NotificationContent(
+          id: (task.id! * 1000) + (baseDateTime.day * 10) + reminderTime.hour,
+          channelKey: task.notifType == 'alarm' ? 'task_alarm' : 'task_notif',
+          title: 'Monthly Task Reminder',
+          body: task.title,
+          notificationLayout: NotificationLayout.Default,
+          category: NotificationCategory.Reminder,
+          wakeUpScreen: true,
+          criticalAlert: true,
+        ),
+        schedule: NotificationCalendar(
+          day: baseDateTime.day, // Same day each month
+          hour: reminderTime.hour,
+          minute: reminderTime.minute,
+          second: 0,
+          millisecond: 0,
+          repeats: true,
+          preciseAlarm: true,
+        ),
+        actionButtons: [
+          NotificationActionButton(
+            key: 'MARK_DONE',
+            label: 'Mark Done',
+            actionType: ActionType.SilentBackgroundAction,
+          ),
+          NotificationActionButton(
+            key: 'SNOOZE',
+            label: 'Snooze',
+            actionType: ActionType.Default,
+          ),
+        ],
+      );
+    } catch (e) {
+      logger.e('Error scheduling monthly notification: $e');
+    }
+  }
+
+  static Future<void> _scheduleYearlyNotification(
+    Task task,
+    TimeOfDay reminderTime,
+    DateTime baseDateTime,
+  ) async {
+    try {
+      // Calculate next occurrence of this date in the year
+      var notifyDate = baseDateTime;
+
+      // Check if date is within end date if specified
+      if (task.endDate != null && notifyDate.isAfter(task.endDate!)) {
+        return;
+      }
+
+      await _notif.createNotification(
+        content: NotificationContent(
+          id: (task.id! * 1000) +
+              (baseDateTime.month * 100) +
+              (baseDateTime.day * 10) +
+              reminderTime.hour,
+          channelKey: task.notifType == 'alarm' ? 'task_alarm' : 'task_notif',
+          title: 'Yearly Task Reminder',
+          body: task.title,
+          notificationLayout: NotificationLayout.Default,
+          category: NotificationCategory.Reminder,
+          wakeUpScreen: true,
+          criticalAlert: true,
+        ),
+        schedule: NotificationCalendar(
+          month: baseDateTime.month, // Same month each year
+          day: baseDateTime.day, // Same day each month
+          hour: reminderTime.hour,
+          minute: reminderTime.minute,
+          second: 0,
+          millisecond: 0,
+          repeats: true,
+          preciseAlarm: true,
+        ),
+        actionButtons: [
+          NotificationActionButton(
+            key: 'MARK_DONE',
+            label: 'Mark Done',
+            actionType: ActionType.SilentBackgroundAction,
+          ),
+          NotificationActionButton(
+            key: 'SNOOZE',
+            label: 'Snooze',
+            actionType: ActionType.Default,
+          ),
+        ],
+      );
+    } catch (e) {
+      logger.e('Error scheduling yearly notification: $e');
     }
   }
 
