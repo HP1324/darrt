@@ -271,37 +271,84 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   void addReminderTime(TimeOfDay time) {
-    final times = jsonDecode(currentTask.reminderTimes ?? '[]') as List;
-    if (times.length >= 7) return;
+    try {
+      final List<String> times = List<String>.from(
+        jsonDecode(currentTask.reminderTimes ?? '[]'),
+      );
 
-    times.add(time);
-    currentTask.reminderTimes = jsonEncode(times
-        .map((t) =>
-            '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}')
-        .toList());
-    notifyListeners();
+      if (times.length >= 7) return;
+
+      // Convert TimeOfDay to string format
+      final timeString =
+          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+
+      // Check for duplicates
+      if (times.contains(timeString)) return;
+
+      times.add(timeString);
+      currentTask.reminderTimes = jsonEncode(times);
+      notifyListeners();
+    } catch (e) {
+      logger.e('Error adding reminder time: $e');
+    }
   }
 
   void removeReminderTime(TimeOfDay time) {
-    final times = jsonDecode(currentTask.reminderTimes ?? '[]') as List;
-    times.removeWhere((t) => t.hour == time.hour && t.minute == time.minute);
+    try {
+      final List<String> times = List<String>.from(
+        jsonDecode(currentTask.reminderTimes ?? '[]'),
+      );
 
-    currentTask.reminderTimes = jsonEncode(times
-        .map((t) =>
-            '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}')
-        .toList());
-    notifyListeners();
+      // Convert TimeOfDay to string format for comparison
+      final timeString =
+          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+
+      times.remove(timeString);
+      currentTask.reminderTimes = jsonEncode(times);
+      notifyListeners();
+    } catch (e) {
+      logger.e('Error removing reminder time: $e');
+    }
   }
 
   void updateReminderTime(TimeOfDay oldTime, TimeOfDay newTime) {
-    if (currentTask.reminderTimes == null) return;
+    try {
+      final List<String> times = List<String>.from(
+        jsonDecode(currentTask.reminderTimes ?? '[]'),
+      );
 
-    final times = jsonDecode(currentTask.reminderTimes!);
-    final index = times.indexOf(oldTime);
-    if (index != -1) {
-      times[index] = newTime;
-      currentTask.reminderTimes = jsonEncode(times);
-      notifyListeners();
+      final oldTimeString =
+          '${oldTime.hour.toString().padLeft(2, '0')}:${oldTime.minute.toString().padLeft(2, '0')}';
+      final newTimeString =
+          '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}';
+
+      final index = times.indexOf(oldTimeString);
+      if (index != -1) {
+        times[index] = newTimeString;
+        currentTask.reminderTimes = jsonEncode(times);
+        notifyListeners();
+      }
+    } catch (e) {
+      logger.e('Error updating reminder time: $e');
+    }
+  }
+
+  List<TimeOfDay> get reminderTimesList {
+    if (currentTask.reminderTimes == null) return [];
+    try {
+      final List<String> times = List<String>.from(
+        jsonDecode(currentTask.reminderTimes!),
+      );
+      return times.map((timeStr) {
+        final parts = timeStr.split(':');
+        return TimeOfDay(
+          hour: int.parse(parts[0]),
+          minute: int.parse(parts[1]),
+        );
+      }).toList();
+    } catch (e) {
+      logger.e('Error decoding reminderTimes: $e');
+      return [];
     }
   }
   //-----------------------------------------------------------------------//
@@ -364,6 +411,16 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   Future<bool> deleteTask(Task task) async {
+    // First remove all notifications for this task
+    if (task.isNotifyEnabled!) {
+      if (task.isRepeating!) {
+        // Remove all scheduled notifications for recurring task
+        await NotificationService.removeRepeatingTaskNotifications(task);
+      } else {
+        await NotificationService.removeTaskNotification(task);
+      }
+    }
+
     await TaskService.deleteTask(task.id!);
     _tasks.remove(task);
     if (task.dueDate != null) {
@@ -417,7 +474,7 @@ class TaskViewModel extends ChangeNotifier {
   void updateTaskListAfterEdit(CategoryModel list) async {
     final tasksForCurrentList =
         tasks.where((t) => t.category!.id == list.id).toList();
-    await TaskService.editTaskListAfterEdit(tasksForCurrentList, list);
+    await TaskService.editTaskCategoryAfterEdit(tasksForCurrentList, list);
     _refreshTasks();
   }
   //--------------------------------------------------------------------------//
@@ -522,23 +579,6 @@ class TaskViewModel extends ChangeNotifier {
       return [];
     } catch (e) {
       logger.e('Error decoding selectedWeekdays: $e');
-      return [];
-    }
-  }
-
-  List<TimeOfDay> get reminderTimesList {
-    if (currentTask.reminderTimes == null) return [];
-    try {
-      final times = jsonDecode(currentTask.reminderTimes!) as List;
-      return times.map((timeStr) {
-        final parts = timeStr.split(':');
-        return TimeOfDay(
-          hour: int.parse(parts[0]),
-          minute: int.parse(parts[1]),
-        );
-      }).toList();
-    } catch (e) {
-      logger.e('Error decoding reminderTimes: $e');
       return [];
     }
   }

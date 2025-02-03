@@ -13,4 +13,7 @@ class MiniLogger {
   static void debug(String message){
     _logger.d('[${formatDateWith(DateTime.now(), _format)}] $message');
   }
+  static void trace(String stacktrace){
+    _logger.t('[${formatDateWith(DateTime.now(), _format)}] StackTrace: $stacktrace');
+  }
 }

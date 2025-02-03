@@ -2,7 +2,7 @@ import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseService {
-  static const createCategoriesTable = """ 
+  static const createCategoriesTable = """
     CREATE TABLE categories(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
@@ -47,7 +47,8 @@ class DatabaseService {
       )
   """;
 
-  static const createDefaultCategories = """INSERT INTO categories (name, icon_code) VALUES
+  static const createDefaultCategories =
+      """INSERT INTO categories (name, icon_code) VALUES
     ('General','folder'),
     ('Sports', 'football'),
     ('Health', 'heart'),
@@ -79,6 +80,14 @@ class DatabaseService {
           await txn.execute(createTasksTable);
           await txn.execute(createStatsTable);
           await txn.execute(createDefaultCategories);
+          await txn.execute('''
+            CREATE TABLE IF NOT EXISTS wishlists (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              title TEXT NOT NULL,
+              isFulfilled INTEGER DEFAULT 0,
+              createdAt TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+          ''');
         });
       },
       onConfigure: (database) async {

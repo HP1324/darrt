@@ -150,17 +150,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                     if (taskVM.isRepeatEnabled) ...[
                       const RepeatingConfigWidget(),
                       const SizedBox(height: 20),
-                      SwitchListTile(
-                        title: Text(
-                          'Enable Notifications',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontSize: 14,
-                                  ),
-                        ),
-                        value: taskVM.currentTask.isNotifyEnabled ?? false,
-                        onChanged: (value) => taskVM.toggleNotifSwitch(value),
-                      ),
+                      NotificationSwitch(),
                       if (taskVM.currentTask.isNotifyEnabled ?? false) ...[
                         const NotificationTypeSelector(),
                         const SizedBox(height: 16),
@@ -963,7 +953,8 @@ class RepeatingConfigWidget extends StatelessWidget {
                     final selected = await showDatePicker(
                       context: context,
                       initialDate: taskVM.taskStartDate,
-                      firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(Duration(days: 365)),
+                      firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate))
+                          .subtract(Duration(days: 365)),
                       lastDate: DateTime(2100),
                     );
                     if (selected != null) {
@@ -1300,9 +1291,18 @@ class ReminderTimesBottomSheet extends StatelessWidget {
     final taskVM = Provider.of<TaskViewModel>(context);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final mediaQuery = MediaQuery.of(context);
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: 24 + mediaQuery.viewInsets.bottom, // Handle keyboard
+      ),
+      constraints: BoxConstraints(
+        maxHeight: mediaQuery.size.height * 0.7, // Maximum 70% of screen height
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1329,43 +1329,48 @@ class ReminderTimesBottomSheet extends StatelessWidget {
               color: colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 24),
-          if (taskVM.reminderTimesList.isEmpty)
-            Center(
-              child: Text(
-                'No reminders set',
-                style: textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            )
-          else
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: taskVM.reminderTimesList.map((time) {
-                return InputChip(
-                  label: Text(time.format(context)),
-                  avatar: const Icon(Icons.access_time, size: 16),
-                  deleteIcon: const Icon(Icons.close, size: 16),
-                  onDeleted: () => taskVM.removeReminderTime(time),
-                  onPressed: () async {
-                    final newTime = await showTimePicker(
-                      context: context,
-                      initialTime: time,
-                    );
-                    if (newTime != null) {
-                      taskVM.updateReminderTime(time, newTime);
-                    }
-                  },
-                  backgroundColor: colorScheme.surfaceVariant,
-                  side: BorderSide.none,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                );
-              }).toList(),
-            ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
+          Flexible(
+            child: taskVM.reminderTimesList.isEmpty
+                ? Center(
+                    child: Text(
+                      'No reminders set',
+                      style: textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  )
+                : SingleChildScrollView(
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: taskVM.reminderTimesList.map((time) {
+                        return InputChip(
+                          label: Text(time.format(context)),
+                          avatar: const Icon(Icons.access_time, size: 16),
+                          deleteIcon: const Icon(Icons.close, size: 16),
+                          onDeleted: () => taskVM.removeReminderTime(time),
+                          onPressed: () async {
+                            final newTime = await showTimePicker(
+                              context: context,
+                              initialTime: time,
+                            );
+                            if (newTime != null) {
+                              taskVM.updateReminderTime(time, newTime);
+                            }
+                          },
+                          backgroundColor: colorScheme.surfaceVariant,
+                          side: BorderSide.none,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+          ),
+          const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(

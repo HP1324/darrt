@@ -7,6 +7,7 @@ import 'package:minimaltodo/views/pages/navigation/calendar_page.dart';
 import 'package:minimaltodo/views/pages/navigation/categories_page.dart';
 import 'package:minimaltodo/views/pages/navigation/finished_tasks_page.dart';
 import 'package:minimaltodo/views/pages/navigation/pending_tasks_page.dart';
+import 'package:minimaltodo/views/pages/navigation/wishlist_page.dart';
 import 'package:minimaltodo/views/pages/task_editor_page.dart';
 import 'package:minimaltodo/views/widgets/app_drawer.dart';
 import 'package:minimaltodo/views/widgets/mini_app_bar.dart';
@@ -33,7 +34,7 @@ class _HomeState extends State<Home> {
           drawer: const AppDrawer(),
           body: [
             const CalendarPage(),
-            const PendingTasksPage(),
+            const WishListPage(),
             const CategoriesPage(),
           ][navVM.currentDestination],
           floatingActionButton: _FloatingActionButtonWidget(),
@@ -53,7 +54,7 @@ class _BottomNavBarWidget extends StatelessWidget {
         children: [
           // const SizedBox.shrink(),
           MiniBottomNavBarItem(icon: Icons.calendar_month, label: 'Calendar', i: 0),
-          MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Pending', i: 1),
+          MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Wishlist', i: 1),
           MiniBottomNavBarItem(icon: Icons.search, label: 'Search', i: -1),
           MiniBottomNavBarItem(icon: Iconsax.category, label: 'Categories', i: 2),
           MiniBottomNavBarItem(icon: Iconsax.note, label: 'Notes', i: -2),

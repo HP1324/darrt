@@ -219,7 +219,7 @@ class ScrollableDateBar extends StatelessWidget {
                     ? colorScheme.primary
                     : isToday
                         ? colorScheme.primaryContainer
-                        : colorScheme.primary.withAlpha(20),
+                        : colorScheme.primary.withAlpha(14),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
@@ -245,9 +245,7 @@ class ScrollableDateBar extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: isSelected
                             ? colorScheme.primaryContainer.withAlpha(150)
-                            : isToday
-                                ? colorScheme.primary.withAlpha(100)
-                                : colorScheme.surfaceContainerHighest.withAlpha(150),
+                            : colorScheme.primary.withAlpha(20),
                       ),
                       child: Center(
                         child: Text(
