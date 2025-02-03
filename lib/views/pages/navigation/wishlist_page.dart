@@ -237,6 +237,7 @@ class WishListPage extends StatelessWidget {
   ) {
     final isSelected = viewModel.selectedIds.contains(wishList.id);
     final isEditing = viewModel.editingWishList?.id == wishList.id;
+    final colorScheme = Theme.of(context).colorScheme;
 
     if (isEditing) {
       return _buildEditingItem(context, viewModel, wishList);
@@ -246,14 +247,12 @@ class WishListPage extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       elevation: 0,
       color: isSelected
-          ? Theme.of(context).colorScheme.primary.withAlpha(12)
-          : Theme.of(context).colorScheme.surface,
+          ? colorScheme.inverseSurface.withAlpha(10)
+          : colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: isSelected
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.outline.withAlpha(20),
+          color: isSelected ? colorScheme.primary : colorScheme.outlineVariant,
           width: isSelected ? 2 : 1,
         ),
       ),
@@ -268,8 +267,8 @@ class WishListPage extends StatelessWidget {
                 decoration:
                     wishList.isFulfilled ? TextDecoration.lineThrough : null,
                 color: wishList.isFulfilled
-                    ? Theme.of(context).colorScheme.outline
-                    : null,
+                    ? colorScheme.outline
+                    : colorScheme.onSurface,
               ),
         ),
         selected: isSelected,
