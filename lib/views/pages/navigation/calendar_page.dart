@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
@@ -227,7 +228,7 @@ class ScrollableDateBar extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      DateFormat('EEE').format(date),
+                      formatDateWith(date, 'EEE'),
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                             color: isSelected
                                 ? colorScheme.onPrimary

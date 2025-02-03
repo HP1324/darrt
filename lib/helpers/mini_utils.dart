@@ -95,7 +95,6 @@ String formatDateWith(DateTime dateTime, String format) {
   return DateFormat(format).format(dateTime);
 }
 
-const gap = SizedBox(height: 20, width: 10);
 
 final Logger logger = Logger();
 

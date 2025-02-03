@@ -10,7 +10,6 @@ class DatabaseService {
       color TEXT
     )
   """;
-
   static const createTasksTable = """CREATE TABLE tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT,
@@ -34,7 +33,6 @@ class DatabaseService {
         FOREIGN KEY(categoryId) REFERENCES categories (id) ON DELETE SET DEFAULT
       )
   """;
-
   static const createStatsTable = """CREATE TABLE stats (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT NOT NULL,
@@ -46,6 +44,13 @@ class DatabaseService {
         low_tasks INTEGER NOT NULL
       )
   """;
+  static const createWishlistTable =  '''CREATE TABLE wishlists (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  isFulfilled INTEGER DEFAULT 0,
+  createdAt TEXT DEFAULT CURRENT_TIMESTAMP
+  )
+  ''';
 
   static const createDefaultCategories =
       """INSERT INTO categories (name, icon_code) VALUES
@@ -65,9 +70,7 @@ class DatabaseService {
     ('Food', 'utensils'),
     ('Friends', 'people'),
     ('Family', 'home'),
-    ('Chores', 'task'),
-    ('Projects', 'chart'),
-    ('Entertainment', 'video')
+    ('Projects', 'chart')
   """;
 
   static Future<Database> openDb() async {
@@ -80,14 +83,7 @@ class DatabaseService {
           await txn.execute(createTasksTable);
           await txn.execute(createStatsTable);
           await txn.execute(createDefaultCategories);
-          await txn.execute('''
-            CREATE TABLE IF NOT EXISTS wishlists (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              title TEXT NOT NULL,
-              isFulfilled INTEGER DEFAULT 0,
-              createdAt TEXT DEFAULT CURRENT_TIMESTAMP
-            )
-          ''');
+          await txn.execute(createWishlistTable);
         });
       },
       onConfigure: (database) async {
