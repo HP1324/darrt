@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/services/database_service.dart';
 import 'package:sqflite/sqflite.dart';
@@ -57,14 +58,14 @@ class TaskService {
     return result;
   }
 
-  static Future<List<bool>> editTaskListAfterEdit(List<Task> tasks, CategoryModel category) async {
+  static Future<List<bool>> editTaskCategoryAfterEdit(List<Task> tasks, CategoryModel category) async {
     final database = await DatabaseService.openDb();
     List<bool> results= [];
     try {
       await database.transaction((txn) async {
         for (var task in tasks) {
           final categoryMap = {'categoryName' : category.name,
-            'catIonCode' : category.iconCode,
+            'catIconCode' : category.iconCode,
             'categoryColor' : category.color };
           final changes = await txn.update(
               'tasks', categoryMap, where: 'id = ? AND categoryId = ?',
@@ -73,7 +74,7 @@ class TaskService {
         }
       });
     }catch(e){
-      logger.e('An Exception or Error occurred while editing task category colors in database: ${e.toString()}');
+      logger.e('An Exception or Error occurred while editing task category color in database: ${e.toString()}');
     }
     return results;
   }
@@ -98,8 +99,8 @@ class TaskService {
           where: 'id = ?', whereArgs: [id]);
       return changes;
     } catch (e, stacktrace) {
-      logger.e('Failed to update notification status: ${e.toString()}');
-      logger.t('This is stacktrace: $stacktrace');
+      MiniLogger.error('Failed to update notification status: ${e.toString()}');
+      MiniLogger.trace(stacktrace.toString());
     }
     return changes;
   }

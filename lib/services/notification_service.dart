@@ -224,6 +224,12 @@ class NotificationService {
     }
   }
 
+  static int generateNotificationId(Task task, DateTime date, TimeOfDay time) {
+    return task.id! * 1000000 +
+        (date.month * 100 + date.day) * 100 +
+        (time.hour * 60 + time.minute);
+  }
+
   static Future<void> _scheduleWeeklyNotification(
     Task task,
     int weekday,
@@ -231,20 +237,22 @@ class NotificationService {
     DateTime baseDateTime,
   ) async {
     try {
-      // Calculate next occurrence of this weekday
       var notifyDate = baseDateTime;
       while (notifyDate.weekday != weekday) {
         notifyDate = notifyDate.add(const Duration(days: 1));
       }
 
-      // Check if date is within end date if specified
       if (task.endDate != null && notifyDate.isAfter(task.endDate!)) {
         return;
       }
 
+      final notificationId =
+          generateNotificationId(task, notifyDate, reminderTime);
+
       await _notif.createNotification(
         content: NotificationContent(
-          id: (task.id! * 1000) + (weekday * 10) + reminderTime.hour,
+          id: notificationId,
+          groupKey: task.id!.toString(),
           channelKey: task.notifType == 'alarm' ? 'task_alarm' : 'task_notif',
           title: 'Repeating Task Reminder',
           body: task.title,
@@ -286,17 +294,13 @@ class NotificationService {
     DateTime baseDateTime,
   ) async {
     try {
-      // Calculate next occurrence of this date in the month
-      var notifyDate = baseDateTime;
-
-      // Check if date is within end date if specified
-      if (task.endDate != null && notifyDate.isAfter(task.endDate!)) {
-        return;
-      }
+      final notificationId =
+          generateNotificationId(task, baseDateTime, reminderTime);
 
       await _notif.createNotification(
         content: NotificationContent(
-          id: (task.id! * 1000) + (baseDateTime.day * 10) + reminderTime.hour,
+          id: notificationId,
+          groupKey: task.id!.toString(),
           channelKey: task.notifType == 'alarm' ? 'task_alarm' : 'task_notif',
           title: 'Monthly Task Reminder',
           body: task.title,
@@ -306,7 +310,7 @@ class NotificationService {
           criticalAlert: true,
         ),
         schedule: NotificationCalendar(
-          day: baseDateTime.day, // Same day each month
+          day: baseDateTime.day,
           hour: reminderTime.hour,
           minute: reminderTime.minute,
           second: 0,
@@ -338,20 +342,13 @@ class NotificationService {
     DateTime baseDateTime,
   ) async {
     try {
-      // Calculate next occurrence of this date in the year
-      var notifyDate = baseDateTime;
-
-      // Check if date is within end date if specified
-      if (task.endDate != null && notifyDate.isAfter(task.endDate!)) {
-        return;
-      }
+      final notificationId =
+          generateNotificationId(task, baseDateTime, reminderTime);
 
       await _notif.createNotification(
         content: NotificationContent(
-          id: (task.id! * 1000) +
-              (baseDateTime.month * 100) +
-              (baseDateTime.day * 10) +
-              reminderTime.hour,
+          id: notificationId,
+          groupKey: task.id!.toString(),
           channelKey: task.notifType == 'alarm' ? 'task_alarm' : 'task_notif',
           title: 'Yearly Task Reminder',
           body: task.title,
@@ -361,8 +358,8 @@ class NotificationService {
           criticalAlert: true,
         ),
         schedule: NotificationCalendar(
-          month: baseDateTime.month, // Same month each year
-          day: baseDateTime.day, // Same day each month
+          month: baseDateTime.month,
+          day: baseDateTime.day,
           hour: reminderTime.hour,
           minute: reminderTime.minute,
           second: 0,
@@ -398,6 +395,21 @@ class NotificationService {
     } catch (e) {
       MiniLogger.error('Failed to remove task notification: ${e.toString()}');
       rethrow;
+    }
+  }
+
+  static Future<void> removeRepeatingTaskNotifications(Task task) async {
+    if (task.id == null) return;
+
+    try {
+      // Cancel all notifications for this task using the group key
+      await AwesomeNotifications()
+          .cancelNotificationsByGroupKey(task.id!.toString());
+
+      // Log the cancellation for debugging
+      logger.d('Cancelled all notifications for task ${task.id}');
+    } catch (e) {
+      logger.e('Error removing recurring notifications: $e');
     }
   }
 }
