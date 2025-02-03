@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/single_task_view.dart';
@@ -29,6 +30,7 @@ class TaskItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<TaskViewModel>(builder: (context, taskViewModel, _) {
+      MiniLogger.debug('Task repeat settings: ${task.repeatConfig ?? 'No repeat config'}');
       return GestureDetector(
         onLongPress: onLongPress,
         child: SelectableTaskItem(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/services/notification_service.dart';
@@ -347,7 +348,7 @@ class TaskViewModel extends ChangeNotifier {
         );
       }).toList();
     } catch (e) {
-      logger.e('Error decoding reminderTimes: $e');
+      MiniLogger.error('Error decoding reminderTimes: $e');
       return [];
     }
   }
@@ -591,7 +592,7 @@ class TaskViewModel extends ChangeNotifier {
           jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
       if (config['repeatType'] != 'weekly') return;
 
-      var days = List<int>.from(config['selectedDays'] ?? []);
+      var days = List.from(config['selectedDays'] ?? []);
       days.removeWhere((weekday) => !isWeekdayValid(weekday));
 
       config['selectedDays'] = days;
