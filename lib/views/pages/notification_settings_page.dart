@@ -1,7 +1,6 @@
-import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minimaltodo/global_utils.dart';
+import 'package:minimaltodo/helpers/mini_utils.dart';
 
 class NotificationSettingsPage extends StatefulWidget {
   const NotificationSettingsPage({super.key});
@@ -34,18 +33,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     setState(() {});
   }
 
-  Future<void> _openSoundSettings() async {
-   AndroidIntent intent = AndroidIntent(
-     action: 'android.intent.action.RINGTONE_PICKER',
-     arguments: {
-       'android.intent.extra.ringtone.TYPE': 'all', // You can specify the type: 'alarm', 'notification', 'ringtone', or 'all'
-       'android.intent.extra.ringtone.SHOW_DEFAULT': true,
-       'android.intent.extra.ringtone.SHOW_SILENT': true,
-       'android.intent.extra.ringtone.TITLE': 'Select Sound',
-     }
-   );
-   await intent.launch();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +130,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                       color: colorScheme.primary,
                     ),
                     onTap: ()async{
-                     await _openSoundSettings();
                     }
                   ),
 
