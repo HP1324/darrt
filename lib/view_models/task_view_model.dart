@@ -29,13 +29,14 @@ class TaskViewModel extends ChangeNotifier {
       startDate: DateTime.now(),
       isRepeating: false,
       isNotifyEnabled: false,
+      repeatConfig: '{"repeatType":"weekly","selectedDays":[1,2,3,4,5,6,7]}',
     );
 
     selectedMinutes = 0;
     titleController.clear();
 
     // No need to reset these as they're now handled through currentTask
-    currentTask.repeatConfig = null;
+    // currentTask.repeatConfig = null;
     currentTask.reminderTimes = null;
   }
 
@@ -253,7 +254,7 @@ class TaskViewModel extends ChangeNotifier {
       } else {
         days.add(weekday);
       }
-
+      days.sort();
       config['selectedDays'] = days;
       currentTask.repeatConfig = jsonEncode(config);
       notifyListeners();
@@ -362,7 +363,7 @@ class TaskViewModel extends ChangeNotifier {
         }
       }
 
-      final id = await TaskService.addTask(currentTask);
+      final id = await TaskService().addTask(currentTask);
       currentTask.id = id;
       _refreshTasks();
 
@@ -450,7 +451,7 @@ class TaskViewModel extends ChangeNotifier {
         // Update the task's finishDates in memory
         // task.finishDates = finishDatesJsonString;
         
-        MiniLogger.info('Selected date task status: ${finishDates[selectedDateString]}');
+        MiniLogger.debug('Selected date task status: ${finishDates[selectedDateString]}');
         // notifyListeners(); // Notify UI of changes
         _refreshTasks();
         return changes;
@@ -590,7 +591,7 @@ class TaskViewModel extends ChangeNotifier {
 
   String? get finishDates => currentTask.finishDates;
   String? get repeatType {
-    if (currentTask.repeatConfig == null) return null;
+    if (currentTask.repeatConfig == null) return 'weekly';
     try {
       final config = jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
       return config['repeatType'] as String?;
@@ -601,7 +602,7 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   List<int> get selectedWeekdays {
-    if (currentTask.repeatConfig == null) return [];
+    if (currentTask.repeatConfig == null) return [1,2,3,4,5,6,7];
     try {
       final config = jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
       if (config['repeatType'] == 'weekly' && config['selectedDays'] is List) {
