@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -42,11 +43,25 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
   Widget build(BuildContext context) {
     return Consumer2<TaskViewModel,CalendarViewModel>(builder: (context, tvm,calendarVM, __) {
       final isUrgent = widget.task.priority?.toLowerCase() == 'urgent';
-      final finishDates = jsonDecode(tvm.finishDates ?? '{}');
-      final dateOnly = DateTime(calendarVM.selectedDate.year, calendarVM.selectedDate.month,calendarVM.selectedDate.day);
-      MiniLogger.debug('Date Only: ${dateOnly.toIso8601String()}');
-      bool isFinishedForDate = finishDates[dateOnly.toIso8601String()] ?? true;
-      MiniLogger.debug('Finish dates: $finishDates');
+      bool isFinishedForDate = false;
+      
+      if (widget.task.isRepeating!) {
+        try {
+          final finishDates = jsonDecode(widget.task.finishDates ?? '{}');
+          final dateOnly = DateTime(
+            calendarVM.selectedDate.year, 
+            calendarVM.selectedDate.month,
+            calendarVM.selectedDate.day
+          );
+          isFinishedForDate = finishDates[dateOnly.toIso8601String()] ?? false;
+          MiniLogger.debug('Date: ${dateOnly.toIso8601String()}, Finished: $isFinishedForDate');
+        } catch (e) {
+          MiniLogger.error('Error parsing finishDates: $e');
+          isFinishedForDate = false;
+        }
+      } else {
+        isFinishedForDate = widget.task.isDone ?? false;
+      }
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
@@ -80,13 +95,9 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        value: !widget.task.isRepeating! ? _isChecked : isFinishedForDate,
+                        value: isFinishedForDate,
                         onChanged: (value) {
                           if (widget.onStatusChanged != null) {
-                            setState(() {
-                              _isChecked = value!;
-                              isFinishedForDate = value;
-                            });
                             widget.onStatusChanged!(value ?? false);
                           }
                         },
@@ -200,7 +211,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                               if (widget.task.isRepeating ?? false) ...[
                                 const SizedBox(width: 4),
                                 Icon(
-                                  Icons.repeat,
+                                  FontAwesomeIcons.repeat,
                                   size: 14,
                                   color: Theme.of(context)
                                       .colorScheme
@@ -223,5 +234,3 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
     });
   }
 }
-
-
