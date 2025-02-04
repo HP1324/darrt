@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/services/category_service.dart';
+import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -36,8 +40,13 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TaskViewModel>(builder: (context, tvm, __) {
+    return Consumer2<TaskViewModel,CalendarViewModel>(builder: (context, tvm,calendarVM, __) {
       final isUrgent = widget.task.priority?.toLowerCase() == 'urgent';
+      final finishDates = jsonDecode(tvm.finishDates ?? '{}');
+      final dateOnly = DateTime(calendarVM.selectedDate.year, calendarVM.selectedDate.month,calendarVM.selectedDate.day);
+      MiniLogger.debug('Date Only: ${dateOnly.toIso8601String()}');
+      bool isFinishedForDate = finishDates[dateOnly.toIso8601String()] ?? true;
+      MiniLogger.debug('Finish dates: $finishDates');
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
@@ -71,11 +80,12 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        value: _isChecked,
+                        value: !widget.task.isRepeating! ? _isChecked : isFinishedForDate,
                         onChanged: (value) {
                           if (widget.onStatusChanged != null) {
                             setState(() {
                               _isChecked = value!;
+                              isFinishedForDate = value;
                             });
                             widget.onStatusChanged!(value ?? false);
                           }

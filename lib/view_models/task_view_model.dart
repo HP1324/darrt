@@ -50,8 +50,6 @@ class TaskViewModel extends ChangeNotifier {
     taskBeforeEdit = task;
     currentTask = task;
     titleController.text = task.title ?? '';
-
-    // No need to initialize these separately as they're now handled through getters
   }
 
   //------------------------ PROPERTIES & CONTROLLERS ------------------------//
@@ -98,8 +96,7 @@ class TaskViewModel extends ChangeNotifier {
       existingTime?.minute ?? DateTime.now().minute,
     );
     if (currentTask.dueDate != null && currentTask.isNotifyEnabled!) {
-      currentTask.notifyTime =
-          currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
+      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
     }
     updateNotifLogicAfterDueDateUpdate();
   }
@@ -114,8 +111,7 @@ class TaskViewModel extends ChangeNotifier {
       time.minute,
     );
     if (currentTask.dueDate != null && currentTask.isNotifyEnabled!) {
-      currentTask.notifyTime =
-          currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
+      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
     }
     updateNotifLogicAfterDueDateUpdate();
   }
@@ -155,15 +151,13 @@ class TaskViewModel extends ChangeNotifier {
   //------------------------ NOTIFICATION HANDLING ------------------------//
   void updateNotifLogicAfterDueDateUpdate() {
     if (currentTask.isNotifyEnabled!) {
-      if (currentTask.dueDate != null &&
-          currentTask.dueDate!.isBefore(DateTime.now())) {
+      if (currentTask.dueDate != null && currentTask.dueDate!.isBefore(DateTime.now())) {
         currentTask.isNotifyEnabled = false;
         if (currentTask.id != null) {
           NotificationService.removeTaskNotification(currentTask);
         }
       }
-      if (currentTask.notifyTime != null &&
-          !currentTask.notifyTime!.isAfter(DateTime.now())) {
+      if (currentTask.notifyTime != null && !currentTask.notifyTime!.isAfter(DateTime.now())) {
         selectedMinutes = 0;
       }
       notifyListeners();
@@ -174,8 +168,7 @@ class TaskViewModel extends ChangeNotifier {
     await NotificationService.initializeNotificationChannels();
     currentTask.isNotifyEnabled = value;
     if (currentTask.isNotifyEnabled! && currentTask.dueDate != null) {
-      currentTask.notifyTime =
-          currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
+      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
     }
     notifyListeners();
   }
@@ -183,8 +176,7 @@ class TaskViewModel extends ChangeNotifier {
   bool updateNotifyTime(int minutes) {
     selectedMinutes = minutes;
     if (currentTask.dueDate != null) {
-      final notifTime =
-          currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
+      final notifTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
       if (notifTime.isAfter(DateTime.now())) {
         currentTask.notifyTime = notifTime;
         notifyListeners();
@@ -214,7 +206,7 @@ class TaskViewModel extends ChangeNotifier {
     }
     var endDate = currentTask.endDate;
 
-    return (date.year == endDate!.year && date.month == endDate.month && date.day == endDate.day)||date.isBefore(currentTask.endDate!) ;
+    return (date.year == endDate!.year && date.month == endDate.month && date.day == endDate.day) || date.isBefore(currentTask.endDate!);
   }
 
   void setTaskStartDate(DateTime date) {
@@ -231,9 +223,7 @@ class TaskViewModel extends ChangeNotifier {
 
   void setRepeatType(String type) {
     try {
-      final config = currentTask.repeatConfig != null
-          ? jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>
-          : {};
+      final config = currentTask.repeatConfig != null ? jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic> : {};
 
       config['repeatType'] = type;
       if (type == 'weekly') {
@@ -253,8 +243,7 @@ class TaskViewModel extends ChangeNotifier {
     if (currentTask.repeatConfig == null) return;
 
     try {
-      final config =
-          jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
+      final config = jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
       if (config['repeatType'] != 'weekly') return;
 
       var days = List.from(config['selectedDays'] ?? []);
@@ -282,8 +271,7 @@ class TaskViewModel extends ChangeNotifier {
       if (times.length >= 7) return;
 
       // Convert TimeOfDay to string format
-      final timeString =
-          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+      final timeString = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
       // Check for duplicates
       if (times.contains(timeString)) return;
@@ -303,8 +291,7 @@ class TaskViewModel extends ChangeNotifier {
       );
 
       // Convert TimeOfDay to string format for comparison
-      final timeString =
-          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+      final timeString = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
       times.remove(timeString);
       currentTask.reminderTimes = jsonEncode(times);
@@ -320,10 +307,8 @@ class TaskViewModel extends ChangeNotifier {
         jsonDecode(currentTask.reminderTimes ?? '[]'),
       );
 
-      final oldTimeString =
-          '${oldTime.hour.toString().padLeft(2, '0')}:${oldTime.minute.toString().padLeft(2, '0')}';
-      final newTimeString =
-          '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}';
+      final oldTimeString = '${oldTime.hour.toString().padLeft(2, '0')}:${oldTime.minute.toString().padLeft(2, '0')}';
+      final newTimeString = '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}';
 
       final index = times.indexOf(oldTimeString);
       if (index != -1) {
@@ -366,12 +351,10 @@ class TaskViewModel extends ChangeNotifier {
         // Validate repeat configuration
         try {
           if (currentTask.repeatConfig == null) return false;
-          final config =
-              jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
+          final config = jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
           if (config['repeatType'] == 'weekly') {
             final days = List<int>.from(config['selectedDays'] ?? []);
-            if (days.isEmpty)
-              return false; // Can't create weekly task without selected days
+            if (days.isEmpty) return false; // Can't create weekly task without selected days
           }
         } catch (e) {
           MiniLogger.error('Error validating repeat config: $e');
@@ -386,8 +369,7 @@ class TaskViewModel extends ChangeNotifier {
       // Schedule notifications
       if (currentTask.isNotifyEnabled!) {
         if (currentTask.isRepeating!) {
-          await NotificationService.createRepeatingTaskNotifications(
-              currentTask);
+          await NotificationService.createRepeatingTaskNotifications(currentTask);
         } else {
           await NotificationService.createTaskNotification(currentTask);
         }
@@ -434,33 +416,65 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   Future<int> toggleStatus(Task task, bool updatedStatus, CalendarViewModel calendarVM) async {
-    if(task.isRepeating!){
-      final db= await DatabaseService.openDb();
-      Map<String,bool> finishDates = jsonDecode(task.finishDates ?? '{}');
-      final selectedDateString = calendarVM.selectedDate.toIso8601String();
-      final sDate = currentTask.startDate;
-      final eDate = currentTask.endDate;
-      finishDates[selectedDateString] = updatedStatus;
-      dynamic finishDatesJson = jsonEncode(finishDates);
-      final changes = await db.update('tasks',{'finishDates' : finishDatesJson},where: 'id = ?', whereArgs: [task.id]);
-      return changes;
-    }
+    // Consider removing this delay unless it's necessary for UI feedback
     await Future.delayed(Duration(milliseconds: 600));
-    int changesMade = 0;
-    task.isDone = updatedStatus;
-    changesMade = await TaskService.toggleDone(
-        task.id!, updatedStatus, task.isDone! ? DateTime.now() : null);
-    if (task.isDone!) {
-      await AwesomeNotifications().cancel(task.id!);
-    } else if (task.isNotifyEnabled!) {
-      if (task.isRepeating!) {
-        await NotificationService.createRepeatingTaskNotifications(task);
-      } else {
-        await NotificationService.createTaskNotification(task);
+
+    if (task.isRepeating!) {
+      final db = await DatabaseService.openDb();
+      // Consider handling the case where finishDates is invalid JSON
+      Map<String, dynamic> finishDates;
+      try {
+        finishDates = jsonDecode(task.finishDates ?? '{}');
+      } catch (e) {
+        finishDates = {};
       }
+
+      // Good practice normalizing the date to remove time components
+      final selectedDateString = DateTime(
+          calendarVM.selectedDate.year,
+          calendarVM.selectedDate.month,
+          calendarVM.selectedDate.day
+      ).toIso8601String();
+
+      finishDates[selectedDateString] = updatedStatus;
+      String finishDatesJsonString = jsonEncode(finishDates);
+
+      try {
+        final changes = await db.update(
+            'tasks',
+            {'finishDates': finishDatesJsonString},
+            where: 'id = ?',
+            whereArgs: [task.id]
+        );
+        MiniLogger.info('Selected date task status: ${finishDates[selectedDateString]}');
+        _refreshTasks();
+        return changes;
+      } catch (e) {
+        MiniLogger.error('An error occurred while updating task finish date status: $e');
+        return 0;
+      }
+    } else {
+      // Non-repeating task logic
+      task.isDone = updatedStatus;
+      int changesMade = await TaskService.toggleDone(
+          task.id!,
+          updatedStatus,
+          task.isDone! ? DateTime.now() : null
+      );
+
+      // Handle notifications
+      if (task.isDone!) {
+        await AwesomeNotifications().cancel(task.id!);
+      } else if (task.isNotifyEnabled!) {
+        if (task.isRepeating!) {  // This condition will never be true here
+          await NotificationService.createRepeatingTaskNotifications(task);
+        } else {
+          await NotificationService.createTaskNotification(task);
+        }
+      }
+      _refreshTasks();
+      return changesMade;
     }
-    _refreshTasks();
-    return changesMade;
   }
 
   //----------------------------------------------------------------------//
@@ -486,8 +500,7 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   void updateTaskListAfterEdit(CategoryModel list) async {
-    final tasksForCurrentList =
-        tasks.where((t) => t.category!.id == list.id).toList();
+    final tasksForCurrentList = tasks.where((t) => t.category!.id == list.id).toList();
     await TaskService.editTaskCategoryAfterEdit(tasksForCurrentList, list);
     _refreshTasks();
   }
@@ -566,15 +579,15 @@ class TaskViewModel extends ChangeNotifier {
   // Helper getters/setters for repeat configuration
   bool get isRepeatEnabled => currentTask.isRepeating ?? false;
 
-  DateTime get taskStartDate => currentTask.startDate ;
+  DateTime get taskStartDate => currentTask.startDate;
 
   DateTime? get taskEndDate => currentTask.endDate;
 
+  String? get finishDates => currentTask.finishDates;
   String? get repeatType {
     if (currentTask.repeatConfig == null) return null;
     try {
-      final config =
-          jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
+      final config = jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
       return config['repeatType'] as String?;
     } catch (e) {
       MiniLogger.error('Error decoding repeatType: $e');
@@ -585,10 +598,9 @@ class TaskViewModel extends ChangeNotifier {
   List<int> get selectedWeekdays {
     if (currentTask.repeatConfig == null) return [];
     try {
-      final config =
-          jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
+      final config = jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
       if (config['repeatType'] == 'weekly' && config['selectedDays'] is List) {
-        return List<int>.from(config['selectedDays']);
+        return List.from(config['selectedDays']);
       }
       return [];
     } catch (e) {
