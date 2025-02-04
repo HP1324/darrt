@@ -417,7 +417,7 @@ class TaskViewModel extends ChangeNotifier {
 
   Future<int> toggleStatus(Task task, bool updatedStatus, CalendarViewModel calendarVM) async {
     // Consider removing this delay unless it's necessary for UI feedback
-    await Future.delayed(Duration(milliseconds: 600));
+    // await Future.delayed(Duration(milliseconds: 600));
 
     if (task.isRepeating!) {
       final db = await DatabaseService.openDb();
@@ -446,7 +446,12 @@ class TaskViewModel extends ChangeNotifier {
             where: 'id = ?',
             whereArgs: [task.id]
         );
+        
+        // Update the task's finishDates in memory
+        // task.finishDates = finishDatesJsonString;
+        
         MiniLogger.info('Selected date task status: ${finishDates[selectedDateString]}');
+        // notifyListeners(); // Notify UI of changes
         _refreshTasks();
         return changes;
       } catch (e) {

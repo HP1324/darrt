@@ -33,7 +33,7 @@ class TaskService {
       Map<String, dynamic> finishDates = {};
       var startDate = task.startDate;
       final endDate = task.endDate;
-      final lastDate = endDate == null ? DateTime.now().add(Duration(days: 3650)) : endDate.add(Duration(days: 1));
+      final lastDate = endDate == null ? DateTime.now().add(Duration(days: 18264)) : endDate.add(Duration(days: 1));
       MiniLogger.debug('Start Date: $startDate, Last Date: $lastDate');
 
         while (startDate.isBefore(lastDate)) {
