@@ -30,8 +30,7 @@ class _CalendarPageState extends State<CalendarPage> {
     super.deactivate();
   }
 
-  void _deleteSelectedTasks(BuildContext context, TaskViewModel taskVM,
-      CalendarViewModel calendarVM) {
+  void _deleteSelectedTasks(BuildContext context, TaskViewModel taskVM, CalendarViewModel calendarVM) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -65,115 +64,103 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Consumer2<TaskViewModel, CalendarViewModel>(
       builder: (context, taskVM, calendarVM, _) {
-        MiniLogger.debug('Selected Date in calendar: ${calendarVM.selectedDate}');
+        final tasks = taskVM.tasks.where((task) => task.dueDate != null).toList();
+        final filteredTasks = calendarVM.filterTasks(tasks);
 
-        final scheduledTasks = taskVM.tasks.where((task) => task.dueDate != null).toList();
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (calendarVM.isSelectionMode)
-              ListTile(
-                leading: IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: calendarVM.clearSelection,
-                ),
-                title: Text('${calendarVM.selectedTaskIds.length} selected'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () => _deleteSelectedTasks(context, taskVM, calendarVM),
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
-              child: Text(
-               formatDateWith(calendarVM.selectedDate, 'EEE, d MMM, yyyy'),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
-              ),
-            ),
-            ScrollableDateBar(
-              calendarVM: calendarVM,
-              onDateSelected: calendarVM.setSelectedDate,
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.only(top: 16),
-                children: [
-                  Builder(
-                    builder: (context) {
-                      final tasksForSelectedDate = calendarVM.getTasksForDate(
-                        calendarVM.selectedDate,
-                        taskVM.tasks,
-                      );
-
-                      if (tasksForSelectedDate.isEmpty) {
-                        return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(32.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Iconsax.calendar_1,
-                                  size: 64,
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'No tasks scheduled for this day',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Tap the + button to add a new task',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }
-
-                      return Column(
-                        children: tasksForSelectedDate
-                            .map((task) => TaskItem(
-                                  key: ValueKey(
-                                      '${task.id}_${task.isDone}_${calendarVM.selectedDate}'),
-                                  task: task,
-                                  isSelected: calendarVM.selectedTaskIds
-                                      .contains(task.id),
-                                  isSelectionMode: calendarVM.isSelectionMode,
-                                  onLongPress: () =>
-                                      calendarVM.toggleTaskSelection(task),
-                                  onSelect: (_) =>
-                                      calendarVM.toggleTaskSelection(task),
-                                ))
-                            .toList(),
-                      );
-                    },
+        return Scaffold(
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (calendarVM.isSelectionMode)
+                ListTile(
+                  leading: IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: calendarVM.clearSelection,
                   ),
-                ],
+                  title: Text('${calendarVM.selectedTaskIds.length} selected'),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () => _deleteSelectedTasks(context, taskVM, calendarVM),
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                child: Row(
+                  children: [
+                    Text(
+                      formatDateWith(calendarVM.selectedDate, 'EEE, d MMM, yyyy'),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                    ),
+                    const Spacer(),
+                    // Task type toggle
+                    InkWell(
+                      onTap: calendarVM.cycleTaskFilter,
+                      borderRadius: BorderRadius.circular(4), // Optional, for ripple effect shaping
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                        decoration: BoxDecoration(),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              calendarVM.getTaskFilterIcon(),
+                              size: 18,
+                            ),
+                            const SizedBox(width: 4), // Space between icon and text
+                            Text(
+                              calendarVM.getTaskFilterLabel(),
+                              style: Theme.of(context).textTheme.labelMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              ScrollableDateBar(
+                calendarVM: calendarVM,
+                onDateSelected: calendarVM.setSelectedDate,
+              ),
+              Expanded(
+                child: filteredTasks.isEmpty
+                    ? Center(
+                        child: Text(
+                          switch (calendarVM.taskFilter) {
+                            TaskFilterType.all => 'No tasks',
+                            TaskFilterType.single => 'No single tasks',
+                            TaskFilterType.recurring => 'No recurring tasks',
+                          },
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                        ),
+                      )
+                    : ListView.builder(
+                        controller: calendarVM.listScrollController,
+                        itemCount: filteredTasks.length,
+                        itemBuilder: (context, index) {
+                          final task = filteredTasks[index];
+                          return TaskItem(
+                            key: ValueKey('task_${task.id}'),
+                            task: task,
+                            onLongPress: () => calendarVM.toggleTaskSelection(task),
+                            isSelected: calendarVM.selectedTaskIds.contains(task.id),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+          floatingActionButton: calendarVM.isFabVisible
+              ? FloatingActionButton(
+                  onPressed: () => Navigator.pushNamed(context, '/task/new'),
+                  child: const Icon(Icons.add),
+                )
+              : null,
         );
       },
     );
@@ -198,7 +185,7 @@ class ScrollableDateBar extends StatelessWidget {
     return SizedBox(
       height: 80,
       child: ListView.builder(
-        controller: calendarVM.scrollController,
+        controller: calendarVM.dateScrollController,
         scrollDirection: Axis.horizontal,
         itemExtent: calendarVM.dateItemWidth,
         physics: const BouncingScrollPhysics(),
@@ -244,22 +231,19 @@ class ScrollableDateBar extends StatelessWidget {
                       height: 32,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isSelected
-                            ? colorScheme.primaryContainer.withAlpha(150)
-                            : colorScheme.primary.withAlpha(20),
+                        color: isSelected ? colorScheme.primaryContainer.withAlpha(150) : colorScheme.primary.withAlpha(20),
                       ),
                       child: Center(
                         child: Text(
                           date.day.toString(),
-                          style:
-                              Theme.of(context).textTheme.labelMedium?.copyWith(
-                                    color: isSelected
-                                        ? colorScheme.onPrimary
-                                        : isToday
-                                            ? colorScheme.onPrimaryContainer
-                                            : colorScheme.onSurfaceVariant,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                color: isSelected
+                                    ? colorScheme.onPrimary
+                                    : isToday
+                                        ? colorScheme.onPrimaryContainer
+                                        : colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ),

@@ -1,4 +1,3 @@
-
 const mFirstInstallDate = 'first_install_date';
 //Preference constants
 const mFirstTimeInstall = 'first_time_install';
@@ -8,3 +7,6 @@ const mFirstTimeNotifPermission = 'first_time_notif';
 const mChannelsInit = 'channels_init';
 ///Whether or not the notifications are enabled
 const mNotificationsEnabled = 'notifications_enabled';
+
+// Task Filter Preference
+const String mTaskFilterPreference = 'task_filter_preference';

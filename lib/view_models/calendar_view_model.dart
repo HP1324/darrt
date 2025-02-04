@@ -5,16 +5,26 @@ import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_storage.dart';
 import 'dart:convert';
 
+enum TaskFilterType { all, single, recurring }
+
 class CalendarViewModel extends ChangeNotifier {
   DateTime _selectedDate = DateTime.now();
   final Set<int> _selectedTaskIds = {};
   bool _isSelectionMode = false;
-  final ScrollController scrollController = ScrollController();
+  bool _isFabVisible = true;
+  
+  // Task filter state
+  TaskFilterType _taskFilter;
+  
+  final ScrollController dateScrollController = ScrollController();
+  final ScrollController listScrollController = ScrollController();
   final double dateItemWidth = 48.0;
   double? _savedScrollPosition;
   DateTime get selectedDate => _selectedDate;
   Set<int> get selectedTaskIds => _selectedTaskIds;
   bool get isSelectionMode => _isSelectionMode;
+  bool get isFabVisible => _isFabVisible;
+  TaskFilterType get taskFilter => _taskFilter;
 
   // Initialize dates range
   final DateTime initialDate = DateTime.parse(MiniBox.read(mFirstInstallDate))
@@ -27,17 +37,73 @@ class CalendarViewModel extends ChangeNotifier {
     (index) => initialDate.add(Duration(days: index)),
   );
   bool _isInitialized = false;
-  CalendarViewModel() {
+  CalendarViewModel() : _taskFilter = TaskFilterType.values[MiniBox.read(mTaskFilterPreference) ?? 0] {
     MiniLogger.debug('Is scroll controller initialized: $_isInitialized');
     // Initialize scroll position to today's date after frame is rendered
     if (!_isInitialized) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (scrollController.hasClients) {
+        if (dateScrollController.hasClients) {
           scrollToDate(DateTime.now(), animate: false);
         }
       });
       _isInitialized = true;
+      
+      // Add scroll listener for FAB visibility
+      listScrollController.addListener(_handleScroll);
     }
+  }
+
+  double? _lastScrollPosition;
+  void _handleScroll() {
+    final currentPosition = listScrollController.position.pixels;
+    if (_lastScrollPosition != null) {
+      // Show FAB when scrolling up, hide when scrolling down
+      final isScrollingUp = currentPosition < _lastScrollPosition!;
+      if (isScrollingUp != _isFabVisible) {
+        _isFabVisible = isScrollingUp;
+        notifyListeners();
+      }
+    }
+    _lastScrollPosition = currentPosition;
+  }
+
+  void cycleTaskFilter() {
+    final values = TaskFilterType.values;
+    final nextIndex = (values.indexOf(_taskFilter) + 1) % values.length;
+    _taskFilter = values[nextIndex];
+    MiniBox.write(mTaskFilterPreference, nextIndex);
+    notifyListeners();
+  }
+
+  String getTaskFilterLabel() {
+    switch (_taskFilter) {
+      case TaskFilterType.all:
+        return 'All Tasks';
+      case TaskFilterType.single:
+        return 'Single';
+      case TaskFilterType.recurring:
+        return 'Recurring';
+    }
+  }
+
+  IconData getTaskFilterIcon() {
+    switch (_taskFilter) {
+      case TaskFilterType.all:
+        return Icons.list;
+      case TaskFilterType.single:
+        return Icons.event;
+      case TaskFilterType.recurring:
+        return Icons.repeat;
+    }
+  }
+
+  List<Task> filterTasks(List<Task> tasks) {
+    if (_taskFilter == TaskFilterType.all) {
+      return tasks;
+    }
+    return tasks.where((task) => 
+      task.isRepeating == (_taskFilter == TaskFilterType.recurring)
+    ).toList();
   }
 
   void setSelectedDate(DateTime date) {
@@ -73,27 +139,27 @@ class CalendarViewModel extends ChangeNotifier {
     final index = dates.indexWhere((d) => isSameDay(d, date));
     if (index != -1) {
       if (animate) {
-        scrollController.animateTo(
+        dateScrollController.animateTo(
           index * dateItemWidth,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
         );
       } else {
-        scrollController.jumpTo(index * dateItemWidth);
+        dateScrollController.jumpTo(index * dateItemWidth);
       }
       setSelectedDate(date);
     }
   }
 
   void saveScrollPosition() {
-    if (scrollController.hasClients) {
-      _savedScrollPosition = scrollController.position.pixels;
+    if (dateScrollController.hasClients) {
+      _savedScrollPosition = dateScrollController.position.pixels;
     }
   }
 
   void restoreScrollPosition() {
-    if (_savedScrollPosition != null && scrollController.hasClients) {
-      scrollController.jumpTo(_savedScrollPosition!);
+    if (_savedScrollPosition != null && dateScrollController.hasClients) {
+      dateScrollController.jumpTo(_savedScrollPosition!);
     }
   }
 
@@ -154,7 +220,9 @@ class CalendarViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    scrollController.dispose();
+    dateScrollController.dispose();
+    listScrollController.removeListener(_handleScroll);
+    listScrollController.dispose();
     super.dispose();
   }
 }
