@@ -220,7 +220,7 @@ class NotificationService {
         }
       }
     } catch (e) {
-      logger.e('Error scheduling repeating notifications: $e');
+      MiniLogger.error('Error scheduling repeating notifications: $e');
     }
   }
 
@@ -284,7 +284,7 @@ class NotificationService {
         ],
       );
     } catch (e) {
-      logger.e('Error scheduling weekly notification: $e');
+      MiniLogger.error('Error scheduling weekly notification: $e');
     }
   }
 
@@ -332,7 +332,7 @@ class NotificationService {
         ],
       );
     } catch (e) {
-      logger.e('Error scheduling monthly notification: $e');
+      MiniLogger.error('Error scheduling monthly notification: $e');
     }
   }
 
@@ -381,7 +381,7 @@ class NotificationService {
         ],
       );
     } catch (e) {
-      logger.e('Error scheduling yearly notification: $e');
+      MiniLogger.error('Error scheduling yearly notification: $e');
     }
   }
 
@@ -409,7 +409,7 @@ class NotificationService {
       // Log the cancellation for debugging
       logger.d('Cancelled all notifications for task ${task.id}');
     } catch (e) {
-      logger.e('Error removing recurring notifications: $e');
+      MiniLogger.error('Error removing recurring notifications: $e');
     }
   }
 }

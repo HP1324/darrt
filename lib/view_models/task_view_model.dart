@@ -7,9 +7,11 @@ import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/services/category_service.dart';
+import 'package:minimaltodo/services/database_service.dart';
 import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/services/stats_service.dart';
 import 'package:minimaltodo/services/task_service.dart';
+import 'package:minimaltodo/view_models/calendar_view_model.dart';
 
 class TaskViewModel extends ChangeNotifier {
   //------------------------ INITIALIZATION ------------------------//
@@ -206,13 +208,13 @@ class TaskViewModel extends ChangeNotifier {
 
     // Calculate the next occurrence of this weekday
     var date = currentTask.startDate;
+
     while (date.weekday != weekday) {
       date = date.add(const Duration(days: 1));
     }
+    var endDate = currentTask.endDate;
 
-    // Check if this weekday occurs between start and end dates
-    return date.isBefore(currentTask.endDate!) ||
-        date.isAtSameMomentAs(currentTask.endDate!);
+    return (date.year == endDate!.year && date.month == endDate.month && date.day == endDate.day)||date.isBefore(currentTask.endDate!) ;
   }
 
   void setTaskStartDate(DateTime date) {
@@ -231,11 +233,11 @@ class TaskViewModel extends ChangeNotifier {
     try {
       final config = currentTask.repeatConfig != null
           ? jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>
-          : <String, dynamic>{};
+          : {};
 
       config['repeatType'] = type;
       if (type == 'weekly') {
-        config['selectedDays'] = <int>[];
+        config['selectedDays'] = [];
       } else {
         config.remove('selectedDays');
       }
@@ -243,7 +245,7 @@ class TaskViewModel extends ChangeNotifier {
       currentTask.repeatConfig = jsonEncode(config);
       notifyListeners();
     } catch (e) {
-      logger.e('Error setting repeat type: $e');
+      MiniLogger.error('Error setting repeat type: $e');
     }
   }
 
@@ -267,13 +269,13 @@ class TaskViewModel extends ChangeNotifier {
       currentTask.repeatConfig = jsonEncode(config);
       notifyListeners();
     } catch (e) {
-      logger.e('Error toggling weekday: $e');
+      MiniLogger.error('Error toggling weekday: $e');
     }
   }
 
   void addReminderTime(TimeOfDay time) {
     try {
-      final List<String> times = List<String>.from(
+      final List<String> times = List.from(
         jsonDecode(currentTask.reminderTimes ?? '[]'),
       );
 
@@ -290,13 +292,13 @@ class TaskViewModel extends ChangeNotifier {
       currentTask.reminderTimes = jsonEncode(times);
       notifyListeners();
     } catch (e) {
-      logger.e('Error adding reminder time: $e');
+      MiniLogger.error('Error adding reminder time: $e');
     }
   }
 
   void removeReminderTime(TimeOfDay time) {
     try {
-      final List<String> times = List<String>.from(
+      final List<String> times = List.from(
         jsonDecode(currentTask.reminderTimes ?? '[]'),
       );
 
@@ -308,13 +310,13 @@ class TaskViewModel extends ChangeNotifier {
       currentTask.reminderTimes = jsonEncode(times);
       notifyListeners();
     } catch (e) {
-      logger.e('Error removing reminder time: $e');
+      MiniLogger.error('Error removing reminder time: $e');
     }
   }
 
   void updateReminderTime(TimeOfDay oldTime, TimeOfDay newTime) {
     try {
-      final List<String> times = List<String>.from(
+      final List<String> times = List.from(
         jsonDecode(currentTask.reminderTimes ?? '[]'),
       );
 
@@ -330,14 +332,14 @@ class TaskViewModel extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      logger.e('Error updating reminder time: $e');
+      MiniLogger.error('Error updating reminder time: $e');
     }
   }
 
   List<TimeOfDay> get reminderTimesList {
     if (currentTask.reminderTimes == null) return [];
     try {
-      final List<String> times = List<String>.from(
+      final List<String> times = List.from(
         jsonDecode(currentTask.reminderTimes!),
       );
       return times.map((timeStr) {
@@ -372,7 +374,7 @@ class TaskViewModel extends ChangeNotifier {
               return false; // Can't create weekly task without selected days
           }
         } catch (e) {
-          logger.e('Error validating repeat config: $e');
+          MiniLogger.error('Error validating repeat config: $e');
           return false;
         }
       }
@@ -431,7 +433,18 @@ class TaskViewModel extends ChangeNotifier {
     return true;
   }
 
-  Future<int> toggleStatus(Task task, bool updatedStatus) async {
+  Future<int> toggleStatus(Task task, bool updatedStatus, CalendarViewModel calendarVM) async {
+    if(task.isRepeating!){
+      final db= await DatabaseService.openDb();
+      Map<String,bool> finishDates = jsonDecode(task.finishDates ?? '{}');
+      final selectedDateString = calendarVM.selectedDate.toIso8601String();
+      final sDate = currentTask.startDate;
+      final eDate = currentTask.endDate;
+      finishDates[selectedDateString] = updatedStatus;
+      dynamic finishDatesJson = jsonEncode(finishDates);
+      final changes = await db.update('tasks',{'finishDates' : finishDatesJson},where: 'id = ?', whereArgs: [task.id]);
+      return changes;
+    }
     await Future.delayed(Duration(milliseconds: 600));
     int changesMade = 0;
     task.isDone = updatedStatus;
@@ -553,7 +566,7 @@ class TaskViewModel extends ChangeNotifier {
   // Helper getters/setters for repeat configuration
   bool get isRepeatEnabled => currentTask.isRepeating ?? false;
 
-  DateTime get taskStartDate => currentTask.startDate;
+  DateTime get taskStartDate => currentTask.startDate ;
 
   DateTime? get taskEndDate => currentTask.endDate;
 
@@ -564,7 +577,7 @@ class TaskViewModel extends ChangeNotifier {
           jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
       return config['repeatType'] as String?;
     } catch (e) {
-      logger.e('Error decoding repeatType: $e');
+      MiniLogger.error('Error decoding repeatType: $e');
       return null;
     }
   }
@@ -579,7 +592,7 @@ class TaskViewModel extends ChangeNotifier {
       }
       return [];
     } catch (e) {
-      logger.e('Error decoding selectedWeekdays: $e');
+      MiniLogger.error('Error decoding selectedWeekdays: $e');
       return [];
     }
   }
@@ -588,8 +601,7 @@ class TaskViewModel extends ChangeNotifier {
     if (currentTask.repeatConfig == null) return;
 
     try {
-      final config =
-          jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
+      final config = jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
       if (config['repeatType'] != 'weekly') return;
 
       var days = List.from(config['selectedDays'] ?? []);
@@ -598,7 +610,7 @@ class TaskViewModel extends ChangeNotifier {
       config['selectedDays'] = days;
       currentTask.repeatConfig = jsonEncode(config);
     } catch (e) {
-      logger.e('Error updating weekday validity: $e');
+      MiniLogger.error('Error updating weekday validity: $e');
     }
   }
 }

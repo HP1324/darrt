@@ -127,16 +127,13 @@ class CalendarViewModel extends ChangeNotifier {
 
       switch (repeatType) {
         case 'weekly':
-          final selectedDays = List<int>.from(config['selectedDays'] ?? []);
+          final selectedDays = List.from(config['selectedDays'] ?? []);
           return selectedDays.contains(date.weekday);
-
         case 'monthly':
           return date.day == task.startDate.day;
-
         case 'yearly':
           return date.day == task.startDate.day &&
               date.month == task.startDate.month;
-
         default:
           return false;
       }

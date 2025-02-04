@@ -1,4 +1,3 @@
-import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseService {
@@ -30,6 +29,7 @@ class DatabaseService {
         endDate TEXT,
         repeatConfig TEXT,
         reminderTimes TEXT,
+        finishDates TEXT,
         FOREIGN KEY(categoryId) REFERENCES categories (id) ON DELETE SET DEFAULT
       )
   """;
