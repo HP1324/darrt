@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
@@ -64,6 +65,8 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Consumer2<TaskViewModel, CalendarViewModel>(
       builder: (context, taskVM, calendarVM, _) {
+        MiniLogger.debug('Selected Date in calendar: ${calendarVM.selectedDate}');
+
         final scheduledTasks =
             taskVM.tasks.where((task) => task.dueDate != null).toList();
 
@@ -79,14 +82,13 @@ class _CalendarPageState extends State<CalendarPage> {
                 title: Text('${calendarVM.selectedTaskIds.length} selected'),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete),
-                  onPressed: () =>
-                      _deleteSelectedTasks(context, taskVM, calendarVM),
+                  onPressed: () => _deleteSelectedTasks(context, taskVM, calendarVM),
                 ),
               ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 2, 16, 2),
               child: Text(
-                DateFormat('EEE, d MMM, yyyy').format(calendarVM.selectedDate),
+               formatDateWith(calendarVM.selectedDate, 'EEE, d MMM, yyyy'),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
@@ -204,8 +206,7 @@ class ScrollableDateBar extends StatelessWidget {
         itemCount: calendarVM.dates.length,
         itemBuilder: (context, index) {
           final date = calendarVM.dates[index];
-          final isSelected =
-              calendarVM.isSameDay(date, calendarVM.selectedDate);
+          final isSelected = calendarVM.isSameDay(date, calendarVM.selectedDate);
           final isToday = calendarVM.isSameDay(date, DateTime.now());
 
           // Get tasks for this date (including repeating tasks)

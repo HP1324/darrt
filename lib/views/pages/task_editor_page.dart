@@ -111,20 +111,20 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                           ),
                         ],
                         selected: {taskVM.isRepeatEnabled},
-                        onSelectionChanged: (Set<bool> selected) {
+                        onSelectionChanged: (selected) {
                           taskVM.toggleRepeat(selected.first);
                         },
                         style: ButtonStyle(
                           shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                              WidgetStatePropertyAll(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
                           backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.selected)) {
+                              WidgetStateProperty.resolveWith(
+                            (states) {
+                              if (states.contains(WidgetState.selected)) {
                                 return Theme.of(context)
                                     .colorScheme
                                     .primaryContainer;
@@ -133,9 +133,9 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                             },
                           ),
                           foregroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.selected)) {
+                              WidgetStateProperty.resolveWith(
+                            (states) {
+                              if (states.contains(WidgetState.selected)) {
                                 return Theme.of(context)
                                     .colorScheme
                                     .onPrimaryContainer;
@@ -903,7 +903,7 @@ class RepeatingConfigWidget extends StatelessWidget {
 
     return Card(
       elevation: 0,
-      color: colorScheme.surfaceVariant.withAlpha(50),
+      color: colorScheme.surfaceContainerHighest.withAlpha(50),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -950,12 +950,13 @@ class RepeatingConfigWidget extends StatelessWidget {
                 // Start Date
                 InkWell(
                   onTap: () async {
+                    context.read<GeneralViewModel>().textFieldNode.unfocus();
                     final selected = await showDatePicker(
                       context: context,
                       initialDate: taskVM.taskStartDate,
                       firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate))
                           .subtract(Duration(days: 365)),
-                      lastDate: DateTime(2100),
+                      lastDate: DateTime.now().add(Duration(days: 18263)),
                     );
                     if (selected != null) {
                       taskVM.setTaskStartDate(selected);
@@ -1002,12 +1003,13 @@ class RepeatingConfigWidget extends StatelessWidget {
                 // End Date
                 InkWell(
                   onTap: () async {
+                    context.read<GeneralViewModel>().textFieldNode.unfocus();
                     final selected = await showDatePicker(
                       context: context,
                       initialDate: taskVM.taskEndDate ??
                           taskVM.taskStartDate.add(const Duration(days: 1)),
                       firstDate: taskVM.taskStartDate,
-                      lastDate: DateTime(2100),
+                      lastDate: DateTime.now().add(Duration(days: 18263)),
                     );
                     taskVM.setTaskEndDate(selected);
                   },
@@ -1222,20 +1224,7 @@ class _WeekdaySelector extends StatelessWidget {
                 onSelected: isValid
                     ? (selected) => taskVM.toggleWeekday(weekday)
                     : null,
-                backgroundColor: isValid
-                    ? colorScheme.surfaceVariant
-                    : colorScheme.surfaceVariant.withAlpha(100),
-                selectedColor: isValid
-                    ? colorScheme.primaryContainer
-                    : colorScheme.surfaceVariant.withAlpha(100),
-                showCheckmark: isValid && isSelected,
-                labelStyle: textTheme.bodyMedium?.copyWith(
-                  color: isValid
-                      ? isSelected
-                          ? colorScheme.onPrimaryContainer
-                          : colorScheme.onSurfaceVariant
-                      : colorScheme.onSurfaceVariant.withAlpha(100),
-                ),
+                showCheckmark: false,
               );
             }),
           ),
