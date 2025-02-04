@@ -67,8 +67,7 @@ class _CalendarPageState extends State<CalendarPage> {
       builder: (context, taskVM, calendarVM, _) {
         MiniLogger.debug('Selected Date in calendar: ${calendarVM.selectedDate}');
 
-        final scheduledTasks =
-            taskVM.tasks.where((task) => task.dueDate != null).toList();
+        final scheduledTasks = taskVM.tasks.where((task) => task.dueDate != null).toList();
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
