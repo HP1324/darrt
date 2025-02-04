@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -27,26 +27,23 @@ class TaskService {
     return null;
   }
 
-  static Future<int> addTask(Task task) async {
+  Future<int> addTask(Task task) async {
     final database = await DatabaseService.openDb();
-    if(task.isRepeating!) {
-      Map<String, dynamic> finishDates = {};
-      var startDate = task.startDate;
+    if (task.isRepeating!) {
+      final startDate = task.startDate;
       final endDate = task.endDate;
       final lastDate = endDate == null ? DateTime.now().add(Duration(days: 18264)) : endDate.add(Duration(days: 1));
       MiniLogger.debug('Start Date: $startDate, Last Date: $lastDate');
 
-        while (startDate.isBefore(lastDate)) {
-          final dateOnly = DateTime(startDate.year,startDate.month,startDate.day);
-          finishDates[dateOnly.toIso8601String()] = false;
-          startDate = startDate.add(Duration(days: 1,hours: 0,minutes: 0,seconds: 0,milliseconds: 0,microseconds: 0));
-          MiniLogger.debug('Start date in loop: $startDate');
-        }
-        MiniLogger.debug('Task Finish Dates: ${task.finishDates}');
-        task.finishDates = jsonEncode(finishDates);
+      // Just pass the timestamps instead of DateTime objects
+      Map<String, dynamic> params = {
+        'startMs': startDate.millisecondsSinceEpoch,
+        'lastMs': lastDate.millisecondsSinceEpoch
+      };
 
-
+      task.finishDates = await compute(_generateFinishDates, params);
     }
+
     MiniLogger.debug('Task finish dates before adding to database: ${task.finishDates}');
     final data = task.toJson();
     debugPrint('Task adding to database ->-> $data');
@@ -54,6 +51,21 @@ class TaskService {
     return id;
   }
 
+  String _generateFinishDates(Map<String, dynamic> params) {
+    final startMs = params['startMs'];
+    final lastMs = params['lastMs'];
+    final dayMs = const Duration(days: 1).inMilliseconds;
+
+    Map<String, bool> finishDates = {};
+
+    for (var ms = startMs; ms < lastMs; ms += dayMs) {
+      final date = DateTime.fromMillisecondsSinceEpoch(ms);
+      final dateOnly = DateTime(date.year, date.month, date.day).toIso8601String();
+      finishDates[dateOnly] = false;
+    }
+
+    return jsonEncode(finishDates);
+  }
   static Future<int> toggleDone(int id, bool updatedStatus, DateTime? finishedAt) async {
     final database = await DatabaseService.openDb();
     int isDone = updatedStatus ? 1 : 0;
