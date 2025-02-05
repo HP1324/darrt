@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 
 class Task {
@@ -16,7 +17,12 @@ class Task {
     this.notifType = 'notif',
     this.priority = 'Low',
     this.isRepeating = false,
-  });
+    DateTime? startDate,
+    this.endDate,
+    this.repeatConfig,
+    this.reminderTimes,
+    this.finishDates,
+  }) : startDate = startDate ?? DateTime.now();
 
   int? id;
   String? title;
@@ -31,6 +37,13 @@ class Task {
   String? priority;
   bool? isRepeating;
 
+  // NEW FIELDS – For repeating tasks only. If task is not repeating these may be ignored.
+  DateTime startDate; // defaults to now if not provided
+  DateTime? endDate; // null means repeat indefinitely
+  String? repeatConfig; // JSON string, e.g. {"repeatType": "weekly", "selectedDays": [1,3,5]}
+  String? reminderTimes; // JSON string list of reminders, e.g. '["08:00", "12:00", "18:00"]'
+  String? finishDates;
+
   Task copyWith({
     int? id,
     String? title,
@@ -44,6 +57,11 @@ class Task {
     String? notifType,
     String? priority,
     bool? isRepeating,
+    DateTime? startDate,
+    DateTime? endDate,
+    String? repeatConfig,
+    String? reminderTimes,
+    String? finishDates,
   }) =>
       Task(
         id: id ?? this.id,
@@ -58,21 +76,25 @@ class Task {
         notifType: notifType ?? this.notifType,
         priority: priority ?? this.priority,
         isRepeating: isRepeating ?? this.isRepeating,
+        startDate: startDate ?? this.startDate,
+        endDate: endDate ?? this.endDate,
+        repeatConfig: repeatConfig ?? this.repeatConfig,
+        finishDates: finishDates ?? this.finishDates,
       );
 
   void printTask() {
     if (kDebugMode) {
-      logger.d(""" 
+      MiniLogger.debug("""
           Task{
            'id': $id,
            'title': $title,
            'isDone': $isDone,
-           'list': {
-             'categoryId' : ${category?.id},
-             'categoryName': ${category?.name},
+           'category': {
+             'id': ${category?.id},
+             'name': ${category?.name},
              'icon_code': ${category?.iconCode},
-             'categoryColor': ${category?.color},
-           } ,
+             'color': ${category?.color},
+           },
            'createdAt': $createdAt,
            'dueDate': $dueDate,
            'finishedAt': $finishedAt,
@@ -80,7 +102,12 @@ class Task {
            'notifyTime': $notifyTime,
            'notifType': $notifType,
            'priority': $priority,
-           'isRepeating' : $isRepeating,
+           'isRepeating': $isRepeating,
+           'startDate': ${startDate.toIso8601String()},
+           'endDate': ${endDate?.toIso8601String()},
+           'repeatConfig': $repeatConfig,
+           'reminderTimes': $reminderTimes,
+           'finishDates':$finishDates,
           }
           """);
     }
@@ -100,81 +127,108 @@ class Task {
         notifyTime == other.notifyTime &&
         notifType == other.notifType &&
         priority == other.priority &&
-        isRepeating == other.isRepeating;
+        isRepeating == other.isRepeating &&
+        startDate == other.startDate &&
+        endDate == other.endDate &&
+        repeatConfig == other.repeatConfig &&
+        reminderTimes == other.reminderTimes &&
+        finishDates == other.finishDates;
   }
 
   @override
   int get hashCode => Object.hash(
-    id,
-    title,
-    isDone,
-    category,
-    createdAt,
-    dueDate,
-    finishedAt,
-    isNotifyEnabled,
-    notifyTime,
-    notifType,
-    priority,
-    isRepeating,
-  );
+        id,
+        title,
+        isDone,
+        category,
+        createdAt,
+        dueDate,
+        finishedAt,
+        isNotifyEnabled,
+        notifyTime,
+        notifType,
+        priority,
+        isRepeating,
+        startDate,
+        endDate,
+        repeatConfig,
+        reminderTimes,
+        finishDates,
+      );
 
   bool isValid() {
     try {
       return title != null && title!.trim().isNotEmpty;
     } catch (e, st) {
-      logger.e('Error occurred: ${e.toString()}');
-      logger.e('Stacktrace: ${st.toString()}');
+      MiniLogger.error('Error occurred: ${e.toString()}');
+      MiniLogger.error('Stacktrace: ${st.toString()}');
       return false;
     }
   }
-  bool isOverdue(){
-    if(dueDate!.isBefore(DateTime.now()) && !isDone!){
+
+  bool isOverdue() {
+    if (dueDate != null && dueDate!.isBefore(DateTime.now()) && (isDone == false)) {
       return true;
     }
     return false;
   }
+
   // Convert Task to JSON
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'title': title,
-    'categoryId': category?.id,
-    'categoryName': category?.name,
-    'catIconCode': category?.iconCode,
-    'categoryColor' : category?.color,
-    'createdAt': DateTime.now().toIso8601String(),
-    'dueDate': dueDate != null
-        ? dueDate!.toIso8601String()
-        : DateTime.now().toIso8601String(),
-    'finishedAt': finishedAt?.toIso8601String(),
-    'isDone': isDone! ? 1 : 0,
-    'isNotifyEnabled': isNotifyEnabled! ? 1 : 0,
-    'notifyTime': notifyTime?.toIso8601String(),
-    'notifType': notifType,
-    'priority': priority,
-    'isRepeating': isRepeating! ? 1 : 0,
-  };
+        'id': id,
+        'title': title,
+        'categoryId': category?.id,
+        'categoryName': category?.name,
+        'catIconCode': category?.iconCode,
+        'categoryColor': category?.color,
+        'createdAt': createdAt?.toIso8601String() ?? DateTime.now().toIso8601String(),
+        'dueDate': dueDate?.toIso8601String(),
+        'finishedAt': finishedAt?.toIso8601String(),
+        'isDone': isDone! ? 1 : 0,
+        'isNotifyEnabled': isNotifyEnabled! ? 1 : 0,
+        'notifyTime': notifyTime?.toIso8601String(),
+        'notifType': notifType,
+        'priority': priority,
+        'isRepeating': isRepeating! ? 1 : 0,
+        'startDate': startDate.toIso8601String(),
+        'endDate': endDate?.toIso8601String(),
+        'repeatConfig': repeatConfig,
+        'reminderTimes': reminderTimes,
+        'finishDates': finishDates,
+      };
 
   // Create a Task from JSON
   factory Task.fromJson(Map<String, dynamic> json) {
-    return Task(
-      id: json['id'],
-      title: json['title'] ?? '',
-      isDone: json['isDone'] == 1,
-      category: CategoryModel(
-        id: json['categoryId'],
-        name: json['categoryName'],
-        iconCode: json['catIconCode'],
-        color: json['categoryColor'],
-      ),
-      createdAt: DateTime.parse(json['createdAt']),
-      dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : null,
-      finishedAt: json['finishedAt'] != null ? DateTime.parse(json['finishedAt']) : null,
-      isNotifyEnabled: json['isNotifyEnabled'] == 1,
-      notifyTime: json['notifyTime'] != null ? DateTime.parse(json['notifyTime']) : null,
-      notifType: json['notifType'],
-      priority: json['priority'],
-      isRepeating: json['isRepeating'] == 1,
-    );
+    try {
+      return Task(
+        id: json['id'],
+        title: json['title'] ?? '',
+        isDone: json['isDone'] == 1,
+        category: json['categoryId'] != null
+            ? CategoryModel(
+                id: json['categoryId'],
+                name: json['categoryName'],
+                iconCode: json['catIconCode'],
+                color: json['categoryColor'],
+              )
+            : null,
+        createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+        dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : null,
+        finishedAt: json['finishedAt'] != null ? DateTime.parse(json['finishedAt']) : null,
+        isNotifyEnabled: json['isNotifyEnabled'] == 1,
+        notifyTime: json['notifyTime'] != null ? DateTime.parse(json['notifyTime']) : null,
+        notifType: json['notifType'],
+        priority: json['priority'],
+        isRepeating: json['isRepeating'] == 1,
+        startDate: json['startDate'] != null ? DateTime.parse(json['startDate']) : DateTime.now(),
+        endDate: json['endDate'] != null ? DateTime.parse(json['endDate']) : null,
+        repeatConfig: json['repeatConfig'],
+        reminderTimes: json['reminderTimes'],
+        finishDates: json['finishDates'],
+      );
+    } catch (e) {
+      MiniLogger.error('Error parsing task from JSON: $e');
+      rethrow;
+    }
   }
 }

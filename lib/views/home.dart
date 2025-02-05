@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/helpers/mini_page_transition.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/view_models/navigation_view_model.dart';
 import 'package:minimaltodo/views/pages/navigation/calendar_page.dart';
 import 'package:minimaltodo/views/pages/navigation/categories_page.dart';
 import 'package:minimaltodo/views/pages/navigation/finished_tasks_page.dart';
 import 'package:minimaltodo/views/pages/navigation/pending_tasks_page.dart';
+import 'package:minimaltodo/views/pages/navigation/wishlist_page.dart';
 import 'package:minimaltodo/views/pages/task_editor_page.dart';
 import 'package:minimaltodo/views/widgets/app_drawer.dart';
 import 'package:minimaltodo/views/widgets/mini_app_bar.dart';
@@ -27,16 +29,16 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      child: Consumer<NavigationViewModel>(builder: (context, navVM, _) {
+      child: Consumer2<NavigationViewModel, CalendarViewModel>(builder: (context, navVM,calendarVM ,_) {
         return Scaffold(
           appBar: MiniAppBar(),
           drawer: const AppDrawer(),
           body: [
             const CalendarPage(),
-            const PendingTasksPage(),
+            const WishListPage(),
             const CategoriesPage(),
           ][navVM.currentDestination],
-          floatingActionButton: _FloatingActionButtonWidget(),
+          floatingActionButton: calendarVM.isFabVisible ?  _FloatingActionButtonWidget() : null,
           bottomNavigationBar: _BottomNavBarWidget(),
         );
       }),
@@ -53,7 +55,7 @@ class _BottomNavBarWidget extends StatelessWidget {
         children: [
           // const SizedBox.shrink(),
           MiniBottomNavBarItem(icon: Icons.calendar_month, label: 'Calendar', i: 0),
-          MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Pending', i: 1),
+          MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Wishlist', i: 1),
           MiniBottomNavBarItem(icon: Icons.search, label: 'Search', i: -1),
           MiniBottomNavBarItem(icon: Iconsax.category, label: 'Categories', i: 2),
           MiniBottomNavBarItem(icon: Iconsax.note, label: 'Notes', i: -2),

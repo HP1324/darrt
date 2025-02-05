@@ -19,7 +19,7 @@ class ThemeViewModel extends ChangeNotifier {
     final storedColorIndex = _box.read(_themeColorKey);
     _selectedColor = storedColorIndex != null
         ? ThemeColors.values[storedColorIndex]
-        : ThemeColors.dustyBlue;
+        : ThemeColors.cerulean;
 
     final storedPreference = _box.read(_themePreferenceKey);
     _themePreference = storedPreference != null
