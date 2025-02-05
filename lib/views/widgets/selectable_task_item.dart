@@ -22,6 +22,7 @@ class SelectableTaskItem extends StatefulWidget {
   });
 
   final Task task;
+  // final
   final bool isSelected;
   final Function(bool) onSelectionChanged;
   final Function()? onTap;
@@ -32,16 +33,13 @@ class SelectableTaskItem extends StatefulWidget {
 }
 
 class _SelectableTaskItemState extends State<SelectableTaskItem> {
-  late bool _isChecked;
-  @override
-  void initState() {
-    super.initState();
-    _isChecked = widget.task.isDone!;
-  }
+
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<TaskViewModel,CalendarViewModel>(builder: (context, tvm,calendarVM, __) {
+    return Selector<CalendarViewModel,DateTime>(
+      selector: (_,calVM)=> calVM.selectedDate,
+        builder: (context,selectedDate, __) {
       final isUrgent = widget.task.priority?.toLowerCase() == 'urgent';
       bool isFinishedForDate = false;
       
@@ -49,9 +47,9 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
         try {
           final finishDates = widget.task.getDecompressedFinishDates();
           final dateOnly = DateTime(
-            calendarVM.selectedDate.year, 
-            calendarVM.selectedDate.month,
-            calendarVM.selectedDate.day
+            selectedDate.year,
+            selectedDate.month,
+            selectedDate.day
           );
           isFinishedForDate = finishDates[dateOnly.toIso8601String()] ?? false;
           MiniLogger.debug('Date: ${dateOnly.toIso8601String()}, Finished: $isFinishedForDate');
@@ -88,15 +86,18 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
-                    child: Checkbox(
-                      key: ValueKey('selection_${widget.task.id}'),
-                      shape: CircleBorder(),
-                      value: isFinishedForDate,
-                      onChanged: (value) {
-                        if (widget.onStatusChanged != null) {
-                          widget.onStatusChanged!(value ?? false);
-                        }
-                      },
+                    child: Transform.scale(
+                      scale: 1.05,
+                      child: Checkbox(
+                        key: ValueKey('selection_${widget.task.id}'),
+                        shape: CircleBorder(),
+                        value: isFinishedForDate,
+                        onChanged: (value) {
+                          if (widget.onStatusChanged != null) {
+                            widget.onStatusChanged!(value ?? false);
+                          }
+                        },
+                      ),
                     ),
                   ),
 
