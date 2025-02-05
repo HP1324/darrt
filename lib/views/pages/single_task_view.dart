@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/main.dart';
 import 'package:minimaltodo/services/category_service.dart';
-import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
-import 'package:minimaltodo/view_models/category_view_model.dart';
-import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/task_editor_page.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 

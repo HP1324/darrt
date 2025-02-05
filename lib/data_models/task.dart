@@ -84,29 +84,30 @@ class Task {
 
   void printTask() {
     if (kDebugMode) {
-      logger.d("""
+      MiniLogger.debug("""
           Task{
-            'id': $id,
-            'title': $title,
-            'isDone': $isDone,
-            'category': {
-              'id': ${category?.id},
-              'name': ${category?.name},
-              'icon_code': ${category?.iconCode},
-              'color': ${category?.color},
-            },
-            'createdAt': $createdAt,
-            'dueDate': $dueDate,
-            'finishedAt': $finishedAt,
-            'isNotifyEnabled': $isNotifyEnabled,
-            'notifyTime': $notifyTime,
-            'notifType': $notifType,
-            'priority': $priority,
-            'isRepeating': $isRepeating,
-            'startDate': ${startDate.toIso8601String()},
-            'endDate': ${endDate?.toIso8601String()},
-            'repeatConfig': $repeatConfig,
-            'reminderTimes': $reminderTimes,
+           'id': $id,
+           'title': $title,
+           'isDone': $isDone,
+           'category': {
+             'id': ${category?.id},
+             'name': ${category?.name},
+             'icon_code': ${category?.iconCode},
+             'color': ${category?.color},
+           },
+           'createdAt': $createdAt,
+           'dueDate': $dueDate,
+           'finishedAt': $finishedAt,
+           'isNotifyEnabled': $isNotifyEnabled,
+           'notifyTime': $notifyTime,
+           'notifType': $notifType,
+           'priority': $priority,
+           'isRepeating': $isRepeating,
+           'startDate': ${startDate.toIso8601String()},
+           'endDate': ${endDate?.toIso8601String()},
+           'repeatConfig': $repeatConfig,
+           'reminderTimes': $reminderTimes,
+           'finishDates':$finishDates,
           }
           """);
     }
