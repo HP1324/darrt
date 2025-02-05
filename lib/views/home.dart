@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/helpers/mini_page_transition.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/view_models/navigation_view_model.dart';
 import 'package:minimaltodo/views/pages/navigation/calendar_page.dart';
 import 'package:minimaltodo/views/pages/navigation/categories_page.dart';
@@ -28,7 +29,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      child: Consumer<NavigationViewModel>(builder: (context, navVM, _) {
+      child: Consumer2<NavigationViewModel, CalendarViewModel>(builder: (context, navVM,calendarVM ,_) {
         return Scaffold(
           appBar: MiniAppBar(),
           drawer: const AppDrawer(),
@@ -37,7 +38,7 @@ class _HomeState extends State<Home> {
             const WishListPage(),
             const CategoriesPage(),
           ][navVM.currentDestination],
-          floatingActionButton: _FloatingActionButtonWidget(),
+          floatingActionButton: calendarVM.isFabVisible ?  _FloatingActionButtonWidget() : null,
           bottomNavigationBar: _BottomNavBarWidget(),
         );
       }),

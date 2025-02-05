@@ -64,9 +64,9 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Consumer2<TaskViewModel, CalendarViewModel>(
       builder: (context, taskVM, calendarVM, _) {
-        final tasks = taskVM.tasks.where((task) => task.dueDate != null).toList();
+        final tasks = taskVM.tasks;
         final filteredTasks = calendarVM.filterTasks(tasks);
-
+        final tasksForSelectedDate = calendarVM.getTasksForDate(calendarVM.selectedDate, filteredTasks);
         return Scaffold(
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,7 +126,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 onDateSelected: calendarVM.setSelectedDate,
               ),
               Expanded(
-                child: filteredTasks.isEmpty
+                child: tasksForSelectedDate.isEmpty
                     ? Center(
                         child: Text(
                           switch (calendarVM.taskFilter) {
@@ -141,9 +141,9 @@ class _CalendarPageState extends State<CalendarPage> {
                       )
                     : ListView.builder(
                         controller: calendarVM.listScrollController,
-                        itemCount: filteredTasks.length,
+                        itemCount: tasksForSelectedDate.length,
                         itemBuilder: (context, index) {
-                          final task = filteredTasks[index];
+                          final task = tasksForSelectedDate[index];
                           return TaskItem(
                             key: ValueKey('task_${task.id}'),
                             task: task,
@@ -155,12 +155,6 @@ class _CalendarPageState extends State<CalendarPage> {
               ),
             ],
           ),
-          floatingActionButton: calendarVM.isFabVisible
-              ? FloatingActionButton(
-                  onPressed: () => Navigator.pushNamed(context, '/task/new'),
-                  child: const Icon(Icons.add),
-                )
-              : null,
         );
       },
     );
@@ -257,3 +251,78 @@ class ScrollableDateBar extends StatelessWidget {
     );
   }
 }
+// Expanded(
+// child: ListView(
+// padding: const EdgeInsets.only(top: 16),
+// children: [
+// Builder(
+// builder: (context) {
+// final tasksForSelectedDate = calendarVM.getTasksForDate(
+// calendarVM.selectedDate,
+// taskVM.tasks,
+// );
+//
+// if (tasksForSelectedDate.isEmpty) {
+// return Center(
+// child: Padding(
+// padding: const EdgeInsets.all(32.0),
+// child: Column(
+// mainAxisSize: MainAxisSize.min,
+// children: [
+// Icon(
+// Iconsax.calendar_1,
+// size: 64,
+// color: Theme.of(context).colorScheme.outline,
+// ),
+// const SizedBox(height: 16),
+// Text(
+// 'No tasks scheduled for this day',
+// style: Theme.of(context)
+//     .textTheme
+//     .bodyLarge
+//     ?.copyWith(
+// color: Theme.of(context)
+//     .colorScheme
+//     .onSurfaceVariant,
+// fontWeight: FontWeight.w500,
+// ),
+// ),
+// const SizedBox(height: 8),
+// Text(
+// 'Tap the + button to add a new task',
+// style: Theme.of(context)
+//     .textTheme
+//     .bodyMedium
+//     ?.copyWith(
+// color: Theme.of(context)
+//     .colorScheme
+//     .onSurfaceVariant,
+// ),
+// ),
+// ],
+// ),
+// ),
+// );
+// }
+//
+// return Column(
+// children: tasksForSelectedDate
+//     .map((task) => TaskItem(
+// key: ValueKey(
+// '${task.id}_${task.isDone}_${calendarVM.selectedDate}'),
+// task: task,
+// isSelected: calendarVM.selectedTaskIds
+//     .contains(task.id),
+// isSelectionMode: calendarVM.isSelectionMode,
+// onLongPress: () =>
+// calendarVM.toggleTaskSelection(task),
+// onSelect: (_) =>
+// calendarVM.toggleTaskSelection(task),
+// ))
+//     .toList(),
+// );
+// },
+// ),
+// ],
+// ),
+// ),

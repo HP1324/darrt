@@ -228,7 +228,7 @@ class TaskViewModel extends ChangeNotifier {
 
       config['repeatType'] = type;
       if (type == 'weekly') {
-        config['selectedDays'] = [];
+        config['selectedDays'] = [1,2,3,4,5];
       } else {
         config.remove('selectedDays');
       }
@@ -250,7 +250,9 @@ class TaskViewModel extends ChangeNotifier {
       var days = List.from(config['selectedDays'] ?? []);
 
       if (days.contains(weekday)) {
-        days.remove(weekday);
+        if(days.length != 1) {
+          days.remove(weekday);
+        }
       } else {
         days.add(weekday);
       }
@@ -488,6 +490,9 @@ class TaskViewModel extends ChangeNotifier {
   //------------------------ TASK LIST MANAGEMENT ------------------------//
   void _refreshTasks() async {
     _tasks = await TaskService.getTasks();
+    MiniLogger.info('---------------PRINTING ALL TASKS-----------------');
+   _tasks.forEach((t)=>t.printTask());
+    MiniLogger.info('---------------/PRINTING ALL TASKS/-----------------');
     notifyListeners();
   }
 
@@ -560,8 +565,8 @@ class TaskViewModel extends ChangeNotifier {
       currentTask.startDate = currentTask.dueDate ?? DateTime.now();
       currentTask.endDate = null;
       currentTask.repeatConfig = jsonEncode({
-        'repeatType': null,
-        'selectedDays': [],
+        'repeatType': 'weekly',
+        'selectedDays': [1,2,3,4,5],
       });
       currentTask.reminderTimes = null;
 
@@ -599,6 +604,7 @@ class TaskViewModel extends ChangeNotifier {
       MiniLogger.error('Error decoding repeatType: $e');
       return null;
     }
+
   }
 
   List<int> get selectedWeekdays {

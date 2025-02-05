@@ -60,13 +60,13 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
           backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(20),
           title: widget.editMode
               ? Text(
-                  widget.taskToEdit!.title!,
-                  style: TextStyle(fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
-                )
+            widget.taskToEdit!.title!,
+            style: TextStyle(fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
+          )
               : Text(
-                  'New Task',
-                  style: TextStyle(fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
-                ),
+            'New Task',
+            style: TextStyle(fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
+          ),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -112,7 +112,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                             ),
                           ),
                           backgroundColor: WidgetStateProperty.resolveWith(
-                            (states) {
+                                (states) {
                               if (states.contains(WidgetState.selected)) {
                                 return Theme.of(context).colorScheme.primaryContainer;
                               }
@@ -120,7 +120,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                             },
                           ),
                           foregroundColor: WidgetStateProperty.resolveWith(
-                            (states) {
+                                (states) {
                               if (states.contains(WidgetState.selected)) {
                                 return Theme.of(context).colorScheme.onPrimaryContainer;
                               }
@@ -162,25 +162,25 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
         floatingActionButton: widget.editMode
             ? null
             : FloatingActionButton(
-                onPressed: () async {
-                  final navigator = Navigator.of(context);
-                  final isNotifEnabled = taskVM.currentTask.isNotifyEnabled;
-                  if (taskVM.titleController.text.trim().isNotEmpty) {
-                    taskVM.title = taskVM.titleController.text;
-                  }
+          onPressed: () async {
+            final navigator = Navigator.of(context);
+            final isNotifEnabled = taskVM.currentTask.isNotifyEnabled;
+            if (taskVM.titleController.text.trim().isNotEmpty) {
+              taskVM.title = taskVM.titleController.text;
+            }
 
-                  final success = await taskVM.addNewTask();
-                  MiniLogger.debug('Task added: $success');
-                  if (success) {
-                    navigator.pop();
-                    MiniLogger.debug('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
-                  }
-                  await _handleNotificationLogic(taskVM);
-                  taskVM.titleController.clear();
-                },
-                shape: const CircleBorder(),
-                child: const Icon(Icons.done),
-              ),
+            final success = await taskVM.addNewTask();
+            MiniLogger.debug('Task added: $success');
+            if (success) {
+              navigator.pop();
+              MiniLogger.debug('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
+            }
+            await _handleNotificationLogic(taskVM);
+            taskVM.titleController.clear();
+          },
+          shape: const CircleBorder(),
+          child: const Icon(Icons.done),
+        ),
       ),
     );
   }
@@ -1131,8 +1131,8 @@ class RecurringReminderTimes extends StatelessWidget {
       title: Text(
         "Daily Reminder Times",
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontSize: 14,
-            ),
+          fontSize: 14,
+        ),
       ),
       subtitle: Text(
         taskVM.reminderTimesList.isEmpty ? 'No reminders set' : taskVM.reminderTimesList.map((t) => t.format(context)).join(', '),
@@ -1164,13 +1164,13 @@ class ReminderTimesBottomSheet extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final mediaQuery = MediaQuery.of(context);
-
+    final bottomPadding = mediaQuery.viewInsets.bottom + mediaQuery.padding.bottom + 24;
     return Container(
       padding: EdgeInsets.only(
         left: 24,
         right: 24,
         top: 24,
-        bottom: 24 + mediaQuery.viewInsets.bottom, // Handle keyboard
+        bottom: bottomPadding, // Handle keyboard
       ),
       constraints: BoxConstraints(
         maxHeight: mediaQuery.size.height * 0.7, // Maximum 70% of screen height
@@ -1205,42 +1205,42 @@ class ReminderTimesBottomSheet extends StatelessWidget {
           Flexible(
             child: taskVM.reminderTimesList.isEmpty
                 ? Center(
-                    child: Text(
-                      'No reminders set',
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  )
+              child: Text(
+                'No reminders set',
+                style: textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            )
                 : SingleChildScrollView(
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: taskVM.reminderTimesList.map((time) {
-                        return InputChip(
-                          label: Text(time.format(context)),
-                          avatar: const Icon(Icons.access_time, size: 16),
-                          deleteIcon: const Icon(Icons.close, size: 16),
-                          onDeleted: () => taskVM.removeReminderTime(time),
-                          onPressed: () async {
-                            final newTime = await showTimePicker(
-                              context: context,
-                              initialTime: time,
-                            );
-                            if (newTime != null) {
-                              taskVM.updateReminderTime(time, newTime);
-                            }
-                          },
-                          backgroundColor: colorScheme.surfaceVariant,
-                          side: BorderSide.none,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                        );
-                      }).toList(),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: taskVM.reminderTimesList.map((time) {
+                  return InputChip(
+                    label: Text(time.format(context)),
+                    avatar: const Icon(Icons.access_time, size: 16),
+                    deleteIcon: const Icon(Icons.close, size: 16),
+                    onDeleted: () => taskVM.removeReminderTime(time),
+                    onPressed: () async {
+                      final newTime = await showTimePicker(
+                        context: context,
+                        initialTime: time,
+                      );
+                      if (newTime != null) {
+                        taskVM.updateReminderTime(time, newTime);
+                      }
+                    },
+                    backgroundColor: colorScheme.surfaceVariant,
+                    side: BorderSide.none,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
                     ),
-                  ),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
           const SizedBox(height: 16),
           SizedBox(
@@ -1248,31 +1248,31 @@ class ReminderTimesBottomSheet extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: taskVM.reminderTimesList.length >= 7
                   ? () {
+                showToast(
+                  context: context,
+                  title: 'Maximum 7 reminders allowed',
+                  type: ToastificationType.warning,
+                );
+              }
+                  : () async {
+                final time = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay.now(),
+                );
+                if (time != null) {
+                  if (taskVM.reminderTimesList.contains(time)) {
+                    if (context.mounted) {
                       showToast(
                         context: context,
-                        title: 'Maximum 7 reminders allowed',
+                        title: 'This time is already added',
                         type: ToastificationType.warning,
                       );
                     }
-                  : () async {
-                      final time = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.now(),
-                      );
-                      if (time != null) {
-                        if (taskVM.reminderTimesList.contains(time)) {
-                          if (context.mounted) {
-                            showToast(
-                              context: context,
-                              title: 'This time is already added',
-                              type: ToastificationType.warning,
-                            );
-                          }
-                        } else {
-                          taskVM.addReminderTime(time);
-                        }
-                      }
-                    },
+                  } else {
+                    taskVM.addReminderTime(time);
+                  }
+                }
+              },
               icon: const Icon(Icons.add),
               label: const Text('Add Reminder Time'),
             ),
