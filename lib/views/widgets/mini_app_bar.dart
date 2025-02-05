@@ -6,14 +6,18 @@ import 'package:minimaltodo/helpers/mini_page_transition.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/mini_storage.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
+import 'package:minimaltodo/services/database_service.dart';
+import 'package:minimaltodo/test_app.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
+import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/navigation/finished_tasks_page.dart';
 import 'package:minimaltodo/views/pages/navigation/pending_tasks_page.dart';
 import 'package:minimaltodo/views/pages/search_page.dart';
+import 'package:minimaltodo/views/pages/single_task_view.dart';
 import 'package:provider/provider.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
-   MiniAppBar({super.key});
+  MiniAppBar({super.key});
   final GlobalKey _popupKey = GlobalKey();
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -25,6 +29,14 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
       // centerTitle: true,
       actions: [
         _MiniAppBarAction(
+          icon: Icon(Icons.flutter_dash),
+          onTap: ()async {
+            final db = await DatabaseService.openDb();
+            await TestApp.insertTestTasks(db);
+            context.read<TaskViewModel>().testRefreshTasks();
+          },
+        ),
+        _MiniAppBarAction(
           onTap: () {
             showModalBottomSheet(
                 context: context,
@@ -32,13 +44,13 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   return Container(
                     decoration: BoxDecoration(),
                     child: CalendarDatePicker(
-                        initialDate: null,
-                        firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(Duration(days: 365)),
-                        lastDate: DateTime.now().add(Duration(days: 18263)),
-                        onDateChanged: (selectedDate){
-                            context.read<CalendarViewModel>().scrollToDate(selectedDate);
-                        },
-                      ),
+                      initialDate: null,
+                      firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(Duration(days: 365)),
+                      lastDate: DateTime.now().add(Duration(days: 18263)),
+                      onDateChanged: (selectedDate) {
+                        context.read<CalendarViewModel>().scrollToDate(selectedDate);
+                      },
+                    ),
                   );
                 });
           },

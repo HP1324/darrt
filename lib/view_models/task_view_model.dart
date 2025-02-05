@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:archive/archive.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -19,7 +20,13 @@ class TaskViewModel extends ChangeNotifier {
     _refreshTasks();
     // filterTasks(0);
   }
-
+  void testRefreshTasks() async {
+    _tasks = await TaskService.getTasks();
+    MiniLogger.info('---------------PRINTING ALL TASKS-----------------');
+    // _tasks.forEach((t) => t.printTask());
+    MiniLogger.info('---------------/PRINTING ALL TASKS/-----------------');
+    notifyListeners();
+  }
   void initNewTask() {
     currentTask = Task(
       dueDate: DateTime.now().add(const Duration(minutes: 2)),
@@ -437,10 +444,13 @@ class TaskViewModel extends ChangeNotifier {
       final selectedDateString = DateTime(calendarVM.selectedDate.year, calendarVM.selectedDate.month, calendarVM.selectedDate.day).toIso8601String();
 
       finishDates[selectedDateString] = updatedStatus;
+
       String finishDatesJsonString = jsonEncode(finishDates);
+      final compressed = GZipEncoder().encode(utf8.encode(finishDatesJsonString));
+      String encodedFinishDates =  base64Encode(compressed);
 
       try {
-        final changes = await db.update('tasks', {'finishDates': finishDatesJsonString}, where: 'id = ?', whereArgs: [task.id]);
+        final changes = await db.update('tasks', {'finishDates': encodedFinishDates}, where: 'id = ?', whereArgs: [task.id]);
 
         // Update the task's finishDates in memory
         // task.finishDates = finishDatesJsonString;
@@ -459,16 +469,19 @@ class TaskViewModel extends ChangeNotifier {
       int changesMade = await TaskService.toggleDone(task.id!, updatedStatus, task.isDone! ? DateTime.now() : null);
 
       // Handle notifications
-      if (task.isDone!) {
-        await AwesomeNotifications().cancel(task.id!);
-      } else if (task.isNotifyEnabled!) {
-        if (task.isRepeating!) {
-          // This condition will never be true here
-          await NotificationService.createRepeatingTaskNotifications(task);
-        } else {
-          await NotificationService.createTaskNotification(task);
+      Future((){
+        if (task.isDone!) {
+          AwesomeNotifications().cancel(task.id!);
+        } else if (task.isNotifyEnabled!) {
+          if (task.isRepeating!) {
+            // This condition will never be true here
+            NotificationService.createRepeatingTaskNotifications(task);
+          } else {
+            NotificationService.createTaskNotification(task);
+          }
         }
-      }
+      });
+
       _refreshTasks();
       return changesMade;
     }
