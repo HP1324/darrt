@@ -45,6 +45,7 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   flex_color_scheme: ^8.1.0
   flutter_launcher_icons: ^0.14.3
+  archive: ^4.0.2
 
 dev_dependencies:
   flutter_test:

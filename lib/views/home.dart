@@ -29,17 +29,25 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      child: Consumer2<NavigationViewModel, CalendarViewModel>(builder: (context, navVM,calendarVM ,_) {
+      child: Selector2<NavigationViewModel, CalendarViewModel, (int,bool)>(
+          selector: (_,navVM,calVM) =>(navVM.currentDestination,calVM.isFabVisible),
+          builder: (context, data ,_) {
+            final (currentDestination, isFabVisible) = data;
         return Scaffold(
-          appBar: MiniAppBar(),
+          appBar:  MiniAppBar(),
           drawer: const AppDrawer(),
-          body: [
-            const CalendarPage(),
-            const WishListPage(),
-            const CategoriesPage(),
-          ][navVM.currentDestination],
-          floatingActionButton: calendarVM.isFabVisible ?  _FloatingActionButtonWidget() : null,
-          bottomNavigationBar: _BottomNavBarWidget(),
+          body:
+            IndexedStack(
+              index: currentDestination,
+              children: [
+                const CalendarPage(),
+                const WishListPage(),
+                const CategoriesPage(),
+              ],
+            ),
+          // floatingActionButton: AnimatedSwitcher(duration: const Duration(milliseconds: 200),child: isFabVisible ?const _FloatingActionButtonWidget() :const SizedBox.shrink(),),
+          floatingActionButton: _FloatingActionButtonWidget(),
+          bottomNavigationBar: const _BottomNavBarWidget(),
         );
       }),
     );

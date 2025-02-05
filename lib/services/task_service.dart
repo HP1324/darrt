@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -30,6 +30,7 @@ class TaskService {
   Future<int> addTask(Task task) async {
     final database = await DatabaseService.openDb();
     if (task.isRepeating!) {
+      MiniLogger.debug('Reminder Times before adding: ${task.reminderTimes}');
       final startDate = task.startDate;
       final endDate = task.endDate;
       final lastDate = endDate == null ? DateTime.now().add(Duration(days: 18264)) : endDate.add(Duration(days: 1));
@@ -63,8 +64,9 @@ class TaskService {
       final dateOnly = DateTime(date.year, date.month, date.day).toIso8601String();
       finishDates[dateOnly] = false;
     }
-
-    return jsonEncode(finishDates);
+    final jsonString = jsonEncode(finishDates);
+    final compressed = GZipEncoder().encode(utf8.encode(jsonString));
+    return base64Encode(compressed);
   }
   static Future<int> toggleDone(int id, bool updatedStatus, DateTime? finishedAt) async {
     final database = await DatabaseService.openDb();

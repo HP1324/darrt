@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -230,5 +233,40 @@ class Task {
       MiniLogger.error('Error parsing task from JSON: $e');
       rethrow;
     }
+  }
+}
+
+extension DateCompression on Task{
+  Map<String,dynamic> getDecompressedFinishDates(){
+    if(finishDates == null || finishDates!.isEmpty) return {};
+
+    try{
+      final compressed = base64Decode(finishDates!);
+      final decompressed = GZipDecoder().decodeBytes(compressed);
+      final jsonString = utf8.decode(decompressed);
+      return Map<String,dynamic>.from(jsonDecode(jsonString));
+    }catch(e){
+      try {
+        return Map<String, bool>.from(jsonDecode(finishDates!));
+      } catch (_) {
+        return {};
+      }
+    }
+  }
+  String getCompressedFinishDates(Map<String, dynamic> params){
+    final startMs = params['startMs'];
+    final lastMs = params['lastMs'];
+    final dayMs = const Duration(days: 1).inMilliseconds;
+
+    Map<String, bool> finishDates = {};
+
+    for (var ms = startMs; ms < lastMs; ms += dayMs) {
+      final date = DateTime.fromMillisecondsSinceEpoch(ms);
+      final dateOnly = DateTime(date.year, date.month, date.day).toIso8601String();
+      finishDates[dateOnly] = false;
+    }
+    final jsonString = jsonEncode(finishDates);
+    final compressed = GZipEncoder().encode(utf8.encode(jsonString));
+    return base64Encode(compressed);
   }
 }
