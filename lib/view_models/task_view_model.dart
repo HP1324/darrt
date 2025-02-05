@@ -17,7 +17,7 @@ class TaskViewModel extends ChangeNotifier {
   //------------------------ INITIALIZATION ------------------------//
   TaskViewModel() {
     _refreshTasks();
-    filterTasks(0);
+    // filterTasks(0);
   }
 
   void initNewTask() {
@@ -228,7 +228,7 @@ class TaskViewModel extends ChangeNotifier {
 
       config['repeatType'] = type;
       if (type == 'weekly') {
-        config['selectedDays'] = [1,2,3,4,5];
+        config['selectedDays'] = [1, 2, 3, 4, 5];
       } else {
         config.remove('selectedDays');
       }
@@ -250,7 +250,7 @@ class TaskViewModel extends ChangeNotifier {
       var days = List.from(config['selectedDays'] ?? []);
 
       if (days.contains(weekday)) {
-        if(days.length != 1) {
+        if (days.length != 1) {
           days.remove(weekday);
         }
       } else {
@@ -278,9 +278,10 @@ class TaskViewModel extends ChangeNotifier {
 
       // Check for duplicates
       if (times.contains(timeString)) return;
-
+      MiniLogger.debug('Time String: $timeString');
       times.add(timeString);
       currentTask.reminderTimes = jsonEncode(times);
+      MiniLogger.debug('All reminder Times: ${currentTask.reminderTimes}');
       notifyListeners();
     } catch (e) {
       MiniLogger.error('Error adding reminder time: $e');
@@ -356,7 +357,7 @@ class TaskViewModel extends ChangeNotifier {
           if (currentTask.repeatConfig == null) return false;
           final config = jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
           if (config['repeatType'] == 'weekly') {
-            final days = List<int>.from(config['selectedDays'] ?? []);
+            final days = List.from(config['selectedDays'] ?? []);
             if (days.isEmpty) return false; // Can't create weekly task without selected days
           }
         } catch (e) {
@@ -427,32 +428,23 @@ class TaskViewModel extends ChangeNotifier {
       // Consider handling the case where finishDates is invalid JSON
       Map<String, dynamic> finishDates;
       try {
-        finishDates = jsonDecode(task.finishDates ?? '{}');
+        finishDates = task.getDecompressedFinishDates();
       } catch (e) {
         finishDates = {};
       }
 
       // Good practice normalizing the date to remove time components
-      final selectedDateString = DateTime(
-          calendarVM.selectedDate.year,
-          calendarVM.selectedDate.month,
-          calendarVM.selectedDate.day
-      ).toIso8601String();
+      final selectedDateString = DateTime(calendarVM.selectedDate.year, calendarVM.selectedDate.month, calendarVM.selectedDate.day).toIso8601String();
 
       finishDates[selectedDateString] = updatedStatus;
       String finishDatesJsonString = jsonEncode(finishDates);
 
       try {
-        final changes = await db.update(
-            'tasks',
-            {'finishDates': finishDatesJsonString},
-            where: 'id = ?',
-            whereArgs: [task.id]
-        );
-        
+        final changes = await db.update('tasks', {'finishDates': finishDatesJsonString}, where: 'id = ?', whereArgs: [task.id]);
+
         // Update the task's finishDates in memory
         // task.finishDates = finishDatesJsonString;
-        
+
         MiniLogger.debug('Selected date task status: ${finishDates[selectedDateString]}');
         // notifyListeners(); // Notify UI of changes
         _refreshTasks();
@@ -464,17 +456,14 @@ class TaskViewModel extends ChangeNotifier {
     } else {
       // Non-repeating task logic
       task.isDone = updatedStatus;
-      int changesMade = await TaskService.toggleDone(
-          task.id!,
-          updatedStatus,
-          task.isDone! ? DateTime.now() : null
-      );
+      int changesMade = await TaskService.toggleDone(task.id!, updatedStatus, task.isDone! ? DateTime.now() : null);
 
       // Handle notifications
       if (task.isDone!) {
         await AwesomeNotifications().cancel(task.id!);
       } else if (task.isNotifyEnabled!) {
-        if (task.isRepeating!) {  // This condition will never be true here
+        if (task.isRepeating!) {
+          // This condition will never be true here
           await NotificationService.createRepeatingTaskNotifications(task);
         } else {
           await NotificationService.createTaskNotification(task);
@@ -491,7 +480,7 @@ class TaskViewModel extends ChangeNotifier {
   void _refreshTasks() async {
     _tasks = await TaskService.getTasks();
     MiniLogger.info('---------------PRINTING ALL TASKS-----------------');
-   _tasks.forEach((t)=>t.printTask());
+    // _tasks.forEach((t) => t.printTask());
     MiniLogger.info('---------------/PRINTING ALL TASKS/-----------------');
     notifyListeners();
   }
@@ -566,7 +555,7 @@ class TaskViewModel extends ChangeNotifier {
       currentTask.endDate = null;
       currentTask.repeatConfig = jsonEncode({
         'repeatType': 'weekly',
-        'selectedDays': [1,2,3,4,5],
+        'selectedDays': [1, 2, 3, 4, 5],
       });
       currentTask.reminderTimes = null;
 
@@ -604,11 +593,10 @@ class TaskViewModel extends ChangeNotifier {
       MiniLogger.error('Error decoding repeatType: $e');
       return null;
     }
-
   }
 
   List<int> get selectedWeekdays {
-    if (currentTask.repeatConfig == null) return [1,2,3,4,5,6,7];
+    if (currentTask.repeatConfig == null) return [1, 2, 3, 4, 5, 6, 7];
     try {
       final config = jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
       if (config['repeatType'] == 'weekly' && config['selectedDays'] is List) {

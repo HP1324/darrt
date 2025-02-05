@@ -47,7 +47,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
       
       if (widget.task.isRepeating!) {
         try {
-          final finishDates = jsonDecode(widget.task.finishDates ?? '{}');
+          final finishDates = widget.task.getDecompressedFinishDates();
           final dateOnly = DateTime(
             calendarVM.selectedDate.year, 
             calendarVM.selectedDate.month,
@@ -88,20 +88,15 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
-                    child: Transform.scale(
-                      scale: 1.0,
-                      child: Checkbox(
-                        key: ValueKey('selection_${widget.task.id}'),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        value: isFinishedForDate,
-                        onChanged: (value) {
-                          if (widget.onStatusChanged != null) {
-                            widget.onStatusChanged!(value ?? false);
-                          }
-                        },
-                      ),
+                    child: Checkbox(
+                      key: ValueKey('selection_${widget.task.id}'),
+                      shape: CircleBorder(),
+                      value: isFinishedForDate,
+                      onChanged: (value) {
+                        if (widget.onStatusChanged != null) {
+                          widget.onStatusChanged!(value ?? false);
+                        }
+                      },
                     ),
                   ),
 

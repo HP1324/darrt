@@ -13,7 +13,7 @@ import 'package:minimaltodo/views/pages/search_page.dart';
 import 'package:provider/provider.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
-  MiniAppBar({super.key});
+   MiniAppBar({super.key});
   final GlobalKey _popupKey = GlobalKey();
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -68,12 +68,6 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   },
                   child: Text('Finished Tasks'),
                 ),
-                // PopupMenuItem(
-                //   onTap: () {
-                //     MiniRouter.to(context, child: PendingTasksPage());
-                //   },
-                //   child: Text('Pending Tasks'),
-                // ),
                 PopupMenuItem(child: Text('Rate Us')),
                 PopupMenuItem(child: Text('Give Feedback')),
                 PopupMenuItem(child: Text('Settings')),
