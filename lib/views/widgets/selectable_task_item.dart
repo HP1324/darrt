@@ -34,7 +34,6 @@ class SelectableTaskItem extends StatefulWidget {
 
 class _SelectableTaskItemState extends State<SelectableTaskItem> {
 
-
   @override
   Widget build(BuildContext context) {
     return Selector<CalendarViewModel,DateTime>(
