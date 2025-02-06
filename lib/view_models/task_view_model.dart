@@ -21,10 +21,10 @@ class TaskViewModel extends ChangeNotifier {
     // filterTasks(0);
   }
   void testRefreshTasks() async {
-    _tasks = await TaskService.getTasks();
-    MiniLogger.info('---------------PRINTING ALL TASKS-----------------');
-    // _tasks.forEach((t) => t.printTask());
-    MiniLogger.info('---------------/PRINTING ALL TASKS/-----------------');
+     _tasks = await TaskService.getTasks();
+    // MiniLogger.info('---------------PRINTING ALL TASKS-----------------');
+    // // _tasks.forEach((t) => t.printTask());
+    // MiniLogger.info('---------------/PRINTING ALL TASKS/-----------------');
     notifyListeners();
   }
   void initNewTask() {
@@ -36,7 +36,7 @@ class TaskViewModel extends ChangeNotifier {
       startDate: DateTime.now(),
       isRepeating: false,
       isNotifyEnabled: false,
-      repeatConfig: '{"repeatType":"weekly","selectedDays":[1,2,3,4,5,6,7]}',
+      repeatConfig: '{"repeatType":"weekly","selectedDays":[1,2,3,4,5]}',
     );
 
     selectedMinutes = 0;

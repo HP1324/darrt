@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/services/task_service.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/single_task_view.dart';
@@ -24,8 +25,9 @@ class TaskItem extends StatelessWidget {
   final bool isSelectionMode;
   final Function(bool)? onSelect;
 
-  void _navigateToTaskDetails(BuildContext context) {
-    MiniRouter.to(context, child: TaskView(task: task));
+  void _navigateToTaskDetails(BuildContext context) async{
+    Task? taskWithId = await TaskService.getTaskById(task.id!);
+    MiniRouter.to(context, child: TaskView(task: taskWithId!,));
   }
 
   @override

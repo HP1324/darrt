@@ -32,6 +32,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
           icon: Icon(Icons.flutter_dash),
           onTap: ()async {
             final db = await DatabaseService.openDb();
+            // await db.delete('tasks');
             await TestApp.insertTestTasks(db);
             context.read<TaskViewModel>().testRefreshTasks();
           },
