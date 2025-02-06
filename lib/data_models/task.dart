@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
+import 'package:minimaltodo/services/database_service.dart';
 
 class Task {
   Task({
@@ -237,7 +238,24 @@ class Task {
 }
 
 extension TaskUtilities on Task{
-  Map<String,dynamic> getDecompressedFinishDates(){
+  Map<String, dynamic> getDecompressedFinishDates(){
+    // if(finishDates == null && repeatConfig == null){
+    //   try {
+    //     final db = await DatabaseService.openDb();
+    //     final finishDates = await db.query('tasks', columns: ['finishDates'], where: 'id = ?', whereArgs: [id]);
+    //     logger.d('runtime type: ${finishDates.runtimeType}');
+    //     final encodedJsonString = finishDates.first['finishDates'] as String?;
+    //     final compressed = base64Decode(encodedJsonString!);
+    //     final decompressed = GZipDecoder().decodeBytes(compressed);
+    //     final decodedJsonString = utf8.decode(decompressed);
+    //
+    //     return Map<String,dynamic>.from(jsonDecode(decodedJsonString));
+    //   }catch(e,stacktrace) {
+    //     MiniLogger.error('error or exception: ${e.toString()}');
+    //     MiniLogger.trace('error or exception: ${stacktrace.toString()}');
+    //     return {};
+    //   }
+    // }
     if(finishDates == null || finishDates!.isEmpty) return {};
 
     try{

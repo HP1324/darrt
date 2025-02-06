@@ -68,9 +68,9 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Consumer2<TaskViewModel, CalendarViewModel>(
       builder: (context, taskVM, calendarVM, _) {
-        // final tasks = taskVM.tasks;
-        // final filteredTasks = calendarVM.filterTasks(tasks);
-        // final tasksForSelectedDate = calendarVM.getTasksForDate(calendarVM.selectedDate, filteredTasks);
+        final tasks = taskVM.tasks;
+        final filteredTasks = calendarVM.filterTasks(tasks);
+        final tasksForSelectedDate = calendarVM.getTasksForDate(calendarVM.selectedDate, filteredTasks);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -126,43 +126,31 @@ class _CalendarPageState extends State<CalendarPage> {
             ),
             ScrollableDateBar(),
             Expanded(
-              child: FutureBuilder(
-                  future: getTasks(calendarVM.taskFilter),
-                  builder: (context, tasks) {
-                    MiniLogger.debug('FutureBuilder is called');
-                    if (tasks.hasData) {
-                      final filteredTasks = calendarVM.filterTasks(tasks.data!);
-                      final tasksForSelectedDate = calendarVM.getTasksForDate(calendarVM.selectedDate, filteredTasks);
-                      if (tasksForSelectedDate.isEmpty) {
-                        return Center(
-                          child: Text(
-                            switch (calendarVM.taskFilter) {
-                              TaskFilterType.all => 'No tasks',
-                              TaskFilterType.single => 'No single tasks',
-                              TaskFilterType.recurring => 'No recurring tasks',
-                            },
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                          ),
-                        );
-                      }
-                      return ListView.builder(
-                        itemCount: tasksForSelectedDate.length,
-                        itemBuilder: (context, index) {
-                          final task = tasksForSelectedDate[index];
-                          return TaskItem(
-                            key: ValueKey('task_${task.id}'),
-                            task: task.toLightweightEntity(),
-                            onLongPress: () => calendarVM.toggleTaskSelection(task),
-                            isSelected: calendarVM.selectedTaskIds.contains(task.id),
-                          );
+              child: tasksForSelectedDate.isEmpty
+                  ? Center(
+                      child: Text(
+                        switch (calendarVM.taskFilter) {
+                          TaskFilterType.all => 'No tasks',
+                          TaskFilterType.single => 'No single tasks',
+                          TaskFilterType.recurring => 'No recurring tasks',
                         },
-                      );
-                    } else {
-                      return EmptyListPlaceholder();
-                    }
-                  }),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: tasksForSelectedDate.length,
+                      itemBuilder: (context, index) {
+                        final task = tasksForSelectedDate[index];
+                        return TaskItem(
+                          key: ValueKey('task_${task.id}'),
+                          task: task.toLightweightEntity(),
+                          onLongPress: () => calendarVM.toggleTaskSelection(task),
+                          isSelected: calendarVM.selectedTaskIds.contains(task.id),
+                        );
+                      },
+                    ),
             ),
           ],
         );
@@ -170,17 +158,17 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  Future<List<Task>> getTasks(TaskFilterType taskFilter) async {
-    final tasks = await TaskService.getTasks();
-    if (taskFilter == TaskFilterType.all) {
-      return tasks;
-    }
-    if (taskFilter == TaskFilterType.single) {
-      return tasks.where((t) => !t.isRepeating!).toList();
-    } else {
-      return tasks.where((t) => t.isRepeating!).toList();
-    }
-  }
+  // Future<List<Task>> getTasks(TaskFilterType taskFilter) async {
+  //   final tasks = await TaskService.getTasks();
+  //   if (taskFilter == TaskFilterType.all) {
+  //     return tasks;
+  //   }
+  //   if (taskFilter == TaskFilterType.single) {
+  //     return tasks.where((t) => !t.isRepeating!).toList();
+  //   } else {
+  //     return tasks.where((t) => t.isRepeating!).toList();
+  //   }
+  // }
 }
 
 class ScrollableDateBar extends StatelessWidget {
