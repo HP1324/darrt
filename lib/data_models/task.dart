@@ -236,7 +236,7 @@ class Task {
   }
 }
 
-extension DateCompression on Task{
+extension TaskUtilities on Task{
   Map<String,dynamic> getDecompressedFinishDates(){
     if(finishDates == null || finishDates!.isEmpty) return {};
 
@@ -247,7 +247,7 @@ extension DateCompression on Task{
       return Map<String,dynamic>.from(jsonDecode(jsonString));
     }catch(e){
       try {
-        return Map<String, bool>.from(jsonDecode(finishDates!));
+        return Map<String, dynamic>.from(jsonDecode(finishDates!));
       } catch (_) {
         return {};
       }
@@ -268,5 +268,17 @@ extension DateCompression on Task{
     final jsonString = jsonEncode(finishDates);
     final compressed = GZipEncoder().encode(utf8.encode(jsonString));
     return base64Encode(compressed);
+  }
+
+  Task toLightweightEntity(){
+    return Task(
+      id: id,
+      title: title,
+      isDone: isDone,
+      isRepeating: isRepeating,
+      dueDate: dueDate,
+      category: category,
+      priority: priority,
+    );
   }
 }
