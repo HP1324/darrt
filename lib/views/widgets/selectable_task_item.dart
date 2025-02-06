@@ -41,25 +41,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
       selector: (_,calVM)=> calVM.selectedDate,
         builder: (context,selectedDate, __) {
       final isUrgent = widget.task.priority?.toLowerCase() == 'urgent';
-      bool isFinishedForDate = false;
-      
-      if (widget.task.isRepeating!) {
-        try {
-          final finishDates = widget.task.getDecompressedFinishDates();
-          final dateOnly = DateTime(
-            selectedDate.year,
-            selectedDate.month,
-            selectedDate.day
-          );
-          isFinishedForDate = finishDates[dateOnly.toIso8601String()] ?? false;
-          MiniLogger.debug('Date: ${dateOnly.toIso8601String()}, Finished: $isFinishedForDate');
-        } catch (e) {
-          MiniLogger.error('Error parsing finishDates: $e');
-          isFinishedForDate = false;
-        }
-      } else {
-        isFinishedForDate = widget.task.isDone ?? false;
-      }
+      bool isFinishedForDate =  getIsFinishedForDate(selectedDate);
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
@@ -94,6 +76,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                         value: isFinishedForDate,
                         onChanged: (value) {
                           if (widget.onStatusChanged != null) {
+
                             widget.onStatusChanged!(value ?? false);
                           }
                         },
@@ -228,5 +211,29 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
         ),
       );
     });
+  }
+
+  bool getIsFinishedForDate(DateTime selectedDate) {
+    bool isFinishedForDate = false;
+    if (widget.task.isRepeating!) {
+      try {
+        final task = context.read<TaskViewModel>().getFullTask(widget.task);
+        final finishDates = task.getDecompressedFinishDates();
+        logger.d('finish dates for this task: $finishDates');
+        final dateOnly = DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day
+        );
+        isFinishedForDate = finishDates[dateOnly.toIso8601String()] ?? false;
+        MiniLogger.debug('Date: ${dateOnly.toIso8601String()}, Finished: $isFinishedForDate');
+      } catch (e) {
+        MiniLogger.error('Error parsing finishDates: $e');
+        isFinishedForDate = false;
+      }
+    } else {
+      isFinishedForDate = widget.task.isDone ?? false;
+    }
+    return isFinishedForDate;
   }
 }

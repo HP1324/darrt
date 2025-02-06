@@ -429,13 +429,13 @@ class TaskViewModel extends ChangeNotifier {
   Future<int> toggleStatus(Task task, bool updatedStatus, CalendarViewModel calendarVM) async {
     // Consider removing this delay unless it's necessary for UI feedback
     // await Future.delayed(Duration(milliseconds: 600));
-
+    logger.d('toggle status called');
     if (task.isRepeating!) {
       final db = await DatabaseService.openDb();
       // Consider handling the case where finishDates is invalid JSON
       Map<String, dynamic> finishDates;
       try {
-        finishDates = task.getDecompressedFinishDates();
+        finishDates =await task.getDecompressedFinishDates();
       } catch (e) {
         finishDates = {};
       }
@@ -444,7 +444,7 @@ class TaskViewModel extends ChangeNotifier {
       final selectedDateString = DateTime(calendarVM.selectedDate.year, calendarVM.selectedDate.month, calendarVM.selectedDate.day).toIso8601String();
 
       finishDates[selectedDateString] = updatedStatus;
-
+      logger.d('This is finish date value: ${finishDates[selectedDateString]}');
       String finishDatesJsonString = jsonEncode(finishDates);
       final compressed = GZipEncoder().encode(utf8.encode(finishDatesJsonString));
       String encodedFinishDates =  base64Encode(compressed);
@@ -487,6 +487,9 @@ class TaskViewModel extends ChangeNotifier {
     }
   }
 
+  Task getFullTask(Task lightTask){
+    return tasks.where((t)=> t.id == lightTask.id).toList()[0];
+  }
   //----------------------------------------------------------------------//
 
   //------------------------ TASK LIST MANAGEMENT ------------------------//

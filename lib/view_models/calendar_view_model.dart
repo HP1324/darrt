@@ -25,6 +25,12 @@ class CalendarViewModel extends ChangeNotifier {
   bool get isSelectionMode => _isSelectionMode;
   bool get isFabVisible => _isFabVisible;
   TaskFilterType get taskFilter => _taskFilter;
+  Map<String,dynamic> taskFinishDates = {};
+  void loadFinishDates (Task task)async{
+      if(task.isRepeating!){
+        taskFinishDates = await task.getDecompressedFinishDates();
+      }
+  }
 
   // Initialize dates range
   final DateTime initialDate = DateTime.parse(MiniBox.read(mFirstInstallDate))
