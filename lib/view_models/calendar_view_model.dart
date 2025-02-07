@@ -28,7 +28,7 @@ class CalendarViewModel extends ChangeNotifier {
   Map<String,dynamic> taskFinishDates = {};
   void loadFinishDates (Task task)async{
       if(task.isRepeating!){
-        taskFinishDates = await task.getDecompressedFinishDates();
+        taskFinishDates = task.getDecompressedFinishDates();
       }
   }
 
@@ -55,7 +55,7 @@ class CalendarViewModel extends ChangeNotifier {
       _isInitialized = true;
       
       // Add scroll listener for FAB visibility
-      listScrollController.addListener(_handleScroll);
+      // listScrollController.addListener(_handleScroll);
     }
   }
 
@@ -227,7 +227,7 @@ class CalendarViewModel extends ChangeNotifier {
   @override
   void dispose() {
     dateScrollController.dispose();
-    listScrollController.removeListener(_handleScroll);
+    // listScrollController.removeListener(_handleScroll);
     listScrollController.dispose();
     super.dispose();
   }
