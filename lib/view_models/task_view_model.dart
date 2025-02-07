@@ -17,16 +17,53 @@ import 'package:minimaltodo/view_models/calendar_view_model.dart';
 class TaskViewModel extends ChangeNotifier {
   //------------------------ INITIALIZATION ------------------------//
   TaskViewModel() {
-    _refreshTasks();
+    loadTasks();
     // filterTasks(0);
   }
   void testRefreshTasks() async {
-     _tasks = await TaskService.getTasks();
+     _tasks = await TaskService.getRecurringTasks();
     // MiniLogger.info('---------------PRINTING ALL TASKS-----------------');
     // // _tasks.forEach((t) => t.printTask());
     // MiniLogger.info('---------------/PRINTING ALL TASKS/-----------------');
     notifyListeners();
   }
+  void loadTasks() async {
+    _tasks = await TaskService.getTasks();
+    // final db = await DatabaseService.openDb();
+    // final List<Map<String, dynamic>> singleTasks = await db.query('tasks', where: 'isRepeating = 0');
+    // singleTaskCompletion.clear();
+    // for (var task in singleTasks){
+    //   singleTaskCompletion[task['id']] = task['isDone'] == 1;
+    // }
+    //
+    // final List<Map<String, dynamic>> recurringTasks =await db.query('task_completion');
+    // recurringTaskCompletion.clear();
+    // for(var entry in recurringTasks){
+    //   int taskId = entry['task_id'] ;
+    //   String date = entry['date'];
+    //
+    //   recurringTaskCompletion.putIfAbsent(taskId, () => {}).add(date);
+    // }
+    notifyListeners();
+  }
+  void loadSingleTasks()async{
+      singleTasks = await TaskService.getSingleTasks();
+      notifyListeners();
+  }
+  void loadRecurringTasks()async{
+    recurringTasks = await TaskService.getRecurringTasks();
+    final List<Map<String, dynamic>> completions =await TaskService.getTaskCompletions();
+    recurringTaskCompletion.clear();
+    for(var entry in completions){
+      int taskId = entry['task_id'] ;
+      String date = entry['date'];
+
+      recurringTaskCompletion.putIfAbsent(taskId, () => {}).add(date);
+    }
+    notifyListeners();
+  }
+
+
   void initNewTask() {
     currentTask = Task(
       dueDate: DateTime.now().add(const Duration(minutes: 2)),
@@ -63,6 +100,12 @@ class TaskViewModel extends ChangeNotifier {
   //------------------------ PROPERTIES & CONTROLLERS ------------------------//
   List<Task> _tasks = [];
   List<Task> get tasks => _tasks;
+  List<Task> singleTasks = [];
+  List<Task> recurringTasks = [];
+  Map<int, bool> singleTaskCompletion = {}; // taskId -> isCompleted (for single tasks)
+  Map<int, Set<String>> recurringTaskCompletion = {}; // taskId -> completed dates (for recurring tasks)
+
+
   Task currentTask = Task();
   TextEditingController titleController = TextEditingController();
   FocusNode titleTextFieldNode = FocusNode();
@@ -397,7 +440,7 @@ class TaskViewModel extends ChangeNotifier {
     if (currentTask.isValid()) {
       changes = await TaskService.editTask(newTask: currentTask.toJson());
     }
-    _refreshTasks();
+    loadTasks();
     // Reschedule notifications based on repeating flag.
     if (currentTask.isRepeating! && currentTask.isNotifyEnabled!) {
       await NotificationService.createRepeatingTaskNotifications(currentTask);
@@ -458,7 +501,7 @@ class TaskViewModel extends ChangeNotifier {
 
         MiniLogger.debug('Selected date task status: ${finishDates[selectedDateString]}');
         // notifyListeners(); // Notify UI of changes
-        _refreshTasks();
+        loadTasks();
         return changes;
       } catch (e) {
         MiniLogger.error('An error occurred while updating task finish date status: $e');
@@ -483,7 +526,7 @@ class TaskViewModel extends ChangeNotifier {
         }
       });
 
-      _refreshTasks();
+      loadTasks();
       return changesMade;
     }
   }
@@ -494,13 +537,7 @@ class TaskViewModel extends ChangeNotifier {
   //----------------------------------------------------------------------//
 
   //------------------------ TASK LIST MANAGEMENT ------------------------//
-  void _refreshTasks() async {
-    _tasks = await TaskService.getTasks();
-    MiniLogger.info('---------------PRINTING ALL TASKS-----------------');
-    // _tasks.forEach((t) => t.printTask());
-    MiniLogger.info('---------------/PRINTING ALL TASKS/-----------------');
-    notifyListeners();
-  }
+
 
   void filterTasks(int filterFlag) async {
     finishedTasks = await TaskService.filterTasks(filterFlag);
@@ -519,7 +556,7 @@ class TaskViewModel extends ChangeNotifier {
   void updateTaskListAfterEdit(CategoryModel list) async {
     final tasksForCurrentList = tasks.where((t) => t.category!.id == list.id).toList();
     await TaskService.editTaskCategoryAfterEdit(tasksForCurrentList, list);
-    _refreshTasks();
+    loadTasks();
   }
   //--------------------------------------------------------------------------//
 
