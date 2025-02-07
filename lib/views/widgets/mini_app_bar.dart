@@ -6,10 +6,14 @@ import 'package:minimaltodo/helpers/mini_page_transition.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/mini_storage.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
+import 'package:minimaltodo/services/database_service.dart';
+import 'package:minimaltodo/test_app.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
+import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/navigation/finished_tasks_page.dart';
 import 'package:minimaltodo/views/pages/navigation/pending_tasks_page.dart';
 import 'package:minimaltodo/views/pages/search_page.dart';
+import 'package:minimaltodo/views/pages/single_task_view.dart';
 import 'package:provider/provider.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -20,10 +24,62 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   AppBar build(BuildContext context) {
     return AppBar(
+      backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(14),
       elevation: 0,
-      title: Text('MinimalTodo', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-      // centerTitle: true,
+      title: Consumer<CalendarViewModel>(
+          builder: (context, calVM, _) {
+            final isBefore = calVM.selectedDate.isBefore(DateTime.now());
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (Widget child, animation) {
+                final inAnimation = Tween<Offset>(
+                  begin: const Offset(-1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation);
+
+                final outAnimation = Tween<Offset>(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation);
+
+                if (child.key == ValueKey<DateTime>(calVM.selectedDate)) {
+                  // This is the new date coming in
+                  return ClipRect(
+                    child: SlideTransition(
+                      position:isBefore ?  inAnimation :outAnimation,
+                      child: child,
+                    ),
+                  );
+                } else {
+                  // This is the old date going out
+                  return ClipRect(
+                    child: SlideTransition(
+                      position:isBefore ? outAnimation:inAnimation,
+                      child: child,
+                    ),
+                  );
+                }
+              },
+              child: Text(
+                formatDateWith(calVM.selectedDate, 'EEE, d MMM, yyyy'),
+                key: ValueKey<DateTime>(calVM.selectedDate),
+                style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            );
+          }
+      ),
       actions: [
+        _MiniAppBarAction(
+          icon: Icon(Icons.flutter_dash),
+          onTap: ()async {
+            final db = await DatabaseService.openDb();
+            // await db.delete('tasks');
+            await TestApp.insertTestTasks(db);
+            context.read<TaskViewModel>().testRefreshTasks();
+          },
+        ),
         _MiniAppBarAction(
           onTap: () {
             showModalBottomSheet(
@@ -32,13 +88,13 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   return Container(
                     decoration: BoxDecoration(),
                     child: CalendarDatePicker(
-                        initialDate: null,
-                        firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(Duration(days: 365)),
-                        lastDate: DateTime.now().add(Duration(days: 18263)),
-                        onDateChanged: (selectedDate){
-                            context.read<CalendarViewModel>().scrollToDate(selectedDate);
-                        },
-                      ),
+                      initialDate: null,
+                      firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(Duration(days: 365)),
+                      lastDate: DateTime.now().add(Duration(days: 18263)),
+                      onDateChanged: (selectedDate) {
+                        context.read<CalendarViewModel>().scrollToDate(selectedDate);
+                      },
+                    ),
                   );
                 });
           },
@@ -68,12 +124,6 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   },
                   child: Text('Finished Tasks'),
                 ),
-                // PopupMenuItem(
-                //   onTap: () {
-                //     MiniRouter.to(context, child: PendingTasksPage());
-                //   },
-                //   child: Text('Pending Tasks'),
-                // ),
                 PopupMenuItem(child: Text('Rate Us')),
                 PopupMenuItem(child: Text('Give Feedback')),
                 PopupMenuItem(child: Text('Settings')),

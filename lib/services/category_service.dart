@@ -10,11 +10,6 @@ class CategoryService {
     final database = await DatabaseService.openDb();
     final List<Map<String, dynamic>> categoryMaps = await database.query('categories');
 
-    // Debug: Print all categories and their icon codes
-    for (var map in categoryMaps) {
-      logger.d('List: ${map['name']}, Icon code: ${map['icon_code']}');
-    }
-
     return List.generate(categoryMaps.length, (index) {
       return CategoryModel.fromJson(categoryMaps[index]);
     });

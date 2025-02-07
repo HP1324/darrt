@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -10,14 +10,32 @@ import 'package:minimaltodo/services/database_service.dart';
 import 'package:sqflite/sqflite.dart';
 
 class TaskService {
-  static Future<List<Task>> getTasks() async {
+
+  static Future<List<Task>> getSingleTasks() async {
     final database = await DatabaseService.openDb();
-    final List<Map<String, dynamic>> taskMaps = await database.query('tasks');
-    return List.generate(taskMaps.length, (index) {
-      return Task.fromJson(taskMaps[index]);
+    final List<Map<String, dynamic>> singleTaskMaps = await database.query('tasks',where: 'isRepeating = ?',whereArgs: [0]);
+    return List.generate(singleTaskMaps.length, (index) {
+      return Task.fromJson(singleTaskMaps[index]);
     });
   }
-
+  static Future<List<Task>> getTasks() async {
+    final database = await DatabaseService.openDb();
+    final List<Map<String, dynamic>> singleTaskMaps = await database.query('tasks');
+    return List.generate(singleTaskMaps.length, (index) {
+      return Task.fromJson(singleTaskMaps[index]);
+    });
+  }
+  static Future<List<Task>> getRecurringTasks() async {
+    final database = await DatabaseService.openDb();
+    final List<Map<String, dynamic>> recurringTaskMaps = await database.query('tasks',where: 'isRepeating = ?',whereArgs: [1]);
+    return List.generate(recurringTaskMaps.length, (index) {
+      return Task.fromJson(recurringTaskMaps[index]);
+    });
+  }
+  static Future<List<Map<String,dynamic>>> getTaskCompletions()async{
+    final db = await DatabaseService.openDb();
+    return await db.query('task_completion');
+  }
   static Future<Task?> getTaskById(int id) async {
     final database = await DatabaseService.openDb();
     List<Map<String, dynamic>> results = await database.query('tasks', where: 'id = ?', whereArgs: [id]);
@@ -29,22 +47,22 @@ class TaskService {
 
   Future<int> addTask(Task task) async {
     final database = await DatabaseService.openDb();
-    if (task.isRepeating!) {
-      final startDate = task.startDate;
-      final endDate = task.endDate;
-      final lastDate = endDate == null ? DateTime.now().add(Duration(days: 18264)) : endDate.add(Duration(days: 1));
-      MiniLogger.debug('Start Date: $startDate, Last Date: $lastDate');
+    // if (task.isRepeating!) {
+    //   MiniLogger.debug('Reminder Times before adding: ${task.reminderTimes}');
+    //   final startDate = task.startDate;
+    //   final endDate = task.endDate;
+    //   final lastDate = endDate == null ? DateTime.now().add(Duration(days: 18264)) : endDate.add(Duration(days: 1));
+    //   MiniLogger.debug('Start Date: $startDate, Last Date: $lastDate');
+    //
+    //   // Just pass the timestamps instead of DateTime objects
+    //   Map<String, dynamic> params = {
+    //     'startMs': startDate.millisecondsSinceEpoch,
+    //     'lastMs': lastDate.millisecondsSinceEpoch
+    //   };
+    //
+    //   task.finishDates = await compute(_generateFinishDates, params);
+    // }
 
-      // Just pass the timestamps instead of DateTime objects
-      Map<String, dynamic> params = {
-        'startMs': startDate.millisecondsSinceEpoch,
-        'lastMs': lastDate.millisecondsSinceEpoch
-      };
-
-      task.finishDates = await compute(_generateFinishDates, params);
-    }
-
-    MiniLogger.debug('Task finish dates before adding to database: ${task.finishDates}');
     final data = task.toJson();
     debugPrint('Task adding to database ->-> $data');
     final id = await database.insert('tasks', data, conflictAlgorithm: ConflictAlgorithm.replace);
@@ -63,8 +81,9 @@ class TaskService {
       final dateOnly = DateTime(date.year, date.month, date.day).toIso8601String();
       finishDates[dateOnly] = false;
     }
-
-    return jsonEncode(finishDates);
+    final jsonString = jsonEncode(finishDates);
+    final compressed = GZipEncoder().encode(utf8.encode(jsonString));
+    return base64Encode(compressed);
   }
   static Future<int> toggleDone(int id, bool updatedStatus, DateTime? finishedAt) async {
     final database = await DatabaseService.openDb();

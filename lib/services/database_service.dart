@@ -29,10 +29,18 @@ class DatabaseService {
         endDate TEXT,
         repeatConfig TEXT,
         reminderTimes TEXT,
-        finishDates TEXT,
         FOREIGN KEY(categoryId) REFERENCES categories (id) ON DELETE SET DEFAULT
       )
   """;
+  static const createTaskCompletionTable = '''
+  CREATE TABLE task_completion(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      task_id INTEGER NOT NULL,
+      date TEXT NOT NULL,
+      isCompleted INTEGER NOT NULL,
+      FOREIGN KEY(task_id) references tasks(id) ON DELETE CASCADE
+  )
+  ''';
   static const createStatsTable = """CREATE TABLE stats (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT NOT NULL,
@@ -68,7 +76,6 @@ class DatabaseService {
     ('Hobbies', 'gamepad'),
     ('Fitness', 'dumbbell'),
     ('Food', 'utensils'),
-    ('Friends', 'people'),
     ('Family', 'home'),
     ('Projects', 'chart')
   """;
@@ -81,6 +88,7 @@ class DatabaseService {
         await database.transaction((txn) async {
           await txn.execute(createCategoriesTable);
           await txn.execute(createTasksTable);
+          await txn.execute(createTaskCompletionTable);
           await txn.execute(createStatsTable);
           await txn.execute(createDefaultCategories);
           await txn.execute(createWishlistTable);
