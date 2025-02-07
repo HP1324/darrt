@@ -13,6 +13,7 @@ import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/services/stats_service.dart';
 import 'package:minimaltodo/services/task_service.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
+import 'package:sqflite/sqflite.dart';
 
 class TaskViewModel extends ChangeNotifier {
   //------------------------ INITIALIZATION ------------------------//
@@ -21,12 +22,13 @@ class TaskViewModel extends ChangeNotifier {
     // filterTasks(0);
   }
   void testRefreshTasks() async {
-     _tasks = await TaskService.getRecurringTasks();
+    _tasks = await TaskService.getRecurringTasks();
     // MiniLogger.info('---------------PRINTING ALL TASKS-----------------');
     // // _tasks.forEach((t) => t.printTask());
     // MiniLogger.info('---------------/PRINTING ALL TASKS/-----------------');
     notifyListeners();
   }
+
   void loadTasks() async {
     _tasks = await TaskService.getTasks();
     // final db = await DatabaseService.openDb();
@@ -46,23 +48,24 @@ class TaskViewModel extends ChangeNotifier {
     // }
     notifyListeners();
   }
-  void loadSingleTasks()async{
-      singleTasks = await TaskService.getSingleTasks();
-      notifyListeners();
+
+  void loadSingleTasks() async {
+    singleTasks = await TaskService.getSingleTasks();
+    notifyListeners();
   }
-  void loadRecurringTasks()async{
+
+  void loadRecurringTasks() async {
     recurringTasks = await TaskService.getRecurringTasks();
-    final List<Map<String, dynamic>> completions =await TaskService.getTaskCompletions();
+    final List<Map<String, dynamic>> completions = await TaskService.getTaskCompletions();
     recurringTaskCompletion.clear();
-    for(var entry in completions){
-      int taskId = entry['task_id'] ;
+    for (var entry in completions) {
+      int taskId = entry['task_id'];
       String date = entry['date'];
 
       recurringTaskCompletion.putIfAbsent(taskId, () => {}).add(date);
     }
     notifyListeners();
   }
-
 
   void initNewTask() {
     currentTask = Task(
@@ -104,7 +107,6 @@ class TaskViewModel extends ChangeNotifier {
   List<Task> recurringTasks = [];
   Map<int, bool> singleTaskCompletion = {}; // taskId -> isCompleted (for single tasks)
   Map<int, Set<String>> recurringTaskCompletion = {}; // taskId -> completed dates (for recurring tasks)
-
 
   Task currentTask = Task();
   TextEditingController titleController = TextEditingController();
@@ -471,73 +473,43 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   Future<int> toggleStatus(Task task, bool updatedStatus, CalendarViewModel calendarVM) async {
-    // Consider removing this delay unless it's necessary for UI feedback
-    // await Future.delayed(Duration(milliseconds: 600));
-    logger.d('toggle status called');
+    final db = await DatabaseService.openDb();
+    var changes = 0;
     if (task.isRepeating!) {
-      final db = await DatabaseService.openDb();
-      // Consider handling the case where finishDates is invalid JSON
-      Map<String, dynamic> finishDates;
-      try {
-        finishDates =await task.getDecompressedFinishDates();
-      } catch (e) {
-        finishDates = {};
-      }
-
-      // Good practice normalizing the date to remove time components
-      final selectedDateString = DateTime(calendarVM.selectedDate.year, calendarVM.selectedDate.month, calendarVM.selectedDate.day).toIso8601String();
-
-      finishDates[selectedDateString] = updatedStatus;
-      logger.d('This is finish date value: ${finishDates[selectedDateString]}');
-      String finishDatesJsonString = jsonEncode(finishDates);
-      final compressed = GZipEncoder().encode(utf8.encode(finishDatesJsonString));
-      String encodedFinishDates =  base64Encode(compressed);
-
-      try {
-        final changes = await db.update('tasks', {'finishDates': encodedFinishDates}, where: 'id = ?', whereArgs: [task.id]);
-
-        // Update the task's finishDates in memory
-        // task.finishDates = finishDatesJsonString;
-
-        MiniLogger.debug('Selected date task status: ${finishDates[selectedDateString]}');
-        // notifyListeners(); // Notify UI of changes
-        loadTasks();
-        return changes;
-      } catch (e) {
-        MiniLogger.error('An error occurred while updating task finish date status: $e');
-        return 0;
+      final selectedDate = DateTime(calendarVM.selectedDate.year, calendarVM.selectedDate.month, calendarVM.selectedDate.day);
+      if (updatedStatus) {
+        changes = await db.insert(
+          'task_completion',
+          {'task_id': task.id, 'date': selectedDate.toIso8601String(), 'isCompleted': 1},
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+        recurringTaskCompletion.putIfAbsent(task.id!, () => {}).add(selectedDate.toIso8601String());
+      } else {
+        changes = await db.delete(
+          'task_completion',
+          where: 'task_id = ? AND date = ?',
+          whereArgs: [task.id, selectedDate.toIso8601String()],
+        );
+        recurringTaskCompletion[task.id]?.remove(selectedDate.toIso8601String());
       }
     } else {
-      // Non-repeating task logic
-      task.isDone = updatedStatus;
-      int changesMade = await TaskService.toggleDone(task.id!, updatedStatus, task.isDone! ? DateTime.now() : null);
-
-      // Handle notifications
-      Future((){
-        if (task.isDone!) {
-          AwesomeNotifications().cancel(task.id!);
-        } else if (task.isNotifyEnabled!) {
-          if (task.isRepeating!) {
-            // This condition will never be true here
-            NotificationService.createRepeatingTaskNotifications(task);
-          } else {
-            NotificationService.createTaskNotification(task);
-          }
-        }
-      });
-
-      loadTasks();
-      return changesMade;
+      changes = await db.update(
+        'tasks',
+        {'isDone':updatedStatus ? 1:0},
+        where: 'id = ?',
+        whereArgs: [task.id],
+      );
+      singleTaskCompletion[task.id!] =   updatedStatus;
     }
+    return changes;
   }
 
-  Task getFullTask(Task lightTask){
-    return tasks.where((t)=> t.id == lightTask.id).toList()[0];
+  Task getFullTask(Task lightTask) {
+    return tasks.where((t) => t.id == lightTask.id).toList()[0];
   }
   //----------------------------------------------------------------------//
 
   //------------------------ TASK LIST MANAGEMENT ------------------------//
-
 
   void filterTasks(int filterFlag) async {
     finishedTasks = await TaskService.filterTasks(filterFlag);
