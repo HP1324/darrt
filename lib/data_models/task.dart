@@ -1,7 +1,11 @@
+import 'dart:convert';
+
+import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
+import 'package:minimaltodo/services/database_service.dart';
 
 class Task {
   Task({
@@ -21,7 +25,6 @@ class Task {
     this.endDate,
     this.repeatConfig,
     this.reminderTimes,
-    this.finishDates,
   }) : startDate = startDate ?? DateTime.now();
 
   int? id;
@@ -41,8 +44,7 @@ class Task {
   DateTime startDate; // defaults to now if not provided
   DateTime? endDate; // null means repeat indefinitely
   String? repeatConfig; // JSON string, e.g. {"repeatType": "weekly", "selectedDays": [1,3,5]}
-  String? reminderTimes; // JSON string list of reminders, e.g. '["08:00", "12:00", "18:00"]'
-  String? finishDates;
+  String? reminderTimes;
 
   Task copyWith({
     int? id,
@@ -61,7 +63,6 @@ class Task {
     DateTime? endDate,
     String? repeatConfig,
     String? reminderTimes,
-    String? finishDates,
   }) =>
       Task(
         id: id ?? this.id,
@@ -79,7 +80,6 @@ class Task {
         startDate: startDate ?? this.startDate,
         endDate: endDate ?? this.endDate,
         repeatConfig: repeatConfig ?? this.repeatConfig,
-        finishDates: finishDates ?? this.finishDates,
       );
 
   void printTask() {
@@ -107,7 +107,6 @@ class Task {
            'endDate': ${endDate?.toIso8601String()},
            'repeatConfig': $repeatConfig,
            'reminderTimes': $reminderTimes,
-           'finishDates':$finishDates,
           }
           """);
     }
@@ -131,8 +130,7 @@ class Task {
         startDate == other.startDate &&
         endDate == other.endDate &&
         repeatConfig == other.repeatConfig &&
-        reminderTimes == other.reminderTimes &&
-        finishDates == other.finishDates;
+        reminderTimes == other.reminderTimes ;
   }
 
   @override
@@ -153,7 +151,6 @@ class Task {
         endDate,
         repeatConfig,
         reminderTimes,
-        finishDates,
       );
 
   bool isValid() {
@@ -194,7 +191,6 @@ class Task {
         'endDate': endDate?.toIso8601String(),
         'repeatConfig': repeatConfig,
         'reminderTimes': reminderTimes,
-        'finishDates': finishDates,
       };
 
   // Create a Task from JSON
@@ -224,11 +220,24 @@ class Task {
         endDate: json['endDate'] != null ? DateTime.parse(json['endDate']) : null,
         repeatConfig: json['repeatConfig'],
         reminderTimes: json['reminderTimes'],
-        finishDates: json['finishDates'],
       );
     } catch (e) {
       MiniLogger.error('Error parsing task from JSON: $e');
       rethrow;
     }
+  }
+}
+
+extension TaskUtilities on Task{
+  Task toLightweightEntity(){
+    return Task(
+      id: id,
+      title: title,
+      isDone: isDone,
+      isRepeating: isRepeating,
+      dueDate: dueDate,
+      category: category,
+      priority: priority,
+    );
   }
 }

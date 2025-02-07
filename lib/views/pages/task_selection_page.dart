@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
-import 'package:minimaltodo/views/widgets/selectable_task_item.dart';
+import 'package:minimaltodo/views/widgets/task_item.dart';
 import 'package:provider/provider.dart';
 
 class TaskSelectionPage extends StatefulWidget {
@@ -88,16 +88,17 @@ class _TaskSelectionPageState extends State<TaskSelectionPage> {
               final task = tasks[index];
               final isSelected = _selectedTaskIds.contains(task.id);
               
-              return SelectableTaskItem(
-                key: ValueKey(task.id),
+              return TaskItem(
+                key: ValueKey('task_${task.id}'),
                 task: task,
-                isSelected: isSelected,
-                onSelectionChanged: (selected) {
+                isSelected: _selectedTaskIds.contains(task.id),
+                isSelectionMode: true,
+                onSelect: (_) {
                   setState(() {
-                    if (selected) {
-                      _selectedTaskIds.add(task.id!);
+                    if (_selectedTaskIds.contains(task.id)) {
+                      _selectedTaskIds.remove(task.id);
                     } else {
-                      _selectedTaskIds.remove(task.id!);
+                      _selectedTaskIds.add(task.id!);
                     }
                   });
                 },

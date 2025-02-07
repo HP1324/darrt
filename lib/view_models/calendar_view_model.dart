@@ -12,10 +12,10 @@ class CalendarViewModel extends ChangeNotifier {
   final Set<int> _selectedTaskIds = {};
   bool _isSelectionMode = false;
   bool _isFabVisible = true;
-  
+
   // Task filter state
   TaskFilterType _taskFilter;
-  
+
   final ScrollController dateScrollController = ScrollController();
   final ScrollController listScrollController = ScrollController();
   final double dateItemWidth = 48.0;
@@ -25,12 +25,16 @@ class CalendarViewModel extends ChangeNotifier {
   bool get isSelectionMode => _isSelectionMode;
   bool get isFabVisible => _isFabVisible;
   TaskFilterType get taskFilter => _taskFilter;
+  Map<String, dynamic> taskFinishDates = {};
+  // void loadFinishDates (Task task)async{
+  //     if(task.isRepeating!){
+  //       taskFinishDates = task.getDecompressedFinishDates();
+  //     }
+  // }
 
   // Initialize dates range
-  final DateTime initialDate = DateTime.parse(MiniBox.read(mFirstInstallDate))
-      .subtract(const Duration(days: 365));
-  final DateTime maxExtentDate =
-      DateTime.now().add(const Duration(days: 18263));
+  final DateTime initialDate = DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(const Duration(days: 365));
+  final DateTime maxExtentDate = DateTime.now().add(const Duration(days: 18263));
 
   late List<DateTime> dates = List.generate(
     maxExtentDate.difference(initialDate).inDays + 1,
@@ -47,9 +51,9 @@ class CalendarViewModel extends ChangeNotifier {
         }
       });
       _isInitialized = true;
-      
+
       // Add scroll listener for FAB visibility
-      listScrollController.addListener(_handleScroll);
+      // listScrollController.addListener(_handleScroll);
     }
   }
 
@@ -97,13 +101,14 @@ class CalendarViewModel extends ChangeNotifier {
     }
   }
 
-  List<Task> filterTasks(List<Task> tasks) {
-    if (_taskFilter == TaskFilterType.all) {
+  List<Task> filterTasks(List<Task> tasks, int tabIndex) {
+    if (tabIndex == 0) {
       return tasks;
+    } else if (tabIndex == 1) {
+      return tasks.where((task) => !task.isRepeating!).toList();
+    }else{
+      return tasks.where((task) => task.isRepeating!).toList();
     }
-    return tasks.where((task) => 
-      task.isRepeating == (_taskFilter == TaskFilterType.recurring)
-    ).toList();
   }
 
   void setSelectedDate(DateTime date) {
@@ -182,8 +187,7 @@ class CalendarViewModel extends ChangeNotifier {
   bool _isTaskOccurringOnDate(Task task, DateTime date) {
     // Include start and end dates in the range check
     if (date.isBefore(task.startDate.subtract(const Duration(days: 1))) ||
-        (task.endDate != null &&
-            date.isAfter(task.endDate!.add(const Duration(days: 1))))) {
+        (task.endDate != null && date.isAfter(task.endDate!.add(const Duration(days: 1))))) {
       return false;
     }
 
@@ -198,8 +202,7 @@ class CalendarViewModel extends ChangeNotifier {
         case 'monthly':
           return date.day == task.startDate.day;
         case 'yearly':
-          return date.day == task.startDate.day &&
-              date.month == task.startDate.month;
+          return date.day == task.startDate.day && date.month == task.startDate.month;
         default:
           return false;
       }
@@ -221,7 +224,7 @@ class CalendarViewModel extends ChangeNotifier {
   @override
   void dispose() {
     dateScrollController.dispose();
-    listScrollController.removeListener(_handleScroll);
+    // listScrollController.removeListener(_handleScroll);
     listScrollController.dispose();
     super.dispose();
   }

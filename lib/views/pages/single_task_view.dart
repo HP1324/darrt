@@ -60,6 +60,7 @@ class TaskView extends StatelessWidget {
   }
 
   String _getReminderTimesDescription(Task task,BuildContext context) {
+    // MiniLogger.debug(task.reminderTimes!);
     if (!(task.isNotifyEnabled ?? false)) return 'Notifications disabled';
     if (task.reminderTimes == null) return 'No reminders set';
 

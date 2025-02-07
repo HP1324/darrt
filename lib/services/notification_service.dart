@@ -103,12 +103,14 @@ class NotificationService {
     MiniLogger.debug(
         'Is notification allowed? ${await _notif.isNotificationAllowed()}');
 
+      MiniLogger.debug('notification type:${task.notifType}, time: ${task.notifyTime}');
     try {
+      final notifType = task.notifType!.toLowerCase();
+      final isAlarm = notifType == 'alarm';
       final isCreated = await _notif.createNotification(
-        content: task.notifType!.toLowerCase() == 'notif'
-            ? NotificationContent(
+        content:  NotificationContent(
                 id: task.id!,
-                channelKey: 'task_notif',
+                channelKey: isAlarm ? 'task_alarm' : 'task_notif',
                 title: 'Task Due at ${formatTime(task.dueDate!)}',
                 body: task.title,
                 actionType: ActionType.Default,
@@ -116,21 +118,7 @@ class NotificationService {
                   'task': taskPayload,
                 },
                 notificationLayout: NotificationLayout.Default,
-                category: NotificationCategory.Reminder,
-                wakeUpScreen: true,
-                criticalAlert: true,
-              )
-            : NotificationContent(
-                id: task.id!,
-                channelKey: 'task_alarm',
-                title: 'Task Due at ${formatTime(task.dueDate!)}',
-                body: task.title,
-                actionType: ActionType.Default,
-                payload: {
-                  'task': taskPayload,
-                },
-                notificationLayout: NotificationLayout.Default,
-                category: NotificationCategory.Alarm,
+                category:isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
                 wakeUpScreen: true,
                 criticalAlert: true,
               ),
@@ -173,8 +161,7 @@ class NotificationService {
         final times = jsonDecode(task.reminderTimes!) as List;
         reminderTimes = times.map((timeStr) {
           final parts = (timeStr as String).split(':');
-          return TimeOfDay(
-              hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+          return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
         }).toList();
       }
 
