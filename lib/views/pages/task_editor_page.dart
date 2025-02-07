@@ -8,6 +8,7 @@ import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/mini_storage.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
+import 'package:minimaltodo/views/pages/single_task_view.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/services/notification_service.dart';
@@ -43,6 +44,9 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
     MiniLogger.debug('build called');
     return PopScope(
       onPopInvokedWithResult: (didPop, result) async {
+        if (taskVM.titleController.text.trim().isNotEmpty) {
+          taskVM.title = taskVM.titleController.text;
+        }
         if (widget.editMode) {
           final navigator = Navigator.of(context);
           final changes = await taskVM.editTask();
@@ -60,13 +64,13 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
           backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(20),
           title: widget.editMode
               ? Text(
-            widget.taskToEdit!.title!,
-            style: TextStyle(fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
-          )
+                  widget.taskToEdit!.title!,
+                  style: TextStyle(fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
+                )
               : Text(
-            'New Task',
-            style: TextStyle(fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
-          ),
+                  'New Task',
+                  style: TextStyle(fontSize: Theme.of(context).textTheme.headlineSmall!.fontSize),
+                ),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -112,7 +116,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                             ),
                           ),
                           backgroundColor: WidgetStateProperty.resolveWith(
-                                (states) {
+                            (states) {
                               if (states.contains(WidgetState.selected)) {
                                 return Theme.of(context).colorScheme.primaryContainer;
                               }
@@ -120,7 +124,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                             },
                           ),
                           foregroundColor: WidgetStateProperty.resolveWith(
-                                (states) {
+                            (states) {
                               if (states.contains(WidgetState.selected)) {
                                 return Theme.of(context).colorScheme.onPrimaryContainer;
                               }
@@ -162,25 +166,24 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
         floatingActionButton: widget.editMode
             ? null
             : FloatingActionButton(
-          onPressed: () async {
-            final navigator = Navigator.of(context);
-            final isNotifEnabled = taskVM.currentTask.isNotifyEnabled;
-            if (taskVM.titleController.text.trim().isNotEmpty) {
-              taskVM.title = taskVM.titleController.text;
-            }
+                onPressed: () async {
+                  final navigator = Navigator.of(context);
+                  if (taskVM.titleController.text.trim().isNotEmpty) {
+                    taskVM.title = taskVM.titleController.text;
+                  }
 
-            final success = await taskVM.addNewTask();
-            MiniLogger.debug('Task added: $success');
-            if (success) {
-              navigator.pop();
-              MiniLogger.debug('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
-            }
-            await _handleNotificationLogic(taskVM);
-            taskVM.titleController.clear();
-          },
-          shape: const CircleBorder(),
-          child: const Icon(Icons.done),
-        ),
+                  final success = await taskVM.addNewTask();
+                  MiniLogger.debug('Task added: $success');
+                  if (success) {
+                    navigator.pop();
+                    MiniLogger.debug('Scheduled notifications ${AwesomeNotifications().listScheduledNotifications()}');
+                  }
+                  await _handleNotificationLogic(taskVM);
+                  taskVM.titleController.clear();
+                },
+                shape: const CircleBorder(),
+                child: const Icon(Icons.done),
+              ),
       ),
     );
   }
@@ -456,71 +459,73 @@ class SetDateWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<TaskViewModel, GeneralViewModel>(builder: (context, taskVM, generalVM, _) {
-      return InkWell(
-        onTap: () async {
-          generalVM.textFieldNode.unfocus();
-          final selectedDate = await showDatePicker(
-            context: context,
-            firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(const Duration(days: 365)),
-            lastDate: DateTime.now().add(const Duration(days: 18263)),
-            initialDate: editMode ? task!.dueDate : DateTime.now(),
-          );
-          if (selectedDate != null) {
-            taskVM.dueDate = selectedDate;
-          }
-        },
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(Icons.calendar_today_outlined, size: 18),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0.5)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'Date',
-                          style: TextStyle(fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500),
-                        ),
-                        Icon(Icons.keyboard_arrow_down_rounded, size: 22),
-                      ],
+    return Selector<TaskViewModel, DateTime>(
+        selector: (context, taskVM) => taskVM.currentTask.dueDate!,
+        builder: (context, dueDate, _) {
+          return InkWell(
+            onTap: () async {
+              context.read<GeneralViewModel>().textFieldNode.unfocus();
+              final selectedDate = await showDatePicker(
+                context: context,
+                firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(const Duration(days: 365)),
+                lastDate: DateTime.now().add(const Duration(days: 18263)),
+                initialDate: dueDate,
+              );
+              if (selectedDate != null && context.mounted) {
+                context.read<TaskViewModel>().setDueDate(selectedDate);
+              }
+            },
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.calendar_today_outlined, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0.5)),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Text(
-                            formatDateWith(taskVM.currentTask.dueDate ?? DateTime.now(), 'dd MMM, yyyy'),
-                            style: TextStyle(
-                              fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                              fontWeight: FontWeight.w400,
+                        Row(
+                          children: [
+                            Text(
+                              'Date',
+                              style: TextStyle(fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500),
                             ),
-                          ),
+                            Icon(Icons.keyboard_arrow_down_rounded, size: 22),
+                          ],
                         ),
-                        InkWell(
-                          onTap: () {
-                            taskVM.removeDueDate();
-                          },
-                          child: Icon(Icons.close, size: 19),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Text(
+                                formatDateWith(dueDate, 'dd MMM, yyyy'),
+                                style: TextStyle(
+                                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                context.read<TaskViewModel>().removeDueDate();
+                              },
+                              child: Icon(Icons.close, size: 19),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      );
-    });
+          );
+        });
   }
 }
 
@@ -530,72 +535,74 @@ class SetTimeWidget extends StatelessWidget {
   final Task? task;
   @override
   Widget build(BuildContext context) {
-    return Consumer2<TaskViewModel, GeneralViewModel>(builder: (context, taskVM, generalVM, _) {
-      return InkWell(
-        onTap: () async {
-          generalVM.textFieldNode.unfocus();
-          final selectedTime = await showTimePicker(
-            context: context,
-            initialTime: TimeOfDay.fromDateTime(taskVM.currentTask.dueDate!),
-          );
-          if (selectedTime != null) {
-            taskVM.time = selectedTime;
-          }
-          MiniLogger.debug('DueDate with time: ${taskVM.currentTask.dueDate}');
-        },
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(Icons.access_time_outlined, size: 18),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0.5),
+    return Selector<TaskViewModel, DateTime>(
+        selector: (context, taskVM) => taskVM.currentTask.dueDate!,
+        builder: (context, dueDate, _) {
+          return InkWell(
+            onTap: () async {
+              context.read<GeneralViewModel>().textFieldNode.unfocus();
+              final selectedTime = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.fromDateTime(dueDate),
+              );
+              if (selectedTime != null && context.mounted) {
+                context.read<TaskViewModel>().setTime(selectedTime);
+              }
+              // MiniLogger.debug('DueDate with time: ${taskVM.currentTask.dueDate}');
+            },
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.access_time_outlined, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0.5),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              'Time',
+                              style: TextStyle(fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500),
+                            ),
+                            Icon(Icons.keyboard_arrow_down_rounded, size: 22),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Text(
+                                formatTime(dueDate),
+                                style: TextStyle(
+                                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                context.read<TaskViewModel>().removeTime();
+                              },
+                              child: Icon(Icons.close, size: 19),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'Time',
-                          style: TextStyle(fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500),
-                        ),
-                        Icon(Icons.keyboard_arrow_down_rounded, size: 22),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Text(
-                            formatTime(taskVM.currentTask.dueDate ?? DateTime.now()),
-                            style: TextStyle(
-                              fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            taskVM.removeTime();
-                          },
-                          child: Icon(Icons.close, size: 19),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              ],
             ),
-          ],
-        ),
-      );
-    });
+          );
+        });
   }
 }
 
@@ -604,24 +611,27 @@ class NotificationSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TaskViewModel>(builder: (context, taskVM, _) {
-      return SwitchListTile(
-        activeColor: Theme.of(context).colorScheme.primary,
-        title: Text("Enable notification", style: TextStyle(fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500)),
-        value: taskVM.currentTask.isNotifyEnabled!,
-        onChanged: (value) async {
-          final allowed = await AwesomeNotifications().isNotificationAllowed();
-          if (allowed) {
-            taskVM.toggleNotifSwitch(value);
-          } else {
-            _showNotificationRationale(context, taskVM, value);
-          }
-        },
-      );
-    });
+    return Selector<TaskViewModel, bool>(
+        selector: (context, taskVM) => taskVM.currentTask.isNotifyEnabled!,
+        builder: (context, isNotifyEnabled, _) {
+          return SwitchListTile(
+            activeColor: Theme.of(context).colorScheme.primary,
+            title: Text("Enable notification",
+                style: TextStyle(fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500)),
+            value: isNotifyEnabled,
+            onChanged: (value) async {
+              final allowed = await AwesomeNotifications().isNotificationAllowed();
+              if (allowed && context.mounted) {
+                context.read<TaskViewModel>().toggleNotifSwitch(value);
+              } else {
+                _showNotificationRationale(context, value);
+              }
+            },
+          );
+        });
   }
 
-  void _showNotificationRationale(BuildContext context, TaskViewModel taskVM, bool value) {
+  void _showNotificationRationale(BuildContext context, bool value) {
     if (context.mounted) {
       showAdaptiveDialog(
         context: context,
@@ -643,7 +653,7 @@ class NotificationSwitch extends StatelessWidget {
                   final navigator = Navigator.of(context);
                   final allowed = await AwesomeNotifications().requestPermissionToSendNotifications();
                   if (allowed) {
-                    taskVM.toggleNotifSwitch(value);
+                    context.read<TaskViewModel>().toggleNotifSwitch(value);
                     await GetStorage().write(mNotificationsEnabled, allowed);
                     await NotificationService.initializeNotificationChannels();
                   }
@@ -673,8 +683,9 @@ class NotificationTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TaskViewModel>(
-      builder: (context, tvm, _) {
+    return Selector<TaskViewModel, String>(
+      selector: (context, taskVM) => taskVM.currentTask.notifType!,
+      builder: (context, notifType, _) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -701,9 +712,9 @@ class NotificationTypeSelector extends StatelessWidget {
                   icon: Icon(Icons.alarm),
                 ),
               ],
-              selected: {tvm.currentTask.notifType ?? 'notif'},
+              selected: {notifType},
               onSelectionChanged: (newSelection) {
-                tvm.updateNotificationType(newSelection.first);
+                context.read<TaskViewModel>().updateNotificationType(newSelection.first);
               },
             ),
           ],
@@ -728,10 +739,7 @@ class NotificationOptionsWidget extends StatelessWidget {
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Notify me before',
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
+          Text('Notify me before', style: TextStyle(fontWeight: FontWeight.w600)),
           SizedBox(height: 12),
           Wrap(
             spacing: 5,
@@ -831,135 +839,8 @@ class RepeatingConfigWidget extends StatelessWidget {
           ),
 
           // Date Range Section
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Date Range',
-                  style: textTheme.titleSmall?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Start Date
-                InkWell(
-                  onTap: () async {
-                    context.read<GeneralViewModel>().textFieldNode.unfocus();
-                    final selected = await showDatePicker(
-                      context: context,
-                      initialDate: taskVM.taskStartDate,
-                      firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(Duration(days: 365)),
-                      lastDate: DateTime.now().add(Duration(days: 18263)),
-                    );
-                    if (selected != null) {
-                      taskVM.setTaskStartDate(selected);
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: colorScheme.outline.withAlpha(50)),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_today,
-                          size: 18,
-                          color: colorScheme.primary,
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Start Date',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            Text(
-                              DateFormat.yMMMd().format(taskVM.taskStartDate),
-                              style: textTheme.bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                // End Date
-                InkWell(
-                  onTap: () async {
-                    context.read<GeneralViewModel>().textFieldNode.unfocus();
-                    final selected = await showDatePicker(
-                      context: context,
-                      initialDate: taskVM.taskEndDate ?? taskVM.taskStartDate.add(const Duration(days: 1)),
-                      firstDate: taskVM.taskStartDate,
-                      lastDate: DateTime.now().add(Duration(days: 18263)),
-                    );
-                    taskVM.setTaskEndDate(selected);
-                  },
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: colorScheme.outline.withAlpha(50)),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.event_repeat,
-                          size: 18,
-                          color: colorScheme.primary,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'End Date (Optional)',
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                              Text(
-                                taskVM.taskEndDate != null ? DateFormat.yMMMd().format(taskVM.taskEndDate!) : 'No end date',
-                                style: textTheme.bodyMedium,
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (taskVM.taskEndDate != null)
-                          IconButton(
-                            icon: Icon(
-                              Icons.clear,
-                              size: 18,
-                              color: colorScheme.error,
-                            ),
-                            onPressed: () => taskVM.setTaskEndDate(null),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
+          const SetStartEndDate(),
           const Divider(height: 1),
-
           // Repeat Type Section
           Padding(
             padding: const EdgeInsets.all(16),
@@ -982,7 +863,7 @@ class RepeatingConfigWidget extends StatelessWidget {
                   subtitle: 'Repeat on specific days of the week',
                   value: 'weekly',
                   groupValue: taskVM.repeatType,
-                  onChanged: (value) => taskVM.setRepeatType(value!),
+                  onChanged: (value) => context.read<TaskViewModel>().setRepeatType(value!),
                 ),
 
                 if (taskVM.repeatType == 'weekly')
@@ -996,7 +877,7 @@ class RepeatingConfigWidget extends StatelessWidget {
                   subtitle: 'Repeat on the same date as start date each month',
                   value: 'monthly',
                   groupValue: taskVM.repeatType,
-                  onChanged: (value) => taskVM.setRepeatType(value!),
+                  onChanged: (value) => context.read<TaskViewModel>().setRepeatType(value!),
                 ),
 
                 _RepeatTypeOption(
@@ -1004,10 +885,157 @@ class RepeatingConfigWidget extends StatelessWidget {
                   subtitle: 'Repeat on the same date as start date each year',
                   value: 'yearly',
                   groupValue: taskVM.repeatType,
-                  onChanged: (value) => taskVM.setRepeatType(value!),
+                  onChanged: (value) => context.read<TaskViewModel>().setRepeatType(value!),
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SetStartEndDate extends StatelessWidget {
+  const SetStartEndDate({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Date Range',
+            style: textTheme.titleSmall?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Start Date
+          Selector<TaskViewModel,DateTime>(
+            selector: (context, taskVM)=>taskVM.taskStartDate,
+            builder: (context,startDate,_) {
+              return InkWell(
+                onTap: () async {
+                  context.read<GeneralViewModel>().textFieldNode.unfocus();
+                  final selected = await showDatePicker(
+                    context: context,
+                    initialDate: startDate,
+                    firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(Duration(days: 365)),
+                    lastDate: DateTime.now().add(Duration(days: 18263)),
+                  );
+                  if (selected != null && context.mounted) {
+                    context.read<TaskViewModel>().setTaskStartDate(selected);
+                  }
+                },
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: colorScheme.outline.withAlpha(50)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        size: 18,
+                        color: colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Start Date',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          Text(
+                            DateFormat.yMMMd().format(startDate),
+                            style: textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+          ),
+
+          const SizedBox(height: 12),
+          // End Date
+          Selector<TaskViewModel,(DateTime?,DateTime)>(
+              selector: (context, taskVM)=>(taskVM.taskEndDate ,taskVM.taskStartDate),
+              builder: (context,data,_) {
+    final (endDate,startDate) = data;
+              return InkWell(
+                onTap: () async {
+                  context.read<GeneralViewModel>().textFieldNode.unfocus();
+                  final selectedEndDate = await showDatePicker(
+                    context: context,
+                    initialDate: endDate?? startDate.add(const Duration(days: 1)),
+                    firstDate: startDate,
+                    lastDate: DateTime.now().add(Duration(days: 18263)),
+                  );
+                  if(selectedEndDate != null && context.mounted) {
+                    context.read<TaskViewModel>().setTaskEndDate(selectedEndDate);
+                  }
+                },
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: colorScheme.outline.withAlpha(50)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.event_repeat,
+                        size: 18,
+                        color: colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'End Date (Optional)',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            Text(
+                              endDate != null ? DateFormat.yMMMd().format(endDate) : 'No end date',
+                              style: textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (endDate != null)
+                        IconButton(
+                          icon: Icon(
+                            Icons.clear,
+                            size: 18,
+                            color: colorScheme.error,
+                          ),
+                          onPressed: () => context.read<TaskViewModel>().setTaskEndDate(null),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            }
           ),
         ],
       ),
@@ -1131,8 +1159,8 @@ class RecurringReminderTimes extends StatelessWidget {
       title: Text(
         "Daily Reminder Times",
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontSize: 14,
-        ),
+              fontSize: 14,
+            ),
       ),
       subtitle: Text(
         taskVM.reminderTimesList.isEmpty ? 'No reminders set' : taskVM.reminderTimesList.map((t) => t.format(context)).join(', '),
@@ -1205,42 +1233,42 @@ class ReminderTimesBottomSheet extends StatelessWidget {
           Flexible(
             child: taskVM.reminderTimesList.isEmpty
                 ? Center(
-              child: Text(
-                'No reminders set',
-                style: textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            )
-                : SingleChildScrollView(
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: taskVM.reminderTimesList.map((time) {
-                  return InputChip(
-                    label: Text(time.format(context)),
-                    avatar: const Icon(Icons.access_time, size: 16),
-                    deleteIcon: const Icon(Icons.close, size: 16),
-                    onDeleted: () => taskVM.removeReminderTime(time),
-                    onPressed: () async {
-                      final newTime = await showTimePicker(
-                        context: context,
-                        initialTime: time,
-                      );
-                      if (newTime != null) {
-                        taskVM.updateReminderTime(time, newTime);
-                      }
-                    },
-                    backgroundColor: colorScheme.surfaceVariant,
-                    side: BorderSide.none,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
+                    child: Text(
+                      'No reminders set',
+                      style: textTheme.bodyLarge?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  );
-                }).toList(),
-              ),
-            ),
+                  )
+                : SingleChildScrollView(
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: taskVM.reminderTimesList.map((time) {
+                        return InputChip(
+                          label: Text(time.format(context)),
+                          avatar: const Icon(Icons.access_time, size: 16),
+                          deleteIcon: const Icon(Icons.close, size: 16),
+                          onDeleted: () => taskVM.removeReminderTime(time),
+                          onPressed: () async {
+                            final newTime = await showTimePicker(
+                              context: context,
+                              initialTime: time,
+                            );
+                            if (newTime != null) {
+                              taskVM.updateReminderTime(time, newTime);
+                            }
+                          },
+                          backgroundColor: colorScheme.surfaceVariant,
+                          side: BorderSide.none,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
           ),
           const SizedBox(height: 16),
           SizedBox(
@@ -1248,31 +1276,31 @@ class ReminderTimesBottomSheet extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: taskVM.reminderTimesList.length >= 7
                   ? () {
-                showToast(
-                  context: context,
-                  title: 'Maximum 7 reminders allowed',
-                  type: ToastificationType.warning,
-                );
-              }
-                  : () async {
-                final time = await showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.now(),
-                );
-                if (time != null) {
-                  if (taskVM.reminderTimesList.contains(time)) {
-                    if (context.mounted) {
                       showToast(
                         context: context,
-                        title: 'This time is already added',
+                        title: 'Maximum 7 reminders allowed',
                         type: ToastificationType.warning,
                       );
                     }
-                  } else {
-                    taskVM.addReminderTime(time);
-                  }
-                }
-              },
+                  : () async {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (time != null) {
+                        if (taskVM.reminderTimesList.contains(time)) {
+                          if (context.mounted) {
+                            showToast(
+                              context: context,
+                              title: 'This time is already added',
+                              type: ToastificationType.warning,
+                            );
+                          }
+                        } else {
+                          taskVM.addReminderTime(time);
+                        }
+                      }
+                    },
               icon: const Icon(Icons.add),
               label: const Text('Add Reminder Time'),
             ),

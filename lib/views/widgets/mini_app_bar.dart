@@ -24,9 +24,52 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   AppBar build(BuildContext context) {
     return AppBar(
+      backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(14),
       elevation: 0,
-      title: Text('MinimalTodo', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-      // centerTitle: true,
+      title: Consumer<CalendarViewModel>(
+          builder: (context, calVM, _) {
+            final isBefore = calVM.selectedDate.isBefore(DateTime.now());
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (Widget child, animation) {
+                final inAnimation = Tween<Offset>(
+                  begin: const Offset(-1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation);
+
+                final outAnimation = Tween<Offset>(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation);
+
+                if (child.key == ValueKey<DateTime>(calVM.selectedDate)) {
+                  // This is the new date coming in
+                  return ClipRect(
+                    child: SlideTransition(
+                      position:isBefore ?  inAnimation :outAnimation,
+                      child: child,
+                    ),
+                  );
+                } else {
+                  // This is the old date going out
+                  return ClipRect(
+                    child: SlideTransition(
+                      position:isBefore ? outAnimation:inAnimation,
+                      child: child,
+                    ),
+                  );
+                }
+              },
+              child: Text(
+                formatDateWith(calVM.selectedDate, 'EEE, d MMM, yyyy'),
+                key: ValueKey<DateTime>(calVM.selectedDate),
+                style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            );
+          }
+      ),
       actions: [
         _MiniAppBarAction(
           icon: Icon(Icons.flutter_dash),

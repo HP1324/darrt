@@ -49,11 +49,9 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
               ? Theme.of(context).colorScheme.primary.withAlpha(60)
               : Theme.of(context).colorScheme.surface.withAlpha(100),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: widget.isSelected
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.primary.withAlpha(80),
-            width: widget.isSelected ? 2 : 0.5,
+          border:widget.isSelected ? null : Border.all(
+            color: Theme.of(context).colorScheme.primary.withAlpha(80),
+            width: 0.5,
           ),
         ),
         child: Material(
