@@ -25,30 +25,31 @@ class TaskItem extends StatelessWidget {
   final bool isSelectionMode;
   final Function(bool)? onSelect;
 
-  void _navigateToTaskDetails(BuildContext context) async{
+  void _navigateToTaskDetails(BuildContext context) async {
     Task? taskWithId = await TaskService.getTaskById(task.id!);
-    MiniRouter.to(context, child: TaskView(task: taskWithId!,));
+    if (context.mounted) {
+      MiniRouter.to(context,
+          child: TaskView(
+            task: taskWithId!,
+          ));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<TaskViewModel, CalendarViewModel>(
-      builder: (context, taskVM, calendarVM, _) {
-        MiniLogger.debug('Task repeat settings: ${task.repeatConfig ?? 'No repeat config'}');
-        return GestureDetector(
-          onLongPress: onLongPress,
-          child: SelectableTaskItem(
-            task: task,
-            isSelected: isSelected,
-            onSelectionChanged: (selected) {
-              if (onSelect != null) {
-                onSelect!(selected);
-              }
-            },
-            onTap: isSelectionMode ? () => onSelect?.call(!isSelected) : () => _navigateToTaskDetails(context),
-          ),
-        );
-      },
+    MiniLogger.debug('Task repeat settings: ${task.repeatConfig ?? 'No repeat config'}');
+    return GestureDetector(
+      onLongPress: onLongPress,
+      child: SelectableTaskItem(
+        task: task,
+        isSelected: isSelected,
+        onSelectionChanged: (selected) {
+          if (onSelect != null) {
+            onSelect!(selected);
+          }
+        },
+        onTap: isSelectionMode ? () => onSelect?.call(!isSelected) : () => _navigateToTaskDetails(context),
+      ),
     );
   }
 }

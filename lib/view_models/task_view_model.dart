@@ -31,21 +31,21 @@ class TaskViewModel extends ChangeNotifier {
 
   void loadTasks() async {
     _tasks = await TaskService.getTasks();
-    // final db = await DatabaseService.openDb();
-    // final List<Map<String, dynamic>> singleTasks = await db.query('tasks', where: 'isRepeating = 0');
-    // singleTaskCompletion.clear();
-    // for (var task in singleTasks){
-    //   singleTaskCompletion[task['id']] = task['isDone'] == 1;
-    // }
-    //
-    // final List<Map<String, dynamic>> recurringTasks =await db.query('task_completion');
-    // recurringTaskCompletion.clear();
-    // for(var entry in recurringTasks){
-    //   int taskId = entry['task_id'] ;
-    //   String date = entry['date'];
-    //
-    //   recurringTaskCompletion.putIfAbsent(taskId, () => {}).add(date);
-    // }
+    final db = await DatabaseService.openDb();
+    final List<Map<String, dynamic>> singleTasks = await db.query('tasks', where: 'isRepeating = 0');
+    singleTaskCompletion.clear();
+    for (var task in singleTasks){
+      singleTaskCompletion[task['id']] = task['isDone'] == 1;
+    }
+
+    final List<Map<String, dynamic>> recurringTasks =await db.query('task_completion');
+    recurringTaskCompletion.clear();
+    for(var entry in recurringTasks){
+      int taskId = entry['task_id'] ;
+      String date = entry['date'];
+
+      recurringTaskCompletion.putIfAbsent(taskId, () => {}).add(date);
+    }
     notifyListeners();
   }
 
@@ -501,6 +501,7 @@ class TaskViewModel extends ChangeNotifier {
       );
       singleTaskCompletion[task.id!] =   updatedStatus;
     }
+    notifyListeners();
     return changes;
   }
 
@@ -609,7 +610,7 @@ class TaskViewModel extends ChangeNotifier {
 
   DateTime? get taskEndDate => currentTask.endDate;
 
-  String? get finishDates => currentTask.finishDates;
+  // String? get finishDates => currentTask.finishDates;
   String? get repeatType {
     if (currentTask.repeatConfig == null) return 'weekly';
     try {

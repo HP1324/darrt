@@ -29,7 +29,6 @@ class DatabaseService {
         endDate TEXT,
         repeatConfig TEXT,
         reminderTimes TEXT,
-        finishDates TEXT,
         FOREIGN KEY(categoryId) REFERENCES categories (id) ON DELETE SET DEFAULT
       )
   """;
