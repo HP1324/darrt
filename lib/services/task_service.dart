@@ -10,14 +10,32 @@ import 'package:minimaltodo/services/database_service.dart';
 import 'package:sqflite/sqflite.dart';
 
 class TaskService {
-  static Future<List<Task>> getTasks() async {
+
+  static Future<List<Task>> getSingleTasks() async {
     final database = await DatabaseService.openDb();
-    final List<Map<String, dynamic>> taskMaps = await database.query('tasks');
-    return List.generate(taskMaps.length, (index) {
-      return Task.fromJson(taskMaps[index]);
+    final List<Map<String, dynamic>> singleTaskMaps = await database.query('tasks',where: 'isRepeating = ?',whereArgs: [0]);
+    return List.generate(singleTaskMaps.length, (index) {
+      return Task.fromJson(singleTaskMaps[index]);
     });
   }
-
+  static Future<List<Task>> getTasks() async {
+    final database = await DatabaseService.openDb();
+    final List<Map<String, dynamic>> singleTaskMaps = await database.query('tasks');
+    return List.generate(singleTaskMaps.length, (index) {
+      return Task.fromJson(singleTaskMaps[index]);
+    });
+  }
+  static Future<List<Task>> getRecurringTasks() async {
+    final database = await DatabaseService.openDb();
+    final List<Map<String, dynamic>> recurringTaskMaps = await database.query('tasks',where: 'isRepeating = ?',whereArgs: [1]);
+    return List.generate(recurringTaskMaps.length, (index) {
+      return Task.fromJson(recurringTaskMaps[index]);
+    });
+  }
+  static Future<List<Map<String,dynamic>>> getTaskCompletions()async{
+    final db = await DatabaseService.openDb();
+    return await db.query('task_completion');
+  }
   static Future<Task?> getTaskById(int id) async {
     final database = await DatabaseService.openDb();
     List<Map<String, dynamic>> results = await database.query('tasks', where: 'id = ?', whereArgs: [id]);
