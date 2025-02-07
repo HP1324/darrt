@@ -47,23 +47,22 @@ class TaskService {
 
   Future<int> addTask(Task task) async {
     final database = await DatabaseService.openDb();
-    if (task.isRepeating!) {
-      MiniLogger.debug('Reminder Times before adding: ${task.reminderTimes}');
-      final startDate = task.startDate;
-      final endDate = task.endDate;
-      final lastDate = endDate == null ? DateTime.now().add(Duration(days: 18264)) : endDate.add(Duration(days: 1));
-      MiniLogger.debug('Start Date: $startDate, Last Date: $lastDate');
+    // if (task.isRepeating!) {
+    //   MiniLogger.debug('Reminder Times before adding: ${task.reminderTimes}');
+    //   final startDate = task.startDate;
+    //   final endDate = task.endDate;
+    //   final lastDate = endDate == null ? DateTime.now().add(Duration(days: 18264)) : endDate.add(Duration(days: 1));
+    //   MiniLogger.debug('Start Date: $startDate, Last Date: $lastDate');
+    //
+    //   // Just pass the timestamps instead of DateTime objects
+    //   Map<String, dynamic> params = {
+    //     'startMs': startDate.millisecondsSinceEpoch,
+    //     'lastMs': lastDate.millisecondsSinceEpoch
+    //   };
+    //
+    //   task.finishDates = await compute(_generateFinishDates, params);
+    // }
 
-      // Just pass the timestamps instead of DateTime objects
-      Map<String, dynamic> params = {
-        'startMs': startDate.millisecondsSinceEpoch,
-        'lastMs': lastDate.millisecondsSinceEpoch
-      };
-
-      task.finishDates = await compute(_generateFinishDates, params);
-    }
-
-    MiniLogger.debug('Task finish dates before adding to database: ${task.finishDates}');
     final data = task.toJson();
     debugPrint('Task adding to database ->-> $data');
     final id = await database.insert('tasks', data, conflictAlgorithm: ConflictAlgorithm.replace);

@@ -25,7 +25,6 @@ class Task {
     this.endDate,
     this.repeatConfig,
     this.reminderTimes,
-    this.finishDates,
   }) : startDate = startDate ?? DateTime.now();
 
   int? id;
@@ -45,8 +44,7 @@ class Task {
   DateTime startDate; // defaults to now if not provided
   DateTime? endDate; // null means repeat indefinitely
   String? repeatConfig; // JSON string, e.g. {"repeatType": "weekly", "selectedDays": [1,3,5]}
-  String? reminderTimes; // JSON string list of reminders, e.g. '["08:00", "12:00", "18:00"]'
-  String? finishDates;
+  String? reminderTimes;
 
   Task copyWith({
     int? id,
@@ -65,7 +63,6 @@ class Task {
     DateTime? endDate,
     String? repeatConfig,
     String? reminderTimes,
-    String? finishDates,
   }) =>
       Task(
         id: id ?? this.id,
@@ -83,7 +80,6 @@ class Task {
         startDate: startDate ?? this.startDate,
         endDate: endDate ?? this.endDate,
         repeatConfig: repeatConfig ?? this.repeatConfig,
-        finishDates: finishDates ?? this.finishDates,
       );
 
   void printTask() {
@@ -111,7 +107,6 @@ class Task {
            'endDate': ${endDate?.toIso8601String()},
            'repeatConfig': $repeatConfig,
            'reminderTimes': $reminderTimes,
-           'finishDates':$finishDates,
           }
           """);
     }
@@ -135,8 +130,7 @@ class Task {
         startDate == other.startDate &&
         endDate == other.endDate &&
         repeatConfig == other.repeatConfig &&
-        reminderTimes == other.reminderTimes &&
-        finishDates == other.finishDates;
+        reminderTimes == other.reminderTimes ;
   }
 
   @override
@@ -157,7 +151,6 @@ class Task {
         endDate,
         repeatConfig,
         reminderTimes,
-        finishDates,
       );
 
   bool isValid() {
@@ -198,7 +191,6 @@ class Task {
         'endDate': endDate?.toIso8601String(),
         'repeatConfig': repeatConfig,
         'reminderTimes': reminderTimes,
-        'finishDates': finishDates,
       };
 
   // Create a Task from JSON
@@ -228,91 +220,15 @@ class Task {
         endDate: json['endDate'] != null ? DateTime.parse(json['endDate']) : null,
         repeatConfig: json['repeatConfig'],
         reminderTimes: json['reminderTimes'],
-        finishDates: json['finishDates'],
       );
     } catch (e) {
       MiniLogger.error('Error parsing task from JSON: $e');
       rethrow;
     }
   }
-  Map<String, dynamic>? _cachedFinishDates;
 }
 
 extension TaskUtilities on Task{
-  // Map<String, dynamic> getDecompressedFinishDates(){
-  //   // if(finishDates == null && repeatConfig == null){
-  //   //   try {
-  //   //     final db = await DatabaseService.openDb();
-  //   //     final finishDates = await db.query('tasks', columns: ['finishDates'], where: 'id = ?', whereArgs: [id]);
-  //   //     logger.d('runtime type: ${finishDates.runtimeType}');
-  //   //     final encodedJsonString = finishDates.first['finishDates'] as String?;
-  //   //     final compressed = base64Decode(encodedJsonString!);
-  //   //     final decompressed = GZipDecoder().decodeBytes(compressed);
-  //   //     final decodedJsonString = utf8.decode(decompressed);
-  //   //
-  //   //     return Map<String,dynamic>.from(jsonDecode(decodedJsonString));
-  //   //   }catch(e,stacktrace) {
-  //   //     MiniLogger.error('error or exception: ${e.toString()}');
-  //   //     MiniLogger.trace('error or exception: ${stacktrace.toString()}');
-  //   //     return {};
-  //   //   }
-  //   // }
-  //   if(finishDates == null || finishDates!.isEmpty) return {};
-  //
-  //   try{
-  //     final compressed = base64Decode(finishDates!);
-  //     final decompressed = GZipDecoder().decodeBytes(compressed);
-  //     final jsonString = utf8.decode(decompressed);
-  //     return Map<String,dynamic>.from(jsonDecode(jsonString));
-  //   }catch(e){
-  //     try {
-  //       return Map<String, dynamic>.from(jsonDecode(finishDates!));
-  //     } catch (_) {
-  //       return {};
-  //     }
-  //   }
-  // }
-  Map<String, dynamic> getDecompressedFinishDates() {
-    if (finishDates == null || finishDates!.isEmpty) return {};
-
-    // Use a cache to prevent redundant decompression
-    if (_cachedFinishDates != null) return _cachedFinishDates!;
-
-    try {
-      final compressed = base64Decode(finishDates!);
-      final decompressed = GZipDecoder().decodeBytes(compressed);
-      final jsonString = utf8.decode(decompressed);
-      _cachedFinishDates = Map<String, dynamic>.from(jsonDecode(jsonString));
-      return _cachedFinishDates!;
-    } catch (e) {
-      try {
-        _cachedFinishDates = Map<String, dynamic>.from(jsonDecode(finishDates!));
-        return _cachedFinishDates!;
-      } catch (_) {
-        return {};
-      }
-    }
-  }
-
-
-
-  String getCompressedFinishDates(Map<String, dynamic> params){
-    final startMs = params['startMs'];
-    final lastMs = params['lastMs'];
-    final dayMs = const Duration(days: 1).inMilliseconds;
-
-    Map<String, bool> finishDates = {};
-
-    for (var ms = startMs; ms < lastMs; ms += dayMs) {
-      final date = DateTime.fromMillisecondsSinceEpoch(ms);
-      final dateOnly = DateTime(date.year, date.month, date.day).toIso8601String();
-      finishDates[dateOnly] = false;
-    }
-    final jsonString = jsonEncode(finishDates);
-    final compressed = GZipEncoder().encode(utf8.encode(jsonString));
-    return base64Encode(compressed);
-  }
-
   Task toLightweightEntity(){
     return Task(
       id: id,

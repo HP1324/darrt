@@ -33,7 +33,11 @@ class SelectableTaskItem extends StatefulWidget {
 }
 
 class _SelectableTaskItemState extends State<SelectableTaskItem> {
+  @override
+  void initState() {
+    super.initState();
 
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -67,16 +71,16 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                     padding: const EdgeInsets.only(left: 8),
                     child: Transform.scale(
                       scale: 1.05,
-                      child: Consumer<CalendarViewModel>(
-                        builder: (context,calVM, _) {
+                      child: Consumer2<CalendarViewModel,TaskViewModel>(
+                        builder: (context,calVM,taskVM, _) {
                           final date = DateTime(calVM.selectedDate.year,calVM.selectedDate.month,calVM.selectedDate.day).toIso8601String();
                           return Checkbox(
                             key: ValueKey('selection_${widget.task.id}'),
                             shape: CircleBorder(),
-                            value: widget.task.isRepeating! ? recurringTaskCompletion[widget.task.id]?.contains(date) : singleTaskCompletion[widget.task.id] ?? false,
+                            value: widget.task.isRepeating! ? taskVM.recurringTaskCompletion[widget.task.id]?.contains(date) ??false: taskVM.singleTaskCompletion[widget.task.id] ?? false,
                             onChanged: (checked) {
                               if(checked != null ) {
-                                toggleStatus(widget.task, checked, calVM);
+                                taskVM.toggleStatus(widget.task, checked, calVM);
                               }
                             },
                           );
@@ -213,29 +217,29 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
       );
   }
 
-  bool getIsFinishedForDate(DateTime selectedDate) {
-    bool isFinishedForDate = false;
-    if (widget.task.isRepeating!) {
-      try {
-        final task = context.read<TaskViewModel>().getFullTask(widget.task);
-        final finishDates = task.getDecompressedFinishDates();
-        logger.d('finish dates for this task: $finishDates');
-        final dateOnly = DateTime(
-          selectedDate.year,
-          selectedDate.month,
-          selectedDate.day
-        );
-        isFinishedForDate = finishDates[dateOnly.toIso8601String()] ?? false;
-        MiniLogger.debug('Date: ${dateOnly.toIso8601String()}, Finished: $isFinishedForDate');
-      } catch (e) {
-        MiniLogger.error('Error parsing finishDates: $e');
-        isFinishedForDate = false;
-      }
-    } else {
-      isFinishedForDate = widget.task.isDone ?? false;
-    }
-    return isFinishedForDate;
-  }
+  // bool getIsFinishedForDate(DateTime selectedDate) {
+  //   bool isFinishedForDate = false;
+  //   if (widget.task.isRepeating!) {
+  //     try {
+  //       final task = context.read<TaskViewModel>().getFullTask(widget.task);
+  //       // final finishDates = task.getDecompressedFinishDates();
+  //       logger.d('finish dates for this task: $finishDates');
+  //       final dateOnly = DateTime(
+  //         selectedDate.year,
+  //         selectedDate.month,
+  //         selectedDate.day
+  //       );
+  //       isFinishedForDate = finishDates[dateOnly.toIso8601String()] ?? false;
+  //       MiniLogger.debug('Date: ${dateOnly.toIso8601String()}, Finished: $isFinishedForDate');
+  //     } catch (e) {
+  //       MiniLogger.error('Error parsing finishDates: $e');
+  //       isFinishedForDate = false;
+  //     }
+  //   } else {
+  //     isFinishedForDate = widget.task.isDone ?? false;
+  //   }
+  //   return isFinishedForDate;
+  // }
   Map<int, bool> singleTaskCompletion = {}; // taskId -> isCompleted (for single tasks)
   Map<int, Set<String>> recurringTaskCompletion = {}; // taskId -> completed dates (for recurring tasks)
   Future<int> toggleStatus(Task task, bool updatedStatus, CalendarViewModel calendarVM) async {
@@ -267,6 +271,9 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
       );
       singleTaskCompletion[task.id!] =   updatedStatus;
     }
+    setState(() {
+
+    });
     return changes;
   }
 }
