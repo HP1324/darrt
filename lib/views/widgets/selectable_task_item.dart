@@ -23,10 +23,9 @@ class SelectableTaskItem extends StatefulWidget {
   });
 
   final Task task;
-  // final
   final bool isSelected;
   final Function(bool) onSelectionChanged;
-  final Function()? onTap;
+  final VoidCallback? onTap;
 
   @override
   State<SelectableTaskItem> createState() => _SelectableTaskItemState();
@@ -62,7 +61,9 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
             onTap: widget.onTap ??
-                () => widget.onSelectionChanged(!widget.isSelected),
+                () {
+                  widget.onSelectionChanged(!widget.isSelected);
+                },
             child: SizedBox(
               height: 72,
               child: Row(

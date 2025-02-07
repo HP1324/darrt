@@ -47,14 +47,13 @@ class _PendingTasksPageState extends State<PendingTasksPage> {
   }
 
   Widget _buildTaskItem(Task task) {
-    final isSelected = _selectedTaskIds.contains(task.id);
     return TaskItem(
-      key: ValueKey(task.id),
+      key: ValueKey('task_${task.id}'),
       task: task,
-      isSelected: isSelected,
+      isSelected: _selectedTaskIds.contains(task.id),
       isSelectionMode: _isSelectionMode,
       onLongPress: () => _startSelectionMode(task),
-      onSelect: (selected) => _toggleTaskSelection(task),
+      onSelect: (_) => _toggleTaskSelection(task),
     );
   }
 
