@@ -146,8 +146,10 @@ class _CalendarPageState extends State<CalendarPage> {
                         return TaskItem(
                           key: ValueKey('task_${task.id}'),
                           task: task.toLightweightEntity(),
-                          onLongPress: () => calendarVM.toggleTaskSelection(task),
                           isSelected: calendarVM.selectedTaskIds.contains(task.id),
+                          isSelectionMode: calendarVM.selectedTaskIds.isNotEmpty,
+                          onLongPress: () => calendarVM.toggleTaskSelection(task),
+                          onSelect: (_) => calendarVM.toggleTaskSelection(task),
                         );
                       },
                     ),
