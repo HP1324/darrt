@@ -48,7 +48,18 @@ class TaskViewModel extends ChangeNotifier {
     }
     notifyListeners();
   }
-
+  List<Task> tasksForTab = [];
+  void setTasksForTab(int currentTab,List<Task> tasksForSelectedDate){
+    if(currentTab == 0) {
+      tasksForTab = tasksForSelectedDate;
+    }
+    else if(currentTab == 1){
+      tasksForTab = tasksForSelectedDate.where((t)=>!t.isRepeating!).toList();
+    }else{
+      tasksForTab = tasksForSelectedDate.where((t)=>!t.isRepeating!).toList();
+    }
+    notifyListeners();
+  }
   void loadSingleTasks() async {
     singleTasks = await TaskService.getSingleTasks();
     notifyListeners();
@@ -139,7 +150,8 @@ class TaskViewModel extends ChangeNotifier {
   //--------------------------------------------------------------//
 
   //------------------------ DATE & TIME HANDLING ------------------------//
-  set dueDate(DateTime dueDate) {
+
+  void setDueDate(DateTime dueDate) {
     final existingTime = currentTask.dueDate;
     currentTask.dueDate = DateTime(
       dueDate.year,
@@ -148,13 +160,14 @@ class TaskViewModel extends ChangeNotifier {
       existingTime?.hour ?? DateTime.now().hour,
       existingTime?.minute ?? DateTime.now().minute,
     );
+    notifyListeners();
     if (currentTask.dueDate != null && currentTask.isNotifyEnabled!) {
       currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
     }
     updateNotifLogicAfterDueDateUpdate();
   }
 
-  set time(TimeOfDay time) {
+  setTime(TimeOfDay time) {
     final existingDate = currentTask.dueDate ?? DateTime.now();
     currentTask.dueDate = DateTime(
       existingDate.year,
@@ -163,9 +176,11 @@ class TaskViewModel extends ChangeNotifier {
       time.hour,
       time.minute,
     );
+    notifyListeners();
     if (currentTask.dueDate != null && currentTask.isNotifyEnabled!) {
       currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
     }
+
     updateNotifLogicAfterDueDateUpdate();
   }
 
