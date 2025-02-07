@@ -235,42 +235,67 @@ class Task {
       rethrow;
     }
   }
+  Map<String, dynamic>? _cachedFinishDates;
 }
 
 extension TaskUtilities on Task{
-  Map<String, dynamic> getDecompressedFinishDates(){
-    // if(finishDates == null && repeatConfig == null){
-    //   try {
-    //     final db = await DatabaseService.openDb();
-    //     final finishDates = await db.query('tasks', columns: ['finishDates'], where: 'id = ?', whereArgs: [id]);
-    //     logger.d('runtime type: ${finishDates.runtimeType}');
-    //     final encodedJsonString = finishDates.first['finishDates'] as String?;
-    //     final compressed = base64Decode(encodedJsonString!);
-    //     final decompressed = GZipDecoder().decodeBytes(compressed);
-    //     final decodedJsonString = utf8.decode(decompressed);
-    //
-    //     return Map<String,dynamic>.from(jsonDecode(decodedJsonString));
-    //   }catch(e,stacktrace) {
-    //     MiniLogger.error('error or exception: ${e.toString()}');
-    //     MiniLogger.trace('error or exception: ${stacktrace.toString()}');
-    //     return {};
-    //   }
-    // }
-    if(finishDates == null || finishDates!.isEmpty) return {};
+  // Map<String, dynamic> getDecompressedFinishDates(){
+  //   // if(finishDates == null && repeatConfig == null){
+  //   //   try {
+  //   //     final db = await DatabaseService.openDb();
+  //   //     final finishDates = await db.query('tasks', columns: ['finishDates'], where: 'id = ?', whereArgs: [id]);
+  //   //     logger.d('runtime type: ${finishDates.runtimeType}');
+  //   //     final encodedJsonString = finishDates.first['finishDates'] as String?;
+  //   //     final compressed = base64Decode(encodedJsonString!);
+  //   //     final decompressed = GZipDecoder().decodeBytes(compressed);
+  //   //     final decodedJsonString = utf8.decode(decompressed);
+  //   //
+  //   //     return Map<String,dynamic>.from(jsonDecode(decodedJsonString));
+  //   //   }catch(e,stacktrace) {
+  //   //     MiniLogger.error('error or exception: ${e.toString()}');
+  //   //     MiniLogger.trace('error or exception: ${stacktrace.toString()}');
+  //   //     return {};
+  //   //   }
+  //   // }
+  //   if(finishDates == null || finishDates!.isEmpty) return {};
+  //
+  //   try{
+  //     final compressed = base64Decode(finishDates!);
+  //     final decompressed = GZipDecoder().decodeBytes(compressed);
+  //     final jsonString = utf8.decode(decompressed);
+  //     return Map<String,dynamic>.from(jsonDecode(jsonString));
+  //   }catch(e){
+  //     try {
+  //       return Map<String, dynamic>.from(jsonDecode(finishDates!));
+  //     } catch (_) {
+  //       return {};
+  //     }
+  //   }
+  // }
+  Map<String, dynamic> getDecompressedFinishDates() {
+    if (finishDates == null || finishDates!.isEmpty) return {};
 
-    try{
+    // Use a cache to prevent redundant decompression
+    if (_cachedFinishDates != null) return _cachedFinishDates!;
+
+    try {
       final compressed = base64Decode(finishDates!);
       final decompressed = GZipDecoder().decodeBytes(compressed);
       final jsonString = utf8.decode(decompressed);
-      return Map<String,dynamic>.from(jsonDecode(jsonString));
-    }catch(e){
+      _cachedFinishDates = Map<String, dynamic>.from(jsonDecode(jsonString));
+      return _cachedFinishDates!;
+    } catch (e) {
       try {
-        return Map<String, dynamic>.from(jsonDecode(finishDates!));
+        _cachedFinishDates = Map<String, dynamic>.from(jsonDecode(finishDates!));
+        return _cachedFinishDates!;
       } catch (_) {
         return {};
       }
     }
   }
+
+
+
   String getCompressedFinishDates(Map<String, dynamic> params){
     final startMs = params['startMs'];
     final lastMs = params['lastMs'];

@@ -68,7 +68,6 @@ class DatabaseService {
     ('Hobbies', 'gamepad'),
     ('Fitness', 'dumbbell'),
     ('Food', 'utensils'),
-    ('Friends', 'people'),
     ('Family', 'home'),
     ('Projects', 'chart')
   """;

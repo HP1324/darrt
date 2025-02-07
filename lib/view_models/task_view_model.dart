@@ -375,7 +375,8 @@ class TaskViewModel extends ChangeNotifier {
 
       final id = await TaskService().addTask(currentTask);
       currentTask.id = id;
-      _refreshTasks();
+      _tasks.add(currentTask);
+      notifyListeners();
 
       // Schedule notifications
       if (currentTask.isNotifyEnabled!) {
