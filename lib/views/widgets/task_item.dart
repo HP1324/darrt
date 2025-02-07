@@ -46,9 +46,6 @@ class TaskItem extends StatelessWidget {
               }
             },
             onTap: isSelectionMode ? () => onSelect?.call(!isSelected) : () => _navigateToTaskDetails(context),
-            onStatusChanged: (isDone) async {
-              await taskVM.toggleStatus(task, isDone,calendarVM);
-            },
           ),
         );
       },

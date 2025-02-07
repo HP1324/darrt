@@ -7,9 +7,11 @@ import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/services/category_service.dart';
+import 'package:minimaltodo/services/database_service.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
 
 class SelectableTaskItem extends StatefulWidget {
   const SelectableTaskItem({
@@ -18,7 +20,6 @@ class SelectableTaskItem extends StatefulWidget {
     required this.isSelected,
     required this.onSelectionChanged,
     this.onTap,
-    this.onStatusChanged,
   });
 
   final Task task;
@@ -26,7 +27,6 @@ class SelectableTaskItem extends StatefulWidget {
   final bool isSelected;
   final Function(bool) onSelectionChanged;
   final Function()? onTap;
-  final Function(bool)? onStatusChanged;
 
   @override
   State<SelectableTaskItem> createState() => _SelectableTaskItemState();
@@ -36,11 +36,9 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<CalendarViewModel,DateTime>(
-      selector: (_,calVM)=> calVM.selectedDate,
-        builder: (context,selectedDate, __) {
+
       final isUrgent = widget.task.priority?.toLowerCase() == 'urgent';
-      bool isFinishedForDate =  getIsFinishedForDate(selectedDate);
+      // bool isFinishedForDate =  getIsFinishedForDate(selectedDate);
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
@@ -69,16 +67,20 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
                     padding: const EdgeInsets.only(left: 8),
                     child: Transform.scale(
                       scale: 1.05,
-                      child: Checkbox(
-                        key: ValueKey('selection_${widget.task.id}'),
-                        shape: CircleBorder(),
-                        value: isFinishedForDate,
-                        onChanged: (value) {
-                          if (widget.onStatusChanged != null) {
-
-                            widget.onStatusChanged!(value ?? false);
-                          }
-                        },
+                      child: Consumer<CalendarViewModel>(
+                        builder: (context,calVM, _) {
+                          final date = DateTime(calVM.selectedDate.year,calVM.selectedDate.month,calVM.selectedDate.day).toIso8601String();
+                          return Checkbox(
+                            key: ValueKey('selection_${widget.task.id}'),
+                            shape: CircleBorder(),
+                            value: widget.task.isRepeating! ? recurringTaskCompletion[widget.task.id]?.contains(date) : singleTaskCompletion[widget.task.id] ?? false,
+                            onChanged: (checked) {
+                              if(checked != null ) {
+                                toggleStatus(widget.task, checked, calVM);
+                              }
+                            },
+                          );
+                        }
                       ),
                     ),
                   ),
@@ -209,7 +211,6 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
           ),
         ),
       );
-    });
   }
 
   bool getIsFinishedForDate(DateTime selectedDate) {
@@ -234,5 +235,38 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
       isFinishedForDate = widget.task.isDone ?? false;
     }
     return isFinishedForDate;
+  }
+  Map<int, bool> singleTaskCompletion = {}; // taskId -> isCompleted (for single tasks)
+  Map<int, Set<String>> recurringTaskCompletion = {}; // taskId -> completed dates (for recurring tasks)
+  Future<int> toggleStatus(Task task, bool updatedStatus, CalendarViewModel calendarVM) async {
+    final db = await DatabaseService.openDb();
+    var changes = 0;
+    if (task.isRepeating!) {
+      final selectedDate = DateTime(calendarVM.selectedDate.year, calendarVM.selectedDate.month, calendarVM.selectedDate.day);
+      if (updatedStatus) {
+        changes = await db.insert(
+          'task_completion',
+          {'task_id': task.id, 'date': selectedDate.toIso8601String(), 'isCompleted': 1},
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+        recurringTaskCompletion.putIfAbsent(task.id!, () => {}).add(selectedDate.toIso8601String());
+      } else {
+        changes = await db.delete(
+          'task_completion',
+          where: 'task_id = ? AND date = ?',
+          whereArgs: [task.id, selectedDate.toIso8601String()],
+        );
+        recurringTaskCompletion[task.id]?.remove(selectedDate.toIso8601String());
+      }
+    } else {
+      changes = await db.update(
+        'tasks',
+        {'isDone':updatedStatus ? 1:0},
+        where: 'id = ?',
+        whereArgs: [task.id],
+      );
+      singleTaskCompletion[task.id!] =   updatedStatus;
+    }
+    return changes;
   }
 }
