@@ -1,17 +1,12 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/task.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/services/category_service.dart';
-import 'package:minimaltodo/services/database_service.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
 
 class SelectableTaskItem extends StatefulWidget {
   const SelectableTaskItem({
@@ -214,65 +209,5 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
           ),
         ),
       );
-  }
-
-  // bool getIsFinishedForDate(DateTime selectedDate) {
-  //   bool isFinishedForDate = false;
-  //   if (widget.task.isRepeating!) {
-  //     try {
-  //       final task = context.read<TaskViewModel>().getFullTask(widget.task);
-  //       // final finishDates = task.getDecompressedFinishDates();
-  //       logger.d('finish dates for this task: $finishDates');
-  //       final dateOnly = DateTime(
-  //         selectedDate.year,
-  //         selectedDate.month,
-  //         selectedDate.day
-  //       );
-  //       isFinishedForDate = finishDates[dateOnly.toIso8601String()] ?? false;
-  //       MiniLogger.debug('Date: ${dateOnly.toIso8601String()}, Finished: $isFinishedForDate');
-  //     } catch (e) {
-  //       MiniLogger.error('Error parsing finishDates: $e');
-  //       isFinishedForDate = false;
-  //     }
-  //   } else {
-  //     isFinishedForDate = widget.task.isDone ?? false;
-  //   }
-  //   return isFinishedForDate;
-  // }
-  Map<int, bool> singleTaskCompletion = {}; // taskId -> isCompleted (for single tasks)
-  Map<int, Set<String>> recurringTaskCompletion = {}; // taskId -> completed dates (for recurring tasks)
-  Future<int> toggleStatus(Task task, bool updatedStatus, CalendarViewModel calendarVM) async {
-    final db = await DatabaseService.openDb();
-    var changes = 0;
-    if (task.isRepeating!) {
-      final selectedDate = DateTime(calendarVM.selectedDate.year, calendarVM.selectedDate.month, calendarVM.selectedDate.day);
-      if (updatedStatus) {
-        changes = await db.insert(
-          'task_completion',
-          {'task_id': task.id, 'date': selectedDate.toIso8601String(), 'isCompleted': 1},
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-        recurringTaskCompletion.putIfAbsent(task.id!, () => {}).add(selectedDate.toIso8601String());
-      } else {
-        changes = await db.delete(
-          'task_completion',
-          where: 'task_id = ? AND date = ?',
-          whereArgs: [task.id, selectedDate.toIso8601String()],
-        );
-        recurringTaskCompletion[task.id]?.remove(selectedDate.toIso8601String());
-      }
-    } else {
-      changes = await db.update(
-        'tasks',
-        {'isDone':updatedStatus ? 1:0},
-        where: 'id = ?',
-        whereArgs: [task.id],
-      );
-      singleTaskCompletion[task.id!] =   updatedStatus;
-    }
-    setState(() {
-
-    });
-    return changes;
   }
 }

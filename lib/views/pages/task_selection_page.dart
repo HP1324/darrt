@@ -86,8 +86,7 @@ class _TaskSelectionPageState extends State<TaskSelectionPage> {
             itemCount: tasks.length,
             itemBuilder: (context, index) {
               final task = tasks[index];
-              final isSelected = _selectedTaskIds.contains(task.id);
-              
+
               return TaskItem(
                 key: ValueKey('task_${task.id}'),
                 task: task,

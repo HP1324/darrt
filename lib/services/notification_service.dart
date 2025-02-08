@@ -6,7 +6,6 @@ import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:intl/intl.dart';
 
 class NotificationService {
   static final _notif = AwesomeNotifications();

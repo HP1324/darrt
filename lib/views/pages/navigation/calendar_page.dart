@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/task.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
-import 'package:minimaltodo/services/database_service.dart';
-import 'package:minimaltodo/services/task_service.dart';
-import 'package:minimaltodo/views/widgets/empty_list_placeholder.dart';
 import 'package:minimaltodo/views/widgets/empty_tasks_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';

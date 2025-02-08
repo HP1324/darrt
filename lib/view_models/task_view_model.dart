@@ -1,12 +1,9 @@
 import 'dart:convert';
-import 'package:archive/archive.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/services/database_service.dart';
 import 'package:minimaltodo/services/notification_service.dart';
@@ -121,7 +118,7 @@ class TaskViewModel extends ChangeNotifier {
 
   Task currentTask = Task();
   TextEditingController titleController = TextEditingController();
-  FocusNode titleTextFieldNode = FocusNode();
+  FocusNode textFieldNode = FocusNode();
   bool isNewTaskAdded = false;
   List<Task> finishedTasks = [];
   List<Task> pendingTasks = [];
