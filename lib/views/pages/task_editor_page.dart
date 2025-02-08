@@ -157,37 +157,21 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
             ),
           ),
         ),
-        persistentFooterButtons:widget.editMode
-            ? null: [
-           FloatingActionButton(
-            onPressed: () async {
-              context.read<TaskViewModel>().setTitle();
-              final success = await context.read<TaskViewModel>().addNewTask();
-              if (success && context.mounted) {
-                Navigator.pop(context);
-                showToast(
-                    context: context, title: 'Task added', type: ToastificationType.success);
-              }
-            },
-            shape: const CircleBorder(),
-            child: const Icon(Icons.done),
-          ),
-        ],
-        // floatingActionButton: widget.editMode
-        //     ? null
-        //     : FloatingActionButton(
-        //         onPressed: () async {
-        //           context.read<TaskViewModel>().setTitle();
-        //           final success = await context.read<TaskViewModel>().addNewTask();
-        //           if (success && context.mounted) {
-        //             Navigator.pop(context);
-        //             showToast(
-        //                 context: context, title: 'Task added', type: ToastificationType.success);
-        //           }
-        //         },
-        //         shape: const CircleBorder(),
-        //         child: const Icon(Icons.done),
-        //       ),
+        floatingActionButton: widget.editMode
+            ? null
+            : FloatingActionButton(
+                onPressed: () async {
+                  context.read<TaskViewModel>().setTitle();
+                  final success = await context.read<TaskViewModel>().addNewTask();
+                  if (success && context.mounted) {
+                    Navigator.pop(context);
+                    showToast(
+                        context: context, title: 'Task added', type: ToastificationType.success);
+                  }
+                },
+                shape: const CircleBorder(),
+                child: const Icon(Icons.done),
+              ),
       ),
     );
   }
