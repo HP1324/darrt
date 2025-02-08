@@ -103,10 +103,10 @@ class TaskViewModel extends ChangeNotifier {
     currentTask = taskBeforeEdit;
     notifyListeners();
   }
-
+  ///[taskBeforeEdit] is for detecting whether a task is actually edited or not
   Task taskBeforeEdit = Task();
   void initEditTask(Task task) {
-    taskBeforeEdit = task;
+    taskBeforeEdit = task.copyWith();
     currentTask = task;
     titleController.text = task.title ?? '';
   }
@@ -130,7 +130,7 @@ class TaskViewModel extends ChangeNotifier {
   int selectedMinutes = 0;
 
   //------------------------ BASIC SETTERS ------------------------//
-  set category(CategoryModel category) {
+  setCategory(CategoryModel category) {
     currentTask.category = category;
     notifyListeners();
   }
@@ -145,7 +145,13 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  set title(String title) => currentTask.title = title;
+  void setTitle() {
+    if(titleController.text.trim().isNotEmpty) {
+      currentTask.title = titleController.text.trim();
+      notifyListeners();
+      titleController.clear();
+    }
+  }
 
   //--------------------------------------------------------------//
 
@@ -445,6 +451,12 @@ class TaskViewModel extends ChangeNotifier {
         } else {
           await NotificationService.createTaskNotification(currentTask);
         }
+      }else{
+        if(currentTask.isRepeating!){
+          await NotificationService.removeRepeatingTaskNotifications(currentTask);
+        }else{
+          await NotificationService.removeTaskNotification(currentTask);
+        }
       }
 
       return true;
@@ -454,6 +466,9 @@ class TaskViewModel extends ChangeNotifier {
 
   Future<int> editTask() async {
     int changes = 0;
+    if(currentTask == taskBeforeEdit){
+      return changes;
+    }
     if (currentTask.isValid()) {
       changes = await TaskService.editTask(newTask: currentTask.toJson());
     }
@@ -621,6 +636,7 @@ class TaskViewModel extends ChangeNotifier {
   // Helper getters/setters for repeat configuration
   bool get isRepeatEnabled => currentTask.isRepeating ?? false;
 
+  bool get isNotifyEnabled => currentTask.isNotifyEnabled ?? false;
   DateTime get taskStartDate => currentTask.startDate;
 
   DateTime? get taskEndDate => currentTask.endDate;

@@ -77,7 +77,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                         ),
                         const SizedBox(width: 8),
                         IconButton(
-                          onPressed: () => MiniRouter.to(context, child: NewListPage(editMode: false)),
+                          onPressed: () => MiniRouter.to(context, child: NewCategoryPage(editMode: false)),
                           icon: const Icon(Iconsax.add),
                         ),
                       ],
