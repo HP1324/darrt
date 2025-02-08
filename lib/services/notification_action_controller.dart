@@ -6,10 +6,7 @@ import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/main.dart';
 import 'package:minimaltodo/services/task_service.dart';
-import 'package:minimaltodo/view_models/task_view_model.dart';
-import 'package:minimaltodo/views/home.dart';
 import 'package:minimaltodo/views/pages/single_task_view.dart';
-import 'package:provider/provider.dart';
 
 class NotificationActionController{
 

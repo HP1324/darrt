@@ -1,6 +1,4 @@
-import 'dart:convert';
 
-import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
@@ -69,22 +67,7 @@ class TaskService {
     return id;
   }
 
-  String _generateFinishDates(Map<String, dynamic> params) {
-    final startMs = params['startMs'];
-    final lastMs = params['lastMs'];
-    final dayMs = const Duration(days: 1).inMilliseconds;
 
-    Map<String, bool> finishDates = {};
-
-    for (var ms = startMs; ms < lastMs; ms += dayMs) {
-      final date = DateTime.fromMillisecondsSinceEpoch(ms);
-      final dateOnly = DateTime(date.year, date.month, date.day).toIso8601String();
-      finishDates[dateOnly] = false;
-    }
-    final jsonString = jsonEncode(finishDates);
-    final compressed = GZipEncoder().encode(utf8.encode(jsonString));
-    return base64Encode(compressed);
-  }
   static Future<int> toggleDone(int id, bool updatedStatus, DateTime? finishedAt) async {
     final database = await DatabaseService.openDb();
     int isDone = updatedStatus ? 1 : 0;

@@ -14,7 +14,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  String? _selectedList;
+  String? _selectedCategory;
   String? _selectedPriority;
   bool _showFilters = false;
 
@@ -27,28 +27,28 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   List<Task> _filterTasks(List<Task> tasks) {
+    if (_searchQuery.isEmpty) {
+      return []; // Return empty list if no search query
+    }
+
     return tasks.where((task) {
       // Title, Priority and List search
-      if (_searchQuery.isNotEmpty) {
-        bool matchesTitle = task.title?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
-        bool matchesPriority =
-            task.priority?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
-        bool matchesList =
-            task.category?.name?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
+      bool matchesTitle = task.title?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
+      bool matchesPriority = task.priority?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
+      bool matchesList = task.category?.name?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false;
 
-        if (!matchesTitle && !matchesPriority && !matchesList) {
-          return false;
-        }
+      if (!matchesTitle && !matchesPriority && !matchesList) {
+        return false;
       }
 
       // list filter
-      if (_selectedList != null) {
-        if (_selectedList == 'General') {
-          if (task.category != null && task.category!.name != 'General') {
+      if (_selectedCategory != null) {
+        if (_selectedCategory == 'General') {
+          if (task.category?.name != 'General' && task.category != null) {
             return false;
           }
         } else {
-          if (task.category?.name?.toLowerCase() != _selectedList?.toLowerCase()) {
+          if (task.category?.name?.toLowerCase() != _selectedCategory?.toLowerCase()) {
             return false;
           }
         }
@@ -65,7 +65,6 @@ class _SearchPageState extends State<SearchPage> {
       return true;
     }).toList();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,19 +92,20 @@ class _SearchPageState extends State<SearchPage> {
           },
         ),
       ),
-      body: Consumer<TaskViewModel>(
-        builder: (context, taskVM, _) {
-          // Get all categories including 'General'
-          final allcategories = [
-            'General',
-            ...taskVM.tasks
-                .map((task) => task.category?.name)
-                .where((name) => name != null && name != 'General')
-                .toSet()
-                .cast<String>()
-          ];
-
-          final filteredTasks = _filterTasks(taskVM.tasks);
+      body: Selector<TaskViewModel, List<Task>>(
+        selector: (context, taskVM) => taskVM.tasks,
+        builder: (context, tasks, _) {
+          final textTheme = Theme.of(context).textTheme;
+          final filteredTasks = _filterTasks(tasks);
+          final allCategories = _searchQuery.isNotEmpty
+              ? [
+                  'General',
+                  ...tasks
+                      .map((task) => task.category?.name)
+                      .where((name) => name != null && name != 'General')
+                      .toSet()
+                ]
+              : ['General']; // Only include General when no search
 
           return Column(
             children: [
@@ -117,49 +117,53 @@ class _SearchPageState extends State<SearchPage> {
                     children: [
                       Text(
                         'Filter by:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: textTheme.labelLarge!.copyWith(fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 8),
-                      // list Filter
                       SizedBox(
                         height: MediaQuery.sizeOf(context).height * 0.1,
                         child: ListView(
                           scrollDirection: Axis.horizontal,
                           children: [
                             FilterChip(
-                              label: const Text('All Categories'),
-                              selected: _selectedList == null,
+                              showCheckmark: false,
+                              label: Text(
+                                'All Categories',
+                                style: TextStyle(fontSize: textTheme.labelMedium!.fontSize),
+                              ),
+                              selected: _selectedCategory == null,
                               onSelected: (selected) {
                                 setState(() {
-                                  _selectedList = null;
+                                  _selectedCategory = null;
                                 });
                               },
                             ),
-                            ...allcategories.map(
-                              (list) => FilterChip(
-                                label: Text(list),
-                                selected: _selectedList == list,
-                                onSelected: (selected) {
-                                  setState(
-                                    () {
-                                      _selectedList = selected ? list : null;
-                                    },
-                                  );
-                                },
+                            ...allCategories.map(
+                              (category) => Padding(
+                                padding: const EdgeInsets.only(left: 6.0),
+                                child: FilterChip(
+                                  showCheckmark: false,
+                                  label: Text(category!,
+                                      style: TextStyle(fontSize: textTheme.labelMedium!.fontSize)),
+                                  selected: _selectedCategory == category,
+                                  onSelected: (selected) {
+                                    setState(
+                                      () {
+                                        _selectedCategory = selected ? category : null;
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 8),
                       Wrap(
                         spacing: 7,
                         children: [
                           FilterChip(
-                            label: const Text('All Priorities'),
+                            showCheckmark: false,
+                            label: Text('All Priorities',style: TextStyle(fontSize: textTheme.labelMedium!.fontSize),),
                             selected: _selectedPriority == null,
                             onSelected: (selected) {
                               setState(() {
@@ -168,7 +172,8 @@ class _SearchPageState extends State<SearchPage> {
                             },
                           ),
                           ..._priorities.map((priority) => FilterChip(
-                                label: Text(priority),
+                            showCheckmark: false,
+                                label: Text(priority,style: TextStyle(fontSize: textTheme.labelMedium!.fontSize),),
                                 selected: _selectedPriority == priority,
                                 onSelected: (selected) {
                                   setState(() {
@@ -183,24 +188,44 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ],
               Expanded(
-                child: filteredTasks.isEmpty
+                child: _searchQuery.isEmpty
                     ? Center(
                         child: Column(
-                          spacing: 14,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.search_off, size: 64),
-                            Text('No tasks found', style: TextStyle(fontSize: 18)),
+                            Icon(Icons.search, size: 64, color: Colors.grey),
+                            SizedBox(height: 16),
+                            Text(
+                              'Start typing to search tasks',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
                           ],
                         ),
                       )
-                    : ListView.builder(
-                        itemCount: filteredTasks.length,
-                        itemBuilder: (context, index) {
-                          final task = filteredTasks[index];
-                          return TaskItem(task: task);
-                        },
-                      ),
+                    : filteredTasks.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.search_off, size: 64),
+                                SizedBox(height: 16),
+                                Text(
+                                  'No tasks found',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: filteredTasks.length,
+                            itemBuilder: (context, index) {
+                              final task = filteredTasks[index];
+                              return TaskItem(task: task);
+                            },
+                          ),
               ),
             ],
           );

@@ -6,7 +6,6 @@ import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/mini_storage.dart';
 import 'package:minimaltodo/services/category_service.dart';
-import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/services/notification_service.dart';
@@ -65,7 +64,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                 ),
         ),
         body: Padding(
-          padding: const EdgeInsets.only(left: 15, right: 15, bottom: 80),
+          padding: const EdgeInsets.only(left: 15, right: 15),
           child: Scrollbar(
             child: SingleChildScrollView(
               child: Selector<TaskViewModel, (bool, bool)>(
@@ -158,21 +157,37 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
             ),
           ),
         ),
-        floatingActionButton: widget.editMode
-            ? null
-            : FloatingActionButton(
-                onPressed: () async {
-                  context.read<TaskViewModel>().setTitle();
-                  final success = await context.read<TaskViewModel>().addNewTask();
-                  if (success && context.mounted) {
-                    Navigator.pop(context);
-                    showToast(
-                        context: context, title: 'Task added', type: ToastificationType.success);
-                  }
-                },
-                shape: const CircleBorder(),
-                child: const Icon(Icons.done),
-              ),
+        persistentFooterButtons:widget.editMode
+            ? null: [
+           FloatingActionButton(
+            onPressed: () async {
+              context.read<TaskViewModel>().setTitle();
+              final success = await context.read<TaskViewModel>().addNewTask();
+              if (success && context.mounted) {
+                Navigator.pop(context);
+                showToast(
+                    context: context, title: 'Task added', type: ToastificationType.success);
+              }
+            },
+            shape: const CircleBorder(),
+            child: const Icon(Icons.done),
+          ),
+        ],
+        // floatingActionButton: widget.editMode
+        //     ? null
+        //     : FloatingActionButton(
+        //         onPressed: () async {
+        //           context.read<TaskViewModel>().setTitle();
+        //           final success = await context.read<TaskViewModel>().addNewTask();
+        //           if (success && context.mounted) {
+        //             Navigator.pop(context);
+        //             showToast(
+        //                 context: context, title: 'Task added', type: ToastificationType.success);
+        //           }
+        //         },
+        //         shape: const CircleBorder(),
+        //         child: const Icon(Icons.done),
+        //       ),
       ),
     );
   }
@@ -189,7 +204,7 @@ class TaskTextField extends StatelessWidget {
         Icon(Icons.assignment_outlined, size: 19),
         Expanded(
           child: TextField(
-            focusNode: context.read<GeneralViewModel>().textFieldNode,
+            focusNode: context.read<TaskViewModel>().textFieldNode,
             controller: context.read<TaskViewModel>().titleController,
             maxLines: null,
             autofocus: true,
@@ -212,7 +227,7 @@ class SetCategoryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        context.read<GeneralViewModel>().textFieldNode.unfocus();
+        context.read<TaskViewModel>().textFieldNode.unfocus();
         showModalBottomSheet(
           context: context,
           builder: (_) {
@@ -465,7 +480,7 @@ class SetDateWidget extends StatelessWidget {
         builder: (context, dueDate, _) {
           return InkWell(
             onTap: () async {
-              context.read<GeneralViewModel>().textFieldNode.unfocus();
+              context.read<TaskViewModel>().textFieldNode.unfocus();
               final selectedDate = await showDatePicker(
                 context: context,
                 firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate))
@@ -546,7 +561,7 @@ class SetTimeWidget extends StatelessWidget {
         builder: (context, dueDate, _) {
           return InkWell(
             onTap: () async {
-              context.read<GeneralViewModel>().textFieldNode.unfocus();
+              context.read<TaskViewModel>().textFieldNode.unfocus();
               final selectedTime = await showTimePicker(
                 context: context,
                 initialTime: TimeOfDay.fromDateTime(dueDate),
@@ -945,7 +960,7 @@ class SetStartEndDate extends StatelessWidget {
               builder: (context, startDate, _) {
                 return InkWell(
                   onTap: () async {
-                    context.read<GeneralViewModel>().textFieldNode.unfocus();
+                    context.read<TaskViewModel>().textFieldNode.unfocus();
                     final selected = await showDatePicker(
                       context: context,
                       initialDate: startDate,
@@ -1001,7 +1016,7 @@ class SetStartEndDate extends StatelessWidget {
                 final (endDate, startDate) = data;
                 return InkWell(
                   onTap: () async {
-                    context.read<GeneralViewModel>().textFieldNode.unfocus();
+                    context.read<TaskViewModel>().textFieldNode.unfocus();
                     final selectedEndDate = await showDatePicker(
                       context: context,
                       initialDate: endDate ?? startDate.add(const Duration(days: 1)),
@@ -1200,7 +1215,7 @@ class RecurringReminderTimes extends StatelessWidget {
           }),
       trailing: const Icon(Icons.access_time),
       onTap: () {
-        context.read<GeneralViewModel>().textFieldNode.unfocus();
+        context.read<TaskViewModel>().textFieldNode.unfocus();
         showModalBottomSheet(
           context: context,
           backgroundColor: colorScheme.surface,

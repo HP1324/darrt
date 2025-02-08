@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
-import 'package:minimaltodo/helpers/mini_page_transition.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/mini_storage.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
@@ -11,9 +8,6 @@ import 'package:minimaltodo/test_app.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/navigation/finished_tasks_page.dart';
-import 'package:minimaltodo/views/pages/navigation/pending_tasks_page.dart';
-import 'package:minimaltodo/views/pages/search_page.dart';
-import 'package:minimaltodo/views/pages/single_task_view.dart';
 import 'package:provider/provider.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {

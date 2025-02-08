@@ -6,8 +6,6 @@ import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/view_models/navigation_view_model.dart';
 import 'package:minimaltodo/views/pages/navigation/calendar_page.dart';
 import 'package:minimaltodo/views/pages/navigation/categories_page.dart';
-import 'package:minimaltodo/views/pages/navigation/finished_tasks_page.dart';
-import 'package:minimaltodo/views/pages/navigation/pending_tasks_page.dart';
 import 'package:minimaltodo/views/pages/navigation/wishlist_page.dart';
 import 'package:minimaltodo/views/pages/task_editor_page.dart';
 import 'package:minimaltodo/views/widgets/app_drawer.dart';
@@ -15,7 +13,6 @@ import 'package:minimaltodo/views/widgets/mini_app_bar.dart';
 import 'package:minimaltodo/views/widgets/mini_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 
-import 'pages/search_page.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
