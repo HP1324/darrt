@@ -8,17 +8,17 @@ import 'package:minimaltodo/views/widgets/color_picker_dialog.dart';
 import 'package:minimaltodo/views/widgets/icon_picker_dialog.dart';
 import 'package:provider/provider.dart';
 
-class NewListPage extends StatefulWidget {
-  const NewListPage({super.key, required this.editMode, this.listToEdit});
+class NewCategoryPage extends StatefulWidget {
+  const NewCategoryPage({super.key, required this.editMode, this.listToEdit});
 
   final bool editMode;
   final CategoryModel? listToEdit;
 
   @override
-  State<NewListPage> createState() => _NewListPageState();
+  State<NewCategoryPage> createState() => _NewCategoryPageState();
 }
 
-class _NewListPageState extends State<NewListPage> {
+class _NewCategoryPageState extends State<NewCategoryPage> {
   final TextEditingController textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
