@@ -1,6 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -23,8 +24,10 @@ void main() async {
     if(MiniBox.read(mFirstInstallDate) == null){
       await MiniBox.write(mFirstInstallDate, DateTime.now().toIso8601String());
     }
-    WidgetsFlutterBinding.ensureInitialized();
+    final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
     await NotificationService.initNotifications();
+    FlutterNativeSplash.remove();
     runApp(const MinimalTodo());
   } catch (e) {
     MiniLogger.error('Failed to initialize app: ${e.toString()}');

@@ -46,6 +46,7 @@ dependencies:
   flex_color_scheme: ^8.1.0
   flutter_launcher_icons: ^0.14.3
   archive: ^4.0.2
+  flutter_native_splash: ^2.4.4
 
 dev_dependencies:
   flutter_test:
@@ -104,3 +105,12 @@ flutter_launcher_icons:
   ios: true      # Enables iOS platform
   image_path: "assets/icon/play_store_512.png"  # Path to your icon image
   min_sdk_android: 21 # android min sdk min:16, default 21
+
+
+flutter_native_splash:
+  android: true
+  ios: true
+  color: "#007BA7"
+  android_12:
+    color: "#007BA7"
+
