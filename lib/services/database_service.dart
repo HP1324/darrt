@@ -36,22 +36,11 @@ class DatabaseService {
   CREATE TABLE task_completion(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       task_id INTEGER NOT NULL,
-      date TEXT NOT NULL,
+      date INTEGER NOT NULL,
       isCompleted INTEGER NOT NULL,
       FOREIGN KEY(task_id) references tasks(id) ON DELETE CASCADE
   )
   ''';
-  static const createStatsTable = """CREATE TABLE stats (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT NOT NULL,
-        total_tasks INTEGER NOT NULL,
-        completed_tasks INTEGER NOT NULL,
-        urgent_tasks INTEGER NOT NULL,
-        high_tasks INTEGER NOT NULL,
-        medium_tasks INTEGER NOT NULL,
-        low_tasks INTEGER NOT NULL
-      )
-  """;
   static const createWishlistTable =  '''CREATE TABLE wishlists (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,
@@ -89,7 +78,6 @@ class DatabaseService {
           await txn.execute(createCategoriesTable);
           await txn.execute(createTasksTable);
           await txn.execute(createTaskCompletionTable);
-          await txn.execute(createStatsTable);
           await txn.execute(createDefaultCategories);
           await txn.execute(createWishlistTable);
         });

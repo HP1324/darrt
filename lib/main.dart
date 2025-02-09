@@ -16,6 +16,7 @@ import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/navigation_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
+import 'package:minimaltodo/views/widgets/selectable_task_item.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -48,6 +49,7 @@ class _MinimalTodoState extends State<MinimalTodo> {
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: NotificationActionController.onActionReceivedMethod,
     );
+
   }
 
   @override
@@ -69,7 +71,7 @@ class _MinimalTodoState extends State<MinimalTodo> {
           darkTheme: FlexColorScheme.dark(
             colors: themeVM.selectedScheme.toDark(),
             surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-            blendLevel: 40, // Reduces contrast by blending colors more subtly
+            blendLevel: 30, // Reduces contrast by blending colors more subtly
             appBarStyle: FlexAppBarStyle.background,
             darkIsTrueBlack: false, // Prevents pure black
             // scaffoldBackground: Color(0xff414141),

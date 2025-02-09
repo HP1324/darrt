@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
+import 'package:minimaltodo/main.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
@@ -23,21 +24,17 @@ class SelectableTaskItem extends StatefulWidget {
   final VoidCallback? onTap;
 
   @override
-  State<SelectableTaskItem> createState() => _SelectableTaskItemState();
+  State<SelectableTaskItem> createState() => SelectableTaskItemState();
 }
 
-class _SelectableTaskItemState extends State<SelectableTaskItem> {
-  @override
-  void initState() {
-    super.initState();
+class SelectableTaskItemState extends State<SelectableTaskItem> {
 
-  }
   @override
   Widget build(BuildContext context) {
-
+      debugPrint("widget context: ${context.hashCode}");
       final isUrgent = widget.task.priority?.toLowerCase() == 'urgent';
-      // bool isFinishedForDate =  getIsFinishedForDate(selectedDate);
       return Container(
+
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
           color: widget.isSelected
@@ -53,8 +50,7 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
-            onTap: widget.onTap ??
-                () {
+            onTap: widget.onTap ??() {
                   widget.onSelectionChanged(!widget.isSelected);
                 },
             child: SizedBox(
@@ -62,12 +58,12 @@ class _SelectableTaskItemState extends State<SelectableTaskItem> {
               child: Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 8),
+                    padding: const EdgeInsets.only(left: 2),
                     child: Transform.scale(
                       scale: 1.05,
                       child: Consumer2<CalendarViewModel,TaskViewModel>(
                         builder: (context,calVM,taskVM, _) {
-                          final date = DateTime(calVM.selectedDate.year,calVM.selectedDate.month,calVM.selectedDate.day).toIso8601String();
+                          final date = DateTime(calVM.selectedDate.year,calVM.selectedDate.month,calVM.selectedDate.day).millisecondsSinceEpoch;
                           return Checkbox(
                             key: ValueKey('selection_${widget.task.id}'),
                             shape: CircleBorder(),

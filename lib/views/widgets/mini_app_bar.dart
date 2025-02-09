@@ -8,11 +8,15 @@ import 'package:minimaltodo/test_app.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/navigation/finished_tasks_page.dart';
+import 'package:minimaltodo/views/widgets/selectable_task_item.dart';
+import 'package:minimaltodo/views/widgets/task_item.dart';
 import 'package:provider/provider.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   MiniAppBar({super.key});
   final GlobalKey _popupKey = GlobalKey();
+
+
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
   @override
@@ -68,10 +72,12 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
         _MiniAppBarAction(
           icon: Icon(Icons.flutter_dash),
           onTap: ()async {
-            final db = await DatabaseService.openDb();
+            // final db = await DatabaseService.openDb();
             // await db.delete('tasks');
-            await TestApp.insertTestTasks(db);
-            context.read<TaskViewModel>().testRefreshTasks();
+            // await TestApp.insertTestTasks(db);
+            // if(context.mounted) {
+            //   context.read<TaskViewModel>().testRefreshTasks();
+            // }
           },
         ),
         _MiniAppBarAction(

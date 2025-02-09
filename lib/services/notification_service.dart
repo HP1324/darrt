@@ -97,10 +97,7 @@ class NotificationService {
       return;
     }
     MiniLogger.debug('Creating one-off task notification');
-    Map<String, dynamic> taskJson = task.toJson();
-    String taskPayload = jsonEncode(taskJson);
-    MiniLogger.debug(
-        'Is notification allowed? ${await _notif.isNotificationAllowed()}');
+    MiniLogger.debug('Is notification allowed? ${await _notif.isNotificationAllowed()}');
 
       MiniLogger.debug('notification type:${task.notifType}, time: ${task.notifyTime}');
     try {
@@ -113,9 +110,7 @@ class NotificationService {
                 title: 'Task Due at ${formatTime(task.dueDate!)}',
                 body: task.title,
                 actionType: ActionType.Default,
-                payload: {
-                  'task': taskPayload,
-                },
+                payload: task.toNotificationPayload(),
                 notificationLayout: NotificationLayout.Default,
                 category:isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
                 wakeUpScreen: true,
@@ -242,8 +237,9 @@ class NotificationService {
           channelKey: task.notifType == 'alarm' ? 'task_alarm' : 'task_notif',
           title: 'Repeating Task Reminder',
           body: task.title,
+          payload: task.toNotificationPayload(),
           notificationLayout: NotificationLayout.Default,
-          category: NotificationCategory.Reminder,
+          category:task.notifType == 'alarm' ? NotificationCategory.Alarm : NotificationCategory.Reminder,
           wakeUpScreen: true,
           criticalAlert: true,
         ),
@@ -290,8 +286,9 @@ class NotificationService {
           channelKey: task.notifType == 'alarm' ? 'task_alarm' : 'task_notif',
           title: 'Monthly Task Reminder',
           body: task.title,
+          payload: task.toNotificationPayload(),
           notificationLayout: NotificationLayout.Default,
-          category: NotificationCategory.Reminder,
+          category: task.notifType == 'alarm' ? NotificationCategory.Alarm : NotificationCategory.Reminder,
           wakeUpScreen: true,
           criticalAlert: true,
         ),
@@ -338,8 +335,9 @@ class NotificationService {
           channelKey: task.notifType == 'alarm' ? 'task_alarm' : 'task_notif',
           title: 'Yearly Task Reminder',
           body: task.title,
+          payload: task.toNotificationPayload(),
           notificationLayout: NotificationLayout.Default,
-          category: NotificationCategory.Reminder,
+          category: task.notifType == 'alarm' ? NotificationCategory.Alarm : NotificationCategory.Reminder,
           wakeUpScreen: true,
           criticalAlert: true,
         ),
