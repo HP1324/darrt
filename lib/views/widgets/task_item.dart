@@ -5,7 +5,6 @@ import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/services/task_service.dart';
 import 'package:minimaltodo/views/pages/single_task_view.dart';
 import 'package:minimaltodo/views/widgets/selectable_task_item.dart';
-
 class TaskItem extends StatelessWidget {
   const TaskItem({
     required this.task,
@@ -21,7 +20,6 @@ class TaskItem extends StatelessWidget {
   final bool isSelectionMode;
   final VoidCallback? onLongPress;
   final Function(bool)? onSelect;
-
   void _navigateToTaskDetails(BuildContext context) async {
     Task? taskWithId = await TaskService.getTaskById(task.id!);
     if (context.mounted) {
@@ -38,6 +36,7 @@ class TaskItem extends StatelessWidget {
     return GestureDetector(
       onLongPress: onLongPress,
       child: SelectableTaskItem(
+        key: task.getTaskItemKey(),
         task: task,
         isSelected: isSelected,
         onSelectionChanged: (selected) {

@@ -12,10 +12,9 @@ class NotificationActionController{
 
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
-    final payload = receivedAction.payload ?? {};
-    String taskJsonString = payload['task']!;
-    Map<String, dynamic> taskJson = jsonDecode(taskJsonString);
-    Task taskObject = Task.fromJson(taskJson);
+    //Get Task object from notification payload
+    Task taskObject = TaskUtilities.fromNotificationPayload(receivedAction.payload ?? {});
+    
     if(receivedAction.buttonKeyPressed == 'Finished'){
       MiniLogger.debug('Finished pressed');
       await TaskService.toggleDone(taskObject.id!, true, DateTime.now());

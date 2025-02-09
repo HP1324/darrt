@@ -1,3 +1,4 @@
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
@@ -126,7 +127,7 @@ class Task {
         startDate == other.startDate &&
         endDate == other.endDate &&
         repeatConfig == other.repeatConfig &&
-        reminderTimes == other.reminderTimes ;
+        reminderTimes == other.reminderTimes;
   }
 
   @override
@@ -150,13 +151,7 @@ class Task {
       );
 
   bool isValid() {
-    try {
-      return title != null && title!.trim().isNotEmpty;
-    } catch (e, st) {
-      MiniLogger.error('Error occurred: ${e.toString()}');
-      MiniLogger.error('Stacktrace: ${st.toString()}');
-      return false;
-    }
+    return title != null && title!.trim().isNotEmpty;
   }
 
   bool isOverdue() {
@@ -224,8 +219,8 @@ class Task {
   }
 }
 
-extension TaskUtilities on Task{
-  Task toLightweightEntity(){
+extension TaskUtilities on Task {
+  Task toLightweightEntity() {
     return Task(
       id: id,
       title: title,
@@ -235,5 +230,18 @@ extension TaskUtilities on Task{
       category: category,
       priority: priority,
     );
+  }
+
+  Map<String, String?>? toNotificationPayload() {
+    Map<String, dynamic> taskJson = toJson();
+    return {'task': jsonEncode(taskJson)};
+  }
+
+  static Task fromNotificationPayload(Map<String, String?>? payload) {
+    return Task.fromJson(jsonDecode(payload!['task']!));
+  }
+
+  ValueKey getTaskItemKey(){
+    return ValueKey('task$id');
   }
 }
