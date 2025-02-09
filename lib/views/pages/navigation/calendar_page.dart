@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/helpers/mini_enums.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/views/widgets/empty_tasks_indicator.dart';
 import 'package:provider/provider.dart';
@@ -123,7 +124,7 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
   }
 }
 
-enum TaskType { all, single, recurring }
+
 
 class TaskListView extends StatefulWidget {
   const TaskListView({

@@ -4,7 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/helpers/mini_storage.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
@@ -44,7 +44,8 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
           context.read<TaskViewModel>().setTitle();
           final changes = await context.read<TaskViewModel>().editTask();
           if (changes > 0 && context.mounted) {
-            showToast(context: context, title: 'Task edited');
+
+            showToast(context: context, title: 'Task edited',type: ToastificationType.success);
             Navigator.pop(context);
           }
         }
@@ -165,8 +166,7 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                   final success = await context.read<TaskViewModel>().addNewTask();
                   if (success && context.mounted) {
                     Navigator.pop(context);
-                    showToast(
-                        context: context, title: 'Task added', type: ToastificationType.success);
+                    showToast(context: context, title: 'Task added', type: ToastificationType.success);
                   }
                 },
                 shape: const CircleBorder(),
@@ -467,7 +467,7 @@ class SetDateWidget extends StatelessWidget {
               context.read<TaskViewModel>().textFieldNode.unfocus();
               final selectedDate = await showDatePicker(
                 context: context,
-                firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate))
+                firstDate: DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate))
                     .subtract(const Duration(days: 365)),
                 lastDate: DateTime.now().add(const Duration(days: 18263)),
                 initialDate: dueDate,
@@ -948,7 +948,7 @@ class SetStartEndDate extends StatelessWidget {
                     final selected = await showDatePicker(
                       context: context,
                       initialDate: startDate,
-                      firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate))
+                      firstDate: DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate))
                           .subtract(Duration(days: 365)),
                       lastDate: DateTime.now().add(Duration(days: 18263)),
                     );

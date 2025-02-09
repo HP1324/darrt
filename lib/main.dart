@@ -5,7 +5,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/mini_storage.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/services/notification_action_controller.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
@@ -16,17 +16,14 @@ import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/navigation_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
-import 'package:minimaltodo/views/widgets/selectable_task_item.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   try {
-    await GetStorage.init();
-    if(MiniBox.read(mFirstInstallDate) == null){
-      await MiniBox.write(mFirstInstallDate, DateTime.now().toIso8601String());
-    }
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+    await GetStorage.init();
+    await MiniBox.initStorage();
     await NotificationService.initNotifications();
     FlutterNativeSplash.remove();
     runApp(const MinimalTodo());

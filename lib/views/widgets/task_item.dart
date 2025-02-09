@@ -36,7 +36,6 @@ class TaskItem extends StatelessWidget {
     return GestureDetector(
       onLongPress: onLongPress,
       child: SelectableTaskItem(
-        key: task.getTaskItemKey(),
         task: task,
         isSelected: isSelected,
         onSelectionChanged: (selected) {

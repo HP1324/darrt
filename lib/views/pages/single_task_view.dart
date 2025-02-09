@@ -59,8 +59,7 @@ class TaskView extends StatelessWidget {
     }
   }
 
-  String _getReminderTimesDescription(Task task,BuildContext context) {
-    // MiniLogger.debug(task.reminderTimes!);
+  String _getReminderTimesDescription(Task task, BuildContext context) {
     if (!(task.isNotifyEnabled ?? false)) return 'Notifications disabled';
     if (task.reminderTimes == null) return 'No reminders set';
 
@@ -130,11 +129,9 @@ class TaskView extends StatelessWidget {
             ),
             if (task.isNotifyEnabled ?? false)
               DetailItem(
-                icon: task.notifType == 'alarm'
-                    ? Icons.alarm
-                    : Icons.notifications_outlined,
+                icon: task.notifType == 'alarm' ? Icons.alarm : Icons.notifications_outlined,
                 title: 'Reminders',
-                subtitle: _getReminderTimesDescription(task,context),
+                subtitle: _getReminderTimesDescription(task, context),
               ),
           ] else ...[
             DetailItem(
@@ -165,30 +162,27 @@ class TaskView extends StatelessWidget {
 }
 
 class DetailItem extends StatelessWidget {
-  const DetailItem(
-      {super.key,
-      required this.icon,
-      required this.title,
-      required this.subtitle});
+  const DetailItem({super.key, required this.icon, required this.title, required this.subtitle});
   final IconData icon;
   final String title;
   final String subtitle;
 
   @override
   Widget build(BuildContext context) {
-    final titleStyle = TextStyle(
-        fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
-        fontWeight: FontWeight.bold,
-        color: Theme.of(context).colorScheme.onSurfaceVariant);
-    final subtitleStyle = TextStyle(
-        fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-        fontWeight: FontWeight.w500,
-        color: Theme.of(context).colorScheme.onSurfaceVariant);
+    final titleStyle = Theme.of(context).textTheme.titleSmall!.copyWith(
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        );
+    final subtitleStyle = Theme.of(context).textTheme.labelMedium!.copyWith(
+          fontWeight: FontWeight.w500,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        );
+
     return Card(
       elevation: 0,
       color: Theme.of(context).colorScheme.primaryContainer.withAlpha(15),
       child: ListTile(
-        leading: Icon(icon),
+        leading: Icon(icon, size: 20),
         title: Text(title, style: titleStyle),
         subtitle: Text(subtitle, style: subtitleStyle),
       ),

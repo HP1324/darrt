@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/helpers/mini_enums.dart';
 
-enum MiniPageTransitionType {
-  jumpFromRight,
-  popFromCenter,
-  popFromTap,
-  fadeIn,
-  slideFromBottom,
-}
+
 
 class MiniPageTransition {
   final BuildContext context;

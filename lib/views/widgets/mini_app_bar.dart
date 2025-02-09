@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/helpers/mini_storage.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/services/database_service.dart';
 import 'package:minimaltodo/test_app.dart';
@@ -89,7 +89,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                     decoration: BoxDecoration(),
                     child: CalendarDatePicker(
                       initialDate: null,
-                      firstDate: DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(Duration(days: 365)),
+                      firstDate: DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate)).subtract(Duration(days: 365)),
                       lastDate: DateTime.now().add(Duration(days: 18263)),
                       onDateChanged: (selectedDate) {
                         context.read<CalendarViewModel>().scrollToDate(selectedDate);

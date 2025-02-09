@@ -1,14 +1,11 @@
 // theme_view_model.dart
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:minimaltodo/helpers/mini_enums.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
-import 'package:minimaltodo/theme_colors.dart';
-
-enum ThemePreference { system, light, dark }
 
 class ThemeViewModel extends ChangeNotifier {
-  final _box = GetStorage();
   static const String _themeColorKey = 'themeColor';
   static const String _themePreferenceKey = 'themePreference';
 
@@ -16,12 +13,12 @@ class ThemeViewModel extends ChangeNotifier {
   late ThemePreference _themePreference;
 
   ThemeViewModel() {
-    final storedColorIndex = _box.read(_themeColorKey);
+    final storedColorIndex = MiniBox.read(_themeColorKey);
     _selectedColor = storedColorIndex != null
         ? ThemeColors.values[storedColorIndex]
         : ThemeColors.cerulean;
 
-    final storedPreference = _box.read(_themePreferenceKey);
+    final storedPreference = MiniBox.read(_themePreferenceKey);
     _themePreference = storedPreference != null
         ? ThemePreference.values[storedPreference]
         : ThemePreference.system;
@@ -59,7 +56,7 @@ class ThemeViewModel extends ChangeNotifier {
 
   Future<void> setThemePreference(ThemePreference preference) async {
     try {
-      await _box.write(_themePreferenceKey, preference.index);
+      await MiniBox.write(_themePreferenceKey, preference.index);
       _themePreference = preference;
       notifyListeners();
     } catch (e) {
@@ -69,7 +66,7 @@ class ThemeViewModel extends ChangeNotifier {
 
   Future<void> setThemeColor(ThemeColors color) async {
     _selectedColor = color;
-    await _box.write(_themeColorKey, color.index);
+    await MiniBox.write(_themeColorKey, color.index);
     notifyListeners();
   }
 }
