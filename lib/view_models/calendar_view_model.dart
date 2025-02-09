@@ -2,19 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/mini_storage.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
 import 'dart:convert';
-
-enum TaskFilterType { all, single, recurring }
 
 class CalendarViewModel extends ChangeNotifier {
   DateTime _selectedDate = DateTime.now();
   final Set<int> _selectedTaskIds = {};
   bool _isSelectionMode = false;
   bool _isFabVisible = true;
-
-  // Task filter state
-  TaskFilterType _taskFilter;
 
   final ScrollController dateScrollController = ScrollController();
   final ScrollController listScrollController = ScrollController();
@@ -24,16 +19,10 @@ class CalendarViewModel extends ChangeNotifier {
   Set<int> get selectedTaskIds => _selectedTaskIds;
   bool get isSelectionMode => _isSelectionMode;
   bool get isFabVisible => _isFabVisible;
-  TaskFilterType get taskFilter => _taskFilter;
   Map<String, dynamic> taskFinishDates = {};
-  // void loadFinishDates (Task task)async{
-  //     if(task.isRepeating!){
-  //       taskFinishDates = task.getDecompressedFinishDates();
-  //     }
-  // }
 
   // Initialize dates range
-  final DateTime initialDate = DateTime.parse(MiniBox.read(mFirstInstallDate)).subtract(const Duration(days: 365));
+  final DateTime initialDate = DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate)).subtract(const Duration(days: 365));
   final DateTime maxExtentDate = DateTime.now().add(const Duration(days: 18263));
 
   late List<DateTime> dates = List.generate(
@@ -41,7 +30,7 @@ class CalendarViewModel extends ChangeNotifier {
     (index) => initialDate.add(Duration(days: index)),
   );
   bool _isInitialized = false;
-  CalendarViewModel() : _taskFilter = TaskFilterType.values[MiniBox.read(mTaskFilterPreference) ?? 0] {
+  CalendarViewModel()  {
     MiniLogger.debug('Is scroll controller initialized: $_isInitialized');
     // Initialize scroll position to today's date after frame is rendered
     if (!_isInitialized) {
@@ -71,48 +60,8 @@ class CalendarViewModel extends ChangeNotifier {
     _lastScrollPosition = currentPosition;
   }
 
-  void cycleTaskFilter() {
-    final values = TaskFilterType.values;
-    final nextIndex = (values.indexOf(_taskFilter) + 1) % values.length;
-    _taskFilter = values[nextIndex];
-    MiniBox.write(mTaskFilterPreference, nextIndex);
-    notifyListeners();
-  }
-
-  String getTaskFilterLabel() {
-    switch (_taskFilter) {
-      case TaskFilterType.all:
-        return 'All Tasks';
-      case TaskFilterType.single:
-        return 'Single';
-      case TaskFilterType.recurring:
-        return 'Recurring';
-    }
-  }
-
-  IconData getTaskFilterIcon() {
-    switch (_taskFilter) {
-      case TaskFilterType.all:
-        return Icons.list;
-      case TaskFilterType.single:
-        return Icons.event;
-      case TaskFilterType.recurring:
-        return Icons.repeat;
-    }
-  }
-
-  List<Task> filterTasks(List<Task> tasks, int tabIndex) {
-    if (tabIndex == 0) {
-      return tasks;
-    } else if (tabIndex == 1) {
-      return tasks.where((task) => !task.isRepeating!).toList();
-    }else{
-      return tasks.where((task) => task.isRepeating!).toList();
-    }
-  }
-
   void setSelectedDate(DateTime date) {
-    _selectedDate = date;
+    _selectedDate = DateTime(date.year,date.month,date.day);
     notifyListeners();
   }
 

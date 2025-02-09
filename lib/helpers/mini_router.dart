@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/helpers/mini_enums.dart';
 import 'package:minimaltodo/helpers/mini_page_transition.dart';
 import 'package:page_transition/page_transition.dart';
 ///Custom router class to simplify navigation process inside the app.

@@ -44,7 +44,7 @@ void showToast({
     closeOnClick: true,
     alignment: alignment,
     animationDuration: const Duration(milliseconds: 200),
-    backgroundColor: colorScheme.surfaceVariant.withAlpha(240),
+    backgroundColor: colorScheme.surfaceContainerHighest .withAlpha(240),
     borderRadius: BorderRadius.circular(8),
     boxShadow: [
       BoxShadow(
@@ -62,33 +62,9 @@ void showToast({
   );
 }
 
-///Validates the [notifyAt] object, if it is in only in future, after this minute.
-bool isValidDateTime(DateTime notifyAt) {
-  DateTime now = DateTime.now();
-  return notifyAt.isAfter(now) &&
-      (notifyAt.minute > now.minute ||
-          notifyAt.hour > now.hour ||
-          notifyAt.day > now.day ||
-          notifyAt.month > now.month ||
-          notifyAt.year > now.year);
-}
-
-///Takes a [DateTime] object and return formatted string as '12 Nov 12:00 AM'
-///if the [notifyAt.year] is next year, it will return 12 Nov 2025 12:00 AM, with explicit year
-String formatDateTime(DateTime dateTime) {
-  final now = DateTime.now();
-  logger.d('DateTime $dateTime');
-  String format = dateTime.year > now.year ? 'dd MMM yyyy' : 'dd MMM';
-  return DateFormat(format).add_jm().format(dateTime);
-}
-
 String formatTime(DateTime notifyAt) {
   return DateFormat.jm()
       .format(notifyAt); // This will automatically use system's format
-}
-
-String formatDate(DateTime notifyAt) {
-  return DateFormat('d MMMM').format(notifyAt);
 }
 
 String formatDateWith(DateTime dateTime, String format) {
@@ -104,8 +80,7 @@ final Logger logger = Logger();
   Offset position = Offset.zero;
   Size size = Size.zero;
   if (key.currentContext != null) {
-    final RenderBox renderBox =
-        key.currentContext!.findRenderObject() as RenderBox;
+    final RenderBox renderBox = key.currentContext!.findRenderObject() as RenderBox;
     position = renderBox.localToGlobal(Offset.zero);
     size = renderBox.size;
   }

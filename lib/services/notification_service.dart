@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
@@ -12,13 +13,12 @@ class NotificationService {
 
   static Future<void> initNotifications() async {
     try {
-      final box = GetStorage();
       bool permissionGranted = await _notif.isNotificationAllowed();
 
-      if (!permissionGranted && (box.read(mFirstTimeNotifPermission) ?? true)) {
+      if (!permissionGranted && (MiniBox.read(mFirstTimeNotifPermission) ?? true)) {
         permissionGranted = await _notif.requestPermissionToSendNotifications();
-        await box.write(mFirstTimeNotifPermission, false);
-        await box.write(mNotificationsEnabled, permissionGranted);
+        await MiniBox.write(mFirstTimeNotifPermission, false);
+        await MiniBox.write(mNotificationsEnabled, permissionGranted);
         MiniLogger.debug('First time permission request: $permissionGranted');
       }
 
@@ -26,13 +26,11 @@ class NotificationService {
         await initializeNotificationChannels();
         MiniLogger.debug('Notification service initialized successfully');
       } else {
-        await box.write(mNotificationsEnabled, false);
-        MiniLogger.debug(
-            'Notifications disabled - continuing without notification support');
+        await MiniBox.write(mNotificationsEnabled, false);
+        MiniLogger.debug('Notifications disabled - continuing without notification support');
       }
     } catch (e) {
-      MiniLogger.error(
-          'Failed to initialize notification service: ${e.toString()}');
+      MiniLogger.error('Failed to initialize notification service: ${e.toString()}');
       await GetStorage().write(mNotificationsEnabled, false);
     }
   }
@@ -68,8 +66,7 @@ class NotificationService {
           NotificationChannel(
             channelKey: 'task_alarm',
             channelName: 'task_alarms',
-            channelDescription:
-                'Channel used to notify users about their tasks with alarm',
+            channelDescription: 'Channel used to notify users about their tasks with alarm',
             importance: NotificationImportance.Max,
             playSound: true,
             defaultRingtoneType: DefaultRingtoneType.Alarm,
@@ -81,8 +78,7 @@ class NotificationService {
       );
       MiniLogger.debug('Channels initialized: $isInitialized');
     } catch (e) {
-      MiniLogger.error(
-          'Failed to initialize notification channels: ${e.toString()}');
+      MiniLogger.error('Failed to initialize notification channels: ${e.toString()}');
       rethrow;
     }
   }
@@ -92,30 +88,29 @@ class NotificationService {
       return;
     }
     if (!await isNotificationsEnabled()) {
-      MiniLogger.debug(
-          'Skipping notification creation - notifications are disabled');
+      MiniLogger.debug('Skipping notification creation - notifications are disabled');
       return;
     }
     MiniLogger.debug('Creating one-off task notification');
     MiniLogger.debug('Is notification allowed? ${await _notif.isNotificationAllowed()}');
 
-      MiniLogger.debug('notification type:${task.notifType}, time: ${task.notifyTime}');
+    MiniLogger.debug('notification type:${task.notifType}, time: ${task.notifyTime}');
     try {
       final notifType = task.notifType!.toLowerCase();
       final isAlarm = notifType == 'alarm';
       final isCreated = await _notif.createNotification(
-        content:  NotificationContent(
-                id: task.id!,
-                channelKey: isAlarm ? 'task_alarm' : 'task_notif',
-                title: 'Task Due at ${formatTime(task.dueDate!)}',
-                body: task.title,
-                actionType: ActionType.Default,
-                payload: task.toNotificationPayload(),
-                notificationLayout: NotificationLayout.Default,
-                category:isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
-                wakeUpScreen: true,
-                criticalAlert: true,
-              ),
+        content: NotificationContent(
+          id: task.id!,
+          channelKey: isAlarm ? 'task_alarm' : 'task_notif',
+          title: 'Task Due at ${formatTime(task.dueDate!)}',
+          body: task.title,
+          actionType: ActionType.Default,
+          payload: task.toNotificationPayload(),
+          notificationLayout: NotificationLayout.Default,
+          category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
+          wakeUpScreen: true,
+          criticalAlert: true,
+        ),
         schedule: NotificationCalendar.fromDate(
           date: task.notifyTime!,
           allowWhileIdle: true,
@@ -227,8 +222,7 @@ class NotificationService {
         return;
       }
 
-      final notificationId =
-          generateNotificationId(task, notifyDate, reminderTime);
+      final notificationId = generateNotificationId(task, notifyDate, reminderTime);
 
       await _notif.createNotification(
         content: NotificationContent(
@@ -239,7 +233,9 @@ class NotificationService {
           body: task.title,
           payload: task.toNotificationPayload(),
           notificationLayout: NotificationLayout.Default,
-          category:task.notifType == 'alarm' ? NotificationCategory.Alarm : NotificationCategory.Reminder,
+          category: task.notifType == 'alarm'
+              ? NotificationCategory.Alarm
+              : NotificationCategory.Reminder,
           wakeUpScreen: true,
           criticalAlert: true,
         ),
@@ -276,8 +272,7 @@ class NotificationService {
     DateTime baseDateTime,
   ) async {
     try {
-      final notificationId =
-          generateNotificationId(task, baseDateTime, reminderTime);
+      final notificationId = generateNotificationId(task, baseDateTime, reminderTime);
 
       await _notif.createNotification(
         content: NotificationContent(
@@ -288,7 +283,9 @@ class NotificationService {
           body: task.title,
           payload: task.toNotificationPayload(),
           notificationLayout: NotificationLayout.Default,
-          category: task.notifType == 'alarm' ? NotificationCategory.Alarm : NotificationCategory.Reminder,
+          category: task.notifType == 'alarm'
+              ? NotificationCategory.Alarm
+              : NotificationCategory.Reminder,
           wakeUpScreen: true,
           criticalAlert: true,
         ),
@@ -325,8 +322,7 @@ class NotificationService {
     DateTime baseDateTime,
   ) async {
     try {
-      final notificationId =
-          generateNotificationId(task, baseDateTime, reminderTime);
+      final notificationId = generateNotificationId(task, baseDateTime, reminderTime);
 
       await _notif.createNotification(
         content: NotificationContent(
@@ -337,7 +333,9 @@ class NotificationService {
           body: task.title,
           payload: task.toNotificationPayload(),
           notificationLayout: NotificationLayout.Default,
-          category: task.notifType == 'alarm' ? NotificationCategory.Alarm : NotificationCategory.Reminder,
+          category: task.notifType == 'alarm'
+              ? NotificationCategory.Alarm
+              : NotificationCategory.Reminder,
           wakeUpScreen: true,
           criticalAlert: true,
         ),
@@ -387,8 +385,7 @@ class NotificationService {
 
     try {
       // Cancel all notifications for this task using the group key
-      await AwesomeNotifications()
-          .cancelNotificationsByGroupKey(task.id!.toString());
+      await AwesomeNotifications().cancelNotificationsByGroupKey(task.id!.toString());
 
       // Log the cancellation for debugging
       logger.d('Cancelled all notifications for task ${task.id}');

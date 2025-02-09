@@ -232,16 +232,16 @@ extension TaskUtilities on Task {
     );
   }
 
+  ///Converting a [Task] object to notification payload object [Map<String,String?>?]
   Map<String, String?>? toNotificationPayload() {
     Map<String, dynamic> taskJson = toJson();
     return {'task': jsonEncode(taskJson)};
   }
 
+  ///Converting a notification payload object [Map<String,String?>?] to a [Task] object.
   static Task fromNotificationPayload(Map<String, String?>? payload) {
     return Task.fromJson(jsonDecode(payload!['task']!));
   }
 
-  ValueKey getTaskItemKey(){
-    return ValueKey('task$id');
-  }
+
 }

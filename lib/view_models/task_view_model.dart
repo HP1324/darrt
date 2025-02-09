@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/services/database_service.dart';
 import 'package:minimaltodo/services/notification_service.dart';
@@ -77,14 +79,14 @@ class TaskViewModel extends ChangeNotifier {
 
   void initNewTask() {
     currentTask = Task(
-      dueDate: DateTime.now().add(const Duration(minutes: 2)),
+      dueDate: DateTime.now().add(const Duration(minutes: 1)),
       category: CategoryModel(id: 1, name: 'General'),
       priority: "Low",
       notifType: "notif",
       startDate: DateTime.now(),
       isRepeating: false,
-      isNotifyEnabled: false,
-      repeatConfig: '{"repeatType":"weekly","selectedDays":[1,2,3,4,5]}',
+      isNotifyEnabled:MiniBox.read(mIsNotificationsGloballyEnabled),
+      repeatConfig: '{"repeatType":"weekly","selectedDays":[1,2,3,4,5,6,7]}',
     );
 
     selectedMinutes = 0;
@@ -105,7 +107,7 @@ class TaskViewModel extends ChangeNotifier {
   Task taskBeforeEdit = Task();
   void initEditTask(Task task) {
     taskBeforeEdit = task.copyWith();
-    currentTask = task;
+    currentTask = task.copyWith();
     titleController.text = task.title ?? '';
   }
 
@@ -172,7 +174,7 @@ class TaskViewModel extends ChangeNotifier {
     updateNotifLogicAfterDueDateUpdate();
   }
 
-  setTime(TimeOfDay time) {
+   void setTime(TimeOfDay time) {
     final existingDate = currentTask.dueDate ?? DateTime.now();
     currentTask.dueDate = DateTime(
       existingDate.year,
@@ -349,8 +351,7 @@ class TaskViewModel extends ChangeNotifier {
       if (times.length >= 7) return;
 
       // Convert TimeOfDay to string format
-      final timeString =
-          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+      final timeString='${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
       // Check for duplicates
       if (times.contains(timeString)) return;
@@ -464,10 +465,13 @@ class TaskViewModel extends ChangeNotifier {
   Future<int> editTask() async {
     int changes = 0;
     if (currentTask == taskBeforeEdit) {
+      MiniLogger.debug('Task is not edited');
       return changes;
     }
     if (currentTask.isValid()) {
+      MiniLogger.debug('Task is valid');
       changes = await TaskService.editTask(newTask: currentTask.toJson());
+      MiniLogger.debug('Changes made: $changes');
       final taskIndex = _tasks.indexWhere((task) => task.id == currentTask.id);
       if (taskIndex != -1) {
         _tasks[taskIndex] = currentTask;
@@ -489,6 +493,7 @@ class TaskViewModel extends ChangeNotifier {
       }
       return changes;
     }else{
+      MiniLogger.debug('Task is not valid');
       return 0;
     }
   }
