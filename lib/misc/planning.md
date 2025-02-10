@@ -102,3 +102,8 @@ void _deleteSelectedTasks(BuildContext context, TaskViewModel taskVM, CalendarVi
       ),
     );
   }
+
+
+///PREFERRED COLORS
+Color(0xff15616D)
+Color(0xff78290F)

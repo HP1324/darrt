@@ -81,30 +81,35 @@ class SelectableTaskItemState extends State<SelectableTaskItem> {
                   // Content
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(8, 12, 4, 12),
+                      padding: const EdgeInsets.fromLTRB(0, 12, 10, 12),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
                               Expanded(
-                                child: Text(
-                                  widget.task.title!,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .textTheme
-                                        .titleSmall!
-                                        .fontSize,
-                                    fontWeight: FontWeight.w500,
-                                    decorationColor:
-                                        Theme.of(context).colorScheme.outline,
-                                    decorationThickness: 2,
-                                    color: widget.task.isDone!
-                                        ? Theme.of(context).colorScheme.outline
-                                        : null,
-                                  ),
+                                child: Consumer2<CalendarViewModel, TaskViewModel>(
+                                    builder: (context, calVM, taskVM, _) {
+                                      final date = DateTime(calVM.selectedDate.year, calVM.selectedDate.month, calVM.selectedDate.day).millisecondsSinceEpoch;
+                                      final isCompleted = widget.task.isRepeating!
+                                          ? taskVM.recurringTaskCompletion[widget.task.id]?.contains(date) ?? false
+                                          : taskVM.singleTaskCompletion[widget.task.id] ?? false;
+
+                                      return Text(
+                                        widget.task.title!,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+                                          fontWeight: FontWeight.w500,
+                                          decorationColor: Theme.of(context).colorScheme.outline,
+                                          decorationThickness: 2,
+                                          color: isCompleted
+                                              ? Theme.of(context).colorScheme.outline
+                                              : Theme.of(context).colorScheme.onSurface,
+                                        ),
+                                      );
+                                    }
                                 ),
                               ),
                               const SizedBox(width: 8),
