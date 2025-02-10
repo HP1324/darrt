@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_enums.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/views/widgets/empty_tasks_indicator.dart';
@@ -22,7 +24,7 @@ class _CalendarPageState extends State<CalendarPage> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this,initialIndex: 1);
+    _tabController = TabController(length: 3, vsync: this,initialIndex: MiniBox.read(mDefaultTaskList));
   }
 
   @override
