@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/theme_colors.dart';
 import 'package:minimaltodo/view_models/theme_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:minimaltodo/helpers/mini_enums.dart';

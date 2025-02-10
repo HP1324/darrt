@@ -3,7 +3,6 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/services/notification_action_controller.dart';
@@ -66,11 +65,11 @@ class _MinimalTodoState extends State<MinimalTodo> {
           navigatorKey: MinimalTodo.navigatorKey,
           theme: FlexColorScheme.light(colors: themeVM.selectedScheme).toTheme,
           darkTheme: FlexColorScheme.dark(
-            colors: themeVM.selectedScheme.toDark(),
+            colors: themeVM.selectedScheme.toDark(35,false),
             surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-            blendLevel: 30, // Reduces contrast by blending colors more subtly
+            blendLevel: 20,
             appBarStyle: FlexAppBarStyle.background,
-            darkIsTrueBlack: false, // Prevents pure black
+            darkIsTrueBlack: false,
             // scaffoldBackground: Color(0xff414141),
           ).toTheme,
           themeMode: themeVM.themeMode,

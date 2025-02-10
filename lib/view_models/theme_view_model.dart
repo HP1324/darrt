@@ -2,23 +2,23 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_enums.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 
 class ThemeViewModel extends ChangeNotifier {
-  static const String _themeColorKey = 'themeColor';
-  static const String _themePreferenceKey = 'themePreference';
+
 
   late ThemeColors _selectedColor;
   late ThemePreference _themePreference;
 
   ThemeViewModel() {
-    final storedColorIndex = MiniBox.read(_themeColorKey);
+    final storedColorIndex = MiniBox.read(mThemeColor);
     _selectedColor = storedColorIndex != null
         ? ThemeColors.values[storedColorIndex]
-        : ThemeColors.cerulean;
+        : ThemeColors.amethyst;
 
-    final storedPreference = MiniBox.read(_themePreferenceKey);
+    final storedPreference = MiniBox.read(mThemePreference);
     _themePreference = storedPreference != null
         ? ThemePreference.values[storedPreference]
         : ThemePreference.system;
@@ -30,7 +30,6 @@ class ThemeViewModel extends ChangeNotifier {
   bool get isDarkMode {
     switch (_themePreference) {
       case ThemePreference.system:
-      // This will be used in the UI to determine the switch state
         return false;
       case ThemePreference.light:
         return false;
@@ -56,7 +55,7 @@ class ThemeViewModel extends ChangeNotifier {
 
   Future<void> setThemePreference(ThemePreference preference) async {
     try {
-      await MiniBox.write(_themePreferenceKey, preference.index);
+      await MiniBox.write(mThemePreference, preference.index);
       _themePreference = preference;
       notifyListeners();
     } catch (e) {
@@ -66,7 +65,7 @@ class ThemeViewModel extends ChangeNotifier {
 
   Future<void> setThemeColor(ThemeColors color) async {
     _selectedColor = color;
-    await MiniBox.write(_themeColorKey, color.index);
+    await MiniBox.write(mThemeColor, color.index);
     notifyListeners();
   }
 }

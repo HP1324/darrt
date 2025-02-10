@@ -59,23 +59,6 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void loadSingleTasks() async {
-    singleTasks = await TaskService.getSingleTasks();
-    notifyListeners();
-  }
-
-  void loadRecurringTasks() async {
-    recurringTasks = await TaskService.getRecurringTasks();
-    final List<Map<String, dynamic>> completions = await TaskService.getTaskCompletions();
-    recurringTaskCompletion.clear();
-    for (var entry in completions) {
-      int taskId = entry['task_id'];
-      int date = entry['date'];
-
-      recurringTaskCompletion.putIfAbsent(taskId, () => {}).add(date);
-    }
-    notifyListeners();
-  }
 
   void initNewTask() {
     currentTask = Task(
