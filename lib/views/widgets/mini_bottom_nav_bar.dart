@@ -42,7 +42,7 @@ class MiniBottomNavBarItem extends StatefulWidget {
   });
 
   final IconData icon;
-  final String label;
+  final String? label;
   final int i;
 
   @override
@@ -99,6 +99,7 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
                     ),
                   ),
                 ),
+                if(widget.label != null)
                 AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 200),
                   style: TextStyle(
@@ -107,7 +108,7 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
                     color: isSelected ? primary : onSurface.withAlpha(150),
                     fontWeight: FontWeight.bold,
                   ),
-                  child: Text(widget.label),
+                  child: Text(widget.label!),
                 ),
               ],
             ),

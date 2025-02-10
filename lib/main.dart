@@ -65,9 +65,8 @@ class _MinimalTodoState extends State<MinimalTodo> {
           navigatorKey: MinimalTodo.navigatorKey,
           theme: FlexColorScheme.light(colors: themeVM.selectedScheme).toTheme,
           darkTheme: FlexColorScheme.dark(
-            colors: themeVM.selectedScheme.toDark(35,false),
+            colors: themeVM.selectedScheme.toDark(),
             surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-            blendLevel: 20,
             appBarStyle: FlexAppBarStyle.background,
             darkIsTrueBlack: false,
             // scaffoldBackground: Color(0xff414141),
