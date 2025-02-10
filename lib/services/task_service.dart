@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -33,10 +32,7 @@ class TaskService {
     });
   }
 
-  static Future<List<Map<String, dynamic>>> getTaskCompletions() async {
-    final db = await DatabaseService.openDb();
-    return await db.query('task_completion');
-  }
+
 
   static Future<Task?> getTaskById(int id) async {
     final database = await DatabaseService.openDb();

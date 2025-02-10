@@ -3,13 +3,8 @@ import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
-import 'package:minimaltodo/services/database_service.dart';
-import 'package:minimaltodo/test_app.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
-import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/navigation/finished_tasks_page.dart';
-import 'package:minimaltodo/views/widgets/selectable_task_item.dart';
-import 'package:minimaltodo/views/widgets/task_item.dart';
 import 'package:provider/provider.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -24,50 +19,51 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(14),
       elevation: 0,
-      title: Consumer<CalendarViewModel>(
-          builder: (context, calVM, _) {
-            final isBefore = calVM.selectedDate.isBefore(DateTime.now());
-            return AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (Widget child, animation) {
-                final inAnimation = Tween<Offset>(
-                  begin: const Offset(-1.0, 0.0),
-                  end: Offset.zero,
-                ).animate(animation);
+        title: Selector<CalendarViewModel,DateTime>(
+            selector: (context, calVM) => calVM.selectedDate,
+            builder: (context, selectedDate, _) {
+              final isBefore = selectedDate.isBefore(DateTime.now());
+              return AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (Widget child, animation) {
+                  final inAnimation = Tween<Offset>(
+                    begin: const Offset(-1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(animation);
 
-                final outAnimation = Tween<Offset>(
-                  begin: const Offset(1.0, 0.0),
-                  end: Offset.zero,
-                ).animate(animation);
+                  final outAnimation = Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(animation);
 
-                if (child.key == ValueKey<DateTime>(calVM.selectedDate)) {
-                  // This is the new date coming in
-                  return ClipRect(
-                    child: SlideTransition(
-                      position:isBefore ?  inAnimation :outAnimation,
-                      child: child,
-                    ),
-                  );
-                } else {
-                  // This is the old date going out
-                  return ClipRect(
-                    child: SlideTransition(
-                      position:isBefore ? outAnimation:inAnimation,
-                      child: child,
-                    ),
-                  );
-                }
-              },
-              child: Text(
-                formatDateWith(calVM.selectedDate, 'EEE, d MMM, yyyy'),
-                key: ValueKey<DateTime>(calVM.selectedDate),
-                style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                  fontWeight: FontWeight.bold,
+                  if (child.key == ValueKey<DateTime>(selectedDate)) {
+                    // This is the new date coming in
+                    return ClipRect(
+                      child: SlideTransition(
+                        position:isBefore ?  inAnimation :outAnimation,
+                        child: child,
+                      ),
+                    );
+                  } else {
+                    // This is the old date going out
+                    return ClipRect(
+                      child: SlideTransition(
+                        position:isBefore ? outAnimation:inAnimation,
+                        child: child,
+                      ),
+                    );
+                  }
+                },
+                child: Text(
+                  formatDateWith(selectedDate, 'EEE, d MMM, yyyy'),
+                  key: ValueKey<DateTime>(selectedDate),
+                  style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            );
-          }
-      ),
+              );
+            }
+        ),
       actions: [
         _MiniAppBarAction(
           icon: Icon(Icons.flutter_dash),

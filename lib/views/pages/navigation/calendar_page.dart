@@ -144,9 +144,14 @@ class _TaskListViewState extends State<TaskListView> with AutomaticKeepAliveClie
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Consumer2<TaskViewModel, CalendarViewModel>(
-      builder: (context, taskVM, calVM, _) {
-        var tasks = calVM.getTasksForDate(calVM.selectedDate, taskVM.tasks);
+    return Selector2<TaskViewModel, CalendarViewModel,(List<Task>,DateTime,Set<int>)>(
+      selector: (context,taskVM,calVM) {
+        final filteredTasks = calVM.getTasksForDate(calVM.selectedDate, taskVM.tasks);
+        return (filteredTasks, calVM.selectedDate, calVM.selectedTaskIds);
+      },
+      builder: (context, data, _) {
+        var (tasks,selectedDate,selectedTaskIds) = data;
+        tasks = context.read<CalendarViewModel>().getTasksForDate(selectedDate, tasks);
         switch (widget.taskType) {
           case TaskType.all:
             tasks = tasks;
@@ -170,10 +175,10 @@ class _TaskListViewState extends State<TaskListView> with AutomaticKeepAliveClie
                   return TaskItem(
                     key: ValueKey('task_${task.id}'),
                     task: task.toLightweightEntity(),
-                    isSelected: calVM.selectedTaskIds.contains(task.id),
-                    isSelectionMode: calVM.selectedTaskIds.isNotEmpty,
-                    onLongPress: () => calVM.toggleTaskSelection(task),
-                    onSelect: (_) => calVM.toggleTaskSelection(task),
+                    isSelected: selectedTaskIds.contains(task.id),
+                    isSelectionMode: selectedTaskIds.isNotEmpty,
+                    onLongPress: () => context.read<CalendarViewModel>().toggleTaskSelection(task),
+                    onSelect: (_) => context.read<CalendarViewModel>().toggleTaskSelection(task),
                   );
                 },
               );
@@ -254,7 +259,7 @@ class DateItem extends StatelessWidget {
                 height: 32,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isSelected ? colorScheme.primaryContainer.withAlpha(150) : colorScheme.primary.withAlpha(20),
+                  color: isSelected ? colorScheme.primaryContainer.withAlpha(150) : colorScheme.primary.withAlpha(30),
                 ),
                 child: Center(
                   child: Text(
