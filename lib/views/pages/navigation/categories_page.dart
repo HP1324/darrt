@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
-import 'package:minimaltodo/views/pages/new_list_page.dart';
+import 'package:minimaltodo/views/pages/new_category_page.dart';
 import 'package:provider/provider.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/views/widgets/custom_text_field.dart';
@@ -19,7 +19,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
   bool _showSearch = false;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  FocusNode _focusNode = FocusNode();
+  final _focusNode = FocusNode();
   @override
   void dispose() {
     _searchController.dispose();
@@ -40,7 +40,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
         }).toList();
 
         return SingleChildScrollView(
-          controller: categoryVM.categoryScrollController,
+          controller: context.read<CategoryViewModel>().categoryPageScrollController,
           child: Column(
             children: [
               Padding(

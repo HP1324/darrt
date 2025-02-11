@@ -7,6 +7,7 @@ import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/widgets/color_picker_dialog.dart';
 import 'package:minimaltodo/views/widgets/icon_picker_dialog.dart';
 import 'package:provider/provider.dart';
+import 'package:toastification/toastification.dart';
 
 class NewCategoryPage extends StatefulWidget {
   const NewCategoryPage({super.key, required this.editMode, this.listToEdit});
@@ -200,23 +201,21 @@ class _NewCategoryPageState extends State<NewCategoryPage> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            final nav = Navigator.of(context);
             if (!widget.editMode!) {
               final success = await categoryVM.addNewCategory();
-              final scrollController = categoryVM.categoryScrollController;
-              if (success) {
-                scrollController.animateTo(
-                  scrollController.position.maxScrollExtent,
-                  duration: Duration(milliseconds: 500),
-                  curve: Curves.easeOut,
-                );
-                nav.pop();
+              if (success && context.mounted) {
+                showToast(context: context, title: 'Category Added',type: ToastificationType.success);
+                final scrollController1  = context.read<CategoryViewModel>().categoryBottomSheetScrollController;
+                final scrollController2  = context.read<CategoryViewModel>().categoryPageScrollController;
+                Navigator.pop(context);
+                scrollToBottom(scrollController1);
+                scrollToBottom(scrollController2);
               }
             } else {
               final edited = await categoryVM.editCategory();
-              if (edited) {
+              if (edited && context.mounted) {
                 tvm.updateTaskListAfterEdit(widget.listToEdit!);
-                nav.pop();
+                Navigator.pop(context);
               }
             }
           },
@@ -224,5 +223,15 @@ class _NewCategoryPageState extends State<NewCategoryPage> {
         ),
       ),
     );
+  }
+
+  void scrollToBottom(ScrollController scrollController){
+    if(scrollController.hasClients) {
+      scrollController.animateTo(
+      scrollController.position.maxScrollExtent,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeOut,
+    );
+    }
   }
 }
