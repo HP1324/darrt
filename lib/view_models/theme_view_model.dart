@@ -16,7 +16,7 @@ class ThemeViewModel extends ChangeNotifier {
     final storedColorIndex = MiniBox.read(mThemeColor);
     _selectedColor = storedColorIndex != null
         ? ThemeColors.values[storedColorIndex]
-        : ThemeColors.amethyst;
+        : ThemeColors.cerulean;
 
     final storedPreference = MiniBox.read(mThemePreference);
     _themePreference = storedPreference != null
