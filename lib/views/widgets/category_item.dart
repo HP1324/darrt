@@ -5,7 +5,7 @@ import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
-import 'package:minimaltodo/views/pages/new_list_page.dart';
+import 'package:minimaltodo/views/pages/new_category_page.dart';
 import 'package:minimaltodo/views/pages/tasks_for_category_page.dart';
 import 'package:provider/provider.dart';
 

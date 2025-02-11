@@ -9,7 +9,7 @@ void showToast({
   required BuildContext context,
   required String title,
   String? description,
-  Duration duration = const Duration(milliseconds: 2000),
+  Duration duration = const Duration(milliseconds: 1400),
   ToastificationType type = ToastificationType.success,
   AlignmentGeometry alignment = Alignment.bottomCenter,
 }) {
@@ -25,7 +25,9 @@ void showToast({
             ? colorScheme.error
             : colorScheme.onSurface,
         fontWeight: FontWeight.w500,
+
       ),
+      maxLines: null,
     ),
     description: description != null
         ? Text(
@@ -44,7 +46,7 @@ void showToast({
     closeOnClick: true,
     alignment: alignment,
     animationDuration: const Duration(milliseconds: 200),
-    backgroundColor: colorScheme.surfaceContainerHighest .withAlpha(240),
+    backgroundColor: colorScheme.surfaceContainerHighest.withAlpha(240),
     borderRadius: BorderRadius.circular(8),
     boxShadow: [
       BoxShadow(

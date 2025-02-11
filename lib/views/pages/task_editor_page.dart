@@ -2,19 +2,20 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:minimaltodo/data_models/category_model.dart';
+import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/services/category_service.dart';
-import 'package:page_transition/page_transition.dart';
-import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/view_models/general_view_model.dart';
-import 'package:minimaltodo/views/pages/new_list_page.dart';
+import 'package:minimaltodo/views/pages/new_category_page.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
@@ -66,78 +67,86 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
         ),
         body: Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
-          child: Scrollbar(
-            child: SingleChildScrollView(
-              child: Selector<TaskViewModel, (bool, bool)>(
-                  selector: (context, taskVM) => (taskVM.isRepeatEnabled, taskVM.isNotifyEnabled),
-                  builder: (context, data, _) {
-                    final (isRepeatEnabled, isNotifyEnabled) = data;
-                    return Column(
-                      children: [
-                        TaskTextField(editMode: widget.editMode),
-                        const SizedBox(height: 50),
-                        Row(
-                          children: [
-                            Flexible(flex: 2, child: const SetCategoryButton()),
-                            Flexible(flex: 3, child: const SetPriorityWidget()),
+          child: SingleChildScrollView(
+            child: Selector<TaskViewModel, (bool, bool)>(
+                selector: (context, taskVM) => (taskVM.isRepeatEnabled, taskVM.isNotifyEnabled),
+                builder: (context, data, _) {
+                  final (isRepeatEnabled, isNotifyEnabled) = data;
+                  return Column(
+                    children: [
+                      TaskTextField(editMode: widget.editMode),
+                      const SizedBox(height: 50),
+                      Row(
+                        children: [
+                          Flexible(flex: 2, child: const SetCategoryButton()),
+                          Flexible(flex: 3, child: const SetPriorityWidget()),
+                        ],
+                      ),
+                      const SizedBox(height: 30),
+                      Card(
+                        elevation: 0,
+                        child: SegmentedButton(
+                          showSelectedIcon: false,
+                          segments: [
+                            ButtonSegment(
+                              value: false,
+                              label: Text('Single Task'),
+                              icon: Icon(
+                                Icons.calendar_today,
+                                size: 18,
+                                color: !isRepeatEnabled
+                                    ? Theme.of(context).colorScheme.onPrimary
+                                    : null,
+                              ),
+                            ),
+                            ButtonSegment(
+                              value: true,
+                              label: Text('Recurring Task'),
+                              icon: Icon(Icons.repeat,
+                                  size: 18,
+                                  color: isRepeatEnabled
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : null),
+                            ),
                           ],
-                        ),
-                        const SizedBox(height: 30),
-                        Card(
-                          elevation: 0,
-                          child: SegmentedButton(
-                            segments: const [
-                              ButtonSegment(
-                                value: false,
-                                label: Text('Single Task'),
-                                icon: Icon(Icons.calendar_today, size: 18),
-                              ),
-                              ButtonSegment(
-                                value: true,
-                                label: Text('Recurring Task'),
-                                icon: Icon(Icons.repeat, size: 18),
-                              ),
-                            ],
-                            selected: {isRepeatEnabled},
-                            onSelectionChanged: (selected) {
-                              context.read<TaskViewModel>().toggleRepeat(selected.first);
-                            },
-                            style: ButtonStyle(
-                              shape: WidgetStatePropertyAll(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
+                          selected: {isRepeatEnabled},
+                          onSelectionChanged: (selected) {
+                            context.read<TaskViewModel>().toggleRepeat(selected.first);
+                          },
+                          style: ButtonStyle(
+                            shape: WidgetStatePropertyAll(
+                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 30),
-                        if (isRepeatEnabled) ...[
-                          const RepeatingConfigWidget(),
-                          const SizedBox(height: 20),
-                          NotificationSwitch(),
-                          if (isNotifyEnabled) ...[
-                            const NotificationTypeSelector(),
-                            const SizedBox(height: 16),
-                            const RecurringReminderTimes(),
-                          ],
-                        ] else ...[
-                          // One-time task settings
-                          SetDateWidget(editMode: widget.editMode, task: widget.taskToEdit),
-                          const SizedBox(height: 8),
-                          SetTimeWidget(editMode: widget.editMode, task: widget.taskToEdit),
+                      ),
+                      const SizedBox(height: 30),
+                      if (isRepeatEnabled) ...[
+                        const RepeatingConfigWidget(),
+                        const SizedBox(height: 10),
+                        NotificationSwitch(),
+                        if (isNotifyEnabled) ...[
+                          const NotificationTypeSelector(),
                           const SizedBox(height: 16),
-                          NotificationSwitch(),
-                          if (isNotifyEnabled) ...[
-                            const NotificationTypeSelector(),
-                            const SizedBox(height: 8),
-                            const NotificationOptionsWidget(),
-                          ],
+                          const RecurringReminderTimes(),
+                        ],
+                        const SizedBox(height: 80),
+                      ] else ...[
+                        // One-time task settings
+                        SetDateWidget(editMode: widget.editMode, task: widget.taskToEdit),
+                        const SizedBox(height: 8),
+                        SetTimeWidget(editMode: widget.editMode, task: widget.taskToEdit),
+                        const SizedBox(height: 16),
+                        NotificationSwitch(),
+                        if (isNotifyEnabled) ...[
+                          const NotificationTypeSelector(),
+                          const SizedBox(height: 8),
+                          const NotificationOptionsWidget(),
                         ],
                       ],
-                    );
-                  }),
-            ),
+                    ],
+                  );
+                }),
           ),
         ),
         floatingActionButton: widget.editMode
@@ -145,11 +154,15 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
             : FloatingActionButton(
                 onPressed: () async {
                   context.read<TaskViewModel>().setTitle();
-                  final success = await context.read<TaskViewModel>().addNewTask();
-                  if (success && context.mounted) {
-                    Navigator.pop(context);
-                    showToast(
-                        context: context, title: 'Task added', type: ToastificationType.success);
+                  final message = await context.read<TaskViewModel>().addNewTask();
+                  if (context.mounted) {
+                    if (message != null) {
+                      message == Messages.mAdded ? Navigator.pop(context) : null;
+                      final type = message == Messages.mAdded
+                          ? ToastificationType.success
+                          : ToastificationType.error;
+                      showToast(context: context, title: message, type: type);
+                    }
                   }
                 },
                 shape: const CircleBorder(),
@@ -293,7 +306,8 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
                   radius: const Radius.circular(4),
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
-                    controller: context.read<CategoryViewModel>().categoryScrollController,
+                    controller:
+                        context.read<CategoryViewModel>().categoryBottomSheetScrollController,
                     itemCount: categories.length,
                     itemBuilder: (_, index) {
                       return RadioListTile(
@@ -417,8 +431,7 @@ class SetPriorityWidget extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () => context.read<TaskViewModel>().navigatePriority(true),
-                        child:
-                            Icon(Icons.chevron_right),
+                        child: Icon(Icons.chevron_right),
                       ),
                     ],
                   ),
@@ -679,13 +692,6 @@ class NotificationTypeSelector extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Notification Type',
-              style: TextStyle(
-                  fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                  fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 10),
             SegmentedButton(
               selectedIcon: Icon(
                 Icons.check,
@@ -769,15 +775,15 @@ class _TimeOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<TaskViewModel>(
-      builder: (context, tvm, _) {
-        final isSelected = tvm.selectedMinutes == minutes;
+      builder: (context, taskVM, _) {
+        final isSelected = taskVM.selectedMinutes == minutes;
         return Material(
           color: isSelected ? Theme.of(context).colorScheme.outlineVariant : null,
           borderRadius: BorderRadius.circular(20),
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
             onTap: () {
-              final isUpdated = tvm.updateNotifyTime(minutes);
+              final isUpdated = taskVM.updateNotifyTime(minutes);
               if (!isUpdated) {
                 showToast(
                     context: context,
@@ -803,87 +809,64 @@ class RepeatingConfigWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
-    return Card(
-      elevation: 0,
-      color: colorScheme.surfaceContainerHighest.withAlpha(50),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: colorScheme.primary.withAlpha(15),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            ),
-            child: Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SetStartEndDate(),
+        const SizedBox(height: 10),
+        Selector<TaskViewModel, String>(
+          selector: (context, taskVM) => taskVM.repeatType!,
+          builder: (context, repeatType, _) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.repeat, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  'Repeat Settings',
-                  style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SegmentedButton(
+                      showSelectedIcon: false,
+                      segments: [
+                        ButtonSegment(value: 'weekly', label: Text('Weekly')),
+                        ButtonSegment(value: 'monthly', label: Text('Monthly')),
+                        ButtonSegment(value: 'yearly', label: Text('Yearly')),
+                      ],
+                      selected: {repeatType},
+                      onSelectionChanged: (newSelection) {
+                        context.read<TaskViewModel>().setRepeatType(newSelection.first);
+                      },
+                    ),
+                  ],
+                ),
+                if (repeatType == 'weekly') _WeekdaySelector(),
+                // Repeat type descriptions
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Text(
+                    _getRepeatTypeDescription(repeatType),
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                 ),
               ],
-            ),
-          ),
-
-          // Date Range Section
-          const SetStartEndDate(),
-          const Divider(height: 1),
-          // Repeat Type Section
-          Selector<TaskViewModel, String>(
-              selector: (context, taskVM) => taskVM.repeatType!,
-              builder: (context, repeatType, _) {
-                return Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Repeat Type',
-                        style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(height: 8),
-
-                      // Repeat Type Radio Buttons with better styling
-                      _RepeatTypeOption(
-                        title: 'Weekly',
-                        subtitle: 'Repeat on specific days of the week',
-                        value: 'weekly',
-                        groupValue: repeatType,
-                        onChanged: (value) => context.read<TaskViewModel>().setRepeatType(value!),
-                      ),
-
-                      if (repeatType == 'weekly')
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8, bottom: 16),
-                          child: _WeekdaySelector(),
-                        ),
-
-                      _RepeatTypeOption(
-                        title: 'Monthly',
-                        subtitle: 'Repeat on the same date as start date each month',
-                        value: 'monthly',
-                        groupValue: repeatType,
-                        onChanged: (value) => context.read<TaskViewModel>().setRepeatType(value!),
-                      ),
-
-                      _RepeatTypeOption(
-                        title: 'Yearly',
-                        subtitle: 'Repeat on the same date as start date each year',
-                        value: 'yearly',
-                        groupValue: repeatType,
-                        onChanged: (value) => context.read<TaskViewModel>().setRepeatType(value!),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-        ],
-      ),
+            );
+          },
+        ),
+      ],
     );
+  }
+
+  String _getRepeatTypeDescription(String repeatType) {
+    switch (repeatType) {
+      case 'weekly':
+        return 'Repeat on specific days of the week';
+      case 'monthly':
+        return 'Repeat on the same date as start date each month';
+      case 'yearly':
+        return 'Repeat on the same date as start date each year';
+      default:
+        return '';
+    }
   }
 }
 
@@ -894,18 +877,10 @@ class SetStartEndDate extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(bottom: 14, left: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Date Range',
-            style: textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          // Start Date
           Selector<TaskViewModel, DateTime>(
               selector: (context, taskVM) => taskVM.taskStartDate,
               builder: (context, startDate, _) {
@@ -926,10 +901,9 @@ class SetStartEndDate extends StatelessWidget {
                   },
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                      border: Border.all(color: colorScheme.outline.withAlpha(50)),
-                      borderRadius: BorderRadius.circular(8),
+                      border: Border(bottom: BorderSide(color: colorScheme.outline.withAlpha(50))),
                     ),
                     child: Row(
                       children: [
@@ -939,17 +913,18 @@ class SetStartEndDate extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Column(
+                          spacing: 2,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Start Date',
-                              style: textTheme.bodySmall?.copyWith(
+                              style: textTheme.labelLarge?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                               ),
                             ),
                             Text(
                               DateFormat.yMMMd().format(startDate),
-                              style: textTheme.bodyMedium,
+                              style: textTheme.labelMedium,
                             ),
                           ],
                         ),
@@ -959,7 +934,7 @@ class SetStartEndDate extends StatelessWidget {
                 );
               }),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 15),
           // End Date
           Selector<TaskViewModel, (DateTime?, DateTime)>(
               selector: (context, taskVM) => (taskVM.taskEndDate, taskVM.taskStartDate),
@@ -980,10 +955,9 @@ class SetStartEndDate extends StatelessWidget {
                   },
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                      border: Border.all(color: colorScheme.outline.withAlpha(50)),
-                      borderRadius: BorderRadius.circular(8),
+                      border: Border(bottom: BorderSide(color: colorScheme.outline.withAlpha(50))),
                     ),
                     child: Row(
                       children: [
@@ -994,11 +968,12 @@ class SetStartEndDate extends StatelessWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Column(
+                            spacing: 3,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'End Date (Optional)',
-                                style: textTheme.bodySmall?.copyWith(
+                                style: textTheme.labelLarge?.copyWith(
                                   color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
@@ -1006,7 +981,7 @@ class SetStartEndDate extends StatelessWidget {
                                 endDate != null
                                     ? DateFormat.yMMMd().format(endDate)
                                     : 'No end date',
-                                style: textTheme.bodyMedium,
+                                style: textTheme.labelMedium,
                               ),
                             ],
                           ),
@@ -1031,113 +1006,70 @@ class SetStartEndDate extends StatelessWidget {
   }
 }
 
-// Custom Radio Option Widget
-class _RepeatTypeOption extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String value;
-  final String? groupValue;
-  final ValueChanged<String?> onChanged;
-
-  const _RepeatTypeOption({
-    required this.title,
-    required this.subtitle,
-    required this.value,
-    required this.groupValue,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final isSelected = value == groupValue;
-
-    return InkWell(
-      onTap: () => onChanged(value),
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-        child: Row(
-          children: [
-            Radio(
-              value: value,
-              groupValue: groupValue,
-              onChanged: onChanged,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _WeekdaySelector extends StatelessWidget {
   const _WeekdaySelector();
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Selector<TaskViewModel, List<int>>(
+          selector: (context, taskVM) => taskVM.selectedWeekdays,
+          builder: (context, selectedWeekdays, _) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 10, top: 8, bottom: 16),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: List.generate(
+                    7,
+                    (index) {
+                      final weekday = index + 1;
+                      final dayName = DateFormat.EEEEE().format(DateTime(2024, 1, weekday));
+                      final isSelected = selectedWeekdays.contains(weekday);
+                      final isValid = context.read<TaskViewModel>().isWeekdayValid(weekday);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Select Days',
-            style: textTheme.titleSmall,
-          ),
-          const SizedBox(height: 8),
-          Selector<TaskViewModel, List<int>>(
-              selector: (context, taskVM) => taskVM.selectedWeekdays,
-              builder: (context, selectedWeekdays, _) {
-                return Wrap(
-                  spacing: 0,
-                  children: List.generate(7, (index) {
-                    final weekday = index + 1;
-                    final dayName = DateFormat.E().format(DateTime(2024, 1, weekday));
-                    final isSelected = selectedWeekdays.contains(weekday);
-                    final isValid = context.read<TaskViewModel>().isWeekdayValid(weekday);
-
-                    return Transform.scale(
-                      scale: 0.9,
-                      child: FilterChip(
-                        selectedColor: Theme.of(context).colorScheme.primary.withAlpha(180),
-                        shape: StadiumBorder(),
-                        label: Text(dayName),
-                        selected: isSelected && isValid,
-                        onSelected: isValid
-                            ? (selected) => context.read<TaskViewModel>().toggleWeekday(weekday)
-                            : null,
-                        showCheckmark: false,
-                      ),
-                    );
-                  }),
-                );
-              }),
-        ],
-      ),
+                      return Padding(
+                        padding: EdgeInsets.only(right: index < 6 ? 4 : 0),
+                        child: SizedBox(
+                          width: 42,
+                          child: FilterChip(
+                            labelPadding: EdgeInsets.zero,
+                            selectedColor: Theme.of(context).colorScheme.primary.withAlpha(180),
+                            shape: CircleBorder(),
+                            label: Text(dayName,
+                                style: TextStyle(
+                                    fontSize: Theme.of(context).textTheme.labelLarge!.fontSize)),
+                            selected: isSelected && isValid,
+                            onSelected: isValid
+                                ? (selected) {
+                                    final message =
+                                        context.read<TaskViewModel>().toggleWeekday(weekday);
+                                    if (message != null) {
+                                      showToast(
+                                        context: context,
+                                        title: 'Can\'t remove',
+                                        description: message,
+                                        type: ToastificationType.warning,
+                                        duration: Duration(milliseconds: 1900),
+                                      );
+                                    }
+                                  }
+                                : null,
+                            showCheckmark: false,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }

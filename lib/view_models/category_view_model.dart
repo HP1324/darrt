@@ -10,7 +10,8 @@ class CategoryViewModel extends ChangeNotifier {
     _refreshCategories();
   }
   List<CategoryModel> categories = [];
-  final categoryScrollController = ScrollController();
+  final categoryBottomSheetScrollController = ScrollController();
+  final categoryPageScrollController = ScrollController();
   CategoryModel? currentCategory = CategoryModel(iconCode: 'folder');
   set name(String name) => currentCategory!.name = name;
   set iconCode(String iconCode) => currentCategory!.iconCode = iconCode;
@@ -32,7 +33,6 @@ class CategoryViewModel extends ChangeNotifier {
     if (currentCategory!.isValid()) {
     logger.d('currentList is valid');
       final id = await CategoryService.addCategory(currentCategory!);
-      // Reset selected icon after adding
       selectedIcon = 'folder';
       _refreshCategories();
       return true;

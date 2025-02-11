@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -288,7 +289,7 @@ class TaskViewModel extends ChangeNotifier {
 
       config['repeatType'] = type;
       if (type == 'weekly') {
-        config['selectedDays'] = [1, 2, 3, 4, 5];
+        config['selectedDays'] = [1, 2, 3, 4, 5,6,7];
       } else {
         config.remove('selectedDays');
       }
@@ -300,18 +301,21 @@ class TaskViewModel extends ChangeNotifier {
     }
   }
 
-  void toggleWeekday(int weekday) {
-    if (currentTask.repeatConfig == null) return;
+  String? toggleWeekday(int weekday) {
+    if (currentTask.repeatConfig == null) return null;
 
     try {
       final config = jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
-      if (config['repeatType'] != 'weekly') return;
+      if (config['repeatType'] != 'weekly') return null;
 
       var days = List.from(config['selectedDays'] ?? []);
 
       if (days.contains(weekday)) {
         if (days.length != 1) {
           days.remove(weekday);
+        }
+        else{
+          return 'At least one day must be selected!';
         }
       } else {
         days.add(weekday);
@@ -323,6 +327,7 @@ class TaskViewModel extends ChangeNotifier {
     } catch (e) {
       MiniLogger.error('Error toggling weekday: $e');
     }
+    return null;
   }
 
   void addReminderTime(TimeOfDay time) {
@@ -406,25 +411,25 @@ class TaskViewModel extends ChangeNotifier {
   //-----------------------------------------------------------------------//
 
   //------------------------ TASK CRUD OPERATIONS ------------------------//
-  Future<bool> addNewTask() async {
+  Future<String?> addNewTask() async {
     // currentTask.category ??= await CategoryService.getGeneralCategory();
 
     if (!currentTask.isValid()) {
-      return false;
+      return Messages.mTaskEmpty;
     }
     // Set up repeat configuration if enabled
     if (currentTask.isRepeating!) {
       // Validate repeat configuration
       try {
-        if (currentTask.repeatConfig == null) return false;
+        if (currentTask.repeatConfig == null) return null;
         final config = jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
         if (config['repeatType'] == 'weekly') {
           final days = List.from(config['selectedDays'] ?? []);
-          if (days.isEmpty) return false; // Can't create weekly task without selected days
+          if (days.isEmpty) return null; // Can't create weekly task without selected days
         }
       } catch (e) {
         MiniLogger.error('Error validating repeat config: $e');
-        return false;
+        return null;
       }
     }
 
@@ -442,7 +447,7 @@ class TaskViewModel extends ChangeNotifier {
       }
     }
 
-    return true;
+    return Messages.mAdded;
   }
 
   Future<int> editTask() async {
