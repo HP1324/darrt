@@ -154,20 +154,29 @@ class _TaskListViewState extends State<TaskListView> with AutomaticKeepAliveClie
       builder: (context, data, _) {
         var (tasks,selectedDate,selectedTaskIds) = data;
         tasks = context.read<CalendarViewModel>().getTasksForDate(selectedDate, tasks);
+        var emptyMessage = '';
+        IconData icon = Icons.notes;
         switch (widget.taskType) {
           case TaskType.all:
             tasks = tasks;
+            emptyMessage = 'No tasks for this date';
             break;
           case TaskType.single:
             tasks = tasks.where((t) => !t.isRepeating!).toList();
+            emptyMessage = 'No single tasks for this date';
+            icon = Icons.note_alt_outlined;
+            break;
           case TaskType.recurring:
             tasks = tasks.where((t) => t.isRepeating!).toList();
+            emptyMessage ='No recurring tasks for this date';
+            icon = Iconsax.repeat;
+            break;
         }
         return tasks.isEmpty
             ? Center(
                 child: EmptyTasksIndicator(
-                  icon: Iconsax.task_square,
-                  message: 'No tasks for this date',
+                  icon: icon,
+                  message: emptyMessage,
                 ),
               )
             : ListView.builder(
