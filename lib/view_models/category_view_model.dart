@@ -18,11 +18,15 @@ class CategoryViewModel extends ChangeNotifier {
   set color(String listColor) => currentCategory!.color  = listColor;
   String? selectedIcon = 'folder'; // Default icon
   String? selectedColor;
+  Map<int, bool> selectedCategories = {};
+  void updateSelectedCategories(int id, bool updatedStatus){
+    selectedCategories[id] = updatedStatus;
+    notifyListeners();
+  }
   void _refreshCategories() async {
     categories = await CategoryService.getCategories();
-
-    if (kDebugMode) {
-      debugPrint(categories.toString());
+    for(var c in categories){
+      selectedCategories[c.id!] = false;
     }
     notifyListeners();
   }
@@ -39,13 +43,13 @@ class CategoryViewModel extends ChangeNotifier {
     return false;
   }
 
-  Future<bool> deleteCategory(CategoryModel category, TaskViewModel taskVM) async {
+  Future<bool> deleteCategory(CategoryModel category) async {
     int rowsAffected = await CategoryService.deleteCategory(category.id!);
     if (rowsAffected > 0) {
       categories.removeWhere((c) => c.id == category.id);
 
       // Update tasks directly using the passed taskVM
-      taskVM.updateTasksAfterListDeletion(category.id!);
+      // taskVM.updateTasksAfterListDeletion(category.id!);
 
       notifyListeners();
       return true;

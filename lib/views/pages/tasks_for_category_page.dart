@@ -1,16 +1,18 @@
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/services/category_service.dart';
+import 'package:minimaltodo/services/task_service.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/widgets/task_item.dart';
 import 'package:provider/provider.dart';
 
 class TasksForCategoryPage extends StatefulWidget {
-  final CategoryModel list;
+  final CategoryModel category;
 
-  const TasksForCategoryPage({super.key, required this.list});
+  const TasksForCategoryPage({super.key, required this.category});
 
   @override
   State<TasksForCategoryPage> createState() => _TasksForCategoryPageState();
@@ -82,7 +84,7 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
                 ),
               )
             : Text(
-                widget.list.name ?? 'Unnamed List',
+                widget.category.name ?? 'Unnamed List',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -125,21 +127,20 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
               ]
             : null,
       ),
-      body: Consumer<TaskViewModel>(
-        builder: (context, taskVM, _) {
-          final tasksInList =
-              taskVM.tasks.where((task) => task.category?.id == widget.list.id).toList();
-
-          if (tasksInList.isEmpty) {
+      body: FutureBuilder(
+        future: TaskService.getCategoryTasks(widget.category.id!),
+        builder: (context,snapshot) {
+          final tasksInCategory = snapshot.data ?? [];
+          if (tasksInCategory.isEmpty) {
             return Center(
               child: Column(
                 spacing: 15,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    CategoryService.getIcon(widget.list.iconCode),
+                    CategoryService.getIcon(widget.category.iconCode),
                     size: 48,
-                    color: CategoryService.getColorFromString(context, widget.list.color),
+                    color: CategoryService.getColorFromString(context, widget.category.color),
                   ),
                   Text('No Tasks Yet',style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
@@ -147,7 +148,7 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
             );
           }
           final groupedTasks = {};
-          for (var task in tasksInList) {
+          for (var task in tasksInCategory) {
             final date = task.dueDate ?? task.createdAt ?? DateTime.now();
             final dateOnly = DateTime(date.year, date.month, date.day);
             if (!groupedTasks.containsKey(dateOnly)) {
@@ -158,7 +159,6 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
 
           // Sort dates
           final sortedDates = groupedTasks.keys.toList()..sort((a, b) => a.compareTo(b));
-
           return ListView.builder(
             itemCount: sortedDates.length,
             itemBuilder: (context, index) {
@@ -184,7 +184,7 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
               );
             },
           );
-        },
+        }
       ),
     );
   }

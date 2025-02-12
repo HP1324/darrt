@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/services/task_service.dart';
 import 'package:minimaltodo/views/pages/task_editor_page.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
@@ -81,7 +83,6 @@ class TaskView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     MiniLogger.debug('Start date: ${task.startDate}, End Date: ${task.endDate}');
     return Scaffold(
       appBar: AppBar(
@@ -106,9 +107,70 @@ class TaskView extends StatelessWidget {
             subtitle: task.title ?? '',
           ),
           DetailItem(
-            icon: CategoryService.getIcon(task.category!.iconCode),
-            title: 'Category',
-            subtitle: task.category!.name ?? 'General',
+            icon: Iconsax.category,
+            title: 'Categories',
+            optionalWidget: FutureBuilder<List<CategoryModel>>(
+              future: TaskService.getTaskCategories(task.id!),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return SizedBox.shrink();
+                }
+                return SizedBox(
+                  height: 20,
+                  child: ShaderMask(
+                    shaderCallback: (bounds) {
+                      return LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black,
+                          Colors.black,
+                          Colors.transparent
+                        ],
+                        stops: [0.0, 0.05, 0.95, 1.0],
+                      ).createShader(bounds);
+                    },
+                    blendMode: BlendMode.dstIn,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      physics: BouncingScrollPhysics(),
+                      separatorBuilder: (context, index) => const SizedBox(width: 2),
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final category = snapshot.data![index];
+                        return Container(
+                          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary.withAlpha(20),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                CategoryService.getIcon(category.iconCode),
+                                size: 12,
+                                color: category.color != null
+                                    ? CategoryService.getColorFromString(context, category.color!)
+                                    : Theme.of(context).colorScheme.primary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                category.name ?? '',
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+
+              },
+            ),
           ),
           DetailItem(
             icon: Icons.flag_outlined,
@@ -162,18 +224,23 @@ class TaskView extends StatelessWidget {
 }
 
 class DetailItem extends StatelessWidget {
-  const DetailItem({super.key, required this.icon, required this.title, required this.subtitle});
+  const DetailItem(
+      {super.key,
+      required this.icon,
+      required this.title,
+      this.subtitle,
+      this.optionalWidget});
   final IconData icon;
   final String title;
-  final String subtitle;
-
+  final String? subtitle;
+  final Widget? optionalWidget;
   @override
   Widget build(BuildContext context) {
-    final titleStyle = Theme.of(context).textTheme.titleSmall!.copyWith(
+    final titleStyle = Theme.of(context).textTheme.titleMedium!.copyWith(
           fontWeight: FontWeight.bold,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         );
-    final subtitleStyle = Theme.of(context).textTheme.labelMedium!.copyWith(
+    final subtitleStyle = Theme.of(context).textTheme.labelLarge!.copyWith(
           fontWeight: FontWeight.w500,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         );
@@ -184,7 +251,7 @@ class DetailItem extends StatelessWidget {
       child: ListTile(
         leading: Icon(icon, size: 20),
         title: Text(title, style: titleStyle),
-        subtitle: Text(subtitle, style: subtitleStyle),
+        subtitle: optionalWidget ?? Text(subtitle!, style: subtitleStyle),
       ),
     );
   }

@@ -11,10 +11,6 @@ class DatabaseQueries{
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT,
         isDone INTEGER DEFAULT 0,
-        categoryId INTEGER DEFAULT 1,
-        categoryName TEXT,
-        catIconCode TEXT,
-        categoryColor TEXT,
         createdAt TEXT,
         dueDate TEXT,
         finishedAt TEXT,
@@ -26,8 +22,7 @@ class DatabaseQueries{
         startDate TEXT NOT NULL,
         endDate TEXT,
         repeatConfig TEXT,
-        reminderTimes TEXT,
-        FOREIGN KEY(categoryId) REFERENCES categories (id) ON DELETE SET DEFAULT
+        reminderTimes TEXT
       )
   """;
   static const createTaskCompletionTable = '''

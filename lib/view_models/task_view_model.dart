@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/messages.dart';
@@ -45,6 +44,7 @@ class TaskViewModel extends ChangeNotifier {
 
       recurringTaskCompletion.putIfAbsent(taskId, () => {}).add(date);
     }
+
     notifyListeners();
   }
 
@@ -64,7 +64,6 @@ class TaskViewModel extends ChangeNotifier {
   void initNewTask() {
     currentTask = Task(
       dueDate: DateTime.now().add(const Duration(minutes: 1)),
-      category: CategoryModel(id: 1, name: 'General'),
       priority: "Low",
       notifType: "notif",
       startDate: DateTime.now(),
@@ -107,18 +106,34 @@ class TaskViewModel extends ChangeNotifier {
   Task currentTask = Task();
   TextEditingController titleController = TextEditingController();
   FocusNode textFieldNode = FocusNode();
-  bool isNewTaskAdded = false;
-  List<Task> finishedTasks = [];
-  List<Task> pendingTasks = [];
   List<String> priorities = ["Urgent", "High", "Medium", "Low"];
   int currentValue = 3; // Default to Low Priority
   int selectedMinutes = 0;
-  Map<int, bool> selectedCategories = {};
 
   //------------------------ BASIC SETTERS ------------------------//
-  setCategory(CategoryModel category) {
-    currentTask.category = category;
-    notifyListeners();
+  Future<void> setCategories(Map<int, bool> selectedCategories) async{
+    var categoryIds = selectedCategories.entries.where((e) => e.value).map((e) => e.key).toList();
+
+    if(categoryIds.isEmpty){
+      categoryIds.insert(0, 1);
+    }
+    final db = await DatabaseService.openDb();
+    try {
+      // First delete existing categories
+      await db.delete('task_categories', where: 'task_id = ?', whereArgs: [currentTask.id]);
+      
+      // Then add new categories
+      final batch = db.batch();
+      if(categoryIds.isEmpty){
+        batch.insert('task_categories', {'task_id' : currentTask.id, 'category_id':1});
+      }
+      for(var id in categoryIds){
+        batch.insert('task_categories', {'task_id' : currentTask.id, 'category_id':id});
+      }
+      await batch.commit();
+    }catch(e){
+      MiniLogger.error('Error setting categories: ${e.toString()}');
+    }
   }
 
   void navigatePriority(bool isNext) {
@@ -412,7 +427,7 @@ class TaskViewModel extends ChangeNotifier {
   //-----------------------------------------------------------------------//
 
   //------------------------ TASK CRUD OPERATIONS ------------------------//
-  Future<String?> addNewTask() async {
+  Future<String?> addNewTask(Map<int,bool> categories) async {
     // currentTask.category ??= await CategoryService.getGeneralCategory();
 
     if (!currentTask.isValid()) {
@@ -437,6 +452,7 @@ class TaskViewModel extends ChangeNotifier {
     final id = await TaskService.addTask(currentTask);
     currentTask.id = id;
     _tasks.add(currentTask);
+    await setCategories(categories);
     notifyListeners();
 
     // Schedule notifications
@@ -548,18 +564,18 @@ class TaskViewModel extends ChangeNotifier {
 
   //------------------------ TASK LIST MANAGEMENT ------------------------//
 
-  void updateTasksAfterListDeletion(int listId) {
-    for (var task in _tasks) {
-      if (task.category?.id == listId) {
-        task.category = CategoryModel(id: 1, name: 'General');
-      }
-    }
-    notifyListeners();
-  }
+  // void updateTasksAfterListDeletion(int listId) {
+  //   for (var task in _tasks) {
+  //     if (task.category?.id == listId) {
+  //       task.category = CategoryModel(id: 1, name: 'General');
+  //     }
+  //   }
+  //   notifyListeners();
+  // }
 
   void updateTaskListAfterEdit(CategoryModel list) async {
-    final tasksForCurrentList = tasks.where((t) => t.category!.id == list.id).toList();
-    await TaskService.editTaskCategoryAfterEdit(tasksForCurrentList, list);
+    // final tasksForCurrentList = tasks.where((t) => t.category!.id == list.id).toList();
+    // await TaskService.editTaskCategoryAfterEdit(tasksForCurrentList, list);
     loadTasks();
   }
   //--------------------------------------------------------------------------//
