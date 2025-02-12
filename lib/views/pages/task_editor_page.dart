@@ -154,7 +154,8 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
             : FloatingActionButton(
                 onPressed: () async {
                   context.read<TaskViewModel>().setTitle();
-                  final message = await context.read<TaskViewModel>().addNewTask();
+                  // context.read<CategoryViewModel>().
+                  final message = await context.read<TaskViewModel>().addNewTask(context.read<CategoryViewModel>().selectedCategories);
                   if (context.mounted) {
                     if (message != null) {
                       message == Messages.mTaskAdded ? Navigator.pop(context) : null;
@@ -240,22 +241,22 @@ class SetCategoryButton extends StatelessWidget {
                       Icon(Icons.keyboard_arrow_down_rounded, size: 22),
                     ],
                   ),
-                  Selector<TaskViewModel, String>(
-                    selector: (context, taskVM) => taskVM.currentTask.category?.name ?? 'General',
-                    builder: (_, category, __) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Text(
-                          category,
-                          style: TextStyle(
-                              fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                              fontWeight: FontWeight.w400,
-                              overflow: TextOverflow.ellipsis),
-                          maxLines: 1,
-                        ),
-                      );
-                    },
-                  ),
+                  // Selector<TaskViewModel, String>(
+                  //   selector: (context, taskVM) => taskVM.currentTask.category?.name ?? 'General',
+                  //   builder: (_, category, __) {
+                  //     return Padding(
+                  //       padding: const EdgeInsets.symmetric(vertical: 4),
+                  //       child: Text(
+                  //         category,
+                  //         style: TextStyle(
+                  //             fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                  //             fontWeight: FontWeight.w400,
+                  //             overflow: TextOverflow.ellipsis),
+                  //         maxLines: 1,
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                 ],
               ),
             ),
@@ -295,78 +296,66 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
             trailing: Icon(Icons.list_alt),
           ),
           Expanded(
-            child:
-                Selector2<CategoryViewModel, TaskViewModel, (List<CategoryModel>, CategoryModel?)>(
-              selector: (context, categoryVM, taskVM) =>
-                  (categoryVM.categories, taskVM.currentTask.category),
-              builder: (context, data, _) {
-                final (categories, category) = data;
-                return Scrollbar(
-                  thickness: 8,
-                  radius: const Radius.circular(4),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    controller:
-                        context.read<CategoryViewModel>().categoryBottomSheetScrollController,
-                    itemCount: categories.length,
-                    itemBuilder: (_, index) {
-                      return RadioListTile(
-                        value: categories[index],
-                        groupValue: category ?? categories[0],
-                        title: Row(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
+            child: FutureBuilder(
+              future: CategoryService.getCategories(),
+              builder: (context, snapshot) {
+                final categories = snapshot.data ?? [];
+                if(snapshot.hasData) {
+                  return Consumer<CategoryViewModel>(
+                    builder: (context, categoryVM, _) {
+                      return Scrollbar(
+                        thickness: 8,
+                        radius: const Radius.circular(4),
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          controller:
+                          context
+                              .read<CategoryViewModel>()
+                              .categoryBottomSheetScrollController,
+                          itemCount: categories.length,
+                          itemBuilder: (_, index) {
+                            return CheckboxListTile(
+                              value: categoryVM.selectedCategories[categories[index].id],
+                              title: Row(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      CategoryService.getIcon(categories[index].iconCode),
+                                      color: categories[index].color != null
+                                          ? CategoryService.getColorFromString(
+                                          context, categories[index].color!)
+                                          : null,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      categories[index].name!,
+                                      style: TextStyle(overflow: TextOverflow.ellipsis),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              child: Icon(
-                                CategoryService.getIcon(categories[index].iconCode),
-                                color: categories[index].color != null
-                                    ? CategoryService.getColorFromString(
-                                        context, categories[index].color!)
-                                    : null,
-                                size: 20,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                categories[index].name!,
-                                style: TextStyle(
-                                    fontWeight: (category ?? categories[0]) == categories[index]
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    overflow: TextOverflow.ellipsis),
-                              ),
-                            ),
-                          ],
+                              onChanged: (selected) {
+                                if (selected != null) {
+                                  context.read<CategoryViewModel>().updateSelectedCategories(
+                                      categories[index].id!, selected);
+                                }
+                              },
+                            );
+                          },
                         ),
-                        onChanged: (selected) {
-                          if (selected != null) {
-                            context.read<TaskViewModel>().setCategory(selected);
-                          }
-                        },
                       );
                     },
-                  ),
-                );
+                  );
+                }else{
+                  return Text('No categories');
+                }
               },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  'Done',
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
             ),
           ),
         ],
@@ -724,18 +713,19 @@ class NotificationTypeSelector extends StatelessWidget {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                      content: Text(
-                        Tutorial.mNotifAlarmDifference,
-                        style:
-                            TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
-                      ),
-                      actions:[
-                        FilledButton(onPressed: ()async{
-                          await SettingsService.openBatterySettings();
-                        }, child: Text('Go to settings')),
-                      ]
-                    );
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                        content: Text(
+                          Tutorial.mNotifAlarmDifference,
+                          style:
+                              TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
+                        ),
+                        actions: [
+                          FilledButton(
+                              onPressed: () async {
+                                await SettingsService.openBatterySettings();
+                              },
+                              child: Text('Go to settings')),
+                        ]);
                   },
                 );
               },

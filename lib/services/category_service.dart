@@ -12,6 +12,7 @@ class CategoryService {
     final List<Map<String, dynamic>> categoryMaps = await database.query('categories');
 
     return List.generate(categoryMaps.length, (index) {
+      MiniLogger.debug('${CategoryModel.fromJson(categoryMaps[index]).name}');
       return CategoryModel.fromJson(categoryMaps[index]);
     });
   }

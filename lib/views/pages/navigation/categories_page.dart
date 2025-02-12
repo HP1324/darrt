@@ -148,7 +148,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                         itemCount: filteredCategories.length,
                         itemBuilder: (context, index) {
                           final list = filteredCategories[index];
-                          return CategoryItem(list: list);
+                          return CategoryItem(category: list);
                         },
                       ),
               ),

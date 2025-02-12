@@ -130,7 +130,10 @@ class TaskService {
       INNER JOIN task_categories ON categories.id = task_categories.category_id
       WHERE task_categories.task_id = ?
     ''', [taskId]);
-
+      for(var c in categories){
+        var category = CategoryModel.fromJson(c);
+        MiniLogger.debug('Task Category: ${category.id}');
+      }
       return categories.map((category) => CategoryModel.fromJson(category)).toList();
     } catch (e) {
       MiniLogger.error('Exception occurred while getting task categories: ${e.toString()}');

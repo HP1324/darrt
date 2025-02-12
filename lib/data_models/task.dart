@@ -9,7 +9,6 @@ class Task {
     this.id,
     this.title,
     this.isDone = false,
-    this.category,
     this.createdAt,
     this.dueDate,
     this.finishedAt,
@@ -26,7 +25,6 @@ class Task {
 
   int? id;
   String? title;
-  CategoryModel? category;
   bool? isDone;
   DateTime? createdAt;
   DateTime? dueDate;
@@ -47,7 +45,6 @@ class Task {
     int? id,
     String? title,
     bool? isDone,
-    CategoryModel? category,
     DateTime? createdAt,
     DateTime? dueDate,
     DateTime? finishedAt,
@@ -65,7 +62,6 @@ class Task {
         id: id ?? this.id,
         title: title ?? this.title,
         isDone: isDone ?? this.isDone,
-        category: category ?? this.category,
         createdAt: createdAt ?? this.createdAt,
         dueDate: dueDate ?? this.dueDate,
         finishedAt: finishedAt ?? this.finishedAt,
@@ -86,12 +82,6 @@ class Task {
            'id': $id,
            'title': $title,
            'isDone': $isDone,
-           'category': {
-             'id': ${category?.id},
-             'name': ${category?.name},
-             'icon_code': ${category?.iconCode},
-             'color': ${category?.color},
-           },
            'createdAt': $createdAt,
            'dueDate': $dueDate,
            'finishedAt': $finishedAt,
@@ -115,7 +105,6 @@ class Task {
         id == other.id &&
         title == other.title &&
         isDone == other.isDone &&
-        category == other.category &&
         createdAt == other.createdAt &&
         dueDate == other.dueDate &&
         finishedAt == other.finishedAt &&
@@ -135,7 +124,6 @@ class Task {
         id,
         title,
         isDone,
-        category,
         createdAt,
         dueDate,
         finishedAt,
@@ -165,10 +153,6 @@ class Task {
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
-        'categoryId': category?.id,
-        'categoryName': category?.name,
-        'catIconCode': category?.iconCode,
-        'categoryColor': category?.color,
         'createdAt': createdAt?.toIso8601String() ?? DateTime.now().toIso8601String(),
         'dueDate': dueDate?.toIso8601String(),
         'finishedAt': finishedAt?.toIso8601String(),
@@ -191,14 +175,6 @@ class Task {
         id: json['id'],
         title: json['title'] ?? '',
         isDone: json['isDone'] == 1,
-        category: json['categoryId'] != null
-            ? CategoryModel(
-                id: json['categoryId'],
-                name: json['categoryName'],
-                iconCode: json['catIconCode'],
-                color: json['categoryColor'],
-              )
-            : null,
         createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
         dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : null,
         finishedAt: json['finishedAt'] != null ? DateTime.parse(json['finishedAt']) : null,
@@ -227,7 +203,6 @@ extension TaskUtilities on Task {
       isDone: isDone,
       isRepeating: isRepeating,
       dueDate: dueDate,
-      category: category,
       priority: priority,
     );
   }
