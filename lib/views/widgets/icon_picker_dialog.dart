@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/services/category_service.dart';
-import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -45,8 +44,8 @@ class IconPickerDialog extends StatelessWidget {
             Container(
               height: MediaQuery.of(context).size.height * 0.5,
               padding: const EdgeInsets.all(16),
-              child: Consumer2<CategoryViewModel,GeneralViewModel>(
-                builder: (context, categoryVM,generacategoryVM ,_) {
+              child: Consumer<CategoryViewModel>(
+                builder: (context, categoryVM,_) {
                   return GridView.builder(
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
@@ -64,7 +63,6 @@ class IconPickerDialog extends StatelessWidget {
                         onTap: () {
                           categoryVM.updateSelectedIcon(iconCode);
                           Navigator.pop(context);
-                          generacategoryVM.textFieldNode.unfocus();
                         },
                         child: Container(
                           decoration: BoxDecoration(
