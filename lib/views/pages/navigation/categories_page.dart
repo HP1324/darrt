@@ -5,7 +5,6 @@ import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/new_category_page.dart';
 import 'package:provider/provider.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:minimaltodo/views/widgets/custom_text_field.dart';
 import 'package:minimaltodo/views/widgets/category_item.dart';
 
 class CategoriesPage extends StatefulWidget {
@@ -65,7 +64,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                 _searchController.clear();
                                 _searchQuery = '';
                                 _focusNode.unfocus();
-                              }else{
+                              } else {
                                 _focusNode.requestFocus();
                               }
                             });
@@ -77,7 +76,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
                         ),
                         const SizedBox(width: 8),
                         IconButton(
-                          onPressed: () => MiniRouter.to(context, child: NewCategoryPage(editMode: false)),
+                          onPressed: () =>
+                              MiniRouter.to(context, child: NewCategoryPage(editMode: false)),
                           icon: const Icon(Iconsax.add),
                         ),
                       ],
@@ -94,15 +94,17 @@ class _CategoriesPageState extends State<CategoriesPage> {
                   opacity: _showSearch ? 1.0 : 0.0,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: CustomTextField(
+                    child: TextField(
                       controller: _searchController,
                       focusNode: _focusNode,
-                      isMaxLinesNull: false,
-                      autoFocus: false,
+                      maxLines: null,
+                      autofocus: false,
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
                       hintText: 'Search categories...',
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 15,
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -118,36 +120,37 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 child: filteredCategories.isEmpty
                     ? SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.5,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Iconsax.search_normal,
-                          size: 48,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No categories found',
-                          style: TextStyle(
-                            fontSize: 16,
+                        height: MediaQuery.of(context).size.height * 0.5,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Iconsax.search_normal,
+                                size: 48,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No categories found',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                )
+                      )
                     : GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,mainAxisExtent: 100),
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: filteredCategories.length,
-                  itemBuilder: (context, index) {
-                    final list = filteredCategories[index];
-                    return CategoryItem(list: list);
-                  },
-                ),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2, mainAxisExtent: 100),
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: filteredCategories.length,
+                        itemBuilder: (context, index) {
+                          final list = filteredCategories[index];
+                          return CategoryItem(list: list);
+                        },
+                      ),
               ),
             ],
           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/services/database_service.dart';
 
@@ -21,7 +22,7 @@ class CategoryService {
     try {
       id = await database.insert('categories', category.toJson());
     } catch (e) {
-      logger.e('an Exception or Error is thrown when adding category to database ${e.toString()}');
+      MiniLogger.error('an Exception or Error is thrown when adding category to database ${e.toString()}');
     }
     return id;
   }
