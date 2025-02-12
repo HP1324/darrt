@@ -2,6 +2,7 @@ import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
+import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/services/database_service.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -31,8 +32,6 @@ class TaskService {
       return Task.fromJson(recurringTaskMaps[index]);
     });
   }
-
-
 
   static Future<Task?> getTaskById(int id) async {
     final database = await DatabaseService.openDb();
@@ -119,6 +118,40 @@ class TaskService {
     } catch (e) {
       MiniLogger.error('Exception occurred while deleting task: ${e.toString()}');
       return 0;
+    }
+  }
+
+  static Future<List<CategoryModel>> getTaskCategories(int taskId) async {
+    final db = await DatabaseService.openDb();
+    try {
+      final categories = await db.rawQuery('''
+      SELECT categories.* 
+      FROM categories
+      INNER JOIN task_categories ON categories.id = task_categories.category_id
+      WHERE task_categories.task_id = ?
+    ''', [taskId]);
+
+      return categories.map((category) => CategoryModel.fromJson(category)).toList();
+    } catch (e) {
+      MiniLogger.error('Exception occurred while getting task categories: ${e.toString()}');
+      return [];
+    }
+  }
+
+  static Future<List<Task>> getCategoryTasks(int categoryId) async {
+    final db = await DatabaseService.openDb();
+    try {
+      final tasks = await db.rawQuery('''
+      SELECT tasks.* 
+      FROM tasks
+      INNER JOIN task_categories ON tasks.id = task_categories.task_id
+      WHERE task_categories.category_id = ?
+    ''', [categoryId]);
+
+      return tasks.map((task) => Task.fromJson(task)).toList();
+    } catch (e) {
+      MiniLogger.error('Exception occurred while getting task categories: ${e.toString()}');
+      return [];
     }
   }
 }

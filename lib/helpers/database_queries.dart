@@ -40,11 +40,13 @@ class DatabaseQueries{
   )
   ''';
   static const createTaskCategoriesTable = '''
+  CREATE TABLE task_categories(
   task_id INTEGER,
   category_id INTEGER,
   FOREIGN KEY(task_id) references tasks(id) ON DELETE CASCADE,
   FOREIGN KEY(category_id) references categories(id) ON DELETE CASCADE  ,
   PRIMARY KEY(task_id, category_id)  -- Composite primary key
+  )
   ''';
   static const createWishlistTable = '''CREATE TABLE wishlists (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
