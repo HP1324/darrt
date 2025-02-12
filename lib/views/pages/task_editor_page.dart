@@ -11,6 +11,7 @@ import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/services/settings_service.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/new_category_page.dart';
@@ -717,18 +718,30 @@ class NotificationTypeSelector extends StatelessWidget {
               },
             ),
             InkWell(
-              onTap: (){
+              onTap: () {
                 context.read<TaskViewModel>().textFieldNode.unfocus();
-                showDialog(context: context, builder: (context){
-                  return AlertDialog(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                    title: Text(Tutorial.mNotifAlarmDifference,style:TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize)),
-                  );
-                });
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                      content: Text(
+                        Tutorial.mNotifAlarmDifference,
+                        style:
+                            TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
+                      ),
+                      actions:[
+                        FilledButton(onPressed: ()async{
+                          await SettingsService.openBatterySettings();
+                        }, child: Text('Go to settings')),
+                      ]
+                    );
+                  },
+                );
               },
               child: CircleAvatar(
                 backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                child: Icon(Icons.question_mark,color: Theme.of(context).colorScheme.primary),
+                child: Icon(Icons.question_mark, color: Theme.of(context).colorScheme.primary),
               ),
             ),
           ],
@@ -1114,7 +1127,7 @@ class RecurringReminderTimes extends StatelessWidget {
             );
           }),
       trailing: const Icon(Icons.access_time),
-      onTap: () async{
+      onTap: () async {
         context.read<TaskViewModel>().textFieldNode.unfocus();
         await showModalBottomSheet(
           context: context,
