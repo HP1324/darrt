@@ -70,7 +70,7 @@ class TaskViewModel extends ChangeNotifier {
       startDate: DateTime.now(),
       isRepeating: false,
       isNotifyEnabled:MiniBox.read(mIsNotificationsGloballyEnabled),
-      repeatConfig: '{"repeatType":"weekly","selectedDays":[1,2,3,4,5,6,7]}',
+      repeatConfig: '{"repeatType":"weekly","selectedDays":[1,2,3,4,5,6]}',
     );
 
     selectedMinutes = 0;
@@ -289,7 +289,7 @@ class TaskViewModel extends ChangeNotifier {
 
       config['repeatType'] = type;
       if (type == 'weekly') {
-        config['selectedDays'] = [1, 2, 3, 4, 5,6,7];
+        config['selectedDays'] = [1, 2, 3, 4, 5,6];
       } else {
         config.remove('selectedDays');
       }
@@ -315,7 +315,7 @@ class TaskViewModel extends ChangeNotifier {
           days.remove(weekday);
         }
         else{
-          return 'At least one day must be selected!';
+          return Messages.mAtleastOneDaySelected;
         }
       } else {
         days.add(weekday);
@@ -447,14 +447,14 @@ class TaskViewModel extends ChangeNotifier {
       }
     }
 
-    return Messages.mAdded;
+    return Messages.mTaskAdded;
   }
 
-  Future<int> editTask() async {
+  Future<String?> editTask() async {
     int changes = 0;
     if (currentTask == taskBeforeEdit) {
       MiniLogger.debug('Task is not edited');
-      return changes;
+      return null;
     }
     if (currentTask.isValid()) {
       MiniLogger.debug('Task is valid');
@@ -479,10 +479,10 @@ class TaskViewModel extends ChangeNotifier {
           await NotificationService.removeTaskNotification(currentTask);
         }
       }
-      return changes;
+      return Messages.mTaskEdited;
     }else{
       MiniLogger.debug('Task is not valid');
-      return 0;
+      return Messages.mTaskEmpty;
     }
   }
 
@@ -574,7 +574,7 @@ class TaskViewModel extends ChangeNotifier {
       currentTask.endDate = null;
       currentTask.repeatConfig = jsonEncode({
         'repeatType': 'weekly',
-        'selectedDays': [1, 2, 3, 4, 5],
+        'selectedDays': [1, 2, 3, 4, 5,6],
       });
       currentTask.reminderTimes = null;
 
@@ -616,7 +616,7 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   List<int> get selectedWeekdays {
-    if (currentTask.repeatConfig == null) return [1, 2, 3, 4, 5, 6, 7];
+    if (currentTask.repeatConfig == null) return [1, 2, 3, 4, 5, 6];
     try {
       final config = jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
       if (config['repeatType'] == 'weekly' && config['selectedDays'] is List) {

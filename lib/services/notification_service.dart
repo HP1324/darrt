@@ -137,67 +137,69 @@ class NotificationService {
       logger.d('Notifications disabled; skipping repeating notifications.');
       return;
     }
+    Future.delayed(Duration.zero,()async{
+      try {
+        // Parse repeat configuration
+        final repeatConfig = jsonDecode(task.repeatConfig ?? '{}');
+        final repeatType = repeatConfig['repeatType'] as String?;
+        final selectedDays = repeatConfig['selectedDays'] as List<dynamic>?;
 
-    try {
-      // Parse repeat configuration
-      final repeatConfig = jsonDecode(task.repeatConfig ?? '{}');
-      final repeatType = repeatConfig['repeatType'] as String?;
-      final selectedDays = repeatConfig['selectedDays'] as List<dynamic>?;
+        // Parse reminder times
+        List<TimeOfDay> reminderTimes = [];
+        if (task.reminderTimes != null) {
+          final times = jsonDecode(task.reminderTimes!) as List;
+          reminderTimes = times.map((timeStr) {
+            final parts = (timeStr as String).split(':');
+            return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+          }).toList();
+        }
 
-      // Parse reminder times
-      List<TimeOfDay> reminderTimes = [];
-      if (task.reminderTimes != null) {
-        final times = jsonDecode(task.reminderTimes!) as List;
-        reminderTimes = times.map((timeStr) {
-          final parts = (timeStr as String).split(':');
-          return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-        }).toList();
-      }
+        // Calculate notification schedule based on repeat type
+        for (var reminderTime in reminderTimes) {
+          final baseDateTime = DateTime(
+            task.startDate.year,
+            task.startDate.month,
+            task.startDate.day,
+            reminderTime.hour,
+            reminderTime.minute,
+          );
 
-      // Calculate notification schedule based on repeat type
-      for (var reminderTime in reminderTimes) {
-        final baseDateTime = DateTime(
-          task.startDate.year,
-          task.startDate.month,
-          task.startDate.day,
-          reminderTime.hour,
-          reminderTime.minute,
-        );
-
-        switch (repeatType) {
-          case 'weekly':
-            if (selectedDays != null) {
-              for (final weekday in selectedDays) {
-                await _scheduleWeeklyNotification(
+          switch (repeatType) {
+            case 'weekly':
+              if (selectedDays != null) {
+                for (final weekday in selectedDays) {
+                  await _scheduleWeeklyNotification(
                   task,
                   weekday,
                   reminderTime,
                   baseDateTime,
-                );
+                  );
+                }
               }
-            }
-            break;
+              break;
 
-          case 'monthly':
-            await _scheduleMonthlyNotification(
+            case 'monthly':
+              await _scheduleMonthlyNotification(
               task,
               reminderTime,
               baseDateTime,
-            );
-            break;
+              );
+              break;
 
-          case 'yearly':
-            await _scheduleYearlyNotification(
+            case 'yearly':
+              await _scheduleYearlyNotification(
               task,
               reminderTime,
               baseDateTime,
-            );
-            break;
+              );
+              break;
+          }
         }
+      } catch (e) {
+        MiniLogger.error('Error scheduling repeating notifications: $e');
       }
-    } catch (e) {
-      MiniLogger.error('Error scheduling repeating notifications: $e');
-    }
+    });
+
   }
 
   static int generateNotificationId(Task task, DateTime date, TimeOfDay time) {
@@ -388,7 +390,7 @@ class NotificationService {
       await AwesomeNotifications().cancelNotificationsByGroupKey(task.id!.toString());
 
       // Log the cancellation for debugging
-      logger.d('Cancelled all notifications for task ${task.id}');
+      MiniLogger.debug('Cancelled all notifications for task ${task.id}');
     } catch (e) {
       MiniLogger.error('Error removing recurring notifications: $e');
     }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:provider/provider.dart' show Consumer;
+
 //ignore: must_be_immutable
 class CustomTextField extends StatelessWidget {
   CustomTextField(
@@ -11,10 +11,10 @@ class CustomTextField extends StatelessWidget {
       required this.autoFocus,
       required this.hintText,
       this.fillColor,
-       this.xPadding,
-       this.yPadding,
-       this.contentPadding,
-        this.onChanged,
+      this.xPadding,
+      this.yPadding,
+      this.contentPadding,
+      this.onChanged,
       this.onSubmitted});
 
   final TextEditingController controller;
@@ -31,27 +31,24 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:  EdgeInsets.symmetric(horizontal: xPadding ?? 0 , vertical: yPadding ?? 0),
-      child: Consumer<GeneralViewModel>(
-        builder: (context,gvm, _) {
-          return TextField(
-            focusNode: focusNode,
-            controller: controller,
-            textInputAction: TextInputAction.done,
-            maxLines: isMaxLinesNull ? null : 1,
-            autofocus: autoFocus,
-            cursorColor: Theme.of(context).colorScheme.primary,
-            decoration: InputDecoration(
-              contentPadding: contentPadding ?? const EdgeInsets.symmetric(vertical: 15, horizontal: 8),
-              filled: true,
-              fillColor: fillColor ?? Theme.of(context).colorScheme.surfaceContainer,
-              hintText: hintText,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8),borderSide: BorderSide.none),
-            ),
-            onSubmitted: onSubmitted,
-            onChanged : onChanged,
-          );
-        }
+      padding: EdgeInsets.symmetric(horizontal: xPadding ?? 0, vertical: yPadding ?? 0),
+      child: TextField(
+        focusNode: focusNode,
+        controller: controller,
+        textInputAction: TextInputAction.done,
+        maxLines: isMaxLinesNull ? null : 1,
+        autofocus: autoFocus,
+        cursorColor: Theme.of(context).colorScheme.primary,
+        decoration: InputDecoration(
+          contentPadding: contentPadding ?? const EdgeInsets.symmetric(vertical: 15, horizontal: 8),
+          filled: true,
+          fillColor: fillColor ?? Theme.of(context).colorScheme.surfaceContainer,
+          hintText: hintText,
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+        ),
+        onSubmitted: onSubmitted,
+        onChanged: onChanged,
       ),
     );
   }

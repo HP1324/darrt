@@ -13,7 +13,6 @@ import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
-import 'package:minimaltodo/view_models/general_view_model.dart';
 import 'package:minimaltodo/views/pages/new_category_page.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -44,9 +43,9 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
       onPopInvokedWithResult: (didPop, result) async {
         if (widget.editMode) {
           context.read<TaskViewModel>().setTitle();
-          final changes = await context.read<TaskViewModel>().editTask();
-          if (changes > 0 && context.mounted) {
-            showToast(context: context, title: 'Task edited', type: ToastificationType.success);
+          final message = await context.read<TaskViewModel>().editTask();
+          if (context.mounted && message != null) {
+            showToast(context: context, title: message, type: ToastificationType.success);
             Navigator.pop(context);
           }
         }
@@ -157,8 +156,8 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                   final message = await context.read<TaskViewModel>().addNewTask();
                   if (context.mounted) {
                     if (message != null) {
-                      message == Messages.mAdded ? Navigator.pop(context) : null;
-                      final type = message == Messages.mAdded
+                      message == Messages.mTaskAdded ? Navigator.pop(context) : null;
+                      final type = message == Messages.mTaskAdded
                           ? ToastificationType.success
                           : ToastificationType.error;
                       showToast(context: context, title: message, type: type);
@@ -689,8 +688,9 @@ class NotificationTypeSelector extends StatelessWidget {
     return Selector<TaskViewModel, String>(
       selector: (context, taskVM) => taskVM.currentTask.notifType!,
       builder: (context, notifType, _) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        return Row(
+          spacing: 10,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SegmentedButton(
               selectedIcon: Icon(
@@ -715,6 +715,21 @@ class NotificationTypeSelector extends StatelessWidget {
               onSelectionChanged: (newSelection) {
                 context.read<TaskViewModel>().updateNotificationType(newSelection.first);
               },
+            ),
+            InkWell(
+              onTap: (){
+                context.read<TaskViewModel>().textFieldNode.unfocus();
+                showDialog(context: context, builder: (context){
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                    title: Text(Tutorial.mNotifAlarmDifference,style:TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize)),
+                  );
+                });
+              },
+              child: CircleAvatar(
+                backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                child: Icon(Icons.question_mark,color: Theme.of(context).colorScheme.primary),
+              ),
             ),
           ],
         );
@@ -1037,7 +1052,7 @@ class _WeekdaySelector extends StatelessWidget {
                           width: 42,
                           child: FilterChip(
                             labelPadding: EdgeInsets.zero,
-                            selectedColor: Theme.of(context).colorScheme.primary.withAlpha(180),
+                            selectedColor: Theme.of(context).colorScheme.primary.withAlpha(230),
                             shape: CircleBorder(),
                             label: Text(dayName,
                                 style: TextStyle(
@@ -1099,9 +1114,9 @@ class RecurringReminderTimes extends StatelessWidget {
             );
           }),
       trailing: const Icon(Icons.access_time),
-      onTap: () {
+      onTap: () async{
         context.read<TaskViewModel>().textFieldNode.unfocus();
-        showModalBottomSheet(
+        await showModalBottomSheet(
           context: context,
           backgroundColor: colorScheme.surface,
           shape: RoundedRectangleBorder(
@@ -1124,13 +1139,14 @@ class ReminderTimesBottomSheet extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final mediaQuery = MediaQuery.of(context);
-    final bottomPadding = mediaQuery.viewInsets.bottom + mediaQuery.padding.bottom + 24;
+    //This padding was causing overflow issues, I realized after a long while and removed bottom padding
+    // final bottomPadding = mediaQuery.viewInsets.bottom + mediaQuery.padding.bottom + 24;
     return Container(
       padding: EdgeInsets.only(
         left: 24,
         right: 24,
         top: 24,
-        bottom: bottomPadding, // Handle keyboard
+        // bottom: bottomPadding, // Handle keyboard
       ),
       constraints: BoxConstraints(
         maxHeight: mediaQuery.size.height * 0.7, // Maximum 70% of screen height
@@ -1214,7 +1230,7 @@ class ReminderTimesBottomSheet extends StatelessWidget {
                 child: FilledButton.icon(
                   onPressed: reminderTimesList.length >= 7
                       ? () {
-                          context.read<GeneralViewModel>().textFieldNode.unfocus();
+                          context.read<TaskViewModel>().textFieldNode.unfocus();
                           showToast(
                             context: context,
                             title: 'Maximum 7 reminders allowed',
@@ -1222,7 +1238,7 @@ class ReminderTimesBottomSheet extends StatelessWidget {
                           );
                         }
                       : () async {
-                          context.read<GeneralViewModel>().textFieldNode.unfocus();
+                          context.read<TaskViewModel>().textFieldNode.unfocus();
                           final time = await showTimePicker(
                             context: context,
                             initialTime: TimeOfDay.now(),
