@@ -113,6 +113,7 @@ class TaskViewModel extends ChangeNotifier {
   List<String> priorities = ["Urgent", "High", "Medium", "Low"];
   int currentValue = 3; // Default to Low Priority
   int selectedMinutes = 0;
+  Map<int, bool> selectedCategories = {};
 
   //------------------------ BASIC SETTERS ------------------------//
   setCategory(CategoryModel category) {

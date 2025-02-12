@@ -18,7 +18,6 @@ class CategoryViewModel extends ChangeNotifier {
   set color(String listColor) => currentCategory!.color  = listColor;
   String? selectedIcon = 'folder'; // Default icon
   String? selectedColor;
-
   void _refreshCategories() async {
     categories = await CategoryService.getCategories();
 
