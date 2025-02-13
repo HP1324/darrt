@@ -76,12 +76,9 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                     children: [
                       TaskTextField(editMode: widget.editMode),
                       const SizedBox(height: 50),
-                      Row(
-                        children: [
-                          Flexible(flex: 2, child: const SetCategoryButton()),
-                          Flexible(flex: 3, child: const SetPriorityWidget()),
-                        ],
-                      ),
+                      const SetCategoryButton(),
+                      const SizedBox(height: 30),
+                      const SetPriorityWidget(),
                       const SizedBox(height: 30),
                       Card(
                         elevation: 0,
@@ -154,7 +151,6 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
             : FloatingActionButton(
                 onPressed: () async {
                   context.read<TaskViewModel>().setTitle();
-                  // context.read<CategoryViewModel>().
                   final message = await context.read<TaskViewModel>().addNewTask(context.read<CategoryViewModel>().selectedCategories);
                   if (context.mounted) {
                     if (message != null) {
@@ -233,7 +229,7 @@ class SetCategoryButton extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        'Category',
+                        'Categories',
                         style: TextStyle(
                             fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
                             fontWeight: FontWeight.w500),
@@ -241,22 +237,70 @@ class SetCategoryButton extends StatelessWidget {
                       Icon(Icons.keyboard_arrow_down_rounded, size: 22),
                     ],
                   ),
-                  // Selector<TaskViewModel, String>(
-                  //   selector: (context, taskVM) => taskVM.currentTask.category?.name ?? 'General',
-                  //   builder: (_, category, __) {
-                  //     return Padding(
-                  //       padding: const EdgeInsets.symmetric(vertical: 4),
-                  //       child: Text(
-                  //         category,
-                  //         style: TextStyle(
-                  //             fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                  //             fontWeight: FontWeight.w400,
-                  //             overflow: TextOverflow.ellipsis),
-                  //         maxLines: 1,
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
+                  SizedBox(
+                    height: 20,
+                    child: ShaderMask(
+                      shaderCallback: (bounds) {
+                        return LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black,
+                            Colors.black,
+                            Colors.transparent
+                          ],
+                          stops: [0.0, 0.05, 0.95, 1.0],
+                        ).createShader(bounds);
+                      },
+                      blendMode: BlendMode.dstIn,
+                      child: Consumer<CategoryViewModel>(
+                        builder: (context,categoryVM, _) {
+                          final ids = categoryVM.selectedCategories.keys.where((key) => categoryVM.selectedCategories[key]!).toList();
+                          return FutureBuilder(
+                            future: CategoryService.getCategoriesByIds(ids),
+                            builder: (context,snapshot) {
+                              final categories = snapshot.data ?? [];
+                              return ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: true,
+                                physics: BouncingScrollPhysics(),
+                                separatorBuilder: (context, index) => const SizedBox(width: 4),
+                                itemCount: categories.length,
+                                itemBuilder: (context, index) {
+                                  final category = snapshot.data![index];
+                                  return Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).colorScheme.primary.withAlpha(20),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          CategoryService.getIcon(category.iconCode),
+                                          size: 12,
+                                          color: category.color != null
+                                              ? CategoryService.getColorFromString(context, category.color!)
+                                              : Theme.of(context).colorScheme.primary,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          category.name ?? '',
+                                          style: Theme.of(context).textTheme.labelSmall,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          );
+                        }
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
@@ -341,7 +385,7 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
                                 ],
                               ),
                               onChanged: (selected) {
-                                if (selected != null) {
+                                if (selected != null && categories[index].id != 1) {
                                   context.read<CategoryViewModel>().updateSelectedCategories(
                                       categories[index].id!, selected);
                                 }

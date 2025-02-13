@@ -17,6 +17,20 @@ class CategoryService {
     });
   }
 
+  static Future<List<CategoryModel>> getCategoriesByIds(List<int> ids) async {
+    if (ids.isEmpty) return [];
+
+    final db = await DatabaseService.openDb();
+    try {
+      final idsString = ids.join(',');  // Convert list of ids to comma-separated string
+      final categories = await db.rawQuery('SELECT * FROM categories WHERE id IN ($idsString)');
+      return categories.map((category) => CategoryModel.fromJson(category)).toList();
+    } catch (e) {
+      MiniLogger.error('Exception occurred while getting categories by IDs: ${e.toString()}');
+      return [];
+    }
+  }
+
   static Future<int> addCategory(CategoryModel category) async {
     final database = await DatabaseService.openDb();
     int id = 0;
@@ -34,16 +48,14 @@ class CategoryService {
     try {
       // Begin transaction to ensure data consistency
       await database.transaction((txn) async {
-        // First update all tasks in this list to set list to null
-        await txn.update('tasks', {'categoryId': 1}, where: 'categoryId = ?', whereArgs: [id]);
+        // First update all tasks in this list to set list to nullable
+        await txn.delete('task_categories', where: 'category_id = ?',whereArgs: [id]);
 
-        // Then delete the list
         rowsAffected = await txn.delete('categories', where: 'id = ?', whereArgs: [id]);
       });
     } catch (e) {
       logger.e('An Exception or Error is thrown while deleting the list: ${e.toString()}');
     }
-
     return rowsAffected; // Return success
   }
 

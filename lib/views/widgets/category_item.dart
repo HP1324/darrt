@@ -83,7 +83,7 @@ class _CategoryItemState extends State<CategoryItem> {
                                 ),
                                 items: [
                                   PopupMenuItem(
-                                    onTap: () => MiniRouter.to(context, child: NewCategoryPage(editMode: true, listToEdit: widget.category)),
+                                    onTap: () => MiniRouter.to(context, child: NewCategoryPage(editMode: true, category: widget.category)),
                                     child: Row(
                                       children: [
                                         Icon(Icons.edit, color: listColor, size: 20),

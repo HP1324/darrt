@@ -10,10 +10,10 @@ import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
 class NewCategoryPage extends StatefulWidget {
-  const NewCategoryPage({super.key, required this.editMode, this.listToEdit});
+  const NewCategoryPage({super.key, required this.editMode, this.category});
 
   final bool editMode;
-  final CategoryModel? listToEdit;
+  final CategoryModel? category;
 
   @override
   State<NewCategoryPage> createState() => _NewCategoryPageState();
@@ -36,15 +36,15 @@ class _NewCategoryPageState extends State<NewCategoryPage> {
     final tvm = Provider.of<TaskViewModel>(context, listen: false);
 
     if (widget.editMode!) {
-      categoryVM.currentCategory = widget.listToEdit!;
+      categoryVM.currentCategory = widget.category!;
     }
 
     return PopScope(
       onPopInvokedWithResult: (_, __) async {
         logger.i('Pop called');
-        if (widget.editMode!) {
+        if (widget.editMode) {
           final edited = await categoryVM.editCategory();
-          tvm.updateTaskListAfterEdit(widget.listToEdit!);
+          tvm.updateTaskListAfterEdit(widget.category!);
           if (edited) {
             // showToast(title: 'List Edited');
           }
@@ -53,7 +53,7 @@ class _NewCategoryPageState extends State<NewCategoryPage> {
       child: Scaffold(
         appBar: AppBar(
           leading: BackButton(),
-          title: Text(widget.editMode ? widget.listToEdit!.name!:'New Category', style: TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(widget.editMode ? widget.category!.name!:'New Category', style: TextStyle(fontWeight: FontWeight.bold)),
           centerTitle: true,
           elevation: 0,
         ),
@@ -214,7 +214,7 @@ class _NewCategoryPageState extends State<NewCategoryPage> {
             } else {
               final edited = await categoryVM.editCategory();
               if (edited && context.mounted) {
-                tvm.updateTaskListAfterEdit(widget.listToEdit!);
+                tvm.updateTaskListAfterEdit(widget.category!);
                 Navigator.pop(context);
               }
             }
