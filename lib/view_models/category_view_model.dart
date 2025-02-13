@@ -26,7 +26,7 @@ class CategoryViewModel extends ChangeNotifier {
   void _refreshCategories() async {
     categories = await CategoryService.getCategories();
     for(var c in categories){
-      selectedCategories[c.id!] = false;
+      selectedCategories[c.id!] = c.id! ==1 ? true : false;
     }
     notifyListeners();
   }
@@ -46,11 +46,8 @@ class CategoryViewModel extends ChangeNotifier {
   Future<bool> deleteCategory(CategoryModel category) async {
     int rowsAffected = await CategoryService.deleteCategory(category.id!);
     if (rowsAffected > 0) {
-      categories.removeWhere((c) => c.id == category.id);
-
-      // Update tasks directly using the passed taskVM
-      // taskVM.updateTasksAfterListDeletion(category.id!);
-
+      //Have to create new list because selector does not update the ui because it checks with == operator which for lists only checks reference equality.
+      categories = categories.where((item) => item != category).toList();
       notifyListeners();
       return true;
     }
