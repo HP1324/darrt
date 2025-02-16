@@ -114,9 +114,6 @@ class TaskViewModel extends ChangeNotifier {
   Future<void> setCategories(Map<int, bool> selectedCategories) async{
     var categoryIds = selectedCategories.entries.where((e) => e.value).map((e) => e.key).toList();
 
-    if(categoryIds.isEmpty){
-      categoryIds.insert(0, 1);
-    }
     final db = await DatabaseService.openDb();
     try {
       // First delete existing categories
@@ -124,13 +121,12 @@ class TaskViewModel extends ChangeNotifier {
       
       // Then add new categories
       final batch = db.batch();
-      if(categoryIds.isEmpty){
-        batch.insert('task_categories', {'task_id' : currentTask.id, 'category_id':1});
-      }
+
       for(var id in categoryIds){
         batch.insert('task_categories', {'task_id' : currentTask.id, 'category_id':id});
       }
       await batch.commit();
+      selectedCategories.updateAll((key, value) => key != 1 ? false : value);
     }catch(e){
       MiniLogger.error('Error setting categories: ${e.toString()}');
     }
@@ -480,6 +476,7 @@ class TaskViewModel extends ChangeNotifier {
       final taskIndex = _tasks.indexWhere((task) => task.id == currentTask.id);
       if (taskIndex != -1) {
         _tasks[taskIndex] = currentTask;
+
         notifyListeners();
       }
       // Reschedule notifications based on repeating flag.

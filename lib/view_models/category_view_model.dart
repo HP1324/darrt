@@ -21,6 +21,19 @@ class CategoryViewModel extends ChangeNotifier {
   Map<int, bool> selectedCategories = {};
   void updateSelectedCategories(int id, bool updatedStatus){
     selectedCategories[id] = updatedStatus;
+    // Ensure General (id 1) is selected if no other category is selected
+    if (!selectedCategories.entries
+        .any((entry) => entry.key != 1 && entry.value == true)) {
+      selectedCategories[1] = true;
+    }
+
+    // Prevent General (id 1) from being unchecked if no other category is selected
+    if (id == 1 && updatedStatus == false) {
+      if (!selectedCategories.entries
+          .any((entry) => entry.key != 1 && entry.value == true)) {
+        selectedCategories[1] = true;
+      }
+    }
     notifyListeners();
   }
   void _refreshCategories() async {
