@@ -43,8 +43,11 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
     return PopScope(
       onPopInvokedWithResult: (didPop, result) async {
         if (widget.editMode) {
-          context.read<TaskViewModel>().setTitle();
-          final message = await context.read<TaskViewModel>().editTask();
+          final taskVM = Provider.of<TaskViewModel>(context, listen: false);
+          final catVM = Provider.of<CategoryViewModel>(context, listen: false);
+          taskVM.setTitle();
+          await taskVM.setCategories(catVM.selectedCategories);
+          final message = await taskVM.editTask();
           if (context.mounted && message != null) {
             showToast(context: context, title: message, type: ToastificationType.success);
             Navigator.pop(context);
@@ -151,7 +154,9 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
             : FloatingActionButton(
                 onPressed: () async {
                   context.read<TaskViewModel>().setTitle();
-                  final message = await context.read<TaskViewModel>().addNewTask(context.read<CategoryViewModel>().selectedCategories);
+                  final message = await context
+                      .read<TaskViewModel>()
+                      .addNewTask(context.read<CategoryViewModel>().selectedCategories);
                   if (context.mounted) {
                     if (message != null) {
                       message == Messages.mTaskAdded ? Navigator.pop(context) : null;
@@ -254,12 +259,13 @@ class SetCategoryButton extends StatelessWidget {
                         ).createShader(bounds);
                       },
                       blendMode: BlendMode.dstIn,
-                      child: Consumer<CategoryViewModel>(
-                        builder: (context,categoryVM, _) {
-                          final ids = categoryVM.selectedCategories.keys.where((key) => categoryVM.selectedCategories[key]!).toList();
-                          return FutureBuilder(
+                      child: Consumer<CategoryViewModel>(builder: (context, categoryVM, _) {
+                        final ids = categoryVM.selectedCategories.keys
+                            .where((key) => categoryVM.selectedCategories[key]!)
+                            .toList();
+                        return FutureBuilder(
                             future: CategoryService.getCategoriesByIds(ids),
-                            builder: (context,snapshot) {
+                            builder: (context, snapshot) {
                               final categories = snapshot.data ?? [];
                               return ListView.separated(
                                 scrollDirection: Axis.horizontal,
@@ -282,7 +288,8 @@ class SetCategoryButton extends StatelessWidget {
                                           CategoryService.getIcon(category.iconCode),
                                           size: 12,
                                           color: category.color != null
-                                              ? CategoryService.getColorFromString(context, category.color!)
+                                              ? CategoryService.getColorFromString(
+                                                  context, category.color!)
                                               : Theme.of(context).colorScheme.primary,
                                         ),
                                         const SizedBox(width: 4),
@@ -295,10 +302,8 @@ class SetCategoryButton extends StatelessWidget {
                                   );
                                 },
                               );
-                            }
-                          );
-                        }
-                      ),
+                            });
+                      }),
                     ),
                   )
                 ],
@@ -344,7 +349,7 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
               future: CategoryService.getCategories(),
               builder: (context, snapshot) {
                 final categories = snapshot.data ?? [];
-                if(snapshot.hasData) {
+                if (snapshot.hasData) {
                   return Consumer<CategoryViewModel>(
                     builder: (context, categoryVM, _) {
                       return Scrollbar(
@@ -353,9 +358,7 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
                         child: ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           controller:
-                          context
-                              .read<CategoryViewModel>()
-                              .categoryBottomSheetScrollController,
+                              context.read<CategoryViewModel>().categoryBottomSheetScrollController,
                           itemCount: categories.length,
                           itemBuilder: (_, index) {
                             return CheckboxListTile(
@@ -370,7 +373,7 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
                                       CategoryService.getIcon(categories[index].iconCode),
                                       color: categories[index].color != null
                                           ? CategoryService.getColorFromString(
-                                          context, categories[index].color!)
+                                              context, categories[index].color!)
                                           : null,
                                       size: 20,
                                     ),
@@ -385,9 +388,10 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
                                 ],
                               ),
                               onChanged: (selected) {
-                                if (selected != null && categories[index].id != 1) {
-                                  context.read<CategoryViewModel>().updateSelectedCategories(
-                                      categories[index].id!, selected);
+                                if (selected != null) {
+                                  context
+                                      .read<CategoryViewModel>()
+                                      .updateSelectedCategories(categories[index].id!, selected);
                                 }
                               },
                             );
@@ -396,7 +400,7 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
                       );
                     },
                   );
-                }else{
+                } else {
                   return Text('No categories');
                 }
               },
