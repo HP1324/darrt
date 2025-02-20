@@ -2,7 +2,6 @@ import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
-import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/services/database_service.dart';
 import 'package:sqflite/sqflite.dart';
 

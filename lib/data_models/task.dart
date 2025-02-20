@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 
 class Task {

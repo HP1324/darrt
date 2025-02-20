@@ -5,7 +5,6 @@ import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/services/task_service.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
-import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/new_category_page.dart';
 import 'package:minimaltodo/views/pages/tasks_for_category_page.dart';
 import 'package:provider/provider.dart';
@@ -26,16 +25,13 @@ class _CategoryItemState extends State<CategoryItem> {
   final GlobalKey _popupKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
-
-
-
       return FutureBuilder(
         future: TaskService.getCategoryTasks(widget.category.id!),
 
         builder: (context,snapshot) {
           final tasksInCategory = snapshot.data ?? [];
           final completedTasks = tasksInCategory.where((task) => task.isDone == true).length;
-          final listColor = widget.category.color != null ? CategoryService.getColorFromString(context, widget.category.color) : Theme.of(context).colorScheme.primary;
+          final categoryColor = widget.category.color != null ? CategoryService.getColorFromString(context, widget.category.color) : Theme.of(context).colorScheme.primary;
           return Card(
             color: Theme.of(context).colorScheme.surfaceContainerLowest,
             elevation: 0,
@@ -55,10 +51,10 @@ class _CategoryItemState extends State<CategoryItem> {
                         Container(
                           padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                            color: listColor.withAlpha(50),
+                            color: categoryColor.withAlpha(50),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Icon(CategoryService.getIcon(widget.category.iconCode), color: listColor, size: 13),
+                          child: Icon(CategoryService.getIcon(widget.category.iconCode), color: categoryColor, size: 13),
                         ),
                         const SizedBox(width: 4),
                         Expanded(
@@ -86,7 +82,7 @@ class _CategoryItemState extends State<CategoryItem> {
                                     onTap: () => MiniRouter.to(context, child: NewCategoryPage(editMode: true, category: widget.category)),
                                     child: Row(
                                       children: [
-                                        Icon(Icons.edit, color: listColor, size: 20),
+                                        Icon(Icons.edit, color: categoryColor, size: 20),
                                         const SizedBox(width: 8),
                                         const Text('Edit'),
                                       ],
@@ -98,7 +94,7 @@ class _CategoryItemState extends State<CategoryItem> {
                                         context: context,
                                         builder: (context) => AlertDialog(
                                           content: const Text(
-                                              'Are you sure you want to delete the list? All tasks in this list will be moved to the General list.'),
+                                              'Are you sure you want to delete the category?'),
                                           actions: [
                                             TextButton(
                                               onPressed: () => Navigator.of(context).pop(),
@@ -144,7 +140,7 @@ class _CategoryItemState extends State<CategoryItem> {
                         child: LinearProgressIndicator(
                           value: completedTasks / tasksInCategory.length,
                           backgroundColor: Theme.of(context).colorScheme.surface,
-                          valueColor: AlwaysStoppedAnimation(listColor),
+                          valueColor: AlwaysStoppedAnimation(categoryColor),
                         ),
                       ),
 
