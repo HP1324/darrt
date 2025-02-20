@@ -21,8 +21,6 @@ class _SearchPageState extends State<SearchPage> {
 
   final List<String> _priorities = ['Low', 'Medium', 'High', 'Urgent'];
 
-  // Keep track of loaded tasks
-  List<Task>? _currentTasks;
 
   @override
   void dispose() {
