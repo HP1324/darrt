@@ -225,7 +225,8 @@ class SetCategoryButton extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 border: Border(
-                    bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0)),
+                  bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,11 +259,12 @@ class SetCategoryButton extends StatelessWidget {
                         ).createShader(bounds);
                       },
                       blendMode: BlendMode.dstIn,
-                      child: Consumer<CategoryViewModel>(builder: (context, categoryVM, _) {
-                        final ids = categoryVM.selectedCategories.keys
-                            .where((key) => categoryVM.selectedCategories[key]!)
-                            .toList();
-                        return FutureBuilder(
+                      child: Consumer<CategoryViewModel>(
+                        builder: (context, categoryVM, _) {
+                          final ids = categoryVM.selectedCategories.keys
+                              .where((key) => categoryVM.selectedCategories[key]!)
+                              .toList();
+                          return FutureBuilder(
                             future: CategoryService.getCategoriesByIds(ids),
                             builder: (context, snapshot) {
                               final categories = snapshot.data ?? [];
@@ -301,10 +303,13 @@ class SetCategoryButton extends StatelessWidget {
                                   );
                                 },
                               );
-                            });
-                      }),
+                            },
+                          );
+                        },
+                      ),
                     ),
-                  )
+                  ),
+                  const SizedBox(height: 10),
                 ],
               ),
             ),
@@ -333,7 +338,7 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
           ListTile(
             onTap: () => MiniRouter.to(context,
                 child: NewCategoryPage(editMode: false), type: PageTransitionType.rightToLeft),
-            title: Text('Create New List', style: TextStyle(fontWeight: FontWeight.w500)),
+            title: Text('Create New Category', style: TextStyle(fontWeight: FontWeight.w500)),
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -445,9 +450,15 @@ class SetPriorityWidget extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
                     children: [
-                      GestureDetector(
-                        onTap: () => context.read<TaskViewModel>().navigatePriority(false),
-                        child: Icon(Icons.chevron_left),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withAlpha(20),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: GestureDetector(
+                          onTap: () => context.read<TaskViewModel>().navigatePriority(false),
+                          child: Icon(Icons.chevron_left),
+                        ),
                       ),
                       Expanded(
                         child: Center(
@@ -457,7 +468,7 @@ class SetPriorityWidget extends StatelessWidget {
                               return Text(
                                 priority,
                                 style: TextStyle(
-                                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                                  fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
                                   fontWeight: FontWeight.w400,
                                 ),
                               );
@@ -465,9 +476,15 @@ class SetPriorityWidget extends StatelessWidget {
                           ),
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () => context.read<TaskViewModel>().navigatePriority(true),
-                        child: Icon(Icons.chevron_right),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withAlpha(20),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: GestureDetector(
+                          onTap: () => context.read<TaskViewModel>().navigatePriority(true),
+                          child: Icon(Icons.chevron_right),
+                        ),
                       ),
                     ],
                   ),
