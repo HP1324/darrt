@@ -10,9 +10,15 @@ import 'package:minimaltodo/views/pages/task_editor_page.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 
-class TaskView extends StatelessWidget {
+class TaskView extends StatefulWidget {
   const TaskView({super.key, required this.task});
   final Task task;
+
+  @override
+  State<TaskView> createState() => _TaskViewState();
+}
+
+class _TaskViewState extends State<TaskView> {
 
   String _getRepeatDescription(Task task) {
     if (!(task.isRepeating ?? false)) return 'Not repeating';
@@ -20,7 +26,7 @@ class TaskView extends StatelessWidget {
     try {
       final config = jsonDecode(task.repeatConfig ?? '{}');
       final repeatType = config['repeatType'] as String?;
-      final selectedDays = List<int>.from(config['selectedDays'] ?? []);
+      final selectedDays = List.from(config['selectedDays'] ?? []);
 
       switch (repeatType) {
         case 'weekly':
@@ -83,18 +89,18 @@ class TaskView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    MiniLogger.debug('Start date: ${task.startDate}, End Date: ${task.endDate}');
+    MiniLogger.debug('Start date: ${widget.task.startDate}, End Date: ${widget.task.endDate}');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colorScheme.primary.withAlpha(30),
-        title: Text('${task.title}'),
+        title: Text('${widget.task.title}'),
       ),
       floatingActionButton: TaskViewButton(
         label: 'Edit',
         onTap: () {
           MiniRouter.to(
             context,
-            child: TaskEditorPage(editMode: true, taskToEdit: task),
+            child: TaskEditorPage(editMode: true, taskToEdit: widget.task),
           );
         },
       ),
@@ -104,13 +110,13 @@ class TaskView extends StatelessWidget {
           DetailItem(
             icon: Icons.assignment_outlined,
             title: 'Task',
-            subtitle: task.title ?? '',
+            subtitle: widget.task.title ?? '',
           ),
           DetailItem(
             icon: Iconsax.category,
             title: 'Categories',
             optionalWidget: FutureBuilder<List<CategoryModel>>(
-              future: TaskService.getTaskCategories(task.id!),
+              future: TaskService.getTaskCategories(widget.task.id!),
               builder: (context, snapshot) {
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return SizedBox.shrink();
@@ -175,46 +181,46 @@ class TaskView extends StatelessWidget {
           DetailItem(
             icon: Icons.flag_outlined,
             title: 'Priority',
-            subtitle: task.priority ?? 'Low',
+            subtitle: widget.task.priority ?? 'Low',
           ),
-          if (task.isRepeating ?? false) ...[
+          if (widget.task.isRepeating ?? false) ...[
             DetailItem(
               icon: Icons.repeat,
               title: 'Repeat',
-              subtitle: _getRepeatDescription(task),
+              subtitle: _getRepeatDescription(widget.task),
             ),
             DetailItem(
               icon: Icons.date_range,
               title: 'Date Range',
-              subtitle: 'From ${DateFormat.yMMMd().format(task.startDate)}'
-                  '${task.endDate != null ? ' to ${DateFormat.yMMMd().format(task.endDate!)}' : ' (No end date)'}',
+              subtitle: 'From ${DateFormat.yMMMd().format(widget.task.startDate)}'
+                  '${widget.task.endDate != null ? ' to ${DateFormat.yMMMd().format(widget.task.endDate!)}' : ' (No end date)'}',
             ),
-            if (task.isNotifyEnabled ?? false)
+            if (widget.task.isNotifyEnabled ?? false)
               DetailItem(
-                icon: task.notifType == 'alarm' ? Icons.alarm : Icons.notifications_outlined,
+                icon: widget.task.notifType == 'alarm' ? Icons.alarm : Icons.notifications_outlined,
                 title: 'Reminders',
-                subtitle: _getReminderTimesDescription(task, context),
+                subtitle: _getReminderTimesDescription(widget.task, context),
               ),
           ] else ...[
             DetailItem(
               icon: Icons.calendar_today,
               title: 'Due Date',
-              subtitle: task.dueDate != null
-                  ? DateFormat.yMMMd().add_jm().format(task.dueDate!)
+              subtitle: widget.task.dueDate != null
+                  ? DateFormat.yMMMd().add_jm().format(widget.task.dueDate!)
                   : 'Not scheduled',
             ),
           ],
           DetailItem(
             icon: Icons.access_time_outlined,
             title: 'Created',
-            subtitle: DateFormat.yMMMd().add_jm().format(task.createdAt!),
+            subtitle: DateFormat.yMMMd().add_jm().format(widget.task.createdAt!),
           ),
-          if (task.isDone ?? false)
+          if (widget.task.isDone ?? false)
             DetailItem(
               icon: Icons.check_circle_outline,
               title: 'Completed',
-              subtitle: task.finishedAt != null
-                  ? DateFormat.yMMMd().add_jm().format(task.finishedAt!)
+              subtitle: widget.task.finishedAt != null
+                  ? DateFormat.yMMMd().add_jm().format(widget.task.finishedAt!)
                   : 'Unknown',
             ),
         ],
