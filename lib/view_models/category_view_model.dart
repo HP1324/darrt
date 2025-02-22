@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
+import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/services/category_service.dart';
+import 'package:minimaltodo/services/task_service.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 
 class CategoryViewModel extends ChangeNotifier {
@@ -21,16 +23,13 @@ class CategoryViewModel extends ChangeNotifier {
   Map<int, bool> selectedCategories = {};
   void updateSelectedCategories(int id, bool updatedStatus){
     selectedCategories[id] = updatedStatus;
-    // Ensure General (id 1) is selected if no other category is selected
-    if (!selectedCategories.entries
-        .any((entry) => entry.key != 1 && entry.value == true)) {
+    if (!selectedCategories.entries.any((entry) => entry.key != 1 && entry.value)) {
       selectedCategories[1] = true;
     }
 
-    // Prevent General (id 1) from being unchecked if no other category is selected
-    if (id == 1 && updatedStatus == false) {
+    if (id == 1 && !updatedStatus) {
       if (!selectedCategories.entries
-          .any((entry) => entry.key != 1 && entry.value == true)) {
+          .any((entry) => entry.key != 1 && entry.value)) {
         selectedCategories[1] = true;
       }
     }
@@ -44,10 +43,25 @@ class CategoryViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void resetCategorySelectionStatus(bool editMode, [Task? task]) async {
+    if (!editMode) {
+      for (var c in categories) {
+        selectedCategories[c.id!] = c.id! == 1; // Select default category only
+      }
+    } else {
+      if (task != null) {
+        final taskCategories = await TaskService.getTaskCategories(task.id!);
+        for (var c in categories) {
+          selectedCategories[c.id!] = taskCategories.contains(c);
+        }
+      }
+    }
+    notifyListeners(); // Ensure UI updates if using ChangeNotifier
+  }
+
+
   Future<bool> addNewCategory() async {
-    logger.d('AddNewList() called');
     if (currentCategory!.isValid()) {
-    logger.d('currentList is valid');
       final id = await CategoryService.addCategory(currentCategory!);
       selectedIcon = 'folder';
       _refreshCategories();
@@ -76,14 +90,9 @@ class CategoryViewModel extends ChangeNotifier {
     return false;
   }
 
-  CategoryModel? selectedList;
-  void updateChosenCategory(CategoryModel selected) {
-    selectedList = selected;
-    //Not calling notify listeners here, because called it in TaskViewModel where the currentTask's list is selected, because of state reaction problems.
-  }
+
 
   void resetCategory() {
-    selectedList = null;
     selectedIcon = 'folder';
     selectedColor = 'primary';
     notifyListeners();
