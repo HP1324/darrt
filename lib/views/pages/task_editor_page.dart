@@ -4,6 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/services/category_service.dart';
@@ -33,8 +34,13 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
   @override
   void initState() {
     super.initState();
+
     final taskVM = context.read<TaskViewModel>();
     widget.editMode ? taskVM.initEditTask(widget.taskToEdit!) : taskVM.initNewTask();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      MiniLogger.debug('Post frame callback is called');
+      context.read<CategoryViewModel>().resetCategorySelectionStatus(widget.editMode, widget.taskToEdit);
+    });
   }
 
   @override
@@ -349,64 +355,53 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
             trailing: Icon(Icons.list_alt),
           ),
           Expanded(
-            child: FutureBuilder(
-              future: CategoryService.getCategories(),
-              builder: (context, snapshot) {
-                final categories = snapshot.data ?? [];
-                if (snapshot.hasData) {
-                  return Consumer<CategoryViewModel>(
-                    builder: (context, categoryVM, _) {
-                      return Scrollbar(
-                        thickness: 8,
-                        radius: const Radius.circular(4),
-                        child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          controller:
-                              context.read<CategoryViewModel>().categoryBottomSheetScrollController,
-                          itemCount: categories.length,
-                          itemBuilder: (_, index) {
-                            return CheckboxListTile(
-                              value: categoryVM.selectedCategories[categories[index].id],
-                              title: Row(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Icon(
-                                      CategoryService.getIcon(categories[index].iconCode),
-                                      color: categories[index].color != null
-                                          ? CategoryService.getColorFromString(
-                                              context, categories[index].color!)
-                                          : null,
-                                      size: 20,
-                                    ),
+            child: Consumer<CategoryViewModel>(
+              builder: (context, categoryVM, _) {
+                final categories = categoryVM.categories;
+                return  Scrollbar(
+                      thickness: 8,
+                      radius: const Radius.circular(4),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        controller: categoryVM.categoryBottomSheetScrollController,
+                        itemCount: categories.length,
+                        itemBuilder: (_, index) {
+                          return CheckboxListTile(
+                            value: categoryVM.selectedCategories[categories[index].id],
+                            title: Row(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      categories[index].name!,
-                                      style: TextStyle(overflow: TextOverflow.ellipsis),
-                                    ),
+                                  child: Icon(
+                                    CategoryService.getIcon(categories[index].iconCode),
+                                    color: categories[index].color != null
+                                        ? CategoryService.getColorFromString(
+                                            context, categories[index].color!)
+                                        : null,
+                                    size: 20,
                                   ),
-                                ],
-                              ),
-                              onChanged: (selected) {
-                                if (selected != null) {
-                                  context
-                                      .read<CategoryViewModel>()
-                                      .updateSelectedCategories(categories[index].id!, selected);
-                                }
-                              },
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  );
-                } else {
-                  return Text('No categories');
-                }
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    categories[index].name!,
+                                    style: const TextStyle(overflow: TextOverflow.ellipsis),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            onChanged: (selected) {
+                              if (selected != null) {
+                                categoryVM.updateSelectedCategories(
+                                    categories[index].id!, selected);
+                              }
+                            },
+                          );
+                        },
+                      )
+                );
               },
             ),
           ),
