@@ -62,7 +62,7 @@ class _BottomNavBarWidget extends StatelessWidget {
           MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Wishlist', i: 1),
           MiniBottomNavBarItem(icon: Icons.search, label: 'Search', i: -1),
           MiniBottomNavBarItem(icon: Iconsax.category, label: 'Categories', i: 2),
-          MiniBottomNavBarItem(icon: Iconsax.note, label: 'Notes', i: -2),
+          MiniBottomNavBarItem(icon: Iconsax.book, label: 'Journal', i: -2),
           // const SizedBox.shrink(),
         ],
       );

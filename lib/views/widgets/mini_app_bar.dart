@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
-import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
-import 'package:minimaltodo/views/pages/navigation/finished_tasks_page.dart';
 import 'package:provider/provider.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -114,12 +112,6 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
               items: [
                 PopupMenuItem(child: Text('Notifications')),
-                PopupMenuItem(
-                  onTap: () {
-                    MiniRouter.to(context, child: FinishedTasksPage());
-                  },
-                  child: Text('Finished Tasks'),
-                ),
                 PopupMenuItem(child: Text('Rate Us')),
                 PopupMenuItem(child: Text('Give Feedback')),
                 PopupMenuItem(child: Text('Settings')),
