@@ -33,7 +33,7 @@ class _CategoryItemState extends State<CategoryItem> {
           final completedTasks = tasksInCategory.where((task) => task.isDone == true).length;
           final categoryColor = widget.category.color != null ? CategoryService.getColorFromString(context, widget.category.color) : Theme.of(context).colorScheme.primary;
           return Card(
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
             elevation: 0,
             margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
             shape: RoundedRectangleBorder(side: BorderSide(width: 0.1), borderRadius: BorderRadius.circular(10)),

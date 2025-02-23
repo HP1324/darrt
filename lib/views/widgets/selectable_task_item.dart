@@ -203,7 +203,9 @@ class SelectableTaskItemState extends State<SelectableTaskItem> {
                                                 return Container(
                                                   padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                                                   decoration: BoxDecoration(
-                                                    color: Theme.of(context).colorScheme.primary.withAlpha(20),
+                                                    color: category.color != null
+                                                        ? CategoryService.getColorFromString(context, category.color!).withAlpha(30)
+                                                        : Theme.of(context).colorScheme.primary.withAlpha(20),
                                                     borderRadius: BorderRadius.circular(4),
                                                   ),
                                                   child: Row(
