@@ -695,17 +695,16 @@ class NotificationSwitch extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Text(
-                  'Please allow the application to send notifications, otherwise we won\'t be able to remind you about your important tasks.'),
+                  'Please allow the application to send notifications, otherwise we won\'t be able to remind you about your tasks.'),
             ),
             actions: [
               InkWell(
                 onTap: () async {
                   final navigator = Navigator.of(context);
-                  final allowed =
-                      await AwesomeNotifications().requestPermissionToSendNotifications();
-                  if (allowed) {
+                  final allowed =await AwesomeNotifications().requestPermissionToSendNotifications();
+                  if (allowed && context.mounted) {
                     context.read<TaskViewModel>().toggleNotifSwitch(value);
-                    await GetStorage().write(mNotificationsEnabled, allowed);
+                    await MiniBox.write(mNotificationsEnabled, allowed);
                     await NotificationService.initializeNotificationChannels();
                   }
                   navigator.pop();

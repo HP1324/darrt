@@ -38,14 +38,14 @@ dependencies:
   page_transition: ^2.2.1
   intl: ^0.20.2
   get_storage: ^2.1.1
+  awesome_notifications_core: ^0.10.0
   awesome_notifications: ^0.10.1
-  toastification: ^2.3.0
+  toastification: ^3.0.2
   logger: ^2.5.0
   fl_chart: ^0.65.0
   font_awesome_flutter: ^10.8.0
-  flex_color_scheme: ^8.1.0
+  flex_color_scheme: ^8.2.0
   flutter_launcher_icons: ^0.14.3
-  archive: ^4.0.2
   flutter_native_splash: ^2.4.4
   flutter_background_service: ^5.1.0
   path: ^1.9.0
