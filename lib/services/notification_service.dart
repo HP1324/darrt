@@ -37,8 +37,7 @@ class NotificationService {
 
   static Future<bool> isNotificationsEnabled() async {
     try {
-      final box = GetStorage();
-      return box.read(mNotificationsEnabled) ?? false;
+      return MiniBox.read(mNotificationsEnabled) ?? false;
     } catch (e) {
       MiniLogger.error('Error checking notification status: ${e.toString()}');
       return false;
@@ -134,7 +133,7 @@ class NotificationService {
 
   static Future<void> createRepeatingTaskNotifications(Task task) async {
     if (!await isNotificationsEnabled()) {
-      logger.d('Notifications disabled; skipping repeating notifications.');
+      MiniLogger.debug('Notifications disabled; skipping repeating notifications.');
       return;
     }
     Future.delayed(Duration.zero,()async{
