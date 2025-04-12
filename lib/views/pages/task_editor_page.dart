@@ -37,9 +37,11 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
 
     final taskVM = context.read<TaskViewModel>();
     widget.editMode ? taskVM.initEditTask(widget.taskToEdit!) : taskVM.initNewTask();
-    WidgetsBinding.instance.addPostFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       MiniLogger.debug('Post frame callback is called');
-      context.read<CategoryViewModel>().resetCategorySelectionStatus(widget.editMode, widget.taskToEdit);
+      context
+          .read<CategoryViewModel>()
+          .resetCategorySelectionStatus(widget.editMode, widget.taskToEdit);
     });
   }
 
@@ -129,26 +131,28 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                       if (isRepeatEnabled) ...[
                         const RepeatingConfigWidget(),
                         const SizedBox(height: 10),
-                        NotificationSwitch(),
+                        // NotificationSwitch(),
                         if (isNotifyEnabled) ...[
-                          const NotificationTypeSelector(),
+
                           const SizedBox(height: 16),
-                          const RecurringReminderTimes(),
                         ],
-                        const SizedBox(height: 80),
                       ] else ...[
                         // One-time task settings
                         SetDateWidget(editMode: widget.editMode, task: widget.taskToEdit),
                         const SizedBox(height: 8),
-                        SetTimeWidget(editMode: widget.editMode, task: widget.taskToEdit),
-                        const SizedBox(height: 16),
-                        NotificationSwitch(),
-                        if (isNotifyEnabled) ...[
-                          const NotificationTypeSelector(),
-                          const SizedBox(height: 8),
-                          const NotificationOptionsWidget(),
-                        ],
+                        // SetTimeWidget(editMode: widget.editMode, task: widget.taskToEdit),
+                        // const SizedBox(height: 16),
+                        // NotificationSwitch(),
+                        //
+                        // if (isNotifyEnabled) ...[
+                        //   const NotificationTypeSelector(),
+                        //   const SizedBox(height: 8),
+                        //   const NotificationOptionsWidget(),
+                        // ],
                       ],
+                      const NotificationTypeSelector(),
+                      const RecurringReminderTimes(),
+                      const SizedBox(height: 70),
                     ],
                   );
                 }),
@@ -358,50 +362,48 @@ class _CategorySelectionBottomSheetState extends State<_CategorySelectionBottomS
             child: Consumer<CategoryViewModel>(
               builder: (context, categoryVM, _) {
                 final categories = categoryVM.categories;
-                return  Scrollbar(
-                      thickness: 8,
-                      radius: const Radius.circular(4),
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        controller: categoryVM.categoryBottomSheetScrollController,
-                        itemCount: categories.length,
-                        itemBuilder: (_, index) {
-                          return CheckboxListTile(
-                            value: categoryVM.selectedCategories[categories[index].id],
-                            title: Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Icon(
-                                    CategoryService.getIcon(categories[index].iconCode),
-                                    color: categories[index].color != null
-                                        ? CategoryService.getColorFromString(
-                                            context, categories[index].color!)
-                                        : null,
-                                    size: 20,
-                                  ),
+                return Scrollbar(
+                    thickness: 8,
+                    radius: const Radius.circular(4),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      controller: categoryVM.categoryBottomSheetScrollController,
+                      itemCount: categories.length,
+                      itemBuilder: (_, index) {
+                        return CheckboxListTile(
+                          value: categoryVM.selectedCategories[categories[index].id],
+                          title: Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    categories[index].name!,
-                                    style: const TextStyle(overflow: TextOverflow.ellipsis),
-                                  ),
+                                child: Icon(
+                                  CategoryService.getIcon(categories[index].iconCode),
+                                  color: categories[index].color != null
+                                      ? CategoryService.getColorFromString(
+                                          context, categories[index].color!)
+                                      : null,
+                                  size: 20,
                                 ),
-                              ],
-                            ),
-                            onChanged: (selected) {
-                              if (selected != null) {
-                                categoryVM.updateSelectedCategories(
-                                    categories[index].id!, selected);
-                              }
-                            },
-                          );
-                        },
-                      )
-                );
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  categories[index].name!,
+                                  style: const TextStyle(overflow: TextOverflow.ellipsis),
+                                ),
+                              ),
+                            ],
+                          ),
+                          onChanged: (selected) {
+                            if (selected != null) {
+                              categoryVM.updateSelectedCategories(categories[index].id!, selected);
+                            }
+                          },
+                        );
+                      },
+                    ));
               },
             ),
           ),
@@ -582,149 +584,76 @@ class SetTimeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Selector<TaskViewModel, DateTime>(
-        selector: (context, taskVM) => taskVM.currentTask.dueDate!,
-        builder: (context, dueDate, _) {
-          return InkWell(
-            onTap: () async {
-              context.read<TaskViewModel>().textFieldNode.unfocus();
-              final selectedTime = await showTimePicker(
-                context: context,
-                initialTime: TimeOfDay.fromDateTime(dueDate),
-              );
-              if (selectedTime != null && context.mounted) {
-                context.read<TaskViewModel>().setTime(selectedTime);
-              }
-              // MiniLogger.debug('DueDate with time: ${taskVM.currentTask.dueDate}');
-            },
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.access_time_outlined, size: 18),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              'Time',
-                              style: TextStyle(
-                                  fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                            Icon(Icons.keyboard_arrow_down_rounded, size: 22),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Text(
-                                formatTime(dueDate),
-                                style: TextStyle(
-                                  fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                context.read<TaskViewModel>().removeTime();
-                              },
-                              child: Icon(Icons.close, size: 19),
-                            ),
-                          ],
-                        ),
-                      ],
+      selector: (context, taskVM) => taskVM.currentTask.dueDate!,
+      builder: (context, dueDate, _) {
+        return InkWell(
+          onTap: () async {
+            context.read<TaskViewModel>().textFieldNode.unfocus();
+            final selectedTime = await showTimePicker(
+              context: context,
+              initialTime: TimeOfDay.fromDateTime(dueDate),
+            );
+            if (selectedTime != null && context.mounted) {
+              context.read<TaskViewModel>().setTime(selectedTime);
+            }
+            // MiniLogger.debug('DueDate with time: ${taskVM.currentTask.dueDate}');
+          },
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.access_time_outlined, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        });
-  }
-}
-
-class NotificationSwitch extends StatelessWidget {
-  const NotificationSwitch({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Selector<TaskViewModel, bool>(
-        selector: (context, taskVM) => taskVM.currentTask.isNotifyEnabled!,
-        builder: (context, isNotifyEnabled, _) {
-          return SwitchListTile(
-            activeColor: Theme.of(context).colorScheme.primary,
-            title: Text("Enable notification",
-                style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                    fontWeight: FontWeight.w500)),
-            value: isNotifyEnabled,
-            onChanged: (value) async {
-              final allowed = await AwesomeNotifications().isNotificationAllowed();
-              if (allowed && context.mounted) {
-                context.read<TaskViewModel>().toggleNotifSwitch(value);
-              } else {
-                _showNotificationRationale(context, value);
-              }
-            },
-          );
-        });
-  }
-
-  void _showNotificationRationale(BuildContext context, bool value) {
-    if (context.mounted) {
-      showAdaptiveDialog(
-        context: context,
-        builder: (_) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-            title: const Text('Permission required'),
-            content: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Text(
-                  'Please allow the application to send notifications, otherwise we won\'t be able to remind you about your tasks.'),
-            ),
-            actions: [
-              InkWell(
-                onTap: () async {
-                  final navigator = Navigator.of(context);
-                  final allowed =await AwesomeNotifications().requestPermissionToSendNotifications();
-                  if (allowed && context.mounted) {
-                    context.read<TaskViewModel>().toggleNotifSwitch(value);
-                    await MiniBox.write(mNotificationsEnabled, allowed);
-                    await NotificationService.initializeNotificationChannels();
-                  }
-                  navigator.pop();
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  child: const Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Go to notification settings'),
-                      Icon(Icons.chevron_right),
+                      Row(
+                        children: [
+                          Text(
+                            'Time',
+                            style: TextStyle(
+                                fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          Icon(Icons.keyboard_arrow_down_rounded, size: 22),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Text(
+                              formatTime(dueDate),
+                              style: TextStyle(
+                                fontSize: Theme.of(context).textTheme.labelMedium!.fontSize,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              context.read<TaskViewModel>().removeTime();
+                            },
+                            child: Icon(Icons.close, size: 19),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
               ),
             ],
-          );
-        },
-      );
-    }
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -793,85 +722,6 @@ class NotificationTypeSelector extends StatelessWidget {
               ),
             ),
           ],
-        );
-      },
-    );
-  }
-}
-
-class NotificationOptionsWidget extends StatelessWidget {
-  const NotificationOptionsWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor.withAlpha(100)),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Notify me before', style: TextStyle(fontWeight: FontWeight.w600)),
-          SizedBox(height: 12),
-          Wrap(
-            spacing: 5,
-            runSpacing: 5,
-            runAlignment: WrapAlignment.start,
-            children: [
-              _TimeOption(minutes: 0, label: 'On time'),
-              _TimeOption(minutes: 5, label: '5 min'),
-              _TimeOption(minutes: 10, label: '10 min'),
-              _TimeOption(minutes: 15, label: '15 min'),
-              _TimeOption(minutes: 30, label: '30 min'),
-              _TimeOption(minutes: 45, label: '45 min'),
-              _TimeOption(minutes: 60, label: '1 hour'),
-              _TimeOption(minutes: 120, label: '2 hours'),
-              _TimeOption(minutes: 180, label: '3 hours'),
-              _TimeOption(minutes: 240, label: '4 hours'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TimeOption extends StatelessWidget {
-  const _TimeOption({
-    required this.minutes,
-    required this.label,
-  });
-
-  final int minutes;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<TaskViewModel>(
-      builder: (context, taskVM, _) {
-        final isSelected = taskVM.selectedMinutes == minutes;
-        return Material(
-          color: isSelected ? Theme.of(context).colorScheme.outlineVariant : null,
-          borderRadius: BorderRadius.circular(20),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(20),
-            onTap: () {
-              final isUpdated = taskVM.updateNotifyTime(minutes);
-              if (!isUpdated) {
-                showToast(
-                    context: context,
-                    title: 'This time has gone',
-                    type: ToastificationType.warning);
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Text(label),
-            ),
-          ),
         );
       },
     );
@@ -1159,7 +1009,7 @@ class RecurringReminderTimes extends StatelessWidget {
 
     return ListTile(
       title: Text(
-        "Daily Reminder Times",
+        "Add Reminders",
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontSize: 14,
             ),
@@ -1169,7 +1019,7 @@ class RecurringReminderTimes extends StatelessWidget {
           builder: (context, reminderTimesList, _) {
             return Text(
               reminderTimesList.isEmpty
-                  ? 'No reminders set'
+                  ? 'Add up to 7 reminders per day'
                   : reminderTimesList.map((t) => t.format(context)).join(', '),
               style: Theme.of(context).textTheme.bodySmall,
             );
@@ -1177,18 +1027,73 @@ class RecurringReminderTimes extends StatelessWidget {
       trailing: const Icon(Icons.access_time),
       onTap: () async {
         context.read<TaskViewModel>().textFieldNode.unfocus();
-        await showModalBottomSheet(
-          context: context,
-          backgroundColor: colorScheme.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(20),
+        final allowed = await AwesomeNotifications().isNotificationAllowed();
+        if (context.mounted) {
+          if (allowed || _showNotificationRationale(context)) {
+            showBottomSheet(context, colorScheme);
+          }
+        }
+      },
+    );
+  }
+
+  void showBottomSheet(BuildContext context, ColorScheme colorScheme) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (ctx) => ReminderTimesBottomSheet(),
+    );
+  }
+
+  bool _showNotificationRationale(BuildContext context) {
+    bool userAllowed = false;
+    showAdaptiveDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+          title: const Text('Permission required'),
+          content: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
             ),
+            child: const Text(
+                'Please allow the application to send notifications, otherwise we won\'t be able to remind you about your tasks.'),
           ),
-          builder: (ctx) => ReminderTimesBottomSheet(),
+          actions: [
+            InkWell(
+              onTap: () async {
+                final navigator = Navigator.of(context);
+                final allowed = await AwesomeNotifications().requestPermissionToSendNotifications();
+                if (allowed && context.mounted) {
+                  await MiniBox.write(mNotificationsEnabled, allowed);
+                  await NotificationService.initializeNotificationChannels();
+                }
+                userAllowed = allowed;
+                navigator.pop();
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                child: const Row(
+                  children: [
+                    Text('Go to notification settings'),
+                    Icon(Icons.chevron_right),
+                  ],
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
+    return userAllowed;
   }
 }
 
@@ -1223,7 +1128,7 @@ class ReminderTimesBottomSheet extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Daily Reminders',
+                    'Reminders',
                     style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -1233,13 +1138,6 @@ class ReminderTimesBottomSheet extends StatelessWidget {
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Set up to 7 reminder times that will repeat daily',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
               ),
               const SizedBox(height: 16),
               Flexible(
@@ -1273,7 +1171,7 @@ class ReminderTimesBottomSheet extends StatelessWidget {
                                     context.read<TaskViewModel>().updateReminderTime(time, newTime);
                                   }
                                 },
-                                backgroundColor: colorScheme.surfaceVariant,
+                                backgroundColor: colorScheme.surfaceContainerHighest,
                                 side: BorderSide.none,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,
@@ -1304,22 +1202,20 @@ class ReminderTimesBottomSheet extends StatelessWidget {
                             context: context,
                             initialTime: TimeOfDay.now(),
                           );
-                          if (time != null) {
+                          if (time != null && context.mounted) {
                             if (reminderTimesList.contains(time)) {
-                              if (context.mounted) {
-                                showToast(
-                                  context: context,
-                                  title: 'This time is already added',
-                                  type: ToastificationType.warning,
-                                );
-                              }
+                              showToast(
+                                context: context,
+                                title: 'This time is already added',
+                                type: ToastificationType.warning,
+                              );
                             } else {
                               context.read<TaskViewModel>().addReminderTime(time);
                             }
                           }
                         },
                   icon: const Icon(Icons.add),
-                  label: const Text('Add Reminder Time'),
+                  label: const Text('Add Reminder'),
                 ),
               ),
             ],

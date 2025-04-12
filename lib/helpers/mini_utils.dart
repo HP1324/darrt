@@ -68,7 +68,19 @@ String formatTime(DateTime notifyAt) {
   return DateFormat.jm()
       .format(notifyAt); // This will automatically use system's format
 }
+String formatTimeOfDay(TimeOfDay time) {
+  // Convert TimeOfDay to DateTime for using DateFormat
+  final now = DateTime.now();
+  final dateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute
+  );
 
+  return DateFormat.jm().format(dateTime);
+}
 String formatDateWith(DateTime dateTime, String format) {
   return DateFormat(format).format(dateTime);
 }
@@ -88,3 +100,5 @@ final Logger logger = Logger();
   }
   return (position, size);
 }
+
+

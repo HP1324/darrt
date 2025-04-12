@@ -69,10 +69,10 @@ class _TaskViewState extends State<TaskView> {
 
   String _getReminderTimesDescription(Task task, BuildContext context) {
     if (!(task.isNotifyEnabled ?? false)) return 'Notifications disabled';
-    if (task.reminderTimes == null) return 'No reminders set';
+    if (task.reminders == null) return 'No reminders set';
 
     try {
-      final times = jsonDecode(task.reminderTimes!) as List;
+      final times = jsonDecode(task.reminders!) as List;
       return times.map((timeStr) {
         final parts = timeStr.split(':');
         final time = TimeOfDay(

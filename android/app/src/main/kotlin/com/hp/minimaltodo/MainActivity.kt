@@ -19,8 +19,7 @@ class MainActivity: FlutterActivity() {
                 if (call.method == "openBatterySettings") {
                     try {
                         val intent = Intent()
-                        intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-                        intent.data = Uri.parse("package:${packageName}")
+                        intent.action = Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
                         startActivity(intent)
                         result.success(null)
                     } catch (e: Exception) {

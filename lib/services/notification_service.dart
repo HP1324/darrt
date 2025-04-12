@@ -83,7 +83,7 @@ class NotificationService {
   }
 
   static Future<void> createTaskNotification(Task task) async {
-    if (task.notifyTime == null || task.notifyTime!.isBefore(DateTime.now())) {
+    if (task.reminders == null) {
       return;
     }
     if (!await isNotificationsEnabled()) {
@@ -95,40 +95,54 @@ class NotificationService {
 
     MiniLogger.debug('notification type:${task.notifType}, time: ${task.notifyTime}');
     try {
+      final times = getReminders(task.reminders!);
       final notifType = task.notifType!.toLowerCase();
       final isAlarm = notifType == 'alarm';
-      final isCreated = await _notif.createNotification(
-        content: NotificationContent(
-          id: task.id!,
-          channelKey: isAlarm ? 'task_alarm' : 'task_notif',
-          title: 'Task Due at ${formatTime(task.dueDate!)}',
-          body: task.title,
-          actionType: ActionType.Default,
-          payload: task.toNotificationPayload(),
-          notificationLayout: NotificationLayout.Default,
-          category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
-          wakeUpScreen: true,
-          criticalAlert: true,
-        ),
-        schedule: NotificationCalendar.fromDate(
-          date: task.notifyTime!,
-          allowWhileIdle: true,
-          preciseAlarm: true,
-        ),
-        actionButtons: [
-          NotificationActionButton(
-            key: 'Finished',
-            label: 'Finished',
-            actionType: ActionType.SilentBackgroundAction,
+      for(var time in times){
+        debugPrint('Reminder: ${time.hour}:${time.minute}');
+        // Notification id must be different for each notification, so we will generate it
+        final notificationId = generateNotificationId(task, task.dueDate!, time);
+        await _notif.createNotification(
+          content:NotificationContent(
+            id: notificationId,
+            groupKey: task.id!.toString(),
+            channelKey: isAlarm ? 'task_alarm' : 'task_notif',
+            title: 'Task Due at ${formatTimeOfDay(time)}',
+            body: task.title,
+            actionType: ActionType.Default,
+            payload: task.toNotificationPayload(),
+            notificationLayout: NotificationLayout.Default,
+            category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
+            wakeUpScreen: true,
+            criticalAlert: true,
           ),
-          NotificationActionButton(key: 'Skip', label: 'Skip'),
-        ],
-      );
-      MiniLogger.debug('One-off notification created: $isCreated');
+          schedule: NotificationCalendar(
+            day: task.dueDate!.day,
+            month: task.dueDate!.month,
+            year:task.dueDate!.year,
+            hour: time.hour,
+            minute: time.minute,
+            second: 0,
+            millisecond: 0,
+            repeats: false,
+            allowWhileIdle: true,
+            preciseAlarm: true,
+            timeZone: await _notif.getLocalTimeZoneIdentifier(),
+          ),
+        );
+      }
     } catch (e) {
       MiniLogger.error('Failed to create task notification: ${e.toString()}');
       rethrow;
     }
+  }
+ static List<TimeOfDay> getReminders(String reminders){
+    final times = jsonDecode(reminders) as List;
+    final reminderTimes = times.map((timeStr) {
+      final parts = (timeStr as String).split(':');
+      return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    }).toList();
+    return reminderTimes;
   }
 
   static Future<void> createRepeatingTaskNotifications(Task task) async {
@@ -136,7 +150,7 @@ class NotificationService {
       MiniLogger.debug('Notifications disabled; skipping repeating notifications.');
       return;
     }
-    Future.delayed(Duration.zero,()async{
+    Future.delayed(Duration.zero, () async {
       try {
         // Parse repeat configuration
         final repeatConfig = jsonDecode(task.repeatConfig ?? '{}');
@@ -145,8 +159,8 @@ class NotificationService {
 
         // Parse reminder times
         List<TimeOfDay> reminderTimes = [];
-        if (task.reminderTimes != null) {
-          final times = jsonDecode(task.reminderTimes!) as List;
+        if (task.reminders != null) {
+          final times = jsonDecode(task.reminders!) as List;
           reminderTimes = times.map((timeStr) {
             final parts = (timeStr as String).split(':');
             return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
@@ -168,10 +182,10 @@ class NotificationService {
               if (selectedDays != null) {
                 for (final weekday in selectedDays) {
                   await _scheduleWeeklyNotification(
-                  task,
-                  weekday,
-                  reminderTime,
-                  baseDateTime,
+                    task,
+                    weekday,
+                    reminderTime,
+                    baseDateTime,
                   );
                 }
               }
@@ -179,17 +193,17 @@ class NotificationService {
 
             case 'monthly':
               await _scheduleMonthlyNotification(
-              task,
-              reminderTime,
-              baseDateTime,
+                task,
+                reminderTime,
+                baseDateTime,
               );
               break;
 
             case 'yearly':
               await _scheduleYearlyNotification(
-              task,
-              reminderTime,
-              baseDateTime,
+                task,
+                reminderTime,
+                baseDateTime,
               );
               break;
           }
@@ -198,7 +212,6 @@ class NotificationService {
         MiniLogger.error('Error scheduling repeating notifications: $e');
       }
     });
-
   }
 
   static int generateNotificationId(Task task, DateTime date, TimeOfDay time) {
@@ -369,16 +382,19 @@ class NotificationService {
   }
 
   static Future<void> removeTaskNotification(Task task) async {
-    try {
-      if (task.isNotifyEnabled!) {
-        await _notif.cancel(task.id!);
-        // Optionally cancel all repeating notifications if using composite id scheme.
-        MiniLogger.debug('Notification ${task.id} canceled');
-      }
-    } catch (e) {
-      MiniLogger.error('Failed to remove task notification: ${e.toString()}');
-      rethrow;
-    }
+   try{
+     if(task.reminders == null){
+       return;
+     }else{
+       final times = getReminders(task.reminders!);
+       for(var time in times){
+         final notificationId = generateNotificationId(task, task.dueDate!, time);
+         await _notif.cancel(notificationId);
+       }
+     }
+   }catch (e, stacktrace){
+     MiniLogger.error('Error removing notification: ${e.toString()}\n$stacktrace');
+   }
   }
 
   static Future<void> removeRepeatingTaskNotifications(Task task) async {

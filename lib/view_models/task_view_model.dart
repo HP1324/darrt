@@ -77,7 +77,7 @@ class TaskViewModel extends ChangeNotifier {
 
     // No need to reset these as they're now handled through currentTask
     // currentTask.repeatConfig = null;
-    currentTask.reminderTimes = null;
+    currentTask.reminders = null;
   }
 
   void resetTask(Task task) {
@@ -179,6 +179,7 @@ class TaskViewModel extends ChangeNotifier {
       time.hour,
       time.minute,
     );
+    MiniLogger.debug('Selected Minutes: ${selectedMinutes}');
     notifyListeners();
     if (currentTask.dueDate != null && currentTask.isNotifyEnabled!) {
       currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
@@ -345,7 +346,7 @@ class TaskViewModel extends ChangeNotifier {
   void addReminderTime(TimeOfDay time) {
     try {
       final List<String> times = List.from(
-        jsonDecode(currentTask.reminderTimes ?? '[]'),
+        jsonDecode(currentTask.reminders ?? '[]'),
       );
 
       if (times.length >= 7) return;
@@ -357,8 +358,8 @@ class TaskViewModel extends ChangeNotifier {
       if (times.contains(timeString)) return;
       MiniLogger.debug('Time String: $timeString');
       times.add(timeString);
-      currentTask.reminderTimes = jsonEncode(times);
-      MiniLogger.debug('All reminder Times: ${currentTask.reminderTimes}');
+      currentTask.reminders = jsonEncode(times);
+      MiniLogger.debug('All reminder Times: ${currentTask.reminders}');
       notifyListeners();
     } catch (e) {
       MiniLogger.error('Error adding reminder time: $e');
@@ -368,14 +369,14 @@ class TaskViewModel extends ChangeNotifier {
   void removeReminderTime(TimeOfDay time) {
     try {
       final List<String> times = List.from(
-        jsonDecode(currentTask.reminderTimes ?? '[]'),
+        jsonDecode(currentTask.reminders ?? '[]'),
       );
 
       // Convert TimeOfDay to string format for comparison
       final timeString = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
       times.remove(timeString);
-      currentTask.reminderTimes = jsonEncode(times);
+      currentTask.reminders = jsonEncode(times);
       notifyListeners();
     } catch (e) {
       MiniLogger.error('Error removing reminder time: $e');
@@ -385,7 +386,7 @@ class TaskViewModel extends ChangeNotifier {
   void updateReminderTime(TimeOfDay oldTime, TimeOfDay newTime) {
     try {
       final List<String> times = List.from(
-        jsonDecode(currentTask.reminderTimes ?? '[]'),
+        jsonDecode(currentTask.reminders ?? '[]'),
       );
 
       final oldTimeString = '${oldTime.hour.toString().padLeft(2, '0')}:${oldTime.minute.toString().padLeft(2, '0')}';
@@ -394,7 +395,7 @@ class TaskViewModel extends ChangeNotifier {
       final index = times.indexOf(oldTimeString);
       if (index != -1) {
         times[index] = newTimeString;
-        currentTask.reminderTimes = jsonEncode(times);
+        currentTask.reminders = jsonEncode(times);
         notifyListeners();
       }
     } catch (e) {
@@ -403,10 +404,10 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   List<TimeOfDay> get reminderTimesList {
-    if (currentTask.reminderTimes == null) return [];
+    if (currentTask.reminders == null) return [];
     try {
       final List<String> times = List.from(
-        jsonDecode(currentTask.reminderTimes!),
+        jsonDecode(currentTask.reminders!),
       );
       return times.map((timeStr) {
         final parts = timeStr.split(':');
@@ -452,7 +453,7 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
 
     // Schedule notifications
-    if (currentTask.isNotifyEnabled!) {
+    if (currentTask.reminders != null) {
       if (currentTask.isRepeating!) {
         await NotificationService.createRepeatingTaskNotifications(currentTask);
       } else {
@@ -590,7 +591,7 @@ class TaskViewModel extends ChangeNotifier {
         'repeatType': 'weekly',
         'selectedDays': [1, 2, 3, 4, 5,6],
       });
-      currentTask.reminderTimes = null;
+      currentTask.reminders = null;
 
       // Clear one-time settings
       currentTask.dueDate = null;
@@ -601,7 +602,7 @@ class TaskViewModel extends ChangeNotifier {
       currentTask.startDate = DateTime.now();
       currentTask.endDate = null;
       currentTask.repeatConfig = null;
-      currentTask.reminderTimes = null;
+      currentTask.reminders = null;
       currentTask.notifyTime = null;
       currentTask.isNotifyEnabled = false;
     }
