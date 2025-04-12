@@ -127,38 +127,42 @@ class _SearchPageState extends State<SearchPage> {
                         return ListView(
                           scrollDirection: Axis.horizontal,
                           children: [
-                            FilterChip(
-                              showCheckmark: false,
-                              label: Text(
-                                'All Categories',
-                                style: TextStyle(
-                                    fontSize: Theme.of(context).textTheme.labelMedium!.fontSize
+                            RepaintBoundary(
+                              child: FilterChip(
+                                showCheckmark: false,
+                                label: Text(
+                                  'All Categories',
+                                  style: TextStyle(
+                                      fontSize: Theme.of(context).textTheme.labelMedium!.fontSize
+                                  ),
                                 ),
+                                selected: _selectedCategory == null,
+                                onSelected: (selected) {
+                                  setState(() {
+                                    _selectedCategory = null;
+                                  });
+                                },
                               ),
-                              selected: _selectedCategory == null,
-                              onSelected: (selected) {
-                                setState(() {
-                                  _selectedCategory = null;
-                                });
-                              },
                             ),
                             ...categories.map(
                                   (category) => Padding(
                                 padding: const EdgeInsets.only(left: 6.0),
-                                child: FilterChip(
-                                  showCheckmark: false,
-                                  label: Text(
-                                    category.name!,
-                                    style: TextStyle(
-                                        fontSize: Theme.of(context).textTheme.labelMedium!.fontSize
+                                child: RepaintBoundary(
+                                  child: FilterChip(
+                                    showCheckmark: false,
+                                    label: Text(
+                                      category.name!,
+                                      style: TextStyle(
+                                          fontSize: Theme.of(context).textTheme.labelMedium!.fontSize
+                                      ),
                                     ),
+                                    selected: _selectedCategory?.id == category.id,
+                                    onSelected: (selected) {
+                                      setState(() {
+                                        _selectedCategory = selected ? category : null;
+                                      });
+                                    },
                                   ),
-                                  selected: _selectedCategory?.id == category.id,
-                                  onSelected: (selected) {
-                                    setState(() {
-                                      _selectedCategory = selected ? category : null;
-                                    });
-                                  },
                                 ),
                               ),
                             ),

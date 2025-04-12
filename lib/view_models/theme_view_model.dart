@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_enums.dart';
-import 'package:minimaltodo/helpers/mini_utils.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 
 class ThemeViewModel extends ChangeNotifier {
 
@@ -59,7 +59,7 @@ class ThemeViewModel extends ChangeNotifier {
       _themePreference = preference;
       notifyListeners();
     } catch (e) {
-      logger.d('Failed to save theme preference: $e');
+      MiniLogger.debug('Failed to save theme preference: $e');
     }
   }
 

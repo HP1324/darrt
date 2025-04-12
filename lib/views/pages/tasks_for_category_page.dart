@@ -115,7 +115,6 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
                               }
                               _clearSelection();
                               Navigator.pop(context);
-                              // showToast(title: 'Tasks deleted');
                             },
                             child: const Text('Delete'),
                           ),

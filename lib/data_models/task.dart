@@ -19,7 +19,7 @@ class Task {
     DateTime? startDate,
     this.endDate,
     this.repeatConfig,
-    this.reminderTimes,
+    this.reminders,
   }) : startDate = startDate ?? DateTime.now();
 
   int? id;
@@ -38,7 +38,7 @@ class Task {
   DateTime startDate; // defaults to now if not provided
   DateTime? endDate; // null means repeat indefinitely
   String? repeatConfig; // JSON string, e.g. {"repeatType": "weekly", "selectedDays": [1,3,5]}
-  String? reminderTimes;
+  String? reminders;
 
   Task copyWith({
     int? id,
@@ -92,7 +92,7 @@ class Task {
            'startDate': ${startDate.toIso8601String()},
            'endDate': ${endDate?.toIso8601String()},
            'repeatConfig': $repeatConfig,
-           'reminderTimes': $reminderTimes,
+           'reminderTimes': $reminders,
           }
           """);
     }
@@ -115,7 +115,7 @@ class Task {
         startDate == other.startDate &&
         endDate == other.endDate &&
         repeatConfig == other.repeatConfig &&
-        reminderTimes == other.reminderTimes;
+        reminders == other.reminders;
   }
 
   @override
@@ -134,7 +134,7 @@ class Task {
         startDate,
         endDate,
         repeatConfig,
-        reminderTimes,
+        reminders,
       );
 
   bool isValid() {
@@ -164,7 +164,7 @@ class Task {
         'startDate': startDate.millisecondsSinceEpoch,
         'endDate': endDate?.millisecondsSinceEpoch,
         'repeatConfig': repeatConfig,
-        'reminderTimes': reminderTimes,
+        'reminderTimes': reminders,
       };
 
   // Create a Task from JSON
@@ -185,7 +185,7 @@ class Task {
         startDate: json['startDate'] != null ? DateTime.fromMillisecondsSinceEpoch(json['startDate']) : DateTime.now(),
         endDate: json['endDate'] != null ? DateTime.fromMillisecondsSinceEpoch(json['endDate']) : null,
         repeatConfig: json['repeatConfig'],
-        reminderTimes: json['reminderTimes'],
+        reminders: json['reminderTimes'],
       );
     } catch (e) {
       MiniLogger.error('Error parsing task from JSON: $e');

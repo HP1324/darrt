@@ -67,11 +67,10 @@ class _MinimalTodoState extends State<MinimalTodo> {
             surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
             appBarStyle: FlexAppBarStyle.background,
             darkIsTrueBlack: false,
-            // scaffoldBackground: Color(0xff414141),
           ).toTheme,
           themeMode: themeVM.themeMode,
           debugShowCheckedModeBanner: false,
-          title: 'MinimalTodo',
+          title: 'MiniTodo',
           home: const Home(),
         );
       }),
