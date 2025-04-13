@@ -107,3 +107,9 @@ void _deleteSelectedTasks(BuildContext context, TaskViewModel taskVM, CalendarVi
 ///PREFERRED COLORS
 Color(0xff15616D)
 Color(0xff78290F)
+
+//Notification feature
+
+1) Remove isNotifyEnabled 
+2) Change setDueDate function in TaskViewModel to adopt new notification settings
+3) Remove setTime function altogether, time is now handled by reminder times bottomsheet
