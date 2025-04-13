@@ -1107,12 +1107,12 @@ class ReminderTimesBottomSheet extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton.icon(
-                  onPressed: reminderTimesList.length >= 7
+                  onPressed: reminderTimesList.length >= 10
                       ? () {
                           context.read<TaskViewModel>().textFieldNode.unfocus();
                           showToast(
                             context: context,
-                            title: 'Maximum 7 reminders allowed',
+                            title: 'Maximum 10 reminders allowed',
                             type: ToastificationType.warning,
                           );
                         }

@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
+import 'package:minimaltodo/helpers/miniutils.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
@@ -60,7 +62,6 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-
   void initNewTask() {
     currentTask = Task(
       dueDate: DateTime.now().add(const Duration(minutes: 1)),
@@ -68,7 +69,7 @@ class TaskViewModel extends ChangeNotifier {
       notifType: "notif",
       startDate: DateTime.now(),
       isRepeating: false,
-      isNotifyEnabled:MiniBox.read(mIsNotificationsGloballyEnabled),
+      isNotifyEnabled: MiniBox.read(mIsNotificationsGloballyEnabled),
       repeatConfig: '{"repeatType":"weekly","selectedDays":[1,2,3,4,5,6]}',
     );
 
@@ -110,23 +111,23 @@ class TaskViewModel extends ChangeNotifier {
   int selectedMinutes = 0;
 
   //------------------------ BASIC SETTERS ------------------------//
-  Future<void> setCategories(Map<int, bool> selectedCategories) async{
+  Future<void> setCategories(Map<int, bool> selectedCategories) async {
     var categoryIds = selectedCategories.entries.where((e) => e.value).map((e) => e.key).toList();
 
     final db = await DatabaseService.openDb();
     try {
       // First delete existing categories
       await db.delete('task_categories', where: 'task_id = ?', whereArgs: [currentTask.id]);
-      
+
       // Then add new categories
       final batch = db.batch();
 
-      for(var id in categoryIds){
-        batch.insert('task_categories', {'task_id' : currentTask.id, 'category_id':id});
+      for (var id in categoryIds) {
+        batch.insert('task_categories', {'task_id': currentTask.id, 'category_id': id});
       }
       await batch.commit();
       selectedCategories.updateAll((key, value) => key != 1 ? false : value);
-    }catch(e){
+    } catch (e) {
       MiniLogger.error('Error setting categories: ${e.toString()}');
     }
   }
@@ -168,8 +169,6 @@ class TaskViewModel extends ChangeNotifier {
     updateNotifLogicAfterDueDateUpdate();
   }
 
-
-
   void resetDueDate() {
     if (currentTask.dueDate != null) {
       currentTask.dueDate = DateTime.now();
@@ -180,8 +179,8 @@ class TaskViewModel extends ChangeNotifier {
   //----------------------------------------------------------------------//
 
   //------------------------ NOTIFICATION HANDLING ------------------------//
-  void updateNotifLogicAfterDueDateUpdate()async {
-    if(currentTask.reminders != null){
+  void updateNotifLogicAfterDueDateUpdate() async {
+    if (currentTask.reminders != null) {
       await NotificationService.createTaskNotification(currentTask);
     }
   }
@@ -228,7 +227,7 @@ class TaskViewModel extends ChangeNotifier {
 
       config['repeatType'] = type;
       if (type == 'weekly') {
-        config['selectedDays'] = [1, 2, 3, 4, 5,6];
+        config['selectedDays'] = [1, 2, 3, 4, 5, 6];
       } else {
         config.remove('selectedDays');
       }
@@ -252,8 +251,7 @@ class TaskViewModel extends ChangeNotifier {
       if (days.contains(weekday)) {
         if (days.length != 1) {
           days.remove(weekday);
-        }
-        else{
+        } else {
           return Messages.mAtleastOneDaySelected;
         }
       } else {
@@ -271,20 +269,23 @@ class TaskViewModel extends ChangeNotifier {
 
   void addReminderTime(TimeOfDay time) {
     try {
-      final List<String> times = List.from(
+      final List<dynamic> reminders = List.from(
         jsonDecode(currentTask.reminders ?? '[]'),
       );
 
-      if (times.length >= 10) return;
+      if (reminders.length >= 10) return;
 
       // Convert TimeOfDay to string format
-      final timeString='${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+      final timeString = MiniUtils.timeOfDayToJsonString(time);
 
+      if (reminders.any((reminder) => reminder['time'] == timeString)) return;
+
+      final notificationId = DateTime.now().millisecondsSinceEpoch.remainder(1000000000);
       // Check for duplicates
-      if (times.contains(timeString)) return;
+      if (reminders.contains(timeString)) return;
       MiniLogger.debug('Time String: $timeString');
-      times.add(timeString);
-      currentTask.reminders = jsonEncode(times);
+      reminders.add({'time': timeString, 'id': notificationId});
+      currentTask.reminders = jsonEncode(reminders);
       MiniLogger.debug('All reminder Times: ${currentTask.reminders}');
       notifyListeners();
     } catch (e) {
@@ -292,36 +293,54 @@ class TaskViewModel extends ChangeNotifier {
     }
   }
 
-  void removeReminderTime(TimeOfDay time) {
+  void removeReminderTime(TimeOfDay time) async {
     try {
-      final List<String> times = List.from(
+      final List<dynamic> reminders = List.from(
         jsonDecode(currentTask.reminders ?? '[]'),
       );
 
       // Convert TimeOfDay to string format for comparison
-      final timeString = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+      final timeString =
+          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
-      times.remove(timeString);
-      currentTask.reminders = jsonEncode(times);
+      List remindersToRemove =
+          reminders.where((reminder) => reminder['time'] == timeString).toList();
+
+      for (var reminder in remindersToRemove) {
+        await NotificationService.removeSingleNotification(reminder['id']);
+        reminders.remove(reminder);
+      }
+
+      currentTask.reminders = jsonEncode(reminders);
       notifyListeners();
-    } catch (e) {
+    } catch (e, stacktrace) {
       MiniLogger.error('Error removing reminder time: $e');
+      MiniLogger.trace('$stacktrace');
     }
   }
 
-  void updateReminderTime(TimeOfDay oldTime, TimeOfDay newTime) {
+  void updateReminderTime(TimeOfDay oldTime, TimeOfDay newTime) async {
     try {
-      final List<String> times = List.from(
+      final List<dynamic> reminders = List.from(
         jsonDecode(currentTask.reminders ?? '[]'),
       );
+      final oldTimeString = MiniUtils.timeOfDayToJsonString(oldTime);
+      final newTimeString = MiniUtils.timeOfDayToJsonString(newTime);
 
-      final oldTimeString = '${oldTime.hour.toString().padLeft(2, '0')}:${oldTime.minute.toString().padLeft(2, '0')}';
-      final newTimeString = '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}';
+      final notificationId = DateTime.now().millisecondsSinceEpoch.remainder(1000000000);
 
-      final index = times.indexOf(oldTimeString);
-      if (index != -1) {
-        times[index] = newTimeString;
-        currentTask.reminders = jsonEncode(times);
+      bool updated = false;
+      for (int i = 0; i < reminders.length; ++i) {
+        if (reminders[i]['time'] == oldTimeString) {
+          await NotificationService.removeSingleNotification(reminders[i]['id']);
+          reminders[i] = {'time': newTimeString, 'id': notificationId};
+          updated = true;
+          break;
+        }
+      }
+
+      if (updated) {
+        currentTask.reminders = jsonEncode(reminders);
         notifyListeners();
       }
     } catch (e) {
@@ -332,10 +351,11 @@ class TaskViewModel extends ChangeNotifier {
   List<TimeOfDay> get reminderTimesList {
     if (currentTask.reminders == null) return [];
     try {
-      final List<String> times = List.from(
+      final List<dynamic> reminders = List.from(
         jsonDecode(currentTask.reminders!),
       );
-      return times.map((timeStr) {
+      return reminders.map((reminder) {
+        final timeStr = reminder['time'] as String;
         final parts = timeStr.split(':');
         return TimeOfDay(
           hour: int.parse(parts[0]),
@@ -350,7 +370,7 @@ class TaskViewModel extends ChangeNotifier {
   //-----------------------------------------------------------------------//
 
   //------------------------ TASK CRUD OPERATIONS ------------------------//
-  Future<String?> addNewTask(Map<int,bool> categories) async {
+  Future<String?> addNewTask(Map<int, bool> categories) async {
     // currentTask.category ??= await CategoryService.getGeneralCategory();
 
     if (!currentTask.isValid()) {
@@ -417,11 +437,11 @@ class TaskViewModel extends ChangeNotifier {
         if (currentTask.isRepeating!) {
           await NotificationService.removeRepeatingTaskNotifications(currentTask);
         } else {
-          await NotificationService.removeTaskNotification(currentTask);
+          await NotificationService.removeAllTaskNotifications(currentTask);
         }
       }
       return Messages.mTaskEdited;
-    }else{
+    } else {
       MiniLogger.debug('Task is not valid');
       return Messages.mTaskEmpty;
     }
@@ -429,12 +449,12 @@ class TaskViewModel extends ChangeNotifier {
 
   Future<bool> deleteTask(Task task) async {
     // First remove all notifications for this task
-    if (task.isNotifyEnabled!) {
+    if (task.reminders != null) {
       if (task.isRepeating!) {
         // Remove all scheduled notifications for recurring task
         await NotificationService.removeRepeatingTaskNotifications(task);
       } else {
-        await NotificationService.removeTaskNotification(task);
+        await NotificationService.removeAllTaskNotifications(task);
       }
     }
 
@@ -450,7 +470,7 @@ class TaskViewModel extends ChangeNotifier {
     try {
       if (task.isRepeating!) {
         final date = DateTime(calendarVM.selectedDate.year, calendarVM.selectedDate.month,
-            calendarVM.selectedDate.day)
+                calendarVM.selectedDate.day)
             .millisecondsSinceEpoch;
         if (updatedStatus) {
           changes = await db.insert(
@@ -478,7 +498,7 @@ class TaskViewModel extends ChangeNotifier {
       }
       notifyListeners();
       return changes;
-    }catch(e){
+    } catch (e) {
       MiniLogger.error('Error toggling status: $e');
       return 0;
     }
@@ -504,7 +524,6 @@ class TaskViewModel extends ChangeNotifier {
   }
   //--------------------------------------------------------------------------//
 
-
   void toggleRepeat(bool value) {
     if (currentTask.isRepeating == value) return;
 
@@ -515,7 +534,7 @@ class TaskViewModel extends ChangeNotifier {
       currentTask.endDate = null;
       currentTask.repeatConfig = jsonEncode({
         'repeatType': 'weekly',
-        'selectedDays': [1, 2, 3, 4, 5,6],
+        'selectedDays': [1, 2, 3, 4, 5, 6],
       });
       currentTask.reminders = null;
 
