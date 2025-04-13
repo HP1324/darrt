@@ -170,32 +170,9 @@ class TaskViewModel extends ChangeNotifier {
 
 
 
-  void removeDueDate() {
+  void resetDueDate() {
     if (currentTask.dueDate != null) {
-      final currentDueDate = currentTask.dueDate!;
-      final now = DateTime.now();
-      currentTask.dueDate = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        currentDueDate.hour,
-        currentDueDate.minute,
-      );
-      notifyListeners();
-    }
-  }
-
-  void removeTime() {
-    if (currentTask.dueDate != null) {
-      final currentDueDate = currentTask.dueDate!;
-      final now = DateTime.now().add(Duration(minutes: 2));
-      currentTask.dueDate = DateTime(
-        currentDueDate.year,
-        currentDueDate.month,
-        currentDueDate.day,
-        now.hour,
-        now.minute,
-      );
+      currentTask.dueDate = DateTime.now();
       notifyListeners();
     }
   }
@@ -203,43 +180,10 @@ class TaskViewModel extends ChangeNotifier {
   //----------------------------------------------------------------------//
 
   //------------------------ NOTIFICATION HANDLING ------------------------//
-  void updateNotifLogicAfterDueDateUpdate() {
-    if (currentTask.isNotifyEnabled!) {
-      if (currentTask.dueDate != null && currentTask.dueDate!.isBefore(DateTime.now())) {
-        currentTask.isNotifyEnabled = false;
-        if (currentTask.id != null) {
-          NotificationService.removeTaskNotification(currentTask);
-        }
-      }
-      if (currentTask.notifyTime != null && !currentTask.notifyTime!.isAfter(DateTime.now())) {
-        selectedMinutes = 0;
-      }
-      notifyListeners();
+  void updateNotifLogicAfterDueDateUpdate()async {
+    if(currentTask.reminders != null){
+      await NotificationService.createTaskNotification(currentTask);
     }
-  }
-
-  void toggleNotifSwitch(bool value) async {
-    await NotificationService.initializeNotificationChannels();
-    currentTask.isNotifyEnabled = value;
-    if (currentTask.isNotifyEnabled! && currentTask.dueDate != null) {
-      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
-    }
-    notifyListeners();
-  }
-
-  bool updateNotifyTime(int minutes) {
-    selectedMinutes = minutes;
-    if (currentTask.dueDate != null) {
-      final notifTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
-      if (notifTime.isAfter(DateTime.now())) {
-        currentTask.notifyTime = notifTime;
-        notifyListeners();
-        return true;
-      }
-    }
-    selectedMinutes = 0;
-    notifyListeners();
-    return false;
   }
 
   void updateNotificationType(String type) {
@@ -331,7 +275,7 @@ class TaskViewModel extends ChangeNotifier {
         jsonDecode(currentTask.reminders ?? '[]'),
       );
 
-      if (times.length >= 7) return;
+      if (times.length >= 10) return;
 
       // Convert TimeOfDay to string format
       final timeString='${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
