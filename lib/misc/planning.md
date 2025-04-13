@@ -112,4 +112,5 @@ Color(0xff78290F)
 
 1) Remove isNotifyEnabled 
 2) Change setDueDate function in TaskViewModel to adopt new notification settings
-3) Remove setTime function altogether, time is now handled by reminder times bottomsheet
+3) [Done] Remove setTime function altogether, time is now handled by reminder times bottomsheet
+4) Show reminder times in single task view
