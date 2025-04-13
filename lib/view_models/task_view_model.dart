@@ -72,7 +72,6 @@ class TaskViewModel extends ChangeNotifier {
       repeatConfig: '{"repeatType":"weekly","selectedDays":[1,2,3,4,5,6]}',
     );
 
-    selectedMinutes = 0;
     titleController.clear();
 
     // No need to reset these as they're now handled through currentTask
@@ -153,7 +152,6 @@ class TaskViewModel extends ChangeNotifier {
   //--------------------------------------------------------------//
 
   //------------------------ DATE & TIME HANDLING ------------------------//
-
   void setDueDate(DateTime dueDate) {
     final existingTime = currentTask.dueDate;
     currentTask.dueDate = DateTime(
@@ -170,23 +168,7 @@ class TaskViewModel extends ChangeNotifier {
     updateNotifLogicAfterDueDateUpdate();
   }
 
-   void setTime(TimeOfDay time) {
-    final existingDate = currentTask.dueDate ?? DateTime.now();
-    currentTask.dueDate = DateTime(
-      existingDate.year,
-      existingDate.month,
-      existingDate.day,
-      time.hour,
-      time.minute,
-    );
-    MiniLogger.debug('Selected Minutes: ${selectedMinutes}');
-    notifyListeners();
-    if (currentTask.dueDate != null && currentTask.isNotifyEnabled!) {
-      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
-    }
 
-    updateNotifLogicAfterDueDateUpdate();
-  }
 
   void removeDueDate() {
     if (currentTask.dueDate != null) {
