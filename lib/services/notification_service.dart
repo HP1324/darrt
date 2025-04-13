@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:minimaltodo/helpers/miniutils.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/data_models/task.dart';
@@ -95,13 +96,12 @@ class NotificationService {
 
     MiniLogger.debug('notification type:${task.notifType}, time: ${task.notifyTime}');
     try {
-      final times = getReminders(task.reminders!);
+      final reminders = MiniUtils.getReminders(task.reminders!);
       final notifType = task.notifType!.toLowerCase();
       final isAlarm = notifType == 'alarm';
-      for(var time in times){
-        debugPrint('Reminder: ${time.hour}:${time.minute}');
-        // Notification id must be different for each notification, so we will generate it
-        final notificationId = generateNotificationId(task, task.dueDate!, time);
+      for(var reminder in reminders){
+        final notificationId = reminder['id'];
+        final time = MiniUtils.getTimeOfDayFromMap(reminder);
         await _notif.createNotification(
           content:NotificationContent(
             id: notificationId,
@@ -135,14 +135,6 @@ class NotificationService {
       MiniLogger.error('Failed to create task notification: ${e.toString()}');
       rethrow;
     }
-  }
- static List<TimeOfDay> getReminders(String reminders){
-    final times = jsonDecode(reminders) as List;
-    final reminderTimes = times.map((timeStr) {
-      final parts = (timeStr as String).split(':');
-      return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-    }).toList();
-    return reminderTimes;
   }
 
   static Future<void> createRepeatingTaskNotifications(Task task) async {
@@ -219,7 +211,6 @@ class NotificationService {
         (date.month * 100 + date.day) * 100 +
         (time.hour * 60 + time.minute);
   }
-
   static Future<void> _scheduleWeeklyNotification(
     Task task,
     int weekday,
@@ -381,22 +372,29 @@ class NotificationService {
     }
   }
 
-  static Future<void> removeTaskNotification(Task task) async {
+  static Future<void> removeAllTaskNotifications(Task task) async {
    try{
      if(task.reminders == null){
        return;
      }else{
-       final times = getReminders(task.reminders!);
-       for(var time in times){
-         final notificationId = generateNotificationId(task, task.dueDate!, time);
-         await _notif.cancel(notificationId);
-       }
+       await _notif.cancelNotificationsByGroupKey(task.id!.toString());
      }
    }catch (e, stacktrace){
      MiniLogger.error('Error removing notification: ${e.toString()}\n$stacktrace');
    }
   }
 
+  static Future<void> removeSingleNotification(int id)async{
+    try {
+      await _notif.cancel(id);
+    }catch (e, stacktrace){
+      MiniLogger.error('Error removing notification: ${e.toString()}');
+      MiniLogger.trace('$stacktrace');
+    }
+  }
+  static Future<void> removeNotificationWithTime()async{
+
+  }
   static Future<void> removeRepeatingTaskNotifications(Task task) async {
     if (task.id == null) return;
 
