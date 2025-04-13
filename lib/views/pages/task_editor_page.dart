@@ -560,7 +560,7 @@ class SetDateWidget extends StatelessWidget {
                             ),
                             InkWell(
                               onTap: () {
-                                context.read<TaskViewModel>().removeDueDate();
+                                context.read<TaskViewModel>().resetDueDate();
                               },
                               child: Icon(Icons.close, size: 19),
                             ),
