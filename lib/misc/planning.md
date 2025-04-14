@@ -111,8 +111,7 @@ Color(0xff78290F)
 //Notification feature
 
 1) Remove isNotifyEnabled 
-2) Change setDueDate function in TaskViewModel to adopt new notification settings
-3) [Done] Remove setTime function altogether, time is now handled by reminder times bottomsheet
-4) Show reminder times in single task view
-5) Remove notification of a particular reminder time when it is removed by the user, or update it when time is updated
-6) Store notification id in reminders json string itself
+2) [Done] Change setDueDate function in TaskViewModel to adopt new notification settings
+3) [Done] Remove setTime function altogether, time is now handled by reminder times bottom sheet
+4) [Done] Show reminder times in single task view
+5) [Done] Store notification id in reminders json string itself

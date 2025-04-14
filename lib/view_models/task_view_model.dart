@@ -70,13 +70,10 @@ class TaskViewModel extends ChangeNotifier {
       startDate: DateTime.now(),
       isRepeating: false,
       isNotifyEnabled: MiniBox.read(mIsNotificationsGloballyEnabled),
-      repeatConfig: '{"repeatType":"weekly","selectedDays":[1,2,3,4,5,6]}',
+      repeatConfig: '{"repeatType":"weekly","selectedDays":[1,2,3,4,5,6,7]}',
     );
-
+    debugPrint('Selected Weekdays in initNewTask: ${currentTask.repeatConfig}');
     titleController.clear();
-
-    // No need to reset these as they're now handled through currentTask
-    // currentTask.repeatConfig = null;
     currentTask.reminders = null;
   }
 
@@ -195,17 +192,26 @@ class TaskViewModel extends ChangeNotifier {
   bool isWeekdayValid(int weekday) {
     if (currentTask.endDate == null) return true;
 
-    // Calculate the next occurrence of this weekday
-    var date = currentTask.startDate;
+    DateTime date = currentTask.startDate;
+    DateTime endDate = currentTask.endDate!;
 
-    while (date.weekday != weekday) {
-      date = date.add(const Duration(days: 1));
+    // If the start date is already the desired weekday
+    if (date.weekday == weekday) {
+      return true;
     }
-    var endDate = currentTask.endDate;
 
-    return (date.year == endDate!.year && date.month == endDate.month && date.day == endDate.day) ||
-        date.isBefore(currentTask.endDate!);
+    // Move forward from start date to find the next matching weekday
+    while (date.isBefore(endDate)) {
+      date = date.add(const Duration(days: 1));
+      if (date.weekday == weekday) {
+        return true; // found a valid day in the range
+      }
+    }
+
+    // No matching weekday found in range
+    return false;
   }
+
 
   void setTaskStartDate(DateTime date) {
     currentTask.startDate = date;
@@ -226,11 +232,11 @@ class TaskViewModel extends ChangeNotifier {
           : {};
 
       config['repeatType'] = type;
-      if (type == 'weekly') {
-        config['selectedDays'] = [1, 2, 3, 4, 5, 6];
-      } else {
-        config.remove('selectedDays');
-      }
+      // if (type != 'weekly') {
+      //   config.remove('selectedDays');
+      //   config['selectedDays'] = [1, 2, 3, 4, 5, 6];
+      // } else {
+      // }
 
       currentTask.repeatConfig = jsonEncode(config);
       notifyListeners();
@@ -534,7 +540,7 @@ class TaskViewModel extends ChangeNotifier {
       currentTask.endDate = null;
       currentTask.repeatConfig = jsonEncode({
         'repeatType': 'weekly',
-        'selectedDays': [1, 2, 3, 4, 5, 6],
+        'selectedDays': [1, 2, 3, 4, 5, 6,7],
       });
       currentTask.reminders = null;
 
@@ -576,10 +582,12 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   List<int> get selectedWeekdays {
-    if (currentTask.repeatConfig == null) return [1, 2, 3, 4, 5, 6];
+    if (currentTask.repeatConfig == null) return [1, 2, 3, 4, 5, 6, 7];
     try {
       final config = jsonDecode(currentTask.repeatConfig!) as Map<String, dynamic>;
+      debugPrint('selected days is list: ${config['selectedDays'] is List}');
       if (config['repeatType'] == 'weekly' && config['selectedDays'] is List) {
+        debugPrint('Selected Days: ${config['selectedDays']}');
         return List.from(config['selectedDays']);
       }
       return [];
@@ -597,12 +605,31 @@ class TaskViewModel extends ChangeNotifier {
       if (config['repeatType'] != 'weekly') return;
 
       var days = List.from(config['selectedDays'] ?? []);
-      days.removeWhere((weekday) => !isWeekdayValid(weekday));
+      List<int> validWeekdays = [];
 
-      config['selectedDays'] = days;
+      // Filter out invalid weekdays and collect valid ones
+      for (var day in days) {
+        if (isWeekdayValid(day)) {
+          validWeekdays.add(day);
+        }
+      }
+
+      // If nothing valid is left, auto-pick the first valid weekday from range
+      if (validWeekdays.isEmpty) {
+        for (int i = 1; i <= 7; i++) {
+          if (isWeekdayValid(i)) {
+            validWeekdays.add(i);
+            break; // Only add the first found valid weekday
+          }
+        }
+      }
+
+      // Update the config
+      config['selectedDays'] = validWeekdays;
       currentTask.repeatConfig = jsonEncode(config);
     } catch (e) {
       MiniLogger.error('Error updating weekday validity: $e');
     }
   }
+
 }
