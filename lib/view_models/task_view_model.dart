@@ -276,7 +276,7 @@ class TaskViewModel extends ChangeNotifier {
       if (reminders.length >= 10) return;
 
       // Convert TimeOfDay to string format
-      final timeString = MiniUtils.timeOfDayToJsonString(time);
+      final timeString = MiniUtils.timeOfDayToTimeString(time);
 
       if (reminders.any((reminder) => reminder['time'] == timeString)) return;
 
@@ -324,8 +324,8 @@ class TaskViewModel extends ChangeNotifier {
       final List<dynamic> reminders = List.from(
         jsonDecode(currentTask.reminders ?? '[]'),
       );
-      final oldTimeString = MiniUtils.timeOfDayToJsonString(oldTime);
-      final newTimeString = MiniUtils.timeOfDayToJsonString(newTime);
+      final oldTimeString = MiniUtils.timeOfDayToTimeString(oldTime);
+      final newTimeString = MiniUtils.timeOfDayToTimeString(newTime);
 
       final notificationId = DateTime.now().millisecondsSinceEpoch.remainder(1000000000);
 

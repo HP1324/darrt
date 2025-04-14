@@ -3,6 +3,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/helpers/miniutils.dart';
 import 'package:minimaltodo/services/category_service.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/services/task_service.dart';
@@ -19,7 +20,6 @@ class TaskView extends StatefulWidget {
 }
 
 class _TaskViewState extends State<TaskView> {
-
   String _getRepeatDescription(Task task) {
     if (!(task.isRepeating ?? false)) return 'Not repeating';
 
@@ -174,7 +174,6 @@ class _TaskViewState extends State<TaskView> {
                     ),
                   ),
                 );
-
               },
             ),
           ),
@@ -195,21 +194,48 @@ class _TaskViewState extends State<TaskView> {
               subtitle: 'From ${DateFormat.yMMMd().format(widget.task.startDate)}'
                   '${widget.task.endDate != null ? ' to ${DateFormat.yMMMd().format(widget.task.endDate!)}' : ' (No end date)'}',
             ),
-            if (widget.task.isNotifyEnabled ?? false)
-              DetailItem(
-                icon: widget.task.notifType == 'alarm' ? Icons.alarm : Icons.notifications_outlined,
-                title: 'Reminders',
-                subtitle: _getReminderTimesDescription(widget.task, context),
-              ),
           ] else ...[
             DetailItem(
               icon: Icons.calendar_today,
               title: 'Due Date',
               subtitle: widget.task.dueDate != null
-                  ? DateFormat.yMMMd().add_jm().format(widget.task.dueDate!)
+                  ? DateFormat.yMMMd().format(widget.task.dueDate!)
                   : 'Not scheduled',
             ),
           ],
+          DetailItem(
+            icon: Icons.notifications,
+            title: 'Reminders',
+            optionalWidget: Builder(
+              builder: (context) {
+                if (widget.task.reminders == null || widget.task.reminders!.isEmpty) {
+                  return Text('No reminders set');
+                }
+                final times = widget.task.getReminderTimeOfDaysList;
+                return SizedBox(
+                  height: 20,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: times.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withAlpha(20),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        child: Text(
+                          MiniUtils.formatTimeOfDay(times[index]),
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                      );
+                    },
+                    separatorBuilder: (_, __) => SizedBox(width: 10),
+                  ),
+                );
+              },
+            ),
+          ),
           DetailItem(
             icon: Icons.access_time_outlined,
             title: 'Created',
@@ -218,7 +244,7 @@ class _TaskViewState extends State<TaskView> {
           if (widget.task.isDone ?? false)
             DetailItem(
               icon: Icons.check_circle_outline,
-              title: 'Completed',
+              title: 'Finished',
               subtitle: widget.task.finishedAt != null
                   ? DateFormat.yMMMd().add_jm().format(widget.task.finishedAt!)
                   : 'Unknown',
@@ -231,11 +257,7 @@ class _TaskViewState extends State<TaskView> {
 
 class DetailItem extends StatelessWidget {
   const DetailItem(
-      {super.key,
-      required this.icon,
-      required this.title,
-      this.subtitle,
-      this.optionalWidget});
+      {super.key, required this.icon, required this.title, this.subtitle, this.optionalWidget});
   final IconData icon;
   final String title;
   final String? subtitle;

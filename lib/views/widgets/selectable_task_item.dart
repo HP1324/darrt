@@ -61,7 +61,7 @@ class SelectableTaskItemState extends State<SelectableTaskItem> {
                   Padding(
                     padding: const EdgeInsets.only(left: 2),
                     child: Transform.scale(
-                      scale: 1.05,
+                      scale: 1.09,
                       child: Consumer2<CalendarViewModel,TaskViewModel>(
                         builder: (context,calVM,taskVM, _) {
                           final date = DateTime(calVM.selectedDate.year,calVM.selectedDate.month,calVM.selectedDate.day).millisecondsSinceEpoch;
@@ -141,114 +141,86 @@ class SelectableTaskItemState extends State<SelectableTaskItem> {
                           ),
                           const Spacer(),
                           // Info row
-                          Row(
-                            children: [
-                              if (widget.task.dueDate != null && !widget.task.isRepeating!) ...[
-                                Icon(
-                                  Icons.access_time_rounded,
-                                  size: 14,
-                                  color: isUrgent ? Colors.red.shade400 : null,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  formatTime(widget.task.dueDate!),
-                                  style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .textTheme
-                                        .labelSmall!
-                                        .fontSize,
-                                    color:
-                                        isUrgent ? Colors.red.shade400 : null,
-                                  ),
-                                ),
-                              ],
-                              const SizedBox(width: 10),
-                              // Replace the existing category Container with this:
-                              // Replace the category Container with this:
-                              Expanded(
-                                child: Selector<CategoryViewModel,List<CategoryModel>>(
-                                selector: (context, categoryVM)=>categoryVM.categories,
-                                  builder: (context,categories,_) {
-                                    return FutureBuilder<List<CategoryModel>>(
-                                      future: TaskService.getTaskCategories(widget.task.id!),
-                                      builder: (context, snapshot) {
-                                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                          return SizedBox.shrink();
-                                        }
-                                        return SizedBox(
-                                          height: 20,
-                                          child: ShaderMask(
-                                            shaderCallback: (bounds) {
-                                              return LinearGradient(
-                                                begin: Alignment.centerLeft,
-                                                end: Alignment.centerRight,
-                                                colors: [
-                                                  Colors.transparent,
-                                                  Colors.black,
-                                                  Colors.black,
-                                                  Colors.transparent
-                                                ],
-                                                stops: [0.0, 0.05, 0.95, 1.0],
-                                              ).createShader(bounds);
-                                            },
-                                            blendMode: BlendMode.dstIn,
-                                            child: ListView.separated(
-                                              scrollDirection: Axis.horizontal,
-                                              shrinkWrap: true,
-                                              physics: BouncingScrollPhysics(),
-                                              separatorBuilder: (context, index) => const SizedBox(width: 2),
-                                              itemCount: snapshot.data!.length,
-                                              itemBuilder: (context, index) {
-                                                final category = snapshot.data![index];
-                                                return Container(
-                                                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                                                  decoration: BoxDecoration(
-                                                    color: category.color != null
-                                                        ? CategoryService.getColorFromString(context, category.color!).withAlpha(30)
-                                                        : Theme.of(context).colorScheme.primary.withAlpha(20),
-                                                    borderRadius: BorderRadius.circular(4),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      Icon(
-                                                        CategoryService.getIcon(category.iconCode),
-                                                        size: 12,
-                                                        color: category.color != null
-                                                            ? CategoryService.getColorFromString(context, category.color!)
-                                                            : Theme.of(context).colorScheme.primary,
-                                                      ),
-                                                      const SizedBox(width: 4),
-                                                      Text(
-                                                        category.name ?? '',
-                                                        style: Theme.of(context).textTheme.labelSmall,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        );
-
-                                      },
-                                    );
+                          Selector<CategoryViewModel,List<CategoryModel>>(
+                          selector: (context, categoryVM)=>categoryVM.categories,
+                            builder: (context,categories,_) {
+                              return FutureBuilder<List<CategoryModel>>(
+                                future: TaskService.getTaskCategories(widget.task.id!),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                    return SizedBox.shrink();
                                   }
-                                ),
-                              ),
-                              if (widget.task.isRepeating ?? false) ...[
-                                const SizedBox(width: 4),
-                                Icon(
-                                  FontAwesomeIcons.repeat,
-                                  size: 14,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primary
-                                      .withAlpha(200),
-                                ),
-                              ],
-                            ],
+                                  return SizedBox(
+                                    height: 20,
+                                    child: ShaderMask(
+                                      shaderCallback: (bounds) {
+                                        return LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                            Colors.transparent,
+                                            Colors.black,
+                                            Colors.black,
+                                            Colors.transparent
+                                          ],
+                                          stops: [0.0, 0.05, 0.95, 1.0],
+                                        ).createShader(bounds);
+                                      },
+                                      blendMode: BlendMode.dstIn,
+                                      child: ListView.separated(
+                                        scrollDirection: Axis.horizontal,
+                                        shrinkWrap: true,
+                                        physics: BouncingScrollPhysics(),
+                                        separatorBuilder: (context, index) => const SizedBox(width: 2),
+                                        itemCount: snapshot.data!.length,
+                                        itemBuilder: (context, index) {
+                                          final category = snapshot.data![index];
+                                          return Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: category.color != null
+                                                  ? CategoryService.getColorFromString(context, category.color!).withAlpha(30)
+                                                  : Theme.of(context).colorScheme.primary.withAlpha(20),
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  CategoryService.getIcon(category.iconCode),
+                                                  size: 12,
+                                                  color: category.color != null
+                                                      ? CategoryService.getColorFromString(context, category.color!)
+                                                      : Theme.of(context).colorScheme.primary,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  category.name ?? '',
+                                                  style: Theme.of(context).textTheme.labelSmall,
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  );
+
+                                },
+                              );
+                            }
                           ),
+                          if (widget.task.isRepeating ?? false) ...[
+                            const SizedBox(width: 4),
+                            Icon(
+                              FontAwesomeIcons.repeat,
+                              size: 14,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withAlpha(200),
+                            ),
+                          ],
                         ],
                       ),
                     ),
