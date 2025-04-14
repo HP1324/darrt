@@ -225,7 +225,7 @@ class _TaskViewState extends State<TaskView> {
                         ),
                         padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                         child: Text(
-                          MiniUtils.formatTimeOfDay(times[index]),
+                          times[index].format(context),
                           style: Theme.of(context).textTheme.labelSmall,
                         ),
                       );
