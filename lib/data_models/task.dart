@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 
 class Task {
@@ -217,5 +218,40 @@ extension TaskUtilities on Task {
     return Task.fromJson(jsonDecode(payload!['task']!));
   }
 
+  List<TimeOfDay> get getReminderTimeOfDaysList {
+    if (reminders == null) return [];
+    try {
+      final List<dynamic> reminders = List.from(
+        jsonDecode(this.reminders!),
+      );
+      return reminders.map((reminder) {
+        final timeStr = reminder['time'] as String;
+        final parts = timeStr.split(':');
+        return TimeOfDay(
+          hour: int.parse(parts[0]),
+          minute: int.parse(parts[1]),
+        );
+      }).toList();
+    } catch (e) {
+      MiniLogger.error('Error decoding reminderTimes: $e');
+      return [];
+    }
+  }
+
+  List<String> get reminderTimeStringsList {
+    if (reminders == null) return [];
+    try {
+      final List<dynamic> reminders = List.from(
+        jsonDecode(this.reminders!),
+      );
+      return reminders.map((reminder) {
+        final timeStr = reminder['time'] as String;
+        return timeStr; // it's already in "HH:mm" format
+      }).toList();
+    } catch (e) {
+      MiniLogger.error('Error decoding reminderTimeStrings: $e');
+      return [];
+    }
+  }
 
 }
