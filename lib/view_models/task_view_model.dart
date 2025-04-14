@@ -232,11 +232,6 @@ class TaskViewModel extends ChangeNotifier {
           : {};
 
       config['repeatType'] = type;
-      // if (type != 'weekly') {
-      //   config.remove('selectedDays');
-      //   config['selectedDays'] = [1, 2, 3, 4, 5, 6];
-      // } else {
-      // }
 
       currentTask.repeatConfig = jsonEncode(config);
       notifyListeners();

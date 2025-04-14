@@ -7,7 +7,7 @@ class MiniUtils {
     return DateFormat(format).format(dateTime);
   }
 
-  /// returns a [List<TimeOfDay>] from given reminders json string
+  /// returns a [List] from given reminders json string
   static List<dynamic> getReminders(String reminderString) {
     final reminders = jsonDecode(reminderString) as List;
     return reminders;
