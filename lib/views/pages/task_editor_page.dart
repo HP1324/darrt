@@ -1,6 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
@@ -133,7 +132,6 @@ class _TaskEditorPageState extends State<TaskEditorPage> {
                         const SizedBox(height: 10),
                         // NotificationSwitch(),
                         if (isNotifyEnabled) ...[
-
                           const SizedBox(height: 16),
                         ],
                       ] else ...[
@@ -939,7 +937,7 @@ class RecurringReminderTimes extends StatelessWidget {
           builder: (context, reminderTimesList, _) {
             return Text(
               reminderTimesList.isEmpty
-                  ? 'Add up to 7 reminders per day'
+                  ? 'Add up to 10 reminders per day'
                   : reminderTimesList.map((t) => t.format(context)).join(', '),
               style: Theme.of(context).textTheme.bodySmall,
             );
