@@ -96,6 +96,7 @@ class NotificationService {
 
     MiniLogger.debug('notification type:${task.notifType}, time: ${task.notifyTime}');
     try {
+
       final reminders = MiniUtils.getReminders(task.reminders!);
       final notifType = task.notifType!.toLowerCase();
       final isAlarm = notifType == 'alarm';
