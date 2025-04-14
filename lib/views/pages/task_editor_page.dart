@@ -781,69 +781,68 @@ class SetStartEndDate extends StatelessWidget {
           const SizedBox(height: 15),
           // End Date
           Selector<TaskViewModel, (DateTime?, DateTime)>(
-              selector: (context, taskVM) => (taskVM.taskEndDate, taskVM.taskStartDate),
-              builder: (context, data, _) {
-                final (endDate, startDate) = data;
-                return InkWell(
-                  onTap: () async {
-                    context.read<TaskViewModel>().textFieldNode.unfocus();
-                    final selectedEndDate = await showDatePicker(
-                      context: context,
-                      initialDate: endDate ?? startDate.add(const Duration(days: 1)),
-                      firstDate: startDate,
-                      lastDate: DateTime.now().add(Duration(days: 18263)),
-                    );
-                    if (selectedEndDate != null && context.mounted) {
-                      context.read<TaskViewModel>().setTaskEndDate(selectedEndDate);
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: colorScheme.outline.withAlpha(50))),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.event_repeat,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Column(
-                            spacing: 3,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'End Date (Optional)',
-                                style: textTheme.labelLarge?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                              Text(
-                                endDate != null
-                                    ? DateFormat.yMMMd().format(endDate)
-                                    : 'No end date',
-                                style: textTheme.labelMedium,
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (endDate != null)
-                          IconButton(
-                            icon: Icon(
-                              Icons.clear,
-                              size: 18,
-                              color: colorScheme.error,
-                            ),
-                            onPressed: () => context.read<TaskViewModel>().setTaskEndDate(null),
-                          ),
-                      ],
-                    ),
+            selector: (context, taskVM) => (taskVM.taskEndDate, taskVM.taskStartDate),
+            builder: (context, data, _) {
+              final (endDate, startDate) = data;
+              return InkWell(
+                onTap: () async {
+                  context.read<TaskViewModel>().textFieldNode.unfocus();
+                  final selectedEndDate = await showDatePicker(
+                    context: context,
+                    initialDate: endDate ?? startDate.add(const Duration(days: 1)),
+                    firstDate: startDate,
+                    lastDate: DateTime.now().add(Duration(days: 18263)),
+                  );
+                  if (selectedEndDate != null && context.mounted) {
+                    context.read<TaskViewModel>().setTaskEndDate(selectedEndDate);
+                  }
+                },
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    border: Border(bottom: BorderSide(color: colorScheme.outline.withAlpha(50))),
                   ),
-                );
-              }),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.event_repeat,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          spacing: 3,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'End Date (Optional)',
+                              style: textTheme.labelLarge?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            Text(
+                              endDate != null ? DateFormat.yMMMd().format(endDate) : 'No end date',
+                              style: textTheme.labelMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (endDate != null)
+                        IconButton(
+                          icon: Icon(
+                            Icons.clear,
+                            size: 18,
+                            color: colorScheme.error,
+                          ),
+                          onPressed: () => context.read<TaskViewModel>().setTaskEndDate(null),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -858,9 +857,8 @@ class _WeekdaySelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Selector<TaskViewModel, List<int>>(
-          selector: (context, taskVM) => taskVM.selectedWeekdays,
-          builder: (context, selectedWeekdays, _) {
+        Consumer<TaskViewModel>(
+          builder: (context, taskVM, _) {
             return Padding(
               padding: const EdgeInsets.only(left: 10, top: 8, bottom: 16),
               child: SingleChildScrollView(
@@ -872,7 +870,7 @@ class _WeekdaySelector extends StatelessWidget {
                     (index) {
                       final weekday = index + 1;
                       final dayName = DateFormat.EEEEE().format(DateTime(2024, 1, weekday));
-                      final isSelected = selectedWeekdays.contains(weekday);
+                      final isSelected = taskVM.selectedWeekdays.contains(weekday);
                       final isValid = context.read<TaskViewModel>().isWeekdayValid(weekday);
 
                       return Padding(
@@ -883,14 +881,15 @@ class _WeekdaySelector extends StatelessWidget {
                             labelPadding: EdgeInsets.zero,
                             selectedColor: Theme.of(context).colorScheme.primary.withAlpha(230),
                             shape: CircleBorder(),
-                            label: Text(dayName,
-                                style: TextStyle(
-                                    fontSize: Theme.of(context).textTheme.labelLarge!.fontSize)),
+                            label: Text(
+                              dayName,
+                              style: TextStyle(
+                                  fontSize: Theme.of(context).textTheme.labelLarge!.fontSize),
+                            ),
                             selected: isSelected && isValid,
                             onSelected: isValid
                                 ? (selected) {
-                                    final message =
-                                        context.read<TaskViewModel>().toggleWeekday(weekday);
+                                    final message = context.read<TaskViewModel>().toggleWeekday(weekday);
                                     if (message != null) {
                                       showToast(
                                         context: context,
