@@ -1,1 +1,0 @@
-D:\Husen\flutter_dev\minimaltodo\build\app\intermediates\cxx\RelWithDebInfo\1t5x696c\obj\arm64-v8a

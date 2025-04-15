@@ -1,2 +1,0 @@
-D:/Husen/flutter_dev/minimaltodo/android/app/.cxx/RelWithDebInfo/k2584x6z/x86/CMakeFiles/edit_cache.dir
-D:/Husen/flutter_dev/minimaltodo/android/app/.cxx/RelWithDebInfo/k2584x6z/x86/CMakeFiles/rebuild_cache.dir
