@@ -491,7 +491,7 @@ class TaskViewModel extends ChangeNotifier {
       } else {
         changes = await db.update(
           'tasks',
-          {'isDone': updatedStatus ? 1 : 0},
+          {'isDone': updatedStatus ? 1 : 0, 'finishedAt': updatedStatus ? DateTime.now().millisecondsSinceEpoch : null},
           where: 'id = ?',
           whereArgs: [task.id],
         );

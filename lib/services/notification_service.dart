@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:minimaltodo/helpers/mini_enums.dart';
 import 'package:minimaltodo/helpers/miniutils.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
@@ -96,15 +97,14 @@ class NotificationService {
 
     MiniLogger.debug('notification type:${task.notifType}, time: ${task.notifyTime}');
     try {
-
       final reminders = MiniUtils.getReminders(task.reminders!);
       final notifType = task.notifType!.toLowerCase();
       final isAlarm = notifType == 'alarm';
-      for(var reminder in reminders){
+      for (var reminder in reminders) {
         final notificationId = reminder['id'];
         final time = MiniUtils.getTimeOfDayFromMap(reminder);
         await _notif.createNotification(
-          content:NotificationContent(
+          content: NotificationContent(
             id: notificationId,
             groupKey: task.id!.toString(),
             channelKey: isAlarm ? 'task_alarm' : 'task_notif',
@@ -120,7 +120,7 @@ class NotificationService {
           schedule: NotificationCalendar(
             day: task.dueDate!.day,
             month: task.dueDate!.month,
-            year:task.dueDate!.year,
+            year: task.dueDate!.year,
             hour: time.hour,
             minute: time.minute,
             second: 0,
@@ -150,16 +150,13 @@ class NotificationService {
         final repeatType = repeatConfig['repeatType'] as String?;
         final selectedDays = repeatConfig['selectedDays'] as List<dynamic>?;
 
-        // Parse reminder times
-        List<TimeOfDay> reminderTimes = [];
-        if (task.reminders != null) {
-          final times = jsonDecode(task.reminders!) as List;
-          reminderTimes = times.map((timeStr) {
-            final parts = (timeStr as String).split(':');
-            return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-          }).toList();
+        ///Removing the reminder ids stored in [Task.reminders], because they are just useful for single tasks, not for recurring tasks.
+        final taskReminders = jsonDecode(task.reminders!) as List<dynamic>;
+        for (var reminder in taskReminders) {
+          reminder.remove('id');
         }
 
+        List<TimeOfDay> reminderTimes = task.getReminderTimeOfDaysList;
         // Calculate notification schedule based on repeat type
         for (var reminderTime in reminderTimes) {
           final baseDateTime = DateTime(
@@ -207,11 +204,43 @@ class NotificationService {
     });
   }
 
+  // static Future<void> createRecurringNotifications(Task task) async {
+  //   if (!await isNotificationsEnabled()) {
+  //     MiniLogger.debug('Notifications disabled; skipping repeating notifications.');
+  //     return;
+  //   }
+  //   final repeatConfig = jsonDecode(task.repeatConfig ?? '{}');
+  //   final repeatType = repeatConfig['repeatType'];
+  //   final weekdays = repeatConfig['selectedDays'];
+  //   if (task.endDate == null && (repeatType == 'monthly' || repeatType == 'yearly')) {
+  //     await _notif.createNotification(
+  //       content: NotificationContent(
+  //         id: notificationId,
+  //         groupKey: task.id!.toString(),
+  //         channelKey: task.notifType == 'alarm' ? 'task_alarm' : 'task_notif',
+  //         title: 'Task due at ${formatTimeOfDay(reminderTime)}',
+  //         body: task.title,
+  //         payload: task.toNotificationPayload(),
+  //         notificationLayout: NotificationLayout.Default,
+  //         category: task.notifType == 'alarm'
+  //             ? NotificationCategory.Alarm
+  //             : NotificationCategory.Reminder,
+  //         wakeUpScreen: true,
+  //         criticalAlert: true,
+  //       ),
+  //       schedule: NotificationCalendar(
+  //
+  //       ),
+  //     );
+  //   }
+  // }
+
   static int generateNotificationId(Task task, DateTime date, TimeOfDay time) {
     return task.id! * 1000000 +
         (date.month * 100 + date.day) * 100 +
         (time.hour * 60 + time.minute);
   }
+
   static Future<void> _scheduleWeeklyNotification(
     Task task,
     int weekday,
@@ -228,14 +257,14 @@ class NotificationService {
         return;
       }
 
-      final notificationId = generateNotificationId(task, notifyDate, reminderTime);
+      final notificationId = DateTime.now().millisecondsSinceEpoch.remainder(1000000000);
 
       await _notif.createNotification(
         content: NotificationContent(
           id: notificationId,
           groupKey: task.id!.toString(),
           channelKey: task.notifType == 'alarm' ? 'task_alarm' : 'task_notif',
-          title: 'Repeating Task Reminder',
+          title: 'Task due at ${formatTimeOfDay(reminderTime)}',
           body: task.title,
           payload: task.toNotificationPayload(),
           notificationLayout: NotificationLayout.Default,
@@ -278,6 +307,27 @@ class NotificationService {
     DateTime baseDateTime,
   ) async {
     try {
+      // Calculate the next notification date
+      final now = DateTime.now();
+      DateTime nextNotificationDate =
+          DateTime(now.year, now.month, baseDateTime.day, reminderTime.hour, reminderTime.minute);
+
+      // If the day has already passed this month, move to next month
+      if (nextNotificationDate.isBefore(now)) {
+        nextNotificationDate = DateTime(
+          now.month == 12 ? now.year + 1 : now.year,
+          now.month == 12 ? 1 : now.month + 1,
+          baseDateTime.day,
+          reminderTime.hour,
+          reminderTime.minute,
+        );
+      }
+
+      // Skip if endDate is before next notification
+      if (task.endDate != null && nextNotificationDate.isAfter(task.endDate!)) {
+        return;
+      }
+
       final notificationId = generateNotificationId(task, baseDateTime, reminderTime);
 
       await _notif.createNotification(
@@ -328,6 +378,27 @@ class NotificationService {
     DateTime baseDateTime,
   ) async {
     try {
+      // Calculate the next notification date
+      final now = DateTime.now();
+      DateTime nextNotificationDate = DateTime(
+          now.year, baseDateTime.month, baseDateTime.day, reminderTime.hour, reminderTime.minute);
+
+// If date has passed this year, move to next year
+      if (nextNotificationDate.isBefore(now)) {
+        nextNotificationDate = DateTime(
+          now.year + 1,
+          baseDateTime.month,
+          baseDateTime.day,
+          reminderTime.hour,
+          reminderTime.minute,
+        );
+      }
+
+// Skip if endDate is before next notification
+      if (task.endDate != null && nextNotificationDate.isAfter(task.endDate!)) {
+        return;
+      }
+
       final notificationId = generateNotificationId(task, baseDateTime, reminderTime);
 
       await _notif.createNotification(
@@ -374,28 +445,27 @@ class NotificationService {
   }
 
   static Future<void> removeAllTaskNotifications(Task task) async {
-   try{
-     if(task.reminders == null){
-       return;
-     }else{
-       await _notif.cancelNotificationsByGroupKey(task.id!.toString());
-     }
-   }catch (e, stacktrace){
-     MiniLogger.error('Error removing notification: ${e.toString()}\n$stacktrace');
-   }
+    try {
+      if (task.reminders == null) {
+        return;
+      } else {
+        await _notif.cancelNotificationsByGroupKey(task.id!.toString());
+      }
+    } catch (e, stacktrace) {
+      MiniLogger.error('Error removing notification: ${e.toString()}\n$stacktrace');
+    }
   }
 
-  static Future<void> removeSingleNotification(int id)async{
+  static Future<void> removeSingleNotification(int id) async {
     try {
       await _notif.cancel(id);
-    }catch (e, stacktrace){
+    } catch (e, stacktrace) {
       MiniLogger.error('Error removing notification: ${e.toString()}');
       MiniLogger.trace('$stacktrace');
     }
   }
-  static Future<void> removeNotificationWithTime()async{
 
-  }
+  static Future<void> removeNotificationWithTime() async {}
   static Future<void> removeRepeatingTaskNotifications(Task task) async {
     if (task.id == null) return;
 

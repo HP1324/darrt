@@ -155,7 +155,6 @@ class Task {
         'title': title,
         'createdAt': createdAt?.millisecondsSinceEpoch ?? DateTime.now().millisecondsSinceEpoch,
         'dueDate': dueDate?.millisecondsSinceEpoch,
-        'finishedAt': finishedAt?.millisecondsSinceEpoch,
         'isDone': isDone! ? 1 : 0,
         'isNotifyEnabled': isNotifyEnabled! ? 1 : 0,
         'notifyTime': notifyTime?.millisecondsSinceEpoch,
