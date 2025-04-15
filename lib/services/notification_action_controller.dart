@@ -16,6 +16,7 @@ class NotificationActionController{
     
     if(receivedAction.buttonKeyPressed == 'Finished'){
       MiniLogger.debug('Finished pressed');
+
       await TaskService.toggleDone(taskObject.id!, true, DateTime.now());
     }else {
       MinimalTodo.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => TaskView(task: taskObject)));

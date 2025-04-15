@@ -140,86 +140,91 @@ class SelectableTaskItemState extends State<SelectableTaskItem> {
                           ),
                           const Spacer(),
                           // Info row
-                          Selector<CategoryViewModel,List<CategoryModel>>(
-                          selector: (context, categoryVM)=>categoryVM.categories,
-                            builder: (context,categories,_) {
-                              return FutureBuilder<List<CategoryModel>>(
-                                future: TaskService.getTaskCategories(widget.task.id!),
-                                builder: (context, snapshot) {
-                                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                    return SizedBox.shrink();
-                                  }
-                                  return SizedBox(
-                                    height: 20,
-                                    child: ShaderMask(
-                                      shaderCallback: (bounds) {
-                                        return LinearGradient(
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
-                                          colors: [
-                                            Colors.transparent,
-                                            Colors.black,
-                                            Colors.black,
-                                            Colors.transparent
-                                          ],
-                                          stops: [0.0, 0.05, 0.95, 1.0],
-                                        ).createShader(bounds);
-                                      },
-                                      blendMode: BlendMode.dstIn,
-                                      child: ListView.separated(
-                                        scrollDirection: Axis.horizontal,
-                                        shrinkWrap: true,
-                                        physics: BouncingScrollPhysics(),
-                                        separatorBuilder: (context, index) => const SizedBox(width: 2),
-                                        itemCount: snapshot.data!.length,
-                                        itemBuilder: (context, index) {
-                                          final category = snapshot.data![index];
-                                          return Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color: category.color != null
-                                                  ? CategoryService.getColorFromString(context, category.color!).withAlpha(30)
-                                                  : Theme.of(context).colorScheme.primary.withAlpha(20),
-                                              borderRadius: BorderRadius.circular(4),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(
-                                                  CategoryService.getIcon(category.iconCode),
-                                                  size: 12,
-                                                  color: category.color != null
-                                                      ? CategoryService.getColorFromString(context, category.color!)
-                                                      : Theme.of(context).colorScheme.primary,
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  category.name ?? '',
-                                                  style: Theme.of(context).textTheme.labelSmall,
-                                                ),
+                          Row(
+                            children: [
+                              Selector<CategoryViewModel,List<CategoryModel>>(
+                              selector: (context, categoryVM)=>categoryVM.categories,
+                                builder: (context,categories,_) {
+                                  return FutureBuilder<List<CategoryModel>>(
+                                    future: TaskService.getTaskCategories(widget.task.id!),
+                                    builder: (context, snapshot) {
+                                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                        return SizedBox.shrink();
+                                      }
+                                      return SizedBox(
+                                        height: 20,
+                                        child: ShaderMask(
+                                          shaderCallback: (bounds) {
+                                            return LinearGradient(
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight,
+                                              colors: [
+                                                Colors.transparent,
+                                                Colors.black,
+                                                Colors.black,
+                                                Colors.transparent
                                               ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  );
+                                              stops: [0.0, 0.05, 0.95, 1.0],
+                                            ).createShader(bounds);
+                                          },
+                                          blendMode: BlendMode.dstIn,
+                                          child: ListView.separated(
+                                            scrollDirection: Axis.horizontal,
+                                            shrinkWrap: true,
+                                            physics: BouncingScrollPhysics(),
+                                            separatorBuilder: (context, index) => const SizedBox(width: 2),
+                                            itemCount: snapshot.data!.length,
+                                            itemBuilder: (context, index) {
+                                              final category = snapshot.data![index];
+                                              return Container(
+                                                padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: category.color != null
+                                                      ? CategoryService.getColorFromString(context, category.color!).withAlpha(30)
+                                                      : Theme.of(context).colorScheme.primary.withAlpha(20),
+                                                  borderRadius: BorderRadius.circular(4),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      CategoryService.getIcon(category.iconCode),
+                                                      size: 12,
+                                                      color: category.color != null
+                                                          ? CategoryService.getColorFromString(context, category.color!)
+                                                          : Theme.of(context).colorScheme.primary,
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                    Text(
+                                                      category.name ?? '',
+                                                      style: Theme.of(context).textTheme.labelSmall,
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      );
 
-                                },
-                              );
-                            }
+                                    },
+                                  );
+                                }
+                              ),
+                              const Spacer(),
+                              if (widget.task.isRepeating ?? false) ...[
+                                const SizedBox(width: 4),
+                                Icon(
+                                  FontAwesomeIcons.repeat,
+                                  size: 13,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withAlpha(200),
+                                ),
+                              ],
+                            ],
                           ),
-                          if (widget.task.isRepeating ?? false) ...[
-                            const SizedBox(width: 4),
-                            Icon(
-                              FontAwesomeIcons.repeat,
-                              size: 14,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primary
-                                  .withAlpha(200),
-                            ),
-                          ],
                         ],
                       ),
                     ),
