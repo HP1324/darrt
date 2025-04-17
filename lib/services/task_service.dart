@@ -54,6 +54,41 @@ class TaskService {
     }
   }
 
+  static Future<int> toggleTaskStatus({required Task task, required bool updatedStatus, required DateTime selectedDate}) async {
+    final db = await DatabaseService.openDb();
+    final date = DateTime(selectedDate.year, selectedDate.month, selectedDate.day).millisecondsSinceEpoch;
+    try {
+      if (task.isRepeating!) {
+        if (updatedStatus) {
+          return await db.insert(
+            'task_completion',
+            {'task_id': task.id, 'date': date, 'isCompleted': 1},
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+        } else {
+          return await db.delete(
+            'task_completion',
+            where: 'task_id = ? AND date = ?',
+            whereArgs: [task.id, date],
+          );
+        }
+      } else {
+        return await db.update(
+          'tasks',
+          {
+            'isDone': updatedStatus ? 1 : 0,
+            'finishedAt': updatedStatus ? DateTime.now().millisecondsSinceEpoch : null,
+          },
+          where: 'id = ?',
+          whereArgs: [task.id],
+        );
+      }
+    } catch (e) {
+      MiniLogger.error('TaskService error: $e');
+      return 0;
+    }
+  }
+
   static Future<int> toggleDone(int id, bool updatedStatus, DateTime? finishedAt) async {
     final database = await DatabaseService.openDb();
     int isDone = updatedStatus ? 1 : 0;
@@ -129,7 +164,7 @@ class TaskService {
       INNER JOIN task_categories ON categories.id = task_categories.category_id
       WHERE task_categories.task_id = ?
     ''', [taskId]);
-      for(var c in categories){
+      for (var c in categories) {
         var category = CategoryModel.fromJson(c);
         MiniLogger.debug('Task Category: ${category.id}');
       }
