@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/mini_consts.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
@@ -66,12 +67,15 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
         _MiniAppBarAction(
           icon: Icon(Icons.flutter_dash),
           onTap: ()async {
-            // final db = await DatabaseService.openDb();
-            // await db.delete('tasks');
-            // await TestApp.insertTestTasks(db);
-            // if(context.mounted) {
-            //   context.read<TaskViewModel>().testRefreshTasks();
-            // }
+            final scheduledNotifs = await AwesomeNotifications().listScheduledNotifications();
+            for(var notif in scheduledNotifs){
+              debugPrint('Group key: ${notif.content!.groupKey}');
+            }
+            print(scheduledNotifs.where((notif) => notif.content!.groupKey == 34.toString()).length);
+            scheduledNotifs.where((t) => t.content!.groupKey == 34.toString()).forEach((element) {
+              print('${element.content!.title}');
+            });
+            // debugPrint('Active notifications: $scheduledNotifs');
           },
         ),
         _MiniAppBarAction(

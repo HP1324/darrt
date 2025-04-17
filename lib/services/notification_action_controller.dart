@@ -7,6 +7,7 @@ import 'package:minimaltodo/main.dart';
 import 'package:minimaltodo/services/task_service.dart';
 import 'package:minimaltodo/views/pages/single_task_view.dart';
 
+
 class NotificationActionController{
 
   @pragma("vm:entry-point")

@@ -97,15 +97,13 @@ class TaskViewModel extends ChangeNotifier {
   List<Task> singleTasks = [];
   List<Task> recurringTasks = [];
   Map<int, bool> singleTaskCompletion = {}; // taskId -> isCompleted (for single tasks)
-  Map<int, Set<int>> recurringTaskCompletion =
-      {}; // taskId -> completed dates (for recurring tasks)
+  Map<int, Set<int>> recurringTaskCompletion = {}; // taskId -> completed dates (for recurring tasks)
 
   Task currentTask = Task();
   TextEditingController titleController = TextEditingController();
   FocusNode textFieldNode = FocusNode();
   List<String> priorities = ["Urgent", "High", "Medium", "Low"];
   int currentValue = 3; // Default to Low Priority
-  int selectedMinutes = 0;
 
   //------------------------ BASIC SETTERS ------------------------//
   Future<void> setCategories(Map<int, bool> selectedCategories) async {
@@ -142,7 +140,6 @@ class TaskViewModel extends ChangeNotifier {
   void setTitle() {
     if (titleController.text.trim().isNotEmpty) {
       currentTask.title = titleController.text.trim();
-      notifyListeners();
       titleController.clear();
     }
   }
@@ -160,10 +157,7 @@ class TaskViewModel extends ChangeNotifier {
       existingTime?.minute ?? DateTime.now().minute,
     );
     notifyListeners();
-    if (currentTask.dueDate != null && currentTask.isNotifyEnabled!) {
-      currentTask.notifyTime = currentTask.dueDate!.subtract(Duration(minutes: selectedMinutes));
-    }
-    updateNotifLogicAfterDueDateUpdate();
+    // updateNotifLogicAfterDueDateUpdate();
   }
 
   void resetDueDate() {
@@ -506,17 +500,6 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   //----------------------------------------------------------------------//
-
-  //------------------------ TASK LIST MANAGEMENT ------------------------//
-
-  // void updateTasksAfterListDeletion(int listId) {
-  //   for (var task in _tasks) {
-  //     if (task.category?.id == listId) {
-  //       task.category = CategoryModel(id: 1, name: 'General');
-  //     }
-  //   }
-  //   notifyListeners();
-  // }
 
   void updateTaskListAfterEdit(CategoryModel list) async {
     // final tasksForCurrentList = tasks.where((t) => t.category!.id == list.id).toList();

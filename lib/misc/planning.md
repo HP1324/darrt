@@ -115,3 +115,24 @@ Color(0xff78290F)
 3) [Done] Remove setTime function altogether, time is now handled by reminder times bottom sheet
 4) [Done] Show reminder times in single task view
 5) [Done] Store notification id in reminders json string itself
+
+# Features
+### Task - Add, Delete, Update, Mark as finished or unfinished
+## Add Task
+1. Add to the database using sqflite
+2. Associate Categories Selected using foreign key relationships
+3. Create notifications if reminders are not null
+4. Update the state of the app where the list of tasks is shown
+
+## Notification - Create, Remove
+1. Create - single or repeating based on isRepeating flag
+
+## Categories 
+1. Create
+   1. Store it to the database with correct icon code and correct color
+   2. Update the state of the UI where this list of categories is shown
+2. Update
+3. Delete
+   1. If task has only that category, update that task's category to general
+      
+   
