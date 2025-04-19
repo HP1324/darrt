@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:math';
+import 'package:flutter/material.dart' show debugPrint;
 import 'package:sqflite/sqflite.dart';
 class TestApp{
 
@@ -68,4 +70,10 @@ class TestApp{
     }
   }
 
+  static Future<void> computeTime(FutureOr Function() function)async{
+    final stopwatch = Stopwatch()..start();
+    await function();
+    stopwatch.stop();
+    debugPrint('Time taken to execute function ${function.toString()} : ${stopwatch.elapsedMilliseconds} ms');
+  }
 }

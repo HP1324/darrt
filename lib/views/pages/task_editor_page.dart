@@ -11,6 +11,7 @@ import 'package:minimaltodo/services/notification_service.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/services/settings_service.dart';
+import 'package:minimaltodo/test_app.dart';
 import 'package:minimaltodo/view_models/category_view_model.dart';
 import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:minimaltodo/views/pages/new_category_page.dart';
@@ -889,7 +890,8 @@ class _WeekdaySelector extends StatelessWidget {
                             selected: isSelected && isValid,
                             onSelected: isValid
                                 ? (selected) {
-                                    final message = context.read<TaskViewModel>().toggleWeekday(weekday);
+                                    final message =
+                                        context.read<TaskViewModel>().toggleWeekday(weekday);
                                     if (message != null) {
                                       showToast(
                                         context: context,

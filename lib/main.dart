@@ -41,6 +41,9 @@ class _MinimalTodoState extends State<MinimalTodo> {
   @override
   void initState() {
     super.initState();
+    NotificationActionController.finishedAction = (task, updatedStatus, date) async {
+      return context.read<TaskViewModel>().toggleStatus(task, updatedStatus, date);
+    };
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: NotificationActionController.onActionReceivedMethod,
     );

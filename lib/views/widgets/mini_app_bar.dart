@@ -10,7 +10,6 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   MiniAppBar({super.key});
   final GlobalKey _popupKey = GlobalKey();
 
-
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
   @override
@@ -18,64 +17,81 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(14),
       elevation: 0,
-        title: Selector<CalendarViewModel,DateTime>(
-            selector: (context, calVM) => calVM.selectedDate,
-            builder: (context, selectedDate, _) {
-              final isBefore = selectedDate.isBefore(DateTime.now());
-              return AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (Widget child, animation) {
-                  final inAnimation = Tween<Offset>(
-                    begin: const Offset(-1.0, 0.0),
-                    end: Offset.zero,
-                  ).animate(animation);
+      title: Selector<CalendarViewModel, DateTime>(
+          selector: (context, calVM) => calVM.selectedDate,
+          builder: (context, selectedDate, _) {
+            final isBefore = selectedDate.isBefore(DateTime.now());
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (Widget child, animation) {
+                final inAnimation = Tween<Offset>(
+                  begin: const Offset(-1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation);
 
-                  final outAnimation = Tween<Offset>(
-                    begin: const Offset(1.0, 0.0),
-                    end: Offset.zero,
-                  ).animate(animation);
+                final outAnimation = Tween<Offset>(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation);
 
-                  if (child.key == ValueKey<DateTime>(selectedDate)) {
-                    // This is the new date coming in
-                    return ClipRect(
-                      child: SlideTransition(
-                        position:isBefore ?  inAnimation :outAnimation,
-                        child: child,
-                      ),
-                    );
-                  } else {
-                    // This is the old date going out
-                    return ClipRect(
-                      child: SlideTransition(
-                        position:isBefore ? outAnimation:inAnimation,
-                        child: child,
-                      ),
-                    );
-                  }
-                },
-                child: Text(
-                  formatDateWith(selectedDate, 'EEE, d MMM, yyyy'),
-                  key: ValueKey<DateTime>(selectedDate),
-                  style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              );
-            }
-        ),
+                if (child.key == ValueKey<DateTime>(selectedDate)) {
+                  // This is the new date coming in
+                  return ClipRect(
+                    child: SlideTransition(
+                      position: isBefore ? inAnimation : outAnimation,
+                      child: child,
+                    ),
+                  );
+                } else {
+                  // This is the old date going out
+                  return ClipRect(
+                    child: SlideTransition(
+                      position: isBefore ? outAnimation : inAnimation,
+                      child: child,
+                    ),
+                  );
+                }
+              },
+              child: Text(
+                formatDateWith(selectedDate, 'EEE, d MMM, yyyy'),
+                key: ValueKey<DateTime>(selectedDate),
+                style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            );
+          }),
       actions: [
         _MiniAppBarAction(
           icon: Icon(Icons.flutter_dash),
-          onTap: ()async {
-            final scheduledNotifs = await AwesomeNotifications().listScheduledNotifications();
-            for(var notif in scheduledNotifs){
-              debugPrint('Group key: ${notif.content!.groupKey}');
-            }
-            print(scheduledNotifs.where((notif) => notif.content!.groupKey == 34.toString()).length);
-            scheduledNotifs.where((t) => t.content!.groupKey == 34.toString()).forEach((element) {
-              print('${element.content!.title}');
-            });
+          onTap: () async {
+            // final scheduledNotifs = await AwesomeNotifications().listScheduledNotifications();
+            // for(var notif in scheduledNotifs){
+            //   debugPrint('Group key: ${notif.content!.groupKey}');
+            // }
+            // print(scheduledNotifs.where((notif) => notif.content!.groupKey == 34.toString()).length);
+            // scheduledNotifs.where((t) => t.content!.groupKey == 34.toString()).forEach((element) {
+            //   print('${element.content!.title}');
+            // });
             // debugPrint('Active notifications: $scheduledNotifs');
+            AwesomeNotifications().createNotification(
+              content: NotificationContent(
+                id: 1,
+                channelKey: 'task_alarm',
+                title: 'Test Notification',
+                body: 'This is a test notification',
+              ),
+              schedule: NotificationCalendar.fromDate(
+                date: DateTime.now().add(Duration(seconds: 5)),
+              ),
+              actionButtons: [
+                NotificationActionButton(
+                  key: 'FINISHED',
+                  label: 'Finished',
+                  actionType: ActionType.SilentAction,
+                ),
+              ]
+            );
           },
         ),
         _MiniAppBarAction(
@@ -87,7 +103,9 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                     decoration: BoxDecoration(),
                     child: CalendarDatePicker(
                       initialDate: null,
-                      firstDate: DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate)).subtract(Duration(days: 365)),
+                      firstDate:
+                          DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate))
+                              .subtract(Duration(days: 365)),
                       lastDate: DateTime.now().add(Duration(days: 18263)),
                       onDateChanged: (selectedDate) {
                         context.read<CalendarViewModel>().scrollToDate(selectedDate);

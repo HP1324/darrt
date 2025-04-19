@@ -33,7 +33,7 @@ class NotificationService {
       }
     } catch (e) {
       MiniLogger.error('Failed to initialize notification service: ${e.toString()}');
-      await GetStorage().write(mNotificationsEnabled, false);
+      await MiniBox.write(mNotificationsEnabled, false);
     }
   }
 
@@ -129,6 +129,13 @@ class NotificationService {
             preciseAlarm: true,
             timeZone: await _notif.getLocalTimeZoneIdentifier(),
           ),
+          actionButtons: [
+            NotificationActionButton(
+              key: 'FINISHED',
+              label: 'Finished',
+              actionType: ActionType.SilentBackgroundAction,
+            ),
+          ]
         );
       }
     } catch (e) {
