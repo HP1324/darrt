@@ -30,7 +30,6 @@ class TaskEditorPage extends StatefulWidget {
 }
 
 class _TaskEditorPageState extends State<TaskEditorPage> {
-  final titleController = TextEditingController();
   @override
   void initState() {
     super.initState();

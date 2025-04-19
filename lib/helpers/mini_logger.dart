@@ -2,8 +2,11 @@ import 'package:logger/logger.dart';
 import 'package:minimaltodo/helpers/mini_utils.dart';
 
 class MiniLogger {
-  static final _logger = Logger();
-  static final _format = 'EEE, dd MMM yyyy HH:mm:ss';
+  static final _logger = Logger(printer: PrettyPrinter(
+    methodCount: 5,
+    dateTimeFormat: DateTimeFormat.dateAndTime
+  ));
+  static final _format = 'EEE, dd MMM yyyy HH:mm:ss:ms';
   static void error(String message){
     _logger.e('[${formatDateWith(DateTime.now(), _format)}] $message');
   }
