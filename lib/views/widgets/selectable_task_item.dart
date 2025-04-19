@@ -31,7 +31,6 @@ class SelectableTaskItemState extends State<SelectableTaskItem> {
 
   @override
   Widget build(BuildContext context) {
-      debugPrint("widget context: ${context.hashCode}");
       final isUrgent = widget.task.priority?.toLowerCase() == 'urgent';
       return Container(
 
@@ -70,7 +69,7 @@ class SelectableTaskItemState extends State<SelectableTaskItem> {
                             value: widget.task.isRepeating! ? taskVM.recurringTaskCompletion[widget.task.id]?.contains(date) ??false: taskVM.singleTaskCompletion[widget.task.id] ?? false,
                             onChanged: (checked) {
                               if(checked != null ) {
-                                taskVM.toggleStatus(widget.task, checked, calVM);
+                                taskVM.toggleStatus(widget.task, checked, calVM.selectedDate);
                               }
                             },
                           );

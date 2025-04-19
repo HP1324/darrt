@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/services/notification_action_controller.dart'
+    show NotificationActionController;
 import 'package:minimaltodo/view_models/calendar_view_model.dart';
 import 'package:minimaltodo/view_models/navigation_view_model.dart';
+import 'package:minimaltodo/view_models/task_view_model.dart' show TaskViewModel;
 import 'package:minimaltodo/views/pages/navigation/calendar_page.dart';
 import 'package:minimaltodo/views/pages/navigation/categories_page.dart';
 import 'package:minimaltodo/views/pages/navigation/wishlist_page.dart';
@@ -21,30 +24,32 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-      child: Selector2<NavigationViewModel, CalendarViewModel, (int, bool)>(
-          selector: (_, navVM, calVM) =>
-              (navVM.currentDestination, calVM.isFabVisible),
-          builder: (context, data, _) {
-            final (currentDestination, isFabVisible) = data;
-            return Scaffold(
-              appBar: MiniAppBar(),
-              drawer: const AppDrawer(),
-              body: IndexedStack(
+      child: Scaffold(
+        appBar: MiniAppBar(),
+        drawer: const AppDrawer(),
+        body: Selector<NavigationViewModel, int>(
+            selector: (_, navVM) => navVM.currentDestination,
+            builder: (context, currentDestination, _) {
+              return IndexedStack(
                 index: currentDestination,
                 children: [
                   const CalendarPage(),
                   const WishListPage(),
                   const CategoriesPage(),
                 ],
-              ),
-              // floatingActionButton: AnimatedSwitcher(duration: const Duration(milliseconds: 200),child: isFabVisible ?const _FloatingActionButtonWidget() :const SizedBox.shrink(),),
-              floatingActionButton: _FloatingActionButtonWidget(),
-              bottomNavigationBar: const _BottomNavBarWidget(),
-            );
-          }),
+              );
+            }),
+        floatingActionButton: _FloatingActionButtonWidget(),
+        bottomNavigationBar: const _BottomNavBarWidget(),
+      ),
     );
   }
 }
@@ -57,13 +62,10 @@ class _BottomNavBarWidget extends StatelessWidget {
       return MiniBottomNavBar(
         children: [
           // const SizedBox.shrink(),
-          MiniBottomNavBarItem(
-              icon: Icons.calendar_month, label: 'Calendar', i: 0),
-          MiniBottomNavBarItem(
-              icon: Icons.assignment_outlined, label: 'Wishlist', i: 1),
+          MiniBottomNavBarItem(icon: Icons.calendar_month, label: 'Calendar', i: 0),
+          MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Wishlist', i: 1),
           MiniBottomNavBarItem(icon: Icons.search, label: 'Search', i: -1),
-          MiniBottomNavBarItem(
-              icon: Iconsax.category, label: 'Categories', i: 2),
+          MiniBottomNavBarItem(icon: Iconsax.category, label: 'Categories', i: 2),
           // MiniBottomNavBarItem(icon: Iconsax.book, label: 'Journal', i: -2),
           // const SizedBox.shrink(),
         ],

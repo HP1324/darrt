@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/data_models/category_model.dart';
 import 'package:minimaltodo/data_models/task.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -16,13 +17,18 @@ class TaskService {
   }
 
   static Future<List<Task>> getTasks() async {
+    final stopwatch = Stopwatch()..start();
     final database = await DatabaseService.openDb();
     final List<Map<String, dynamic>> singleTaskMaps = await database.query('tasks');
-    return List.generate(singleTaskMaps.length, (index) {
-      return Task.fromJson(singleTaskMaps[index]);
-    });
+    final list = await compute(parseTasks, singleTaskMaps);
+    // final list = singleTaskMaps.map((taskMap) => Task.fromJson(taskMap)).toList();
+    stopwatch.stop();
+    debugPrint("Time taken to get tasks: ${stopwatch.elapsedMilliseconds}");
+    return list;
   }
-
+  static List<Task> parseTasks(List<Map<String,dynamic>> taskMaps){
+    return taskMaps.map((taskMap) => Task.fromJson(taskMap)).toList();
+  }
   static Future<List<Task>> getRecurringTasks() async {
     final database = await DatabaseService.openDb();
     final List<Map<String, dynamic>> recurringTaskMaps =

@@ -367,7 +367,6 @@ class TaskViewModel extends ChangeNotifier {
   //------------------------ TASK CRUD OPERATIONS ------------------------//
   Future<String?> addNewTask(Map<int, bool> categories) async {
     // currentTask.category ??= await CategoryService.getGeneralCategory();
-
     if (!currentTask.isValid()) {
       return Messages.mTaskEmpty;
     }
@@ -401,7 +400,6 @@ class TaskViewModel extends ChangeNotifier {
         await NotificationService.createTaskNotification(currentTask);
       }
     }
-
     return Messages.mTaskAdded;
   }
 
@@ -459,13 +457,13 @@ class TaskViewModel extends ChangeNotifier {
     return true;
   }
 
-  Future<int> toggleStatus(Task task, bool updatedStatus, CalendarViewModel calendarVM) async {
+  Future<int> toggleStatus(Task task, bool updatedStatus, DateTime selectedDate) async {
     final db = await DatabaseService.openDb();
     var changes = 0;
     try {
       if (task.isRepeating!) {
-        final date = DateTime(calendarVM.selectedDate.year, calendarVM.selectedDate.month,
-                calendarVM.selectedDate.day)
+        final date = DateTime(selectedDate.year, selectedDate.month,
+                selectedDate.day)
             .millisecondsSinceEpoch;
         if (updatedStatus) {
           changes = await db.insert(
