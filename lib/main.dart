@@ -3,30 +3,32 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:minimaltodo/app/calendar_view_model.dart';
+import 'package:minimaltodo/app/navigation_view_model.dart';
+import 'package:minimaltodo/app/theme_view_model.dart';
+import 'package:minimaltodo/category/logic/category_state_controller.dart';
+import 'package:minimaltodo/category/logic/category_view_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
-import 'package:minimaltodo/services/notification_action_controller.dart';
-import 'package:minimaltodo/view_models/calendar_view_model.dart';
-import 'package:minimaltodo/view_models/theme_view_model.dart';
-import 'package:minimaltodo/view_models/wishlist_view_model.dart';
+import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/task/logic/task_state_controller.dart';
+import 'package:minimaltodo/task/logic/task_view_model.dart';
 import 'package:minimaltodo/views/home.dart';
-import 'package:minimaltodo/services/notification_service.dart';
-import 'package:minimaltodo/view_models/category_view_model.dart';
-import 'package:minimaltodo/view_models/navigation_view_model.dart';
-import 'package:minimaltodo/view_models/task_view_model.dart';
 import 'package:provider/provider.dart';
-
+import 'package:minimaltodo/app/services/notification_action_controller.dart';
+import 'package:minimaltodo/app/services/notification_service.dart';
 void main() async {
   try {
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
     await GetStorage.init();
     await MiniBox.initStorage();
+    await ObjectBox.init();
     await NotificationService.initNotifications();
     FlutterNativeSplash.remove();
     runApp(const MinimalTodo());
   } catch (e) {
-    MiniLogger.error('Failed to initialize app: ${e.toString()}');
+    MiniLogger.e('Failed to initialize app: ${e.toString()}');
   }
 }
 
@@ -41,9 +43,6 @@ class _MinimalTodoState extends State<MinimalTodo> {
   @override
   void initState() {
     super.initState();
-    NotificationActionController.finishedAction = (task, updatedStatus, date) async {
-      return context.read<TaskViewModel>().toggleStatus(task, updatedStatus, date);
-    };
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: NotificationActionController.onActionReceivedMethod,
     );
@@ -59,7 +58,9 @@ class _MinimalTodoState extends State<MinimalTodo> {
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
         ChangeNotifierProvider(create: (_) => ThemeViewModel()),
         ChangeNotifierProvider(create: (_) => CalendarViewModel()),
-        ChangeNotifierProvider(create: (_) => WishListViewModel()),
+        ChangeNotifierProvider(create: (_) => CalendarViewModel()),
+        ChangeNotifierProvider(create: (_) => TaskStateController()),
+        ChangeNotifierProvider(create: (_) => CategoryStateController()),
       ],
       child: Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
         return MaterialApp(

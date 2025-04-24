@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum TaskType { all, single, recurring }
 enum ThemePreference { system, light, dark }
-
-
 enum ThemeColors {
   amethyst,
   cerulean,
@@ -41,12 +38,4 @@ extension ThemeColorsExtension on ThemeColors {
         return const Color(0xFFC8A2C8);      // Muted purple
     }
   }
-}
-
-enum MiniPageTransitionType {
-  jumpFromRight,
-  popFromCenter,
-  popFromTap,
-  fadeIn,
-  slideFromBottom,
 }
