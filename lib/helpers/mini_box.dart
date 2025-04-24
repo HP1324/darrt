@@ -1,5 +1,5 @@
 import 'package:get_storage/get_storage.dart';
-import 'package:minimaltodo/helpers/mini_consts.dart';
+import 'package:minimaltodo/helpers/consts.dart';
 
 class MiniBox{
   static final _box = GetStorage();
@@ -21,7 +21,7 @@ class MiniBox{
   ///Set global preferences and other settings like first time install date etc.
   static Future<void> initStorage()async {
     await writeIfNull(mDefaultTaskList, 0);
-    await writeIfNull(mIsNotificationsGloballyEnabled, false);
+    await writeIfNull(mFirstTimeInstall, true);
     await writeIfNull(mFirstInstallDate, DateTime.now().millisecondsSinceEpoch);
   }
 }

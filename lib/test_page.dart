@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:minimaltodo/views/widgets/mini_bottom_nav_bar.dart';
+import 'package:minimaltodo/app/widgets/mini_bottom_nav_bar.dart';
 
 class TestPage extends StatefulWidget {
   const TestPage({super.key});

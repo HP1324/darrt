@@ -1,22 +1,21 @@
 import 'package:logger/logger.dart';
-import 'package:minimaltodo/helpers/mini_utils.dart';
+import 'package:minimaltodo/helpers/utils.dart';
 
 class MiniLogger {
   static final _logger = Logger(printer: PrettyPrinter(
     methodCount: 5,
     dateTimeFormat: DateTimeFormat.dateAndTime
   ));
-  static final _format = 'EEE, dd MMM yyyy HH:mm:ss:ms';
-  static void error(String message){
-    _logger.e('[${formatDateWith(DateTime.now(), _format)}] $message');
+  static void e(String message){
+    _logger.e(message);
   }
-  static void info(String message){
-    _logger.i('[${formatDateWith(DateTime.now(), _format)}] $message');
+  static void i(String message){
+    _logger.i(message);
   }
-  static void debug(String message){
-    _logger.d('[${formatDateWith(DateTime.now(), _format)}] $message');
+  static void d(String message){
+    _logger.d(message);
   }
-  static void trace(String stacktrace){
-    _logger.t('[${formatDateWith(DateTime.now(), _format)}] StackTrace: $stacktrace');
+  static void t(String stacktrace){
+    _logger.t('[StackTrace: $stacktrace');
   }
 }
