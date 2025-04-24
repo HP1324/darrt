@@ -10,16 +10,15 @@ class TaskViewModel extends ChangeNotifier {
   TaskViewModel() {
     _tasks = ObjectBox.store.box<Task>().getAll();
     singleTaskCompletions.clear();
-    for (var task in _tasks.where((t)=>!t.isRepeating).toList()) {
+    for (var task in _tasks.where((t) => !t.isRepeating).toList()) {
       singleTaskCompletions[task.id] = task.isDone;
     }
     recurringTaskCompletions.clear();
-    for(var completion in ObjectBox.store.box<TaskCompletion>().getAll()){
+    for (var completion in ObjectBox.store.box<TaskCompletion>().getAll()) {
       int id = completion.task.targetId;
       int date = completion.date.millisecondsSinceEpoch;
-      recurringTaskCompletions.putIfAbsent(id, ()=>{}).add(date);
+      recurringTaskCompletions.putIfAbsent(id, () => {}).add(date);
     }
-
   }
   List<Task> _tasks = [];
   final _box = ObjectBox.store.box<Task>();
@@ -55,15 +54,14 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
     debugPrint('Task added or edited with id: $id');
 
-    if(task.reminderObjects.isEmpty){
-      NotificationService.removeAllTaskNotifications(task);
-    }else{
-      if(task.isRepeating) {
+    NotificationService.removeAllTaskNotifications(task).then((_) {
+      if (task.isRepeating) {
         NotificationService.createRepeatingTaskNotifications(task);
-      }else{
+      } else {
         NotificationService.createTaskNotification(task);
       }
-    }
+    });
+
     return edit ? 'Task edited' : 'Task added';
   }
 
@@ -85,7 +83,10 @@ class TaskViewModel extends ChangeNotifier {
         cbox.put(completion);
         recurringTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
       } else {
-        final completion = cbox.query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date))).build().findFirst();
+        final completion = cbox
+            .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
+            .build()
+            .findFirst();
         if (completion != null) {
           cbox.remove(completion.id);
           recurringTaskCompletions[task.id]?.remove(date);
@@ -98,7 +99,6 @@ class TaskViewModel extends ChangeNotifier {
     }
     notifyListeners();
   }
-
 
   String deleteSelectedTasks() {
     _box.removeMany(_selectedTaskIds.toList());

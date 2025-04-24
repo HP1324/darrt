@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/category/category_model.dart';
 import 'package:minimaltodo/category/logic/category_view_model.dart';
@@ -82,7 +83,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
               if (context.select((TaskStateController controller) => controller.isRepeating)) ...[
                 const DateRangeSelector(),
                 const RepeatTypeSelector(),
-                if (context.select((TaskStateController controller) => controller.repeatConfig).type == 'weekly') const WeekdaySelector(),
+                if (context
+                        .select((TaskStateController controller) => controller.repeatConfig)
+                        .type ==
+                    'weekly')
+                  const WeekdaySelector(),
               ] else ...[
                 const DuedateSelector(),
               ],
@@ -93,13 +98,20 @@ class _AddTaskPageState extends State<AddTaskPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          final categories =context.read<CategoryViewModel>().categories.where((c) => context.read<TaskStateController>().categorySelection[c] == true).toList();
-          Task newTask = context.read<TaskStateController>().buildTask(edit: widget.edit, task: widget.task);
-          final message = context.read<TaskViewModel>().putTask(newTask, categories: categories, edit: widget.edit);
+          final categories = context
+              .read<CategoryViewModel>()
+              .categories
+              .where((c) => context.read<TaskStateController>().categorySelection[c] == true)
+              .toList();
+          Task newTask =
+              context.read<TaskStateController>().buildTask(edit: widget.edit, task: widget.task);
+          final message = context
+              .read<TaskViewModel>()
+              .putTask(newTask, categories: categories, edit: widget.edit);
           var type = ToastificationType.success;
           if (message == Messages.mTaskAdded || message == Messages.mTaskEdited) {
             Navigator.pop(context);
-          }else{
+          } else {
             type = ToastificationType.error;
           }
           Utils.showToast(context, type: type, description: message);
@@ -124,7 +136,9 @@ class AddRemindersWidget extends StatelessWidget {
       ),
       subtitle: Consumer<TaskStateController>(builder: (context, controller, _) {
         return Text(
-          controller.reminders.isEmpty ? 'Click here to add reminders per day' : controller.reminders.map((r) => r.time.format(context)).join(', '),
+          controller.reminders.isEmpty
+              ? 'Click here to add reminders per day'
+              : controller.reminders.map((r) => r.time.format(context)).join(', '),
           style: Theme.of(context).textTheme.bodySmall,
         );
       }),
@@ -170,30 +184,32 @@ class AddRemindersWidget extends StatelessWidget {
                       Flexible(
                         child: reminders.isEmpty
                             ? Center(
-                          child: Text(
-                            'No reminders set',
-                            style: textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
-                          ),
-                        )
+                                child: Text(
+                                  'No reminders set',
+                                  style:
+                                      textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
+                                ),
+                              )
                             : ListView.builder(
-                          itemCount: reminders.length,
-                          itemBuilder: (context, index) {
-                            debugPrint('Reminder ${index + 1} time in list: ${reminders[index].time.hour}:${reminders[index].time.minute}');
-                            return ReminderItem(
-                              reminder: reminders[index],
-                              onTap: () {
-                                showReminderDialog(
-                                  context,
-                                  edit: true,
-                                  reminder: reminders[index],
-                                );
-                              },
-                              onRemove: () {
-                                controller.removeReminder(reminders[index]);
-                              },
-                            );
-                          },
-                        ),
+                                itemCount: reminders.length,
+                                itemBuilder: (context, index) {
+                                  debugPrint(
+                                      'Reminder ${index + 1} time in list: ${reminders[index].time.hour}:${reminders[index].time.minute}');
+                                  return ReminderItem(
+                                    reminder: reminders[index],
+                                    onTap: () {
+                                      showReminderDialog(
+                                        context,
+                                        edit: true,
+                                        reminder: reminders[index],
+                                      );
+                                    },
+                                    onRemove: () {
+                                      controller.removeReminder(reminders[index]);
+                                    },
+                                  );
+                                },
+                              ),
                       ),
                       const SizedBox(height: 16),
                       SizedBox(
@@ -266,7 +282,7 @@ class WeekdaySelector extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(
           7,
-              (index) {
+          (index) {
             List<String> days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
             return Selector<TaskStateController, List<int>>(
               selector: (context, controller) => controller.repeatConfig.days,
@@ -276,7 +292,8 @@ class WeekdaySelector extends StatelessWidget {
                   shape: CircleBorder(),
                   showCheckmark: false,
                   label: Text(days[index]),
-                  selected: weekdays.contains(index + 1) && context.read<TaskStateController>().isWeekdayValid(index + 1),
+                  selected: weekdays.contains(index + 1) &&
+                      context.read<TaskStateController>().isWeekdayValid(index + 1),
                   onSelected: (selected) {
                     final isValid = context.read<TaskStateController>().isWeekdayValid(index + 1);
                     if (!isValid) return;
@@ -419,9 +436,9 @@ class _ReminderDialogState extends State<ReminderDialog> {
       title: Text(
         widget.edit ? 'Edit reminder' : 'Add a reminder',
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -435,14 +452,15 @@ class _ReminderDialogState extends State<ReminderDialog> {
           Text(
             'Reminder type',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
           ),
           const SizedBox(height: 8),
           SegmentedButton(
             showSelectedIcon: false,
             style: SegmentedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+              backgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
               padding: const EdgeInsets.symmetric(vertical: 10),
             ),
             segments: [
@@ -454,7 +472,9 @@ class _ReminderDialogState extends State<ReminderDialog> {
                     Icon(
                       Icons.notifications_outlined,
                       size: 18,
-                      color: _selectedType == 'notif' ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: _selectedType == 'notif'
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     const SizedBox(width: 8),
                     const Text('Notification'),
@@ -469,7 +489,9 @@ class _ReminderDialogState extends State<ReminderDialog> {
                     Icon(
                       Icons.alarm_outlined,
                       size: 18,
-                      color: _selectedType == 'alarm' ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: _selectedType == 'alarm'
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     const SizedBox(width: 8),
                     const Text('Alarm'),
@@ -484,8 +506,8 @@ class _ReminderDialogState extends State<ReminderDialog> {
           Text(
             'Time',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
           ),
           const SizedBox(height: 8),
           Material(
@@ -505,8 +527,8 @@ class _ReminderDialogState extends State<ReminderDialog> {
                     Text(
                       _selectedTime.format(context),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                     ),
                     Icon(
                       Icons.access_time_rounded,
@@ -530,7 +552,7 @@ class _ReminderDialogState extends State<ReminderDialog> {
         FilledButton(
           onPressed: () {
             final newReminder = Reminder(
-              id: DateTime.now().millisecondsSinceEpoch,
+              id: DateTime.now().millisecondsSinceEpoch.remainder(10000),
               type: _selectedType,
               time: _selectedTime,
             );
@@ -557,7 +579,9 @@ void showReminderDialog(BuildContext context, {bool edit = false, Reminder? remi
       edit: edit,
       reminder: reminder,
       onSaved: (newReminder) {
-        context.read<TaskStateController>().putReminder(edit: edit, reminder: newReminder, oldReminder: reminder);
+        context
+            .read<TaskStateController>()
+            .putReminder(edit: edit, reminder: newReminder, oldReminder: reminder);
       },
     ),
   );
@@ -571,35 +595,41 @@ class TaskTypeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Selector<TaskStateController, bool>(
-        selector: (context, controller) => controller.isRepeating,
-        builder: (context, repeat, _) {
-          return SegmentedButton(
-            showSelectedIcon: false,
-            segments: [
-              ButtonSegment(
-                value: false,
-                label: Text('Single Task'),
-                icon: Icon(
-                  Icons.calendar_today,
-                  size: 18,
-                  color: !repeat ? Theme.of(context).colorScheme.onPrimary : null,
-                ),
+      selector: (context, controller) => controller.isRepeating,
+      builder: (context, repeat, _) {
+        return SegmentedButton(
+          showSelectedIcon: false,
+          segments: [
+            ButtonSegment(
+              value: false,
+              label: Text('Single Task',style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium?.fontSize)),
+              icon: Icon(
+                Icons.calendar_today,
+                size: 18,
+                color: !repeat ? Theme.of(context).colorScheme.onPrimary : null,
               ),
-              ButtonSegment(
-                value: true,
-                label: Text('Recurring Task'),
-                icon: Icon(Icons.repeat, size: 18, color: repeat ? Theme.of(context).colorScheme.onPrimary : null),
-              ),
-            ],
-            selected: {repeat},
-            onSelectionChanged: (selected) {
-              context.read<TaskStateController>().toggleRepeat(selected.first);
-            },
-            style: ButtonStyle(
-              shape: WidgetStatePropertyAll(StadiumBorder()),
             ),
-          );
-        });
+            ButtonSegment(
+              value: true,
+              label: Text('Recurring Task',style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium?.fontSize)),
+              icon: Icon(
+                Icons.repeat,
+                size: 18,
+                color: repeat ? Theme.of(context).colorScheme.onPrimary : null,
+              ),
+            ),
+          ],
+          selected: {repeat},
+          onSelectionChanged: (selected) {
+            context.read<TaskStateController>().toggleRepeat(selected.first);
+          },
+          style: ButtonStyle(
+            shape: WidgetStatePropertyAll(StadiumBorder()),
+          ),
+        );
+      },
+    );
+
   }
 }
 
@@ -630,7 +660,8 @@ class CategorySelector extends StatelessWidget {
                     context,
                     MaterialPageRoute(builder: (_) => AddCategoryPage(edit: false)),
                   ),
-                  title: const Text('Create New Category', style: TextStyle(fontWeight: FontWeight.w500)),
+                  title: const Text('Create New Category',
+                      style: TextStyle(fontWeight: FontWeight.w500)),
                   leading: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
@@ -652,7 +683,8 @@ class CategorySelector extends StatelessWidget {
                             selector: (_, controller) => controller.categorySelection,
                             builder: (context, map, _) => CheckboxListTile(
                               value: map[cat] ?? false,
-                              title: Text(cat.name ?? '', style: const TextStyle(overflow: TextOverflow.ellipsis)),
+                              title: Text(cat.name ?? '',
+                                  style: const TextStyle(overflow: TextOverflow.ellipsis)),
                               onChanged: (selected) {
                                 if (selected != null) {
                                   context.read<TaskStateController>().setCategory(cat, selected);
@@ -689,7 +721,9 @@ class CategorySelector extends StatelessWidget {
                     children: [
                       Text(
                         'Categories',
-                        style: TextStyle(fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                            fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+                            fontWeight: FontWeight.w500),
                       ),
                       Icon(Icons.keyboard_arrow_down_rounded, size: 22),
                     ],
@@ -701,7 +735,12 @@ class CategorySelector extends StatelessWidget {
                         return LinearGradient(
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
-                          colors: [Colors.transparent, Colors.black, Colors.black, Colors.transparent],
+                          colors: [
+                            Colors.transparent,
+                            Colors.black,
+                            Colors.black,
+                            Colors.transparent
+                          ],
                           stops: [0.0, 0.05, 0.95, 1.0],
                         ).createShader(bounds);
                       },
@@ -709,7 +748,8 @@ class CategorySelector extends StatelessWidget {
                       child: Selector<TaskStateController, Map<CategoryModel, bool>>(
                         selector: (context, controller) => controller.categorySelection,
                         builder: (context, map, _) {
-                          final categories = map.entries.where((e) => e.value).map((e) => e.key).toList();
+                          final categories =
+                              map.entries.where((e) => e.value).map((e) => e.key).toList();
                           return ListView.separated(
                             scrollDirection: Axis.horizontal,
                             shrinkWrap: true,
@@ -751,12 +791,16 @@ class PrioritySelector extends StatelessWidget {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0)),
+              border: Border(
+                  bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Priority', style: TextStyle(fontSize: Theme.of(context).textTheme.titleSmall!.fontSize, fontWeight: FontWeight.w500)),
+                Text('Priority',
+                    style: TextStyle(
+                        fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+                        fontWeight: FontWeight.w500)),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
@@ -906,9 +950,9 @@ class ReminderItem extends StatelessWidget {
               Text(
                 reminder.time.format(context),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
               ),
               const SizedBox(width: 16),
               Row(
@@ -923,8 +967,8 @@ class ReminderItem extends StatelessWidget {
                   Text(
                     reminder.type == 'alarm' ? 'Alarm' : 'Notification',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                   ),
                 ],
               ),

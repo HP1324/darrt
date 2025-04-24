@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/task/reminder.dart';
+import 'package:minimaltodo/task/repeat_config.dart';
 import 'package:minimaltodo/task/task.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -54,8 +54,7 @@ class NotificationService {
           NotificationChannel(
             channelKey: 'task_notif',
             channelName: 'task_notifications',
-            channelDescription:
-                'Channel used to notify users about their tasks with simple notification',
+            channelDescription: 'Channel used to notify users about their tasks with simple notification',
             importance: NotificationImportance.Max,
             playSound: true,
             defaultRingtoneType: DefaultRingtoneType.Notification,
@@ -96,13 +95,12 @@ class NotificationService {
 
     try {
       for (var reminder in task.reminderObjects) {
-        final notificationId = reminder.id;
         final time = reminder.time;
         final isAlarm = reminder.type.toLowerCase() == 'alarm';
 
         await _notif.createNotification(
             content: NotificationContent(
-              id: notificationId,
+              id: reminder.id,
               groupKey: task.id.toString(),
               channelKey: isAlarm ? 'task_alarm' : 'task_notif',
               title: 'Task Due at ${Utils.formatTime(time)}',
@@ -148,7 +146,7 @@ class NotificationService {
       return;
     }
     if(task.endDate != null && task.endDate!.difference(task.startDate) > Duration(days: 365)) {
-      compute(scheduleRepeatNotifications, task);
+      await compute(scheduleRepeatNotifications, task);
     } else {
       scheduleRepeatNotifications(task);
     }
@@ -156,15 +154,11 @@ class NotificationService {
 
   static void scheduleRepeatNotifications(Task task) async {
     try {
-      // Parse repeat configuration
-      final repeatConfig = jsonDecode(task.repeatConfig ?? '{}');
-      final repeatType = repeatConfig['repeatType'] as String?;
-      final selectedDays = repeatConfig['selectedDays'] as List<dynamic>?;
-
-      // Get reminders directly from task
+      RepeatConfig config = RepeatConfig.fromJsonString(task.repeatConfig!);
+      final type = config.type;
+      final days = config.days;
       List<Reminder> reminders = task.reminderObjects;
 
-      // Calculate notification schedule based on repeat type
       for (var reminder in reminders) {
         final baseDateTime = DateTime(
           task.startDate.year,
@@ -174,25 +168,23 @@ class NotificationService {
           reminder.time.minute,
         );
 
-        switch (repeatType) {
+        switch (type) {
           case 'weekly':
-            if (selectedDays != null) {
-              for (final weekday in selectedDays) {
-                await _scheduleWeeklyNotification(
-                  task,
-                  weekday,
-                  reminder.time,
-                  baseDateTime,
-                  reminder.type,
-                );
-              }
+            for (final weekday in days) {
+              await _scheduleWeeklyNotification(
+                task,
+                weekday,
+                reminder,
+                baseDateTime,
+                reminder.type,
+              );
             }
-            break;
+                      break;
 
           case 'monthly':
             await _scheduleMonthlyNotification(
               task,
-              reminder.time,
+              reminder,
               baseDateTime,
               reminder.type,
             );
@@ -201,7 +193,7 @@ class NotificationService {
           case 'yearly':
             await _scheduleYearlyNotification(
               task,
-              reminder.time,
+              reminder,
               baseDateTime,
               reminder.type,
             );
@@ -216,7 +208,7 @@ class NotificationService {
   static Future<void> _scheduleWeeklyNotification(
       Task task,
       int weekday,
-      TimeOfDay reminderTime,
+      Reminder reminder,
       DateTime baseDateTime,
       String notificationType,
       ) async {
@@ -225,20 +217,24 @@ class NotificationService {
       while (notifyDate.weekday != weekday) {
         notifyDate = notifyDate.add(const Duration(days: 1));
       }
-
+      final id = notificationId;
+      if(kDebugMode){
+        debugPrint('Weekday: $weekday');
+        debugPrint('Reminder: $id ${reminder.time.hour}:${reminder.time.minute}');
+        debugPrint('Base date: ${Utils.formatDate(baseDateTime, 'dd/MMM/yyyy')}');
+      }
       if (task.endDate != null && notifyDate.isAfter(task.endDate!)) {
         return;
       }
 
-      final notificationId = DateTime.now().millisecondsSinceEpoch.remainder(1000000000);
       final isAlarm = notificationType.toLowerCase() == 'alarm';
 
       await _notif.createNotification(
         content: NotificationContent(
-          id: notificationId,
-          groupKey: task.id!.toString(),
+          id: id,
+          groupKey: task.id.toString(),
           channelKey: isAlarm ? 'task_alarm' : 'task_notif',
-          title: 'Task due at ${Utils.formatTime(reminderTime)}',
+          title: 'Task due at ${Utils.formatTime(reminder.time)}',
           body: task.title,
           payload: task.toNotificationPayload(),
           notificationLayout: NotificationLayout.Default,
@@ -248,12 +244,14 @@ class NotificationService {
         ),
         schedule: NotificationCalendar(
           weekday: weekday,
-          hour: reminderTime.hour,
-          minute: reminderTime.minute,
+          hour: reminder.time.hour,
+          minute: reminder.time.minute,
           second: 0,
           millisecond: 0,
           repeats: true,
           preciseAlarm: true,
+          timeZone: await _notif.getLocalTimeZoneIdentifier(),
+
         ),
         actionButtons: [
           NotificationActionButton(
@@ -275,7 +273,7 @@ class NotificationService {
 
   static Future<void> _scheduleMonthlyNotification(
       Task task,
-      TimeOfDay reminderTime,
+      Reminder reminder,
       DateTime baseDateTime,
       String notificationType,
       ) async {
@@ -283,7 +281,7 @@ class NotificationService {
       // Calculate the next notification date
       final now = DateTime.now();
       DateTime nextNotificationDate =
-      DateTime(now.year, now.month, baseDateTime.day, reminderTime.hour, reminderTime.minute);
+      DateTime(now.year, now.month, baseDateTime.day, reminder.time.hour, reminder.time.minute);
 
       // If the day has already passed this month, move to next month
       if (nextNotificationDate.isBefore(now)) {
@@ -291,8 +289,8 @@ class NotificationService {
           now.month == 12 ? now.year + 1 : now.year,
           now.month == 12 ? 1 : now.month + 1,
           baseDateTime.day,
-          reminderTime.hour,
-          reminderTime.minute,
+          reminder.time.hour,
+          reminder.time.minute,
         );
       }
 
@@ -301,15 +299,14 @@ class NotificationService {
         return;
       }
 
-      final notificationId = DateTime.now().millisecondsSinceEpoch.remainder(1000000000);
       final isAlarm = notificationType.toLowerCase() == 'alarm';
 
       await _notif.createNotification(
         content: NotificationContent(
           id: notificationId,
-          groupKey: task.id!.toString(),
+          groupKey: task.id.toString(),
           channelKey: isAlarm ? 'task_alarm' : 'task_notif',
-          title: 'Monthly Task Due at ${Utils.formatTime(reminderTime)}',
+          title: 'Monthly Task Due at ${Utils.formatTime(reminder.time)}',
           body: task.title,
           payload: task.toNotificationPayload(),
           notificationLayout: NotificationLayout.Default,
@@ -319,12 +316,13 @@ class NotificationService {
         ),
         schedule: NotificationCalendar(
           day: baseDateTime.day,
-          hour: reminderTime.hour,
-          minute: reminderTime.minute,
+          hour: reminder.time.hour,
+          minute: reminder.time.minute,
           second: 0,
           millisecond: 0,
           repeats: true,
           preciseAlarm: true,
+          timeZone: await _notif.getLocalTimeZoneIdentifier(),
         ),
         actionButtons: [
           NotificationActionButton(
@@ -346,7 +344,7 @@ class NotificationService {
 
   static Future<void> _scheduleYearlyNotification(
       Task task,
-      TimeOfDay reminderTime,
+      Reminder reminder,
       DateTime baseDateTime,
       String notificationType,
       ) async {
@@ -354,7 +352,7 @@ class NotificationService {
       // Calculate the next notification date
       final now = DateTime.now();
       DateTime nextNotificationDate = DateTime(
-          now.year, baseDateTime.month, baseDateTime.day, reminderTime.hour, reminderTime.minute);
+          now.year, baseDateTime.month, baseDateTime.day, reminder.time.hour, reminder.time.minute);
 
       // If date has passed this year, move to next year
       if (nextNotificationDate.isBefore(now)) {
@@ -362,8 +360,8 @@ class NotificationService {
           now.year + 1,
           baseDateTime.month,
           baseDateTime.day,
-          reminderTime.hour,
-          reminderTime.minute,
+          reminder.time.hour,
+          reminder.time.minute,
         );
       }
 
@@ -372,15 +370,14 @@ class NotificationService {
         return;
       }
 
-      final notificationId = DateTime.now().millisecondsSinceEpoch.remainder(1000000000);
       final isAlarm = notificationType.toLowerCase() == 'alarm';
 
       await _notif.createNotification(
         content: NotificationContent(
           id: notificationId,
-          groupKey: task.id!.toString(),
+          groupKey: task.id.toString(),
           channelKey: isAlarm ? 'task_alarm' : 'task_notif',
-          title: 'Yearly Task Due at ${Utils.formatTime(reminderTime)}',
+          title: 'Yearly Task Due at ${Utils.formatTime(reminder.time)}',
           body: task.title,
           payload: task.toNotificationPayload(),
           notificationLayout: NotificationLayout.Default,
@@ -391,12 +388,14 @@ class NotificationService {
         schedule: NotificationCalendar(
           month: baseDateTime.month,
           day: baseDateTime.day,
-          hour: reminderTime.hour,
-          minute: reminderTime.minute,
+          hour: reminder.time.hour,
+          minute: reminder.time.minute,
           second: 0,
           millisecond: 0,
           repeats: true,
           preciseAlarm: true,
+          timeZone: await _notif.getLocalTimeZoneIdentifier(),
+
         ),
         actionButtons: [
           NotificationActionButton(
@@ -415,6 +414,7 @@ class NotificationService {
       MiniLogger.e('Error scheduling yearly notification: $e');
     }
   }
+  static int get notificationId => DateTime.now().millisecondsSinceEpoch.remainder(100000);
   static Future<void> removeAllTaskNotifications(Task task) async {
     try {
       if (task.reminders == null) {
@@ -435,18 +435,11 @@ class NotificationService {
       MiniLogger.t('$stacktrace');
     }
   }
-  static int generateNotificationId(Task task, DateTime date, TimeOfDay time) {
-    return task.id! * 1000000 +
-        (date.month * 100 + date.day) * 100 +
-        (time.hour * 60 + time.minute);
-  }
-  static Future<void> removeNotificationWithTime() async {}
-  static Future<void> removeRepeatingTaskNotifications(Task task) async {
-    if (task.id == null) return;
 
+  static Future<void> removeRepeatingTaskNotifications(Task task) async {
     try {
       // Cancel all notifications for this task using the group key
-      await AwesomeNotifications().cancelNotificationsByGroupKey(task.id!.toString());
+      await AwesomeNotifications().cancelNotificationsByGroupKey(task.id.toString());
 
       // Log the cancellation for debugging
       MiniLogger.d('Cancelled all notifications for task ${task.id}');
