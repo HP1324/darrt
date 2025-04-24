@@ -4,11 +4,8 @@ import 'package:minimaltodo/main.dart';
 import 'package:minimaltodo/task/task.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
 
-typedef FinishedActionCallback = Future<int> Function(Task, bool, DateTime);
 
-@pragma("vm:entry-point")
 class NotificationActionController {
-  static FinishedActionCallback? finishedAction;
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     //Get Task object from notification payload

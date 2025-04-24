@@ -65,15 +65,15 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
         _MiniAppBarAction(
           icon: Icon(Icons.flutter_dash),
           onTap: () async {
-            // final scheduledNotifs = await AwesomeNotifications().listScheduledNotifications();
-            // for(var notif in scheduledNotifs){
-            //   debugPrint('Group key: ${notif.content!.groupKey}');
-            // }
-            // print(scheduledNotifs.where((notif) => notif.content!.groupKey == 34.toString()).length);
-            // scheduledNotifs.where((t) => t.content!.groupKey == 34.toString()).forEach((element) {
-            //   print('${element.content!.title}');
-            // });
-            // debugPrint('Active notifications: $scheduledNotifs');
+            final scheduledNotifs = await AwesomeNotifications().listScheduledNotifications();
+            for(var notif in scheduledNotifs){
+              debugPrint('Group key: ${notif.content!.groupKey}');
+            }
+            print(scheduledNotifs.where((notif) => notif.content!.groupKey == 34.toString()).length);
+            scheduledNotifs.where((t) => t.content!.groupKey == 34.toString()).forEach((element) {
+              print('${element.content!.title}');
+            });
+            debugPrint('Active notifications: $scheduledNotifs');
             AwesomeNotifications().createNotification(
               content: NotificationContent(
                 id: 1,

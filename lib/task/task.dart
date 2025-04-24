@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:minimaltodo/category/category_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/task/reminder.dart';
 import 'package:minimaltodo/task/repeat_config.dart';
 import 'package:minimaltodo/task/task_completion.dart';
@@ -54,29 +55,30 @@ class Task {
 
       final isInRange = d.isAtSameMomentAs(start) || d.isAfter(start);
       final isBeforeEnd = end == null || d.isAtSameMomentAs(end) || d.isBefore(end);
-      if(!(isInRange && isBeforeEnd)) return false;
+      if (!(isInRange && isBeforeEnd)) return false;
       final config = RepeatConfig.fromJsonString(repeatConfig ?? '{}');
-      if(config.type == 'weekly'){
+      if (config.type == 'weekly') {
         return config.days.contains(d.weekday);
-      }else if(config.type == 'monthly'){
+      } else if (config.type == 'monthly') {
         return d.day == start.day;
-      }else{
+      } else {
         return d.day == start.day && d.month == start.month;
       }
     }
   }
 
   List<Reminder> get reminderObjects {
-    if(reminders == null || reminders == "{}"){
+    if (reminders == null || reminders == "{}") {
       return [];
     }
-    final List<dynamic>  decodedReminders = jsonDecode(reminders!);
+    final List<dynamic> decodedReminders = jsonDecode(reminders!);
 
-    return decodedReminders.map((reminder){
+    return decodedReminders.map((reminder) {
+      final id = reminder['id'];
       final timeString = reminder['time'];
       final type = reminder['type'] ?? 'notif';
 
-      return Reminder(time: Reminder.stringToTime(timeString),type: type);
+      return Reminder(id: id, time: Reminder.stringToTime(timeString), type: type);
     }).toList();
   }
 
@@ -84,32 +86,37 @@ class Task {
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
-        'createdAt': createdAt?.millisecondsSinceEpoch ?? DateTime.now().millisecondsSinceEpoch,
         'dueDate': dueDate.millisecondsSinceEpoch,
         'isDone': isDone ? 1 : 0,
         'isRepeating': isRepeating ? 1 : 0,
         'startDate': startDate.millisecondsSinceEpoch,
         'endDate': endDate?.millisecondsSinceEpoch,
         'repeatConfig': repeatConfig,
-        'reminderTimes': reminders,
+        'reminders': reminders,
+        'priority': priority,
+        'categoryId' : categories.map((c)=>c.id).toList(),
       };
 
   // Create a Task from JSON
   factory Task.fromJson(Map<String, dynamic> json) {
     try {
-      return Task(
+      final task =  Task(
         id: json['id'],
         title: json['title'] ?? '',
         isDone: json['isDone'] == 1,
-        createdAt: json['createdAt'] != null ? DateTime.fromMillisecondsSinceEpoch(json['createdAt']) : null,
-        dueDate: json['dueDate'] != null ? DateTime.fromMillisecondsSinceEpoch(json['dueDate']) : null,
+        dueDate: DateTime.fromMillisecondsSinceEpoch(json['dueDate']),
         priority: json['priority'],
         isRepeating: json['isRepeating'] == 1,
-        startDate: json['startDate'] != null ? DateTime.fromMillisecondsSinceEpoch(json['startDate']) : DateTime.now(),
-        endDate: json['endDate'] != null ? DateTime.fromMillisecondsSinceEpoch(json['endDate']) : null,
+        startDate: DateTime.fromMillisecondsSinceEpoch(json['startDate']),
+        endDate:json['endDate'] != null ? DateTime.fromMillisecondsSinceEpoch(json['endDate']) : null,
         repeatConfig: json['repeatConfig'],
-        reminders: json['reminderTimes'],
+        reminders: json['reminders'],
       );
+      final ids = (json['categoryIds'] as List?)?.cast<int>() ?? [];
+      final fetched = ObjectBox.store.box<CategoryModel>().getMany(ids);
+      task.categories.addAll(fetched.whereType<CategoryModel>());
+
+      return task;
     } catch (e) {
       MiniLogger.e('Error parsing task from JSON: $e');
       rethrow;
@@ -131,13 +138,11 @@ extension TaskUtilities on Task {
 
   ///Converting a [Task] object to notification payload object [Map<String,String?>?]
   Map<String, String?>? toNotificationPayload() {
-    Map<String, dynamic> taskJson = toJson();
-    return {'task': jsonEncode(taskJson)};
+    return {'task': jsonEncode(toJson())};
   }
 
   ///Converting a notification payload object [Map<String,String?>?] to a [Task] object.
   static Task fromNotificationPayload(Map<String, String?>? payload) {
     return Task.fromJson(jsonDecode(payload!['task']!));
   }
-
 }
