@@ -22,8 +22,11 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
         final tasks = taskVM.tasks.where((t) => t.categories.contains(widget.category)).toList();
         final color = IconColorStorage.colors[widget.category.color] ?? Theme.of(context).colorScheme.primary;
         final icon = IconColorStorage.flattenedIcons[widget.category.icon];
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         return Scaffold(
-          backgroundColor: Color.lerp(color, Colors.white, 0.95),
+          backgroundColor: isDark
+              ? Color.lerp(Theme.of(context).colorScheme.surface, color, 0.14)
+              : Color.lerp(Colors.white, color, 0.05),
           appBar: AppBar(title: Text(widget.category.name),backgroundColor: color.withAlpha(25),),
           body: tasks.isEmpty
               ? Center(
@@ -35,6 +38,7 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
               ))
               : Column(
             children: [
+              const SizedBox(height: 15),
               if (taskVM.selectedTaskIds.isNotEmpty)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -54,11 +58,14 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
                   ],
                 ),
               Expanded(
-                child: ListView.builder(
-                  itemCount: tasks.length,
-                  itemBuilder: (context, index) {
-                    return TaskItem(task: tasks[index]);
-                  },
+                child: Scrollbar(
+                  thickness: 7,
+                  child: ListView.builder(
+                    itemCount: tasks.length,
+                    itemBuilder: (context, index) {
+                      return TaskItem(task: tasks[index]);
+                    },
+                  ),
                 ),
               ),
             ],
