@@ -22,7 +22,7 @@ class _TaskItemState extends State<TaskItem> {
       selector: (context, taskVM) => taskVM.selectedTaskIds,
       builder: (context, ids, _) {
         final isSelected = ids.contains(widget.task.id);
-        final isUrgent = widget.task.priority?.toLowerCase() == 'urgent';
+        final isUrgent = widget.task.priority.toLowerCase() == 'urgent';
 
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -173,7 +173,7 @@ class _TaskItemState extends State<TaskItem> {
                                 ),
                                 if (!widget.task.isRepeating) ...[
                                   Text(
-                                    DateFormat('MMM d').format(widget.task.dueDate!),
+                                    DateFormat('MMM d').format(widget.task.dueDate),
                                     style: Theme.of(context).textTheme.labelSmall,
                                   ),
                                   const SizedBox(width: 4),

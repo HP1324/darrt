@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/category/category_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/objectbox.g.dart';
 import 'package:minimaltodo/task/reminder.dart';
 import 'package:minimaltodo/task/repeat_config.dart';
 import 'package:minimaltodo/task/task_completion.dart';
@@ -94,7 +96,7 @@ class Task {
         'repeatConfig': repeatConfig,
         'reminders': reminders,
         'priority': priority,
-        'categoryId' : categories.map((c)=>c.id).toList(),
+        'categoryIds' : categories.map((c)=>c.id).toList(),
       };
 
   // Create a Task from JSON
@@ -102,7 +104,7 @@ class Task {
     try {
       final task =  Task(
         id: json['id'],
-        title: json['title'] ?? '',
+        title: json['title'],
         isDone: json['isDone'] == 1,
         dueDate: DateTime.fromMillisecondsSinceEpoch(json['dueDate']),
         priority: json['priority'],
@@ -115,7 +117,9 @@ class Task {
       final ids = (json['categoryIds'] as List?)?.cast<int>() ?? [];
       final fetched = ObjectBox.store.box<CategoryModel>().getMany(ids);
       task.categories.addAll(fetched.whereType<CategoryModel>());
-
+      if(kDebugMode){
+        debugPrint('Task categories in notification payload: ${task.categories.length}');
+      }
       return task;
     } catch (e) {
       MiniLogger.e('Error parsing task from JSON: $e');

@@ -1,5 +1,4 @@
 import 'package:logger/logger.dart';
-import 'package:minimaltodo/helpers/utils.dart';
 
 class MiniLogger {
   static final _logger = Logger(printer: PrettyPrinter(

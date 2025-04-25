@@ -53,7 +53,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                 }
               },
               child: Text(
-                Utils.formatDate(selectedDate, 'EEE, d MMM, yyyy'),
+                formatDate(selectedDate, 'EEE, d MMM, yyyy'),
                 key: ValueKey<DateTime>(selectedDate),
                 style: Theme.of(context).textTheme.labelLarge!.copyWith(
                       fontWeight: FontWeight.bold,
@@ -120,7 +120,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
           key: _popupKey,
           icon: Icon(Icons.more_vert),
           onTap: () {
-            final (position, size) = Utils.getPositionAndSize(_popupKey);
+            final (position, size) = getPositionAndSize(_popupKey);
             showMenu(
               context: context,
               color: Theme.of(context).colorScheme.onPrimary,

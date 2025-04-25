@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/category/category_model.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
@@ -21,6 +22,7 @@ class TaskStateController extends ChangeNotifier {
   void initTaskState(Task task) {
     final categories = ObjectBox.store.box<CategoryModel>().getAll();
     titleController.text = task.title;
+    priority = task.priority;
     dueDate = task.dueDate;
     isRepeating = task.isRepeating;
     startDate = task.startDate;
@@ -194,12 +196,13 @@ class TaskStateController extends ChangeNotifier {
   ///Add or edit a reminder.
   ///[oldReminder] is necessary to provide when editing task to match if this reminder exists
   String putReminder({bool edit = false, required Reminder reminder, Reminder? oldReminder}) {
-    debugPrint('All reminders');
-    for(var reminder in reminders){
-      debugPrint('Reminder: ${reminder.time.hour}:${reminder.time.minute}');
+    if(kDebugMode) {
+      debugPrint('All reminders');
+      for (var reminder in reminders) {
+        debugPrint('Reminder: ${reminder.time.hour}:${reminder.time.minute}');
+      }
+      debugPrint('All reminders');
     }
-    debugPrint('All reminders');
-
     if (edit) {
       final index = reminders.indexWhere((r) => r.time.hour == oldReminder!.time.hour && r.time.minute == oldReminder.time.minute);
       print('this is index: $index');
