@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/category/category_model.dart';
+import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/task/logic/task_view_model.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
 import 'package:provider/provider.dart';
@@ -15,17 +16,24 @@ class TasksForCategoryPage extends StatefulWidget {
 class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
 
   @override
-  void initState() {
-    super.initState();
-  }
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.category.name)),
-      body: Consumer<TaskViewModel>(
-        builder: (context,taskVM,_) {
-          final tasks = taskVM.tasks.where((t) => t.categories.contains(widget.category)).toList();
-          return Column(
+    return Consumer<TaskViewModel>(
+      builder: (context, taskVM, _) {
+        final tasks = taskVM.tasks.where((t) => t.categories.contains(widget.category)).toList();
+        final color = IconColorStorage.colors[widget.category.color] ?? Theme.of(context).colorScheme.primary;
+        final icon = IconColorStorage.flattenedIcons[widget.category.icon];
+        return Scaffold(
+          backgroundColor: Color.lerp(color, Colors.white, 0.95),
+          appBar: AppBar(title: Text(widget.category.name),backgroundColor: color.withAlpha(25),),
+          body: tasks.isEmpty
+              ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, color: color, size: 70),
+                ],
+              ))
+              : Column(
             children: [
               if (taskVM.selectedTaskIds.isNotEmpty)
                 Row(
@@ -54,9 +62,9 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
                 ),
               ),
             ],
-          );
-        }
-      ),
+          ),
+        );
+      },
     );
   }
 }

@@ -3,8 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:toastification/toastification.dart';
 
 
-class Utils{
-  static void showToast(BuildContext context,{required ToastificationType type, required String description}){
+  void showToast(BuildContext context,{required ToastificationType type, required String description}){
     toastification.show(
         context: context,
         description: Text(description),
@@ -13,7 +12,7 @@ class Utils{
         alignment: Alignment.bottomCenter
     );
   }
-  static (Offset, Size) getPositionAndSize(GlobalKey key) {
+  (Offset, Size) getPositionAndSize(GlobalKey key) {
     Offset position = Offset.zero;
     Size size = Size.zero;
     if (key.currentContext != null) {
@@ -24,12 +23,8 @@ class Utils{
     return (position, size);
   }
 
-  static formatTime(TimeOfDay time){
-    final date = DateTime(2023, 1, 1, time.hour, time.minute);
-    return DateFormat().add_jm().format(date);
-  }
-  static formatDate(DateTime date, String format){
-    return DateFormat(format).format(date);
-  }
-}
+  String formatTime(TimeOfDay time) => DateFormat().add_jm().format(DateTime(time.hour, time.minute));
+
+  String formatDate(DateTime date, String format)=> DateFormat(format).format(date);
+
 

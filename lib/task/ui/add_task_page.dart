@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/category/category_model.dart';
 import 'package:minimaltodo/category/logic/category_view_model.dart';
@@ -114,7 +113,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
           } else {
             type = ToastificationType.error;
           }
-          Utils.showToast(context, type: type, description: message);
+          showToast(context, type: type, description: message);
         },
         child: Icon(Icons.done),
       ),
@@ -683,7 +682,7 @@ class CategorySelector extends StatelessWidget {
                             selector: (_, controller) => controller.categorySelection,
                             builder: (context, map, _) => CheckboxListTile(
                               value: map[cat] ?? false,
-                              title: Text(cat.name ?? '',
+                              title: Text(cat.name,
                                   style: const TextStyle(overflow: TextOverflow.ellipsis)),
                               onChanged: (selected) {
                                 if (selected != null) {

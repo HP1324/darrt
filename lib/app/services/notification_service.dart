@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
@@ -103,11 +102,11 @@ class NotificationService {
               id: reminder.id,
               groupKey: task.id.toString(),
               channelKey: isAlarm ? 'task_alarm' : 'task_notif',
-              title: 'Task Due at ${Utils.formatTime(time)}',
+              title: 'Task Due at ${formatTime(time)}',
               body: task.title,
               actionType: ActionType.Default,
               payload: task.toNotificationPayload(),
-              notificationLayout: NotificationLayout.Default,
+              notificationLayout: NotificationLayout.BigText,
               category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
               wakeUpScreen: true,
               criticalAlert: true,
@@ -221,7 +220,7 @@ class NotificationService {
       if(kDebugMode){
         debugPrint('Weekday: $weekday');
         debugPrint('Reminder: $id ${reminder.time.hour}:${reminder.time.minute}');
-        debugPrint('Base date: ${Utils.formatDate(baseDateTime, 'dd/MMM/yyyy')}');
+        debugPrint('Base date: ${formatDate(baseDateTime, 'dd/MMM/yyyy')}');
       }
       if (task.endDate != null && notifyDate.isAfter(task.endDate!)) {
         return;
@@ -234,7 +233,7 @@ class NotificationService {
           id: id,
           groupKey: task.id.toString(),
           channelKey: isAlarm ? 'task_alarm' : 'task_notif',
-          title: 'Task due at ${Utils.formatTime(reminder.time)}',
+          title: 'Task due at ${formatTime(reminder.time)}',
           body: task.title,
           payload: task.toNotificationPayload(),
           notificationLayout: NotificationLayout.Default,
@@ -306,7 +305,7 @@ class NotificationService {
           id: notificationId,
           groupKey: task.id.toString(),
           channelKey: isAlarm ? 'task_alarm' : 'task_notif',
-          title: 'Monthly Task Due at ${Utils.formatTime(reminder.time)}',
+          title: 'Monthly Task Due at ${formatTime(reminder.time)}',
           body: task.title,
           payload: task.toNotificationPayload(),
           notificationLayout: NotificationLayout.Default,
@@ -377,7 +376,7 @@ class NotificationService {
           id: notificationId,
           groupKey: task.id.toString(),
           channelKey: isAlarm ? 'task_alarm' : 'task_notif',
-          title: 'Yearly Task Due at ${Utils.formatTime(reminder.time)}',
+          title: 'Yearly Task Due at ${formatTime(reminder.time)}',
           body: task.title,
           payload: task.toNotificationPayload(),
           notificationLayout: NotificationLayout.Default,
