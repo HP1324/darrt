@@ -28,16 +28,11 @@ class Task {
         startDate = startDate ?? DateTime.now();
   @Id()
   int id;
-  String title;
-  DateTime? createdAt;
-  DateTime dueDate;
-  bool isDone;
-  String priority;
-  bool isRepeating;
-  DateTime startDate;
-  DateTime? endDate;
-  String? reminders;
-  String? repeatConfig;
+  String title,priority;
+  DateTime? createdAt, endDate;
+  DateTime dueDate,startDate;
+  bool isDone,isRepeating;
+  String? reminders,repeatConfig;
 
   final categories = ToMany<CategoryModel>();
   @Backlink()
