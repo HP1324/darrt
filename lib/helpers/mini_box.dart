@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 
@@ -22,6 +23,6 @@ class MiniBox{
   static Future<void> initStorage()async {
     await writeIfNull(mDefaultTaskList, 0);
     await writeIfNull(mFirstTimeInstall, true);
-    await writeIfNull(mFirstInstallDate, DateTime.now().millisecondsSinceEpoch);
+    await writeIfNull(mFirstInstallDate, DateUtils.dateOnly(DateTime.now()).millisecondsSinceEpoch);
   }
 }

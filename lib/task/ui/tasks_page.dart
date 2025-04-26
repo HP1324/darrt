@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/app/calendar_view_model.dart';
 import 'package:minimaltodo/app/widgets/empty_tasks_indicator.dart';
+import 'package:minimaltodo/helpers/consts.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/task/logic/task_view_model.dart';
 import 'package:minimaltodo/task/task.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
@@ -26,6 +28,7 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
   Widget build(BuildContext context) {
     return Consumer2<TaskViewModel, CalendarViewModel>(builder: (context, taskVM, calVM, _) {
       final tasks = taskVM.tasks.where((t) => t.isActiveOn(calVM.selectedDate)).toList();
+      final firstDate = DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate));
       return Column(
         children: [
           SizedBox(
@@ -33,9 +36,9 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
             child: ListView.separated(
               controller: calVM.dateScrollController,
               scrollDirection: Axis.horizontal,
-              itemCount: DateTime.now().add(Duration(days: 18262)).difference(DateTime(2024, 1, 1)).inDays,
+              itemCount: DateTime.now().add(Duration(days: maxExtentDateDays)).difference(firstDate).inDays,
               itemBuilder: (context, index) {
-                final date = DateTime(2024, 1, 1).add(Duration(days: index));
+                final date = firstDate.add(Duration(days: index));
                 return DateItem(date: date);
               },
               separatorBuilder: (context, index) => SizedBox(
