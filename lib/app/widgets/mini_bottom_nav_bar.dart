@@ -19,7 +19,7 @@ class _MiniBottomNavBarState extends State<MiniBottomNavBar> {
       // margin: EdgeInsets.only(right: 20,left: 20,bottom: 7),
       height: MediaQuery.sizeOf(context).height * 0.075,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withAlpha(20),
+        // color: Theme.of(context).colorScheme.primary.withAlpha(20),
         // borderRadius: BorderRadius.circular(30),
       ),
       child: Center(

@@ -15,7 +15,6 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   AppBar build(BuildContext context) {
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(14),
       elevation: 0,
       title: Selector<CalendarViewModel, DateTime>(
           selector: (context, calVM) => calVM.selectedDate,
