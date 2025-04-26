@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/helpers/consts.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
 
 class CalendarViewModel extends ChangeNotifier {
   DateTime selectedDate = DateTime.now();
@@ -11,7 +13,7 @@ class CalendarViewModel extends ChangeNotifier {
   ScrollController dateScrollController = ScrollController();
 
   void scrollToDate(DateTime date) {
-    final index = date.difference(DateTime(2024,1,1)).inDays;
+    final index = date.difference(DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate))).inDays;
     dateScrollController.animateTo(index  * 43.0, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
     updateSelectedDate(date);
   }
