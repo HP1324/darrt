@@ -4,6 +4,8 @@ class Messages{
   static final mTaskDeleted = 'Task deleted';
   static final mTaskEmpty = 'Please enter a task first';
   static final mAtleastOneDaySelected = 'At least one day must be selected!';
-  static final mNotifAlarmDifference = 'For reliable alerts, disable battery optimization for this app. Alarms are more precise, while notifications may delay 1-5 mins due to Android\'s power-saving. Turn off optimization in device settings for best performance. This may affect battery life.;';
+  static final mNotifAlarmDifference =
+      'To ensure timely alarms and reminders, please consider disabling battery optimization for this app. While notifications may be delayed by 1–5 minutes due to power-saving features, alarms remain accurate. You can adjust battery optimization settings in your device preferences. Note: this may slightly impact battery life.';
+
 }
 
