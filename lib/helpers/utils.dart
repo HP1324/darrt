@@ -25,8 +25,11 @@ import 'consts.dart';
     }
     return (position, size);
   }
-
-  String formatTime(TimeOfDay time) => DateFormat().add_jm().format(DateTime(time.hour, time.minute));
+String formatTime(TimeOfDay time) {
+  final now = DateTime.now();
+  final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+  return DateFormat.jm().format(dt); // "5:30 PM" format
+}
 
   String formatDate(DateTime date, String format)=> DateFormat(format).format(date);
 
