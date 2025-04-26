@@ -4,6 +4,7 @@ import 'package:awesome_notifications/awesome_notifications.dart' show AwesomeNo
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/app/services/notification_service.dart';
+import 'package:minimaltodo/app/services/settings_service.dart';
 import 'package:minimaltodo/category/category_model.dart';
 import 'package:minimaltodo/category/logic/category_view_model.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
@@ -644,40 +645,73 @@ class TaskTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<TaskStateController, bool>(
-      selector: (context, controller) => controller.isRepeating,
-      builder: (context, repeat, _) {
-        return SegmentedButton(
-          showSelectedIcon: false,
-          segments: [
-            ButtonSegment(
-              value: false,
-              label: Text('Single Task',style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium?.fontSize)),
-              icon: Icon(
-                Icons.calendar_today,
-                size: 18,
-                color: !repeat ? Theme.of(context).colorScheme.onPrimary : null,
+    return Row(
+      children: [
+        Selector<TaskStateController, bool>(
+          selector: (context, controller) => controller.isRepeating,
+          builder: (context, repeat, _) {
+            return SegmentedButton(
+              showSelectedIcon: false,
+              segments: [
+                ButtonSegment(
+                  value: false,
+                  label: Text('Single Task',style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium?.fontSize)),
+                  icon: Icon(
+                    Icons.calendar_today,
+                    size: 18,
+                    color: !repeat ? Theme.of(context).colorScheme.onPrimary : null,
+                  ),
+                ),
+                ButtonSegment(
+                  value: true,
+                  label: Text('Recurring Task',style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium?.fontSize)),
+                  icon: Icon(
+                    Icons.repeat,
+                    size: 18,
+                    color: repeat ? Theme.of(context).colorScheme.onPrimary : null,
+                  ),
+                ),
+              ],
+              selected: {repeat},
+              onSelectionChanged: (selected) {
+                context.read<TaskStateController>().toggleRepeat(selected.first);
+              },
+              style: ButtonStyle(
+                shape: WidgetStatePropertyAll(StadiumBorder()),
               ),
-            ),
-            ButtonSegment(
-              value: true,
-              label: Text('Recurring Task',style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium?.fontSize)),
-              icon: Icon(
-                Icons.repeat,
-                size: 18,
-                color: repeat ? Theme.of(context).colorScheme.onPrimary : null,
-              ),
-            ),
-          ],
-          selected: {repeat},
-          onSelectionChanged: (selected) {
-            context.read<TaskStateController>().toggleRepeat(selected.first);
+            );
           },
-          style: ButtonStyle(
-            shape: WidgetStatePropertyAll(StadiumBorder()),
+        ),
+
+        InkWell(
+          onTap: () {
+            context.read<TaskStateController>().textFieldNode.unfocus();
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                    content: Text(
+                      Messages.mNotifAlarmDifference,
+                      style:
+                      TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
+                    ),
+                    actions: [
+                      FilledButton(
+                          onPressed: () async {
+                            await SettingsService.openBatterySettings();
+                          },
+                          child: Text('Go to settings')),
+                    ]);
+              },
+            );
+          },
+          child: CircleAvatar(
+            backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            child: Icon(Icons.question_mark, color: Theme.of(context).colorScheme.primary),
           ),
-        );
-      },
+        ),
+      ],
     );
 
   }
