@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:toastification/toastification.dart';
+
+import 'consts.dart';
 
 
   void showToast(BuildContext context,{required ToastificationType type, required String description}){
@@ -26,5 +29,14 @@ import 'package:toastification/toastification.dart';
   String formatTime(TimeOfDay time) => DateFormat().add_jm().format(DateTime(time.hour, time.minute));
 
   String formatDate(DateTime date, String format)=> DateFormat(format).format(date);
+
+  DateTime getFirstDate(){
+    return DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate))
+        .subtract(const Duration(days: 365));
+  }
+
+  DateTime getMaxDate(){
+    return DateTime.now().add(Duration(days: maxExtentDateDays));
+  }
 
 
