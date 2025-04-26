@@ -96,7 +96,9 @@ class NotificationService {
       for (var reminder in task.reminderObjects) {
         final time = reminder.time;
         final isAlarm = reminder.type.toLowerCase() == 'alarm';
-
+        if(kDebugMode){
+          debugPrint('Reminder: ${reminder.time.hour}:${reminder.time.minute}');
+        }
         await _notif.createNotification(
             content: NotificationContent(
               id: reminder.id,
