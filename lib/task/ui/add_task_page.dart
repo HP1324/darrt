@@ -1,12 +1,16 @@
 // ignore_for_file: avoid_print
 
+import 'package:awesome_notifications/awesome_notifications.dart' show AwesomeNotifications;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:minimaltodo/app/services/notification_service.dart';
 import 'package:minimaltodo/category/category_model.dart';
 import 'package:minimaltodo/category/logic/category_view_model.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
+import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/messages.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/logic/task_state_controller.dart';
 import 'package:minimaltodo/task/logic/task_view_model.dart';
@@ -144,98 +148,145 @@ class AddRemindersWidget extends StatelessWidget {
       trailing: const Icon(Icons.access_time),
       onTap: () async {
         context.read<TaskStateController>().textFieldNode.unfocus();
-        showModalBottomSheet(
-          context: context,
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(20),
-            ),
-          ),
-          builder: (context) {
-            return Container(
-              padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
-              child: Consumer<TaskStateController>(
-                builder: (context, controller, _) {
-                  final textTheme = Theme.of(context).textTheme;
-                  final scheme = Theme.of(context).colorScheme;
-                  final reminders = controller.reminders;
-
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Reminders',
-                            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Flexible(
-                        child: reminders.isEmpty
-                            ? Center(
-                                child: Text(
-                                  'No reminders set',
-                                  style:
-                                      textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
-                                ),
-                              )
-                            : ListView.builder(
-                                itemCount: reminders.length,
-                                itemBuilder: (context, index) {
-                                  debugPrint(
-                                      'Reminder ${index + 1} time in list: ${reminders[index].time.hour}:${reminders[index].time.minute}');
-                                  return ReminderItem(
-                                    reminder: reminders[index],
-                                    onTap: () {
-                                      showReminderDialog(
-                                        context,
-                                        edit: true,
-                                        reminder: reminders[index],
-                                      );
-                                    },
-                                    onRemove: () {
-                                      controller.removeReminder(reminders[index]);
-                                    },
-                                  );
-                                },
-                              ),
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton.icon(
-                          onPressed: () async {
-                            showReminderDialog(context);
-                          },
-                          icon: const Icon(Icons.add),
-                          label: const Text('Add Reminder'),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            );
-          },
-        );
-        // final allowed = await AwesomeNotifications().isNotificationAllowed();
-        // if (context.mounted) {
-        //   if (allowed || _showNotificationRationale(context)) {
-        //     showBottomSheet(context, colorScheme);
-        //   }
-        // }
+        final allowed = await AwesomeNotifications().isNotificationAllowed();
+        if (context.mounted) {
+          if (allowed || _showNotificationRationale(context)) {
+            showBottomSheet(context);
+          }
+        }
       },
     );
+  }
+  void showBottomSheet(BuildContext context){
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
+          child: Consumer<TaskStateController>(
+            builder: (context, controller, _) {
+              final textTheme = Theme.of(context).textTheme;
+              final scheme = Theme.of(context).colorScheme;
+              final reminders = controller.reminders;
+
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Reminders',
+                        style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Flexible(
+                    child: reminders.isEmpty
+                        ? Center(
+                      child: Text(
+                        'No reminders set',
+                        style:
+                        textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
+                      ),
+                    )
+                        : ListView.builder(
+                      itemCount: reminders.length,
+                      itemBuilder: (context, index) {
+                        debugPrint(
+                            'Reminder ${index + 1} time in list: ${reminders[index].time.hour}:${reminders[index].time.minute}');
+                        return ReminderItem(
+                          reminder: reminders[index],
+                          onTap: () {
+                            showReminderDialog(
+                              context,
+                              edit: true,
+                              reminder: reminders[index],
+                            );
+                          },
+                          onRemove: () {
+                            controller.removeReminder(reminders[index]);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: () async {
+                        showReminderDialog(context);
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('Add Reminder'),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+  bool _showNotificationRationale(BuildContext context) {
+    bool userAllowed = false;
+    showAdaptiveDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+          title: const Text('Permission required'),
+          content: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Text(
+                'Please allow the application to send notifications, otherwise we won\'t be able to remind you about your tasks.'),
+          ),
+          actions: [
+            InkWell(
+              onTap: () async {
+                final navigator = Navigator.of(context);
+                final allowed = await AwesomeNotifications().requestPermissionToSendNotifications();
+                if (allowed && context.mounted) {
+                  await MiniBox.write(mNotificationsEnabled, allowed);
+                  await NotificationService.initializeNotificationChannels();
+                }
+                userAllowed = allowed;
+                navigator.pop();
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                child: const Row(
+                  children: [
+                    Text('Go to notification settings'),
+                    Icon(Icons.chevron_right),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    return userAllowed;
   }
 }
 
