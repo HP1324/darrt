@@ -74,51 +74,78 @@ class DateItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 1.0),
       child: Consumer<CalendarViewModel>(
         builder: (context, calVM, _) {
-          bool isSelected = calVM.selectedDate == date;
-          bool isToday = DateUtils.isSameDay(date, DateTime.now());
-          final scheme = Theme.of(context).colorScheme;
+          final bool isSelected = calVM.selectedDate == date;
+          final bool isToday = DateUtils.isSameDay(date, DateTime.now());
+          final ColorScheme scheme = Theme.of(context).colorScheme;
+          final Brightness brightness = Theme.of(context).brightness;
+
+          // Determine text and background colors based on states
+          Color dayTextColor;
+          Color dateBackgroundColor;
+          Color dateTextColor;
+
+          if (isSelected) {
+            // Selected state styling
+            dayTextColor = scheme.primary;
+            dateBackgroundColor = scheme.primary;
+            dateTextColor = scheme.onPrimary;
+          } else if (isToday) {
+            // Today but not selected styling
+            dayTextColor = scheme.secondary;
+            dateBackgroundColor = scheme.secondaryContainer.withOpacity(0.5);
+            dateTextColor = scheme.onSecondaryContainer;
+          } else {
+            // Default state styling
+            dayTextColor = scheme.onSurface.withOpacity(0.8);
+            dateBackgroundColor = Colors.transparent;
+            dateTextColor = scheme.onSurface;
+          }
+
           return InkWell(
             onTap: () {
               context.read<CalendarViewModel>().updateSelectedDate(date);
             },
             borderRadius: BorderRadius.circular(12),
             child: Container(
-              height: 60,
-              width: 40,
+              height: 62,
+              width: 42,
               decoration: BoxDecoration(
-                color: isSelected
-                    ? scheme.primary
-                    : isToday
-                    ? scheme.primaryContainer
-                    : scheme.primary.withAlpha(14),
                 borderRadius: BorderRadius.circular(12),
+                border: isToday  ?
+                Border.all(color: scheme.secondary.withValues(alpha:0.5), width: 1.5) : null,
               ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     DateFormat('EEE').format(date),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: isSelected
-                          ? scheme.onPrimary
-                          : isToday
-                          ? scheme.onPrimaryContainer
-                          : scheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
+                      color: dayTextColor,
+                      fontWeight: isSelected || isToday ? FontWeight.w600 : FontWeight.normal,
                     ),
                   ),
-                  CircleAvatar(
-                    backgroundColor: isSelected ? scheme.primaryContainer.withAlpha(150) : scheme.primary.withAlpha(30),
-                    radius: 11,
-                    child: Text(
-                      '${date.day}',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: isSelected
-                            ? scheme.onPrimary
-                            : isToday
-                            ? scheme.onPrimaryContainer
-                            : scheme.onSurfaceVariant,
-                        fontWeight: FontWeight.bold,
+                  const SizedBox(height: 4),
+                  Container(
+                    width: 26,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: dateBackgroundColor,
+                      boxShadow: isSelected ? [
+                        BoxShadow(
+                          color: scheme.primary.withOpacity(0.3),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        )
+                      ] : null,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${date.day}',
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: dateTextColor,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
