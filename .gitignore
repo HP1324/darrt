@@ -45,4 +45,6 @@ app.*.map.json
 /android/app/release
 # Ignore build-related native config files
 android/app/.cxx/
-
+/linux/
+/macos/
+/windows/
