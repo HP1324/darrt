@@ -16,103 +16,110 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   AppBar build(BuildContext context) {
     return AppBar(
       elevation: 0,
-      title: Selector<CalendarViewModel, DateTime>(
-          selector: (context, calVM) => calVM.selectedDate,
-          builder: (context, selectedDate, _) {
-            final isBefore = selectedDate.isBefore(DateTime.now());
-            return AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (Widget child, animation) {
-                final inAnimation = Tween<Offset>(
-                  begin: const Offset(-1.0, 0.0),
-                  end: Offset.zero,
-                ).animate(animation);
+      title: InkWell(
+        splashFactory: NoSplash.splashFactory,
+        onTap: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return Container(
+                decoration: BoxDecoration(),
+                child: CalendarDatePicker(
+                  initialDate: DateTime.now(),
+                  firstDate: getFirstDate(),
+                  lastDate: getMaxDate(),
+                  onDateChanged: (selectedDate) {
+                    final date = DateUtils.dateOnly(selectedDate);
+                    context.read<CalendarViewModel>().scrollToDate(date);
+                  },
+                ),
+              );
+            },
+          );
+        },
+        child: Row(
+          children: [
+            Selector<CalendarViewModel, DateTime>(
+                selector: (context, calVM) => calVM.selectedDate,
+                builder: (context, selectedDate, _) {
+                  final isBefore = selectedDate.isBefore(DateTime.now());
+                  final title = DateUtils.isSameDay(selectedDate, DateTime.now()) ? 'Today': formatDate(selectedDate, 'EEE, d MMM, yyyy');
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder: (Widget child, animation) {
+                      final inAnimation = Tween<Offset>(
+                        begin: const Offset(-1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation);
 
-                final outAnimation = Tween<Offset>(
-                  begin: const Offset(1.0, 0.0),
-                  end: Offset.zero,
-                ).animate(animation);
+                      final outAnimation = Tween<Offset>(
+                        begin: const Offset(1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation);
 
-                if (child.key == ValueKey<DateTime>(selectedDate)) {
-                  // This is the new date coming in
-                  return ClipRect(
-                    child: SlideTransition(
-                      position: isBefore ? inAnimation : outAnimation,
-                      child: child,
+                      if (child.key == ValueKey<DateTime>(selectedDate)) {
+                        // This is the new date coming in
+                        return ClipRect(
+                          child: SlideTransition(
+                            position: isBefore ? inAnimation : outAnimation,
+                            child: child,
+                          ),
+                        );
+                      } else {
+                        // This is the old date going out
+                        return ClipRect(
+                          child: SlideTransition(
+                            position: isBefore ? outAnimation : inAnimation,
+                            child: child,
+                          ),
+                        );
+                      }
+                    },
+                    child: Text(
+                      title,
+                      key: ValueKey<DateTime>(selectedDate),
+                      style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                   );
-                } else {
-                  // This is the old date going out
-                  return ClipRect(
-                    child: SlideTransition(
-                      position: isBefore ? outAnimation : inAnimation,
-                      child: child,
-                    ),
-                  );
-                }
-              },
-              child: Text(
-                formatDate(selectedDate, 'EEE, d MMM, yyyy'),
-                key: ValueKey<DateTime>(selectedDate),
-                style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-            );
-          }),
+                }),
+            Icon(Icons.arrow_drop_down_rounded),
+          ],
+        ),
+      ),
       actions: [
         _MiniAppBarAction(
           icon: Icon(Icons.flutter_dash),
           onTap: () async {
             final scheduledNotifs = await AwesomeNotifications().listScheduledNotifications();
-            for(var notif in scheduledNotifs){
+            for (var notif in scheduledNotifs) {
               debugPrint('Group key: ${notif.content!.groupKey}');
             }
-            print(scheduledNotifs.where((notif) => notif.content!.groupKey == 34.toString()).length);
+            print(
+                scheduledNotifs.where((notif) => notif.content!.groupKey == 34.toString()).length);
             scheduledNotifs.where((t) => t.content!.groupKey == 34.toString()).forEach((element) {
               print('${element.content!.title}');
             });
             debugPrint('Active notifications: $scheduledNotifs');
             AwesomeNotifications().createNotification(
-              content: NotificationContent(
-                id: 1,
-                channelKey: 'task_alarm',
-                title: 'Test Notification',
-                body: 'This is a test notification',
-              ),
-              schedule: NotificationCalendar.fromDate(
-                date: DateTime.now().add(Duration(seconds: 5)),
-              ),
-              actionButtons: [
-                NotificationActionButton(
-                  key: 'FINISHED',
-                  label: 'Finished',
-                  actionType: ActionType.SilentAction,
+                content: NotificationContent(
+                  id: 1,
+                  channelKey: 'task_alarm',
+                  title: 'Test Notification',
+                  body: 'This is a test notification',
                 ),
-              ]
-            );
+                schedule: NotificationCalendar.fromDate(
+                  date: DateTime.now().add(Duration(seconds: 5)),
+                ),
+                actionButtons: [
+                  NotificationActionButton(
+                    key: 'FINISHED',
+                    label: 'Finished',
+                    actionType: ActionType.SilentAction,
+                  ),
+                ]);
           },
-        ),
-        _MiniAppBarAction(
-          onTap: () {
-            showModalBottomSheet(
-                context: context,
-                builder: (context) {
-                  return Container(
-                    decoration: BoxDecoration(),
-                    child: CalendarDatePicker(
-                      initialDate: DateTime.now(),
-                      firstDate:getFirstDate(),
-                      lastDate: getMaxDate(),
-                      onDateChanged: (selectedDate) {
-                        final date = DateUtils.dateOnly(selectedDate);
-                        context.read<CalendarViewModel>().scrollToDate(date);
-                      },
-                    ),
-                  );
-                });
-          },
-          icon: Icon(Icons.calendar_month_outlined),
         ),
         _MiniAppBarAction(
           key: _popupKey,
