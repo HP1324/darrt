@@ -33,19 +33,9 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
         children: [
           SizedBox(
             height: 60,
-            child: ListView.separated(
-              controller: calVM.dateScrollController,
-              scrollDirection: Axis.horizontal,
-              itemCount: DateTime.now().add(Duration(days: maxExtentDateDays)).difference(firstDate).inDays,
-              itemBuilder: (context, index) {
-                final date = firstDate.add(Duration(days: index));
-                return DateItem(date: date);
-              },
-              separatorBuilder: (context, index) => SizedBox(
-                width: 3,
-              ),
-            ),
-          ),
+            child: ScrollableDateBar(),
+          )
+          ,
           TabBar(
             controller: _tabController,
             splashBorderRadius: BorderRadius.circular(10),
@@ -204,6 +194,28 @@ class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin{
           ),
         ),
       ],
+    );
+  }
+}
+
+class ScrollableDateBar extends StatelessWidget {
+  const ScrollableDateBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<CalendarViewModel>(
+      builder: (context, calVM, _) {
+        return ListView.builder(
+          controller: calVM.dateScrollController,
+          scrollDirection: Axis.horizontal,
+          itemExtent: calVM.dateItemWidth,
+          physics: const BouncingScrollPhysics(),
+          itemCount: calVM.dates.length,
+          itemBuilder: (context, index) => DateItem(
+            date: calVM.dates[index],
+          ),
+        );
+      },
     );
   }
 }

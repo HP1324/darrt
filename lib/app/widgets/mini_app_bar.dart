@@ -103,8 +103,8 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                     decoration: BoxDecoration(),
                     child: CalendarDatePicker(
                       initialDate: DateTime.now(),
-                      firstDate:DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate)),
-                      lastDate: DateTime.now().add(Duration(days: maxExtentDateDays)),
+                      firstDate:getFirstDate(),
+                      lastDate: getMaxDate(),
                       onDateChanged: (selectedDate) {
                         final date = DateUtils.dateOnly(selectedDate);
                         context.read<CalendarViewModel>().scrollToDate(date);
