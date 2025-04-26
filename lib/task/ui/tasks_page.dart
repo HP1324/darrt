@@ -70,61 +70,64 @@ class DateItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<CalendarViewModel>(
-      builder: (context, calVM, _) {
-        bool isSelected = calVM.selectedDate == date;
-        bool isToday = DateUtils.isSameDay(date, DateTime.now());
-        final scheme = Theme.of(context).colorScheme;
-        return InkWell(
-          onTap: () {
-            context.read<CalendarViewModel>().updateSelectedDate(date);
-          },
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            height: 60,
-            width: 40,
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? scheme.primary
-                  : isToday
-                  ? scheme.primaryContainer
-                  : scheme.primary.withAlpha(14),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  DateFormat('EEE').format(date),
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: isSelected
-                        ? scheme.onPrimary
-                        : isToday
-                        ? scheme.onPrimaryContainer
-                        : scheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                CircleAvatar(
-                  backgroundColor: isSelected ? scheme.primaryContainer.withAlpha(150) : scheme.primary.withAlpha(30),
-                  radius: 11,
-                  child: Text(
-                    '${date.day}',
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 1.0),
+      child: Consumer<CalendarViewModel>(
+        builder: (context, calVM, _) {
+          bool isSelected = calVM.selectedDate == date;
+          bool isToday = DateUtils.isSameDay(date, DateTime.now());
+          final scheme = Theme.of(context).colorScheme;
+          return InkWell(
+            onTap: () {
+              context.read<CalendarViewModel>().updateSelectedDate(date);
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              height: 60,
+              width: 40,
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? scheme.primary
+                    : isToday
+                    ? scheme.primaryContainer
+                    : scheme.primary.withAlpha(14),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    DateFormat('EEE').format(date),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: isSelected
                           ? scheme.onPrimary
                           : isToday
                           ? scheme.onPrimaryContainer
                           : scheme.onSurfaceVariant,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                ),
-              ],
+                  CircleAvatar(
+                    backgroundColor: isSelected ? scheme.primaryContainer.withAlpha(150) : scheme.primary.withAlpha(30),
+                    radius: 11,
+                    child: Text(
+                      '${date.day}',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: isSelected
+                            ? scheme.onPrimary
+                            : isToday
+                            ? scheme.onPrimaryContainer
+                            : scheme.onSurfaceVariant,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
