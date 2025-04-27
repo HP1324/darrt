@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/services/notification_service.dart';
 import 'package:minimaltodo/category/category_model.dart';
@@ -21,6 +23,8 @@ class TaskViewModel extends ChangeNotifier {
     }
   }
   List<Task> _tasks = [];
+
+
   final _box = ObjectBox.store.box<Task>();
   List<Task> get tasks => _tasks;
   final Set<int> _selectedTaskIds = {};
@@ -74,6 +78,8 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   void toggleStatus(Task task, bool value, DateTime d) {
+    debugPrint('Isolate in toggle status: ${Isolate.current.debugName}');
+    debugPrint('Before toggeling status: ${toString()}');
     if (task.isRepeating) {
       final cbox = ObjectBox.store.box<TaskCompletion>();
       final date = DateTime(d.year, d.month, d.day).millisecondsSinceEpoch;
@@ -97,6 +103,8 @@ class TaskViewModel extends ChangeNotifier {
       _box.put(task);
       singleTaskCompletions[task.id] = value;
     }
+    debugPrint('notifyListeners() will be called now');
+
     notifyListeners();
   }
 
