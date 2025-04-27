@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/category/category_model.dart';
@@ -109,6 +110,7 @@ class Task {
         repeatConfig: json['repeatConfig'],
         reminders: json['reminders'],
       );
+      debugPrint('Current Isolate in fromJson ${Isolate.current.debugName}');
       final ids = (json['categoryIds'] as List?)?.cast<int>() ?? [];
       final fetched = ObjectBox.store.box<CategoryModel>().getMany(ids);
       task.categories.addAll(fetched.whereType<CategoryModel>());

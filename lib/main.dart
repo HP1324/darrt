@@ -5,6 +5,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minimaltodo/app/calendar_view_model.dart';
 import 'package:minimaltodo/app/navigation_view_model.dart';
+import 'package:minimaltodo/app/services/notification_action_controller.dart';
 import 'package:minimaltodo/app/theme_view_model.dart';
 import 'package:minimaltodo/category/logic/category_state_controller.dart';
 import 'package:minimaltodo/category/logic/category_view_model.dart';
@@ -16,7 +17,6 @@ import 'package:minimaltodo/task/logic/task_state_controller.dart';
 import 'package:minimaltodo/task/logic/task_view_model.dart';
 import 'package:minimaltodo/views/home.dart';
 import 'package:provider/provider.dart';
-import 'package:minimaltodo/app/services/notification_action_controller.dart';
 import 'package:minimaltodo/app/services/notification_service.dart';
 Future<void> initApp() async {
   try {
