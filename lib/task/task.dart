@@ -117,7 +117,7 @@ class Task {
       }
       return task;
     } catch (e) {
-      MiniLogger.e('Error parsing task from JSON: $e');
+      MiniLogger.e('Error parsing task from JSON: ${e.toString()}\nError type: ${e.runtimeType}');
       rethrow;
     }
   }

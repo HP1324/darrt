@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:toastification/toastification.dart';
 
 import 'consts.dart';
 
+final getIt = GetIt.instance;
 
   void showToast(BuildContext context,{required ToastificationType type, required String description}){
     toastification.show(
