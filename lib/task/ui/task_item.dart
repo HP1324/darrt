@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:minimaltodo/app/calendar_view_model.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
+import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/logic/task_view_model.dart';
 import 'package:minimaltodo/task/task.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
@@ -68,7 +70,11 @@ class _TaskItemState extends State<TaskItem> {
                                 shape: CircleBorder(),
                                 value: repeat ? rtc[widget.task.id]?.contains(date) ?? false : stc[widget.task.id] ?? false,
                                 onChanged: (value) {
-                                  taskVM.toggleStatus(widget.task, value ?? false, calVM.selectedDate);
+                                  debugPrint('TaskVM hashcode: ${taskVM.hashCode}');
+                                  debugPrint('GetIt TaskVM hashcode: ${getIt<TaskViewModel>().hashCode}');
+                                  // debugPrint('GetIt TaskVM hashcode: ${getIt<TaskViewModel>().hashCode}');
+                                  // taskVM.toggleStatus(widget.task, value ?? false, calVM.selectedDate);
+                                  getIt<TaskViewModel>().toggleStatus(widget.task, value ?? false, calVM.selectedDate);
                                 },
                               );
                             }

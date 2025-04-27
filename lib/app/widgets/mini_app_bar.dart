@@ -94,6 +94,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
           onTap: () async {
             if(kDebugMode){
               debugPrint('${SchedulerBinding.instance.lifecycleState}');
+              debugPrint('${WidgetsBinding.instance.lifecycleState}');
             }
             // final scheduledNotifs = await AwesomeNotifications().listScheduledNotifications();
             // for (var notif in scheduledNotifs) {
