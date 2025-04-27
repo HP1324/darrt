@@ -11,25 +11,31 @@ import 'package:minimaltodo/category/logic/category_view_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/logic/task_state_controller.dart';
 import 'package:minimaltodo/task/logic/task_view_model.dart';
 import 'package:minimaltodo/views/home.dart';
 import 'package:provider/provider.dart';
 import 'package:minimaltodo/app/services/notification_action_controller.dart';
 import 'package:minimaltodo/app/services/notification_service.dart';
-void main() async {
+Future<void> initApp() async {
   try {
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
     await GetStorage.init();
     await MiniBox.initStorage();
     await ObjectBox.init();
+    getIt.registerSingleton<TaskViewModel>(TaskViewModel());
     await NotificationService.initNotifications();
     FlutterNativeSplash.remove();
-    runApp(const MinimalTodo());
   } catch (e) {
-    MiniLogger.e('Failed to initialize app: ${e.toString()}');
+    MiniLogger.e('Failed to initialize app: ${e.toString()}, Error type: ${e.runtimeType}');
   }
+}
+
+void main() async {
+  await initApp();
+  runApp(MinimalTodo());
 }
 
 class MinimalTodo extends StatefulWidget {
@@ -44,9 +50,8 @@ class _MinimalTodoState extends State<MinimalTodo> {
   void initState() {
     super.initState();
     AwesomeNotifications().setListeners(
-      onActionReceivedMethod: NotificationActionController.onActionReceivedMethod,
+      onActionReceivedMethod: onActionReceivedMethod,
     );
-
   }
 
   @override

@@ -130,7 +130,7 @@ class NotificationService {
               NotificationActionButton(
                 key: 'FINISHED',
                 label: 'Finished',
-                actionType: ActionType.SilentBackgroundAction,
+                actionType: ActionType.SilentAction,
               ),
             ]
         );
