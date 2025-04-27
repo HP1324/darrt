@@ -26,6 +26,7 @@ class TaskViewModel extends ChangeNotifier {
 
 
   final _box = ObjectBox.store.box<Task>();
+  final _completionBox = ObjectBox.store.box<TaskCompletion>();
   List<Task> get tasks => _tasks;
   final Set<int> _selectedTaskIds = {};
   Set<int> get selectedTaskIds => _selectedTaskIds;
@@ -77,32 +78,33 @@ class TaskViewModel extends ChangeNotifier {
     return 'Task deleted';
   }
 
-  void toggleStatus(Task task, bool value, DateTime d) {
+  void toggleStatus(Task task, bool value, DateTime d) async{
+
     debugPrint('Isolate in toggle status: ${Isolate.current.debugName}');
-    debugPrint('Before toggeling status: ${toString()}');
-    if (task.isRepeating) {
-      final cbox = ObjectBox.store.box<TaskCompletion>();
-      final date = DateTime(d.year, d.month, d.day).millisecondsSinceEpoch;
-      if (value) {
-        final completion = TaskCompletion(date: d, isDone: value);
-        completion.task.target = task;
-        cbox.put(completion);
-        recurringTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
-      } else {
-        final completion = cbox
-            .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
-            .build()
-            .findFirst();
-        if (completion != null) {
-          cbox.remove(completion.id);
-          recurringTaskCompletions[task.id]?.remove(date);
+    debugPrint('Before toggling status: ${toString()}');
+      if (task.isRepeating) {
+        final date = DateUtils.dateOnly(d).millisecondsSinceEpoch;
+        if (value) {
+          final completion = TaskCompletion(date: DateUtils.dateOnly(d), isDone: value);
+          completion.task.target = task;
+          _completionBox.put(completion);
+          recurringTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
+        } else {
+          final completion = _completionBox
+              .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
+              .build()
+              .findFirst();
+          debugPrint('Completion value: ${completion != null}');
+          if (completion != null) {
+            _completionBox.remove(completion.id);
+            recurringTaskCompletions[task.id]?.remove(date);
+          }
         }
+      } else {
+        task.isDone = value;
+        _box.put(task);
+        singleTaskCompletions[task.id] = value;
       }
-    } else {
-      task.isDone = value;
-      _box.put(task);
-      singleTaskCompletions[task.id] = value;
-    }
     debugPrint('notifyListeners() will be called now');
 
     notifyListeners();

@@ -1,5 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
+import 'package:minimaltodo/app/services/notification_action_controller.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/task/reminder.dart';
@@ -24,6 +25,10 @@ class NotificationService {
 
       if (permissionGranted) {
         await initializeNotificationChannels();
+        // final listenersSet = await _notif.setListeners(
+        //   onActionReceivedMethod: onActionReceivedMethod,
+        // );
+        // debugPrint('Listeners set: $listenersSet');
         MiniLogger.d('Notification service initialized successfully');
       } else {
         await MiniBox.write(mNotificationsEnabled, false);
@@ -107,7 +112,7 @@ class NotificationService {
               title: 'Task Due at ${formatTime(time)}',
               body: task.title,
               actionType: ActionType.Default,
-              payload: task.toNotificationPayload(),
+              payload:  {'id' : task.id.toString()},//task.toNotificationPayload(),
               notificationLayout: NotificationLayout.BigText,
               category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
               wakeUpScreen: true,
@@ -237,7 +242,7 @@ class NotificationService {
           channelKey: isAlarm ? 'task_alarm' : 'task_notif',
           title: 'Task due at ${formatTime(reminder.time)}',
           body: task.title,
-          payload: task.toNotificationPayload(),
+          payload: {'id' : task.id.toString()},
           notificationLayout: NotificationLayout.Default,
           category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
           wakeUpScreen: true,
@@ -256,9 +261,9 @@ class NotificationService {
         ),
         actionButtons: [
           NotificationActionButton(
-            key: 'MARK_DONE',
-            label: 'Mark Done',
-            actionType: ActionType.SilentBackgroundAction,
+            key: 'FINISHED',
+            label: 'Finished',
+            actionType: ActionType.SilentAction,
           ),
           NotificationActionButton(
             key: 'SNOOZE',
@@ -309,7 +314,7 @@ class NotificationService {
           channelKey: isAlarm ? 'task_alarm' : 'task_notif',
           title: 'Monthly Task Due at ${formatTime(reminder.time)}',
           body: task.title,
-          payload: task.toNotificationPayload(),
+          payload: {'id' : task.id.toString()},
           notificationLayout: NotificationLayout.Default,
           category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
           wakeUpScreen: true,
@@ -329,7 +334,7 @@ class NotificationService {
           NotificationActionButton(
             key: 'MARK_DONE',
             label: 'Mark Done',
-            actionType: ActionType.SilentBackgroundAction,
+            actionType: ActionType.SilentAction,
           ),
           NotificationActionButton(
             key: 'SNOOZE',
@@ -380,7 +385,7 @@ class NotificationService {
           channelKey: isAlarm ? 'task_alarm' : 'task_notif',
           title: 'Yearly Task Due at ${formatTime(reminder.time)}',
           body: task.title,
-          payload: task.toNotificationPayload(),
+          payload: {'id' : task.id.toString()},
           notificationLayout: NotificationLayout.Default,
           category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
           wakeUpScreen: true,
@@ -402,7 +407,7 @@ class NotificationService {
           NotificationActionButton(
             key: 'MARK_DONE',
             label: 'Mark Done',
-            actionType: ActionType.SilentBackgroundAction,
+            actionType: ActionType.SilentAction,
           ),
           NotificationActionButton(
             key: 'SNOOZE',
