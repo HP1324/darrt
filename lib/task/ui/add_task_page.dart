@@ -95,7 +95,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
               ] else ...[
                 const DuedateSelector(),
               ],
-              const AddRemindersWidget()
+              const AddRemindersWidget(),
+              const SizedBox(height: 100),
             ],
           ),
         ),
@@ -146,7 +147,35 @@ class AddRemindersWidget extends StatelessWidget {
           style: Theme.of(context).textTheme.bodySmall,
         );
       }),
-      trailing: const Icon(Icons.access_time),
+      trailing: InkWell(
+        onTap: () {
+          context.read<TaskStateController>().textFieldNode.unfocus();
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                  content: Text(
+                    Messages.mNotifAlarmDifference,
+                    style:
+                    TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
+                  ),
+                  actions: [
+                    FilledButton(
+                        onPressed: () async {
+                          await SettingsService.openBatterySettings();
+                        },
+                        child: Text('Go to settings')),
+                  ]);
+            },
+          );
+        },
+        child: CircleAvatar(
+          radius: 15,
+          backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+          child: Icon(Icons.question_mark, color: Theme.of(context).colorScheme.primary),
+        ),
+      ),
       onTap: () async {
         context.read<TaskStateController>().textFieldNode.unfocus();
         final allowed = await AwesomeNotifications().isNotificationAllowed();
@@ -314,6 +343,7 @@ class DuedateSelector extends StatelessWidget {
               controller.setDueDate(date);
             }
           },
+          onClear: () => controller.resetDueDate(),
         );
       },
     );
@@ -343,6 +373,7 @@ class WeekdaySelector extends StatelessWidget {
                   shape: CircleBorder(),
                   showCheckmark: false,
                   label: Text(days[index]),
+                  labelStyle: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium?.fontSize),
                   selected: weekdays.contains(index + 1) &&
                       context.read<TaskStateController>().isWeekdayValid(index + 1),
                   onSelected: (selected) {
@@ -370,17 +401,26 @@ class RepeatTypeSelector extends StatelessWidget {
     return Selector<TaskStateController, RepeatConfig>(
         selector: (context, controller) => controller.repeatConfig,
         builder: (context, config, _) {
-          return SegmentedButton(
-            showSelectedIcon: false,
-            segments: [
-              ButtonSegment(value: 'weekly', label: Text('Weekly')),
-              ButtonSegment(value: 'monthly', label: Text('Monthly')),
-              ButtonSegment(value: 'yearly', label: Text('Yearly')),
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SegmentedButton(
+                showSelectedIcon: false,
+                segments: [
+                  ButtonSegment(value: 'weekly', label: Text('Weekly')),
+                  ButtonSegment(value: 'monthly', label: Text('Monthly')),
+                  ButtonSegment(value: 'yearly', label: Text('Yearly')),
+                ],
+                selected: {config.type ?? 'weekly'},
+                onSelectionChanged: (selected) {
+                  context.read<TaskStateController>().setRepeatType(selected.first);
+                },
+                style: ButtonStyle(
+                  textStyle: WidgetStatePropertyAll(Theme.of(context).textTheme.labelMedium)
+                ),
+              ),
+              RepeatTypeHelpButton(),
             ],
-            selected: {config.type ?? 'weekly'},
-            onSelectionChanged: (selected) {
-              context.read<TaskStateController>().setRepeatType(selected.first);
-            },
           );
         });
   }
@@ -645,75 +685,73 @@ class TaskTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Selector<TaskStateController, bool>(
-          selector: (context, controller) => controller.isRepeating,
-          builder: (context, repeat, _) {
-            return SegmentedButton(
-              showSelectedIcon: false,
-              segments: [
-                ButtonSegment(
-                  value: false,
-                  label: Text('Single Task',style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium?.fontSize)),
-                  icon: Icon(
-                    Icons.calendar_today,
-                    size: 18,
-                    color: !repeat ? Theme.of(context).colorScheme.onPrimary : null,
-                  ),
-                ),
-                ButtonSegment(
-                  value: true,
-                  label: Text('Recurring Task',style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium?.fontSize)),
-                  icon: Icon(
-                    Icons.repeat,
-                    size: 18,
-                    color: repeat ? Theme.of(context).colorScheme.onPrimary : null,
-                  ),
-                ),
-              ],
-              selected: {repeat},
-              onSelectionChanged: (selected) {
-                context.read<TaskStateController>().toggleRepeat(selected.first);
-              },
-              style: ButtonStyle(
-                shape: WidgetStatePropertyAll(StadiumBorder()),
-              ),
-            );
-          },
-        ),
+    final theme = Theme.of(context);
 
-        InkWell(
-          onTap: () {
-            context.read<TaskStateController>().textFieldNode.unfocus();
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                    content: Text(
-                      Messages.mNotifAlarmDifference,
-                      style:
-                      TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Selector<TaskStateController, bool>(
+            selector: (context, controller) => controller.isRepeating,
+            builder: (context, repeat, _) {
+              return SizedBox(
+                width: constraints.maxWidth,
+                child: SegmentedButton(
+                  showSelectedIcon: false,
+                  segments: [
+                    ButtonSegment(
+                      value: false,
+                      label: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'Single Task',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: !repeat ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                            fontWeight: !repeat ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                      icon: Icon(
+                        Icons.calendar_today,
+                        size: 18,
+                        color: !repeat ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                      ),
                     ),
-                    actions: [
-                      FilledButton(
-                          onPressed: () async {
-                            await SettingsService.openBatterySettings();
-                          },
-                          child: Text('Go to settings')),
-                    ]);
-              },
-            );
-          },
-          child: CircleAvatar(
-            backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            child: Icon(Icons.question_mark, color: Theme.of(context).colorScheme.primary),
-          ),
-        ),
-      ],
+                    ButtonSegment(
+                      value: true,
+                      label: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'Recurring Task',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: repeat ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                            fontWeight: repeat ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                      icon: Icon(
+                        Icons.repeat,
+                        size: 18,
+                        color: repeat ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                  selected: {repeat},
+                  onSelectionChanged: (selected) {
+                    context.read<TaskStateController>().toggleRepeat(selected.first);
+                  },
+                  style: const ButtonStyle(
+                    // Using static values instead of deprecated MaterialStateProperty
+                    shape: WidgetStatePropertyAll(StadiumBorder()),
+                    padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 12, horizontal: 8)),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
-
   }
 }
 
@@ -1065,6 +1103,224 @@ class ReminderItem extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+
+class RepeatTypeHelpButton extends StatelessWidget {
+  const RepeatTypeHelpButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () => _showRepeatTypeDialog(context),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: colorScheme.secondaryContainer,
+        ),
+        child: Icon(
+          Icons.help_outline_rounded,
+          size: 18,
+          color: colorScheme.onSecondaryContainer,
+        ),
+      ),
+    );
+  }
+
+  void _showRepeatTypeDialog(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        title: Row(
+          children: [
+            Icon(
+              Icons.repeat_rounded,
+              color: colorScheme.primary,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Repeat Options',
+              style: textTheme.titleLarge?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildRepeatTypeSection(
+                  context: context,
+                  title: 'Weekly',
+                  icon: Icons.view_week_rounded,
+                  description: 'Select specific days of the week for your task to repeat on.',
+                ),
+                _buildWeeklyExample(context),
+                const Divider(),
+                _buildRepeatTypeSection(
+                  context: context,
+                  title: 'Monthly',
+                  icon: Icons.calendar_month_rounded,
+                  description: 'Task repeats on the same date as start date every month (e.g., on the 15th of each month).',
+                ),
+                const Divider(),
+                _buildRepeatTypeSection(
+                  context: context,
+                  title: 'Yearly',
+                  icon: Icons.event_repeat_rounded,
+                  description: 'Task repeats on the same date as start date every year (e.g., January 1st each year).',
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'Got it',
+              style: TextStyle(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRepeatTypeSection({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    required String description,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer.withAlpha(200),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              size: 24,
+              color: colorScheme.onPrimaryContainer,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeeklyExample(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    final weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    final selectedDays = [true, false, true, false, true, false, false]; // Example selection
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 40, top: 8, bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Example:',
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+          const SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: List.generate(
+                weekDays.length,
+                    (index) => Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: selectedDays[index]
+                          ? colorScheme.primary
+                          : colorScheme.surfaceVariant,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      weekDays[index],
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: selectedDays[index]
+                            ? colorScheme.onPrimary
+                            : colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Task will repeat on Monday, Wednesday and Friday until end date (if specified).',
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
     );
   }

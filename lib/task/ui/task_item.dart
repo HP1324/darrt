@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:minimaltodo/app/calendar_view_model.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
@@ -41,6 +40,7 @@ class _TaskItemState extends State<TaskItem> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
+              splashFactory: InkSparkle.splashFactory,
               borderRadius: BorderRadius.circular(12),
               onTap: () {
                 if (ids.isEmpty) {

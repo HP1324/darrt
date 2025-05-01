@@ -68,6 +68,10 @@ class TaskStateController extends ChangeNotifier {
     dueDate = date;
     notifyListeners();
   }
+  void resetDueDate(){
+    dueDate = DateTime.now();
+    notifyListeners();
+  }
 
   String setStartDate(DateTime date) {
     if (endDate == null || !(date.isAfter(endDate!) || DateUtils.isSameDay(endDate, date))) {

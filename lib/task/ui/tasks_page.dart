@@ -77,7 +77,6 @@ class DateItem extends StatelessWidget {
           final bool isSelected = calVM.selectedDate == date;
           final bool isToday = DateUtils.isSameDay(date, DateTime.now());
           final ColorScheme scheme = Theme.of(context).colorScheme;
-          final Brightness brightness = Theme.of(context).brightness;
 
           // Determine text and background colors based on states
           Color dayTextColor;
@@ -92,11 +91,11 @@ class DateItem extends StatelessWidget {
           } else if (isToday) {
             // Today but not selected styling
             dayTextColor = scheme.secondary;
-            dateBackgroundColor = scheme.secondaryContainer.withOpacity(0.5);
+            dateBackgroundColor = scheme.secondaryContainer.withValues(alpha:0.5);
             dateTextColor = scheme.onSecondaryContainer;
           } else {
             // Default state styling
-            dayTextColor = scheme.onSurface.withOpacity(0.8);
+            dayTextColor = scheme.onSurface.withValues(alpha:0.8);
             dateBackgroundColor = Colors.transparent;
             dateTextColor = scheme.onSurface;
           }
@@ -107,8 +106,6 @@ class DateItem extends StatelessWidget {
             },
             borderRadius: BorderRadius.circular(12),
             child: Container(
-              height: 62,
-              width: 42,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 border: isToday  ?
@@ -133,7 +130,7 @@ class DateItem extends StatelessWidget {
                       color: dateBackgroundColor,
                       boxShadow: isSelected ? [
                         BoxShadow(
-                          color: scheme.primary.withOpacity(0.3),
+                          color: scheme.primary.withValues(alpha:0.3),
                           blurRadius: 4,
                           offset: const Offset(0, 1),
                         )
