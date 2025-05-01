@@ -15,22 +15,16 @@ import 'package:minimaltodo/task/ui/add_task_page.dart';
 Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
   try {
     final appState = SchedulerBinding.instance.lifecycleState;
-    debugPrint('App state right now: $appState');
-    if(appState == AppLifecycleState.detached) {
+    if (appState == AppLifecycleState.detached) {
       await ObjectBox.init();
       getIt.registerSingleton<TaskViewModel>(TaskViewModel());
     }
-    // Task task = TaskUtilities.fromNotificationPayload(receivedAction.payload ?? {});
     Task task = ObjectBox.store.box<Task>().get(int.parse(receivedAction.payload!['id']!))!;
-    debugPrint('Isolate in notification action: ${Isolate.current.debugName}');
-    final widgetAppState = WidgetsBinding.instance.lifecycleState;
-    debugPrint('Widgets app state right now: $widgetAppState');
     if (receivedAction.buttonKeyPressed == 'FINISHED') {
-      // if (appState == AppLifecycleState.resumed || appState == AppLifecycleState.paused) {
-        getIt<TaskViewModel>().toggleStatus(task, true, DateTime.now());
-      // }
+      getIt<TaskViewModel>().toggleStatus(task, true, DateTime.now());
     } else {
-      MinimalTodo.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => AddTaskPage(edit: true, task: task)));
+      MinimalTodo.navigatorKey.currentState
+          ?.push(MaterialPageRoute(builder: (_) => AddTaskPage(edit: true, task: task)));
     }
   } catch (e, t) {
     MiniLogger.e(

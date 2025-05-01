@@ -72,6 +72,7 @@ class TaskViewModel extends ChangeNotifier {
 
   String deleteTask(int id) {
     _box.remove(id);
+    NotificationService.removeAllTaskNotifications(_tasks.firstWhere((t) => t.id == id));
     final index = _tasks.indexWhere((t) => t.id == id);
     _tasks.removeAt(index);
     notifyListeners();
@@ -113,6 +114,7 @@ class TaskViewModel extends ChangeNotifier {
   String deleteSelectedTasks() {
     _box.removeMany(_selectedTaskIds.toList());
     for (int id in _selectedTaskIds) {
+      NotificationService.removeAllTaskNotifications(_tasks.firstWhere((t) => t.id == id));
       _tasks.removeWhere((t) => t.id == id);
     }
     clearSelection();
