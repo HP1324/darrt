@@ -1,20 +1,43 @@
-import 'dart:convert' show jsonEncode,jsonDecode;
+import 'dart:convert' show jsonEncode, jsonDecode;
 
 import 'package:flutter/material.dart';
 
-class Reminder{
-  int id;
-  TimeOfDay time;
-  String type;
+class Reminder {
+  final int id;
+  final TimeOfDay time;
+  final String type;
 
-  Reminder({this.id = 0,required this.time, this.type = 'notif'});
+  const Reminder({this.id = 0, required this.time, this.type = 'notif'});
 
-
-  String toJsonString(){
-    return jsonEncode({'time' : timeToString(), 'type' : type});
+  Reminder copyWith({int? id, TimeOfDay? time, String? type}) {
+    return Reminder(
+      id: id ?? this.id,
+      time: time ?? this.time,
+      type: type ?? this.type,
+    );
   }
 
-  factory Reminder.fromJsonString(String json){
+  @override
+  String toString() {
+    return 'Reminder(id: $id, time: $time, type: $type)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Reminder &&
+        other.id == id &&
+        (other.time.hour == time.hour && other.time.minute == time.minute) &&
+        other.type == type;
+  }
+  @override
+  int get hashCode =>Object.hash(id.hashCode, time.hour.hashCode, time.minute.hashCode, type.hashCode);
+
+  String toJsonString() {
+    return jsonEncode({'time': timeToString(), 'type': type});
+  }
+
+  factory Reminder.fromJsonString(String json) {
     final Map<String, dynamic> data = jsonDecode(json);
     return Reminder(
       time: stringToTime(data['time']),
@@ -26,6 +49,7 @@ class Reminder{
     final minute = time.minute;
     return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
   }
+
   static TimeOfDay stringToTime(String timeString) {
     final parts = timeString.split(':');
     final hour = int.parse(parts[0]);
@@ -34,11 +58,14 @@ class Reminder{
   }
 
   static String remindersToJsonString(List<Reminder> reminders) {
-    List<Map<String, dynamic>> reminderMapList = reminders.map((r) => {
-      'id' : r.id,
-      'time': r.timeToString(),
-      'type': r.type,
-    }).toList();
+    List<Map<String, dynamic>> reminderMapList = reminders
+        .map((r) => {
+              'id': r.id,
+              'time': r.timeToString(),
+              'type': r.type,
+            })
+        .toList();
     return jsonEncode(reminderMapList);
   }
+
 }

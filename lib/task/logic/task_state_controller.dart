@@ -5,9 +5,8 @@ import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/task/reminder.dart';
 import 'package:minimaltodo/task/repeat_config.dart';
 import 'package:minimaltodo/task/task.dart';
-
+@immutable
 class TaskState {
-  final TextEditingController titleController;
   final Map<CategoryModel, bool> categorySelection;
   final DateTime dueDate;
   final bool isRepeating;
@@ -19,7 +18,6 @@ class TaskState {
   final int currentPriority;
 
   const TaskState({
-    required this.titleController,
     required this.categorySelection,
     required this.dueDate,
     required this.isRepeating,
@@ -32,7 +30,6 @@ class TaskState {
   });
 
   TaskState copyWith({
-    TextEditingController? titleController,
     Map<CategoryModel, bool>? categorySelection,
     DateTime? dueDate,
     bool? isRepeating,
@@ -44,7 +41,6 @@ class TaskState {
     int? currentPriority,
   }) {
     return TaskState(
-      titleController: titleController ?? this.titleController,
       categorySelection: categorySelection ?? this.categorySelection,
       dueDate: dueDate ?? this.dueDate,
       isRepeating: isRepeating ?? this.isRepeating,
@@ -70,7 +66,7 @@ class TaskStateController extends ChangeNotifier {
   List<Reminder> reminders = [];
   String priority = 'Low';
 
-  FocusNode textFieldNode = FocusNode();
+  final FocusNode textFieldNode = FocusNode();
   void initTaskState(Task task) {
     final categories = ObjectBox.store.box<CategoryModel>().getAll();
     titleController.text = task.title;
@@ -162,7 +158,7 @@ class TaskStateController extends ChangeNotifier {
   }
 
   void updateWeekdayValidity() {
-    final config = repeatConfig;
+    var config = repeatConfig;
     if (config.type != 'weekly') return;
 
     List<int> validWeekdays = [];
@@ -183,8 +179,8 @@ class TaskStateController extends ChangeNotifier {
         }
       }
     }
-
     config.days = validWeekdays;
+    // config = config.copyWith(days: validWeekdays);
   }
 
   bool isWeekdayValid(int weekday) {
