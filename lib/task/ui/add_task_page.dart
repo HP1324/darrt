@@ -364,7 +364,7 @@ class WeekdaySelector extends StatelessWidget {
         children: List.generate(
           7,
           (index) {
-            List<String> days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+            final List<String> days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
             return Selector<TaskStateController, List<int>>(
               selector: (context, controller) => controller.repeatConfig.days,
               builder: (context, weekdays, _) {
