@@ -63,7 +63,6 @@ class _MinimalTodoState extends State<MinimalTodo> {
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
         ChangeNotifierProvider(create: (_) => ThemeViewModel()),
         ChangeNotifierProvider(create: (_) => CalendarViewModel()),
-        ChangeNotifierProvider(create: (_) => CalendarViewModel()),
         ChangeNotifierProvider(create: (_) => TaskStateController()),
         ChangeNotifierProvider(create: (_) => CategoryStateController()),
       ],
