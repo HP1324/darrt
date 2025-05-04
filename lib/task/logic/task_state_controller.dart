@@ -6,6 +6,58 @@ import 'package:minimaltodo/task/reminder.dart';
 import 'package:minimaltodo/task/repeat_config.dart';
 import 'package:minimaltodo/task/task.dart';
 
+class TaskState {
+  final TextEditingController titleController;
+  final Map<CategoryModel, bool> categorySelection;
+  final DateTime dueDate;
+  final bool isRepeating;
+  final DateTime startDate;
+  final DateTime? endDate;
+  final RepeatConfig repeatConfig;
+  final List<Reminder> reminders;
+  final String priority;
+  final int currentPriority;
+
+  const TaskState({
+    required this.titleController,
+    required this.categorySelection,
+    required this.dueDate,
+    required this.isRepeating,
+    required this.startDate,
+    this.endDate,
+    required this.repeatConfig,
+    required this.reminders,
+    required this.priority,
+    required this.currentPriority,
+  });
+
+  TaskState copyWith({
+    TextEditingController? titleController,
+    Map<CategoryModel, bool>? categorySelection,
+    DateTime? dueDate,
+    bool? isRepeating,
+    DateTime? startDate,
+    DateTime? endDate,
+    RepeatConfig? repeatConfig,
+    List<Reminder>? reminders,
+    String? priority,
+    int? currentPriority,
+  }) {
+    return TaskState(
+      titleController: titleController ?? this.titleController,
+      categorySelection: categorySelection ?? this.categorySelection,
+      dueDate: dueDate ?? this.dueDate,
+      isRepeating: isRepeating ?? this.isRepeating,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      repeatConfig: repeatConfig ?? this.repeatConfig,
+      reminders: reminders ?? this.reminders,
+      priority: priority ?? this.priority,
+      currentPriority: currentPriority ?? this.currentPriority,
+    );
+  }
+}
+
 ///Controls the temporary state of the task add page when task is being added or updated
 class TaskStateController extends ChangeNotifier {
   final titleController = TextEditingController();
@@ -42,7 +94,7 @@ class TaskStateController extends ChangeNotifier {
     reminders;
     priority = 'Low';
     titleController.clear();
-    reminders =[];
+    reminders = [];
   }
 
   Task buildTask({required bool edit, Task? task}) {
@@ -55,7 +107,7 @@ class TaskStateController extends ChangeNotifier {
       endDate: endDate,
       isRepeating: isRepeating,
       repeatConfig: repeatConfig.toJsonString(),
-      reminders:  Reminder.remindersToJsonString(reminders) ,
+      reminders: Reminder.remindersToJsonString(reminders),
     );
   }
 
@@ -68,7 +120,8 @@ class TaskStateController extends ChangeNotifier {
     dueDate = date;
     notifyListeners();
   }
-  void resetDueDate(){
+
+  void resetDueDate() {
     dueDate = DateTime.now();
     notifyListeners();
   }
@@ -102,10 +155,12 @@ class TaskStateController extends ChangeNotifier {
     endDate = null;
     notifyListeners();
   }
-  void setRepeatType(String type){
+
+  void setRepeatType(String type) {
     repeatConfig = RepeatConfig(type: type);
     notifyListeners();
   }
+
   void updateWeekdayValidity() {
     final config = repeatConfig;
     if (config.type != 'weekly') return;
@@ -195,12 +250,10 @@ class TaskStateController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Reminder currentReminder = Reminder(time: TimeOfDay(hour: 12, minute: 0), type: 'notif');
-
   ///Add or edit a reminder.
   ///[oldReminder] is necessary to provide when editing task to match if this reminder exists
   String putReminder({bool edit = false, required Reminder reminder, Reminder? oldReminder}) {
-    if(kDebugMode) {
+    if (kDebugMode) {
       debugPrint('All reminders');
       for (var reminder in reminders) {
         debugPrint('Reminder: ${reminder.time.hour}:${reminder.time.minute}');
@@ -208,7 +261,8 @@ class TaskStateController extends ChangeNotifier {
       debugPrint('All reminders');
     }
     if (edit) {
-      final index = reminders.indexWhere((r) => r.time.hour == oldReminder!.time.hour && r.time.minute == oldReminder.time.minute);
+      final index = reminders.indexWhere(
+          (r) => r.time.hour == oldReminder!.time.hour && r.time.minute == oldReminder.time.minute);
       print('this is index: $index');
       if (index != -1) {
         reminders[index] = reminder;
