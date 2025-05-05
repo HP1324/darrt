@@ -36,9 +36,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   @override
   void initState() {
     super.initState();
-    if (widget.edit) {
-      context.read<TaskStateController>().initTaskState(widget.task!);
-    }
+      context.read<TaskStateController>().initTaskState(widget.edit, widget.edit ? widget.task : null);
   }
 
   late TaskStateController controller;
@@ -103,27 +101,26 @@ class _AddTaskPageState extends State<AddTaskPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          final categories = context
-              .read<CategoryViewModel>()
-              .categories
-              .where((c) => context.read<TaskStateController>().categorySelection[c] == true)
-              .toList();
-          Task newTask =
-              context.read<TaskStateController>().buildTask(edit: widget.edit, task: widget.task);
-          final message = context
-              .read<TaskViewModel>()
-              .putTask(newTask, categories: categories, edit: widget.edit);
-          var type = ToastificationType.success;
-          if (message == Messages.mTaskAdded || message == Messages.mTaskEdited) {
-            Navigator.pop(context);
-          } else {
-            type = ToastificationType.error;
-          }
-          showToast(context, type: type, description: message);
+          _putTask(context);
         },
         child: Icon(Icons.done),
       ),
     );
+  }
+  void _putTask(BuildContext context){
+    final controller = context.read<TaskStateController>();
+    final catVM = context.read<CategoryViewModel>();
+    final taskVM = context.read<TaskViewModel>();
+    final categories = catVM.categories.where((c) => controller.categorySelection[c] == true).toList();
+    Task newTask =controller.buildTask(edit: widget.edit, task: widget.task);
+    final message = taskVM.putTask(newTask, categories: categories, edit: widget.edit);
+    var type = ToastificationType.success;
+    if (message == Messages.mTaskAdded || message == Messages.mTaskEdited) {
+      Navigator.pop(context);
+    } else {
+      type = ToastificationType.error;
+    }
+    showToast(context, type: type, description: message);
   }
 }
 
@@ -140,10 +137,11 @@ class AddRemindersWidget extends StatelessWidget {
         style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 14),
       ),
       subtitle: Consumer<TaskStateController>(builder: (context, controller, _) {
+        final reminders = controller.reminders;
         return Text(
-          controller.reminders.isEmpty
+          reminders.isEmpty
               ? 'Click here to add reminders per day'
-              : controller.reminders.map((r) => r.time.format(context)).join(', '),
+              : reminders.map((r) => r.time.format(context)).join(', '),
           style: Theme.of(context).textTheme.bodySmall,
         );
       }),

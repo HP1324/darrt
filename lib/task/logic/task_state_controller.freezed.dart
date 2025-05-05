@@ -155,7 +155,7 @@ class _$TaskStateCopyWithImpl<$Res> implements $TaskStateCopyWith<$Res> {
 
 /// @nodoc
 
-class _TaskState implements TaskState {
+class _TaskState extends TaskState {
   const _TaskState(
       {required final Map<CategoryModel, bool> categorySelection,
       required this.dueDate,
@@ -167,7 +167,8 @@ class _TaskState implements TaskState {
       required this.priority,
       required this.currentPriority})
       : _categorySelection = categorySelection,
-        _reminders = reminders;
+        _reminders = reminders,
+        super._();
 
   final Map<CategoryModel, bool> _categorySelection;
   @override
