@@ -2,6 +2,7 @@ import 'dart:convert' show jsonEncode, jsonDecode;
 
 import 'package:flutter/material.dart';
 
+
 class Reminder {
   final int id;
   final TimeOfDay time;
@@ -22,16 +23,7 @@ class Reminder {
     return 'Reminder(id: $id, time: $time, type: $type)';
   }
 
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is Reminder &&
-        other.id == id &&
-        (other.time.hour == time.hour && other.time.minute == time.minute) &&
-        other.type == type;
-  }
-  @override
-  int get hashCode =>Object.hash(id.hashCode, time.hour.hashCode, time.minute.hashCode, type.hashCode);
+
 
   String toJsonString() {
     return jsonEncode({'time': timeToString(), 'type': type});
