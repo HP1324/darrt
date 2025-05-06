@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:minimaltodo/category/category_model.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/state/state_controller.dart';
 import 'package:minimaltodo/task/reminder.dart';
 import 'package:minimaltodo/task/repeat_config.dart';
 import 'package:minimaltodo/task/task.dart';
@@ -26,19 +27,13 @@ abstract class TaskState with _$TaskState {
 }
 
 ///Controls the temporary state of the task add page when task is being added or updated
-class TaskStateController extends ChangeNotifier {
-  late TaskState _state;
+class TaskStateController extends StateController<TaskState, Task> {
 
-  TaskState get state => _state;
-
-  final TextEditingController titleController = TextEditingController();
-
-  final FocusNode textFieldNode = FocusNode();
-
-  void initTaskState(bool edit, [Task? task]) {
-    titleController.text = edit ? task!.title : '';
+  @override
+  void initState(bool edit, [Task? task]) {
+    textController.text = edit ? task!.title : '';
     final categories = ObjectBox.store.box<CategoryModel>().getAll();
-    _state = TaskState(
+    state = TaskState(
       categorySelection: edit
           ? {for (var cat in categories) cat: task!.categories.contains(cat)}
           : {CategoryModel(id: 1, name: 'General'): true},
@@ -53,8 +48,9 @@ class TaskStateController extends ChangeNotifier {
     );
   }
 
-  void clearTaskState() {
-    _state = _state.copyWith(
+  @override
+  void clearState() {
+    state = state.copyWith(
       categorySelection: {CategoryModel(id: 1, name: 'General'): true},
       dueDate: DateTime.now(),
       isRepeating: false,
@@ -64,12 +60,13 @@ class TaskStateController extends ChangeNotifier {
       reminders: [],
       priority: priorities[3],
     );
-    titleController.clear();
+    textController.clear();
   }
-
-  Task buildTask({required bool edit, Task? task}) {
+  @override
+  Task buildModel({required bool edit, Task? model}) {
+    final task = model;
     return Task(
-      title: titleController.text,
+      title: textController.text,
       dueDate: dueDate,
       priority: priority,
       id: edit ? task!.id : 0,
@@ -82,23 +79,23 @@ class TaskStateController extends ChangeNotifier {
   }
 
   void setCategory(CategoryModel category, bool value) {
-    _state = _state.copyWith(categorySelection: {...categorySelection, category: value});
+    state = state.copyWith(categorySelection: {...categorySelection, category: value});
     notifyListeners();
   }
 
   void setDueDate(DateTime date) {
-    _state = _state.copyWith(dueDate: date);
+    state = state.copyWith(dueDate: date);
     notifyListeners();
   }
 
   void resetDueDate() {
-    _state = _state.copyWith(dueDate: DateTime.now());
+    state = state.copyWith(dueDate: DateTime.now());
     notifyListeners();
   }
 
   String setStartDate(DateTime date) {
     if (endDate == null || !(date.isAfter(endDate!) || DateUtils.isSameDay(endDate, date))) {
-      _state = _state.copyWith(startDate: date);
+      state = state.copyWith(startDate: date);
       updateWeekdayValidity();
       notifyListeners();
       return 'Start date set';
@@ -107,13 +104,13 @@ class TaskStateController extends ChangeNotifier {
   }
 
   void resetStartDate() {
-    _state = _state.copyWith(startDate: DateTime.now());
+    state = state.copyWith(startDate: DateTime.now());
     notifyListeners();
   }
 
   String setEndDate(DateTime date) {
     if (!DateUtils.isSameDay(startDate, date) && date.isAfter(startDate)) {
-      _state = _state.copyWith(endDate: date);
+      state = state.copyWith(endDate: date);
       updateWeekdayValidity();
       notifyListeners();
       return 'End date set';
@@ -122,12 +119,12 @@ class TaskStateController extends ChangeNotifier {
   }
 
   void resetEndDate() {
-    _state = _state.copyWith(endDate: null);
+    state = state.copyWith(endDate: null);
     notifyListeners();
   }
 
   void setRepeatType(String type) {
-    _state = _state.copyWith(repeatConfig: RepeatConfig(type: type));
+    state = state.copyWith(repeatConfig: RepeatConfig(type: type));
     notifyListeners();
   }
 
@@ -189,14 +186,14 @@ class TaskStateController extends ChangeNotifier {
       }
     }
     updatedDays.sort();
-    _state =
-        _state.copyWith(repeatConfig: RepeatConfig(type: repeatConfig.type, days: updatedDays));
+    state =
+        state.copyWith(repeatConfig: RepeatConfig(type: repeatConfig.type, days: updatedDays));
     notifyListeners();
   }
 
   void toggleRepeat(bool value) {
     if (isRepeating == value) return;
-    _state = _state.copyWith(
+    state = state.copyWith(
       isRepeating: value,
       dueDate: value ? DateTime.now() : dueDate,
       startDate: value ? startDate : dueDate,
@@ -210,7 +207,7 @@ class TaskStateController extends ChangeNotifier {
   void navigatePriority(bool isNext) {
     final len = priorities.length;
     final newP = (currentPriority + (isNext ? 1 : -1) + len) % len;
-    _state = _state.copyWith(currentPriority: newP, priority: priorities[newP]);
+    state = state.copyWith(currentPriority: newP, priority: priorities[newP]);
     notifyListeners();
   }
 
@@ -236,7 +233,7 @@ class TaskStateController extends ChangeNotifier {
       if (exists) return 'Time already added';
       updatedReminders.add(reminder);
     }
-    _state = _state.copyWith(reminders: updatedReminders);
+    state = state.copyWith(reminders: updatedReminders);
     notifyListeners();
     return 'Reminder saved';
   }
@@ -244,19 +241,19 @@ class TaskStateController extends ChangeNotifier {
   void removeReminder(Reminder reminder) {
     List<Reminder> updatedReminders = List.from(reminders);
     updatedReminders.remove(reminder);
-    _state = _state.copyWith(reminders: updatedReminders);
+    state = state.copyWith(reminders: updatedReminders);
     notifyListeners();
   }
 }
 
 extension AccessState on TaskStateController {
-  bool get isRepeating => _state.isRepeating;
-  DateTime get dueDate => _state.dueDate;
-  DateTime get startDate => _state.startDate;
-  DateTime? get endDate => _state.endDate;
-  RepeatConfig get repeatConfig => _state.repeatConfig;
-  List<Reminder> get reminders => _state.reminders;
-  String get priority => _state.priority;
-  int get currentPriority => _state.currentPriority;
-  Map<CategoryModel, bool> get categorySelection => _state.categorySelection;
+  bool get isRepeating => state.isRepeating;
+  DateTime get dueDate => state.dueDate;
+  DateTime get startDate => state.startDate;
+  DateTime? get endDate => state.endDate;
+  RepeatConfig get repeatConfig => state.repeatConfig;
+  List<Reminder> get reminders => state.reminders;
+  String get priority => state.priority;
+  int get currentPriority => state.currentPriority;
+  Map<CategoryModel, bool> get categorySelection => state.categorySelection;
 }
