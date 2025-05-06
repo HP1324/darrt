@@ -36,7 +36,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   @override
   void initState() {
     super.initState();
-      context.read<TaskStateController>().initTaskState(widget.edit, widget.edit ? widget.task : null);
+      context.read<TaskStateController>().initState(widget.edit, widget.edit ? widget.task : null);
   }
 
   late TaskStateController controller;
@@ -48,7 +48,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   @override
   void dispose() {
-    controller.clearTaskState();
+    controller.clearState();
     super.dispose();
   }
 
@@ -69,7 +69,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   Expanded(
                     child: TextField(
                       textCapitalization: TextCapitalization.sentences,
-                      controller: context.read<TaskStateController>().titleController,
+                      controller: context.read<TaskStateController>().textController,
                       autofocus: true,
                       focusNode: context.read<TaskStateController>().textFieldNode,
                       decoration: InputDecoration(
@@ -112,7 +112,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
     final catVM = context.read<CategoryViewModel>();
     final taskVM = context.read<TaskViewModel>();
     final categories = catVM.categories.where((c) => controller.categorySelection[c] == true).toList();
-    Task newTask =controller.buildTask(edit: widget.edit, task: widget.task);
+    Task newTask =controller.buildModel(edit: widget.edit, model: widget.task);
     final message = taskVM.putTask(newTask, categories: categories, edit: widget.edit);
     var type = ToastificationType.success;
     if (message == Messages.mTaskAdded || message == Messages.mTaskEdited) {

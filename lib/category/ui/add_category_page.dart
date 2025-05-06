@@ -19,7 +19,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   @override
   void initState() {
     super.initState();
-      context.read<CategoryStateController>().initCategoryState(widget.edit,widget.category!);
+      context.read<CategoryStateController>().initState(widget.edit,widget.category!);
   }
 
   @override
@@ -30,7 +30,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
 
   @override
   void dispose() {
-    controller.clearCategoryState();
+    controller.clearState();
     super.dispose();
   }
 
@@ -48,7 +48,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
             const SizedBox(height: 20),
             TextField(
               textCapitalization: TextCapitalization.sentences,
-              controller: controller.nameController,
+              controller: controller.textController,
               autofocus: true,
               decoration: const InputDecoration(
                 hintText: 'Enter Category Name Here',
@@ -110,7 +110,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          CategoryModel category = controller.buildCategory(edit: widget.edit, category: widget.category);
+          CategoryModel category = controller.buildModel(edit: widget.edit, model: widget.category);
           final message = context.read<CategoryViewModel>().putCategory(category, edit: widget.edit);
           Navigator.pop(context);
         },
