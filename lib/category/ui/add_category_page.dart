@@ -19,9 +19,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   @override
   void initState() {
     super.initState();
-    if (widget.edit) {
-      context.read<CategoryStateController>().initCategoryState(widget.category!);
-    }
+      context.read<CategoryStateController>().initCategoryState(widget.edit,widget.category!);
   }
 
   @override
