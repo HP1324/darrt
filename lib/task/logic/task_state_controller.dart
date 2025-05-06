@@ -30,7 +30,9 @@ class TaskStateController extends ChangeNotifier {
   late TaskState _state;
 
   TaskState get state => _state;
-  final titleController = TextEditingController();
+
+  final TextEditingController titleController = TextEditingController();
+
   final FocusNode textFieldNode = FocusNode();
 
   void initTaskState(bool edit, [Task? task]) {
