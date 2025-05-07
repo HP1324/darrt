@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class NavigationViewModel extends ChangeNotifier {
+class NavigationManager extends ChangeNotifier {
   List<bool> selected = [true,false,false,false,false];
   int currentDestination = 0;
   void onDestinationChanged(int selectedDest){

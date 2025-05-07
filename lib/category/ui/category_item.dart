@@ -4,10 +4,12 @@ import 'package:minimaltodo/category/logic/category_view_model.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/tasks_for_category_page.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
+import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/logic/task_view_model.dart';
 import 'package:provider/provider.dart';
+import 'package:toastification/toastification.dart';
 
 class CategoryItem extends StatefulWidget {
   const CategoryItem({
@@ -114,9 +116,10 @@ class _CategoryItemState extends State<CategoryItem> {
                                       ),
                                       FilledButton(
                                         onPressed: () async {
-                                          context
+                                          final message = context
                                               .read<CategoryViewModel>()
-                                              .deleteCategory(widget.category.id);
+                                              .deleteItem(widget.category.id);
+                                          showToast(context, type: ToastificationType.success, description: Messages.mCategoryDeleted);
                                           Navigator.pop(context);
                                         },
                                         child: const Text('Delete'),

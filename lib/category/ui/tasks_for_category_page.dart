@@ -51,7 +51,7 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
                     ),
                     IconButton(
                       onPressed: () {
-                        context.read<TaskViewModel>().deleteSelectedTasks();
+                        context.read<TaskViewModel>().deleteMultipleItems();
                       },
                       icon: Icon(Icons.delete),
                     ),

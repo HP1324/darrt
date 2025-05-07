@@ -7,7 +7,7 @@ class ThemeSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeViewModel>(
+    return Consumer<ThemeManager>(
       builder: (context, themeVM, _) {
         return Scaffold(
           // backgroundColor: Colors.transparent,
@@ -40,7 +40,7 @@ class ThemeSettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildColorGrid(ThemeViewModel themeVM) {
+  Widget _buildColorGrid(ThemeManager themeVM) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -63,7 +63,7 @@ class ThemeSettingsPage extends StatelessWidget {
       },
     );
   }
-  Widget _buildThemeSelector(BuildContext context, ThemeViewModel themeVM) {
+  Widget _buildThemeSelector(BuildContext context, ThemeManager themeVM) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

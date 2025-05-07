@@ -18,7 +18,15 @@ import 'package:minimaltodo/task/logic/task_view_model.dart';
 import 'package:minimaltodo/views/home.dart';
 import 'package:provider/provider.dart';
 import 'package:minimaltodo/app/services/notification_service.dart';
-
+void registerSingletons(){
+  getIt.registerSingleton<TaskViewModel>(TaskViewModel());
+  getIt.registerSingleton<CategoryViewModel>(CategoryViewModel());
+  getIt.registerSingleton<TaskStateController>(TaskStateController());
+  getIt.registerSingleton<CategoryStateController>(CategoryStateController());
+  getIt.registerSingleton<CalendarManager>(CalendarManager());
+  getIt.registerSingleton<ThemeManager>(ThemeManager());
+  getIt.registerSingleton<NavigationManager>(NavigationManager());
+}
 Future<void> initApp() async {
   try {
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -26,9 +34,7 @@ Future<void> initApp() async {
     await GetStorage.init();
     await MiniBox.initStorage();
     await ObjectBox.init();
-    getIt.registerSingleton<TaskStateController>(TaskStateController());
-    getIt.registerSingleton<TaskViewModel>(TaskViewModel());
-    getIt.registerSingleton<CategoryViewModel>(CategoryViewModel());
+    registerSingletons();
     await NotificationService.initNotifications();
     FlutterNativeSplash.remove();
   } catch (e) {
@@ -64,12 +70,12 @@ class _MinimalTodoState extends State<MinimalTodo> {
         ChangeNotifierProvider(create: (_) => getIt<TaskViewModel>()),
         ChangeNotifierProvider(create: (_) => getIt<CategoryViewModel>()),
         ChangeNotifierProvider(create: (_) => getIt<TaskStateController>()),
-        ChangeNotifierProvider(create: (_) => NavigationViewModel()),
-        ChangeNotifierProvider(create: (_) => ThemeViewModel()),
-        ChangeNotifierProvider(create: (_) => CalendarViewModel()),
-        ChangeNotifierProvider(create: (_) => CategoryStateController()),
+        ChangeNotifierProvider(create: (_) => getIt<NavigationManager>()),
+        ChangeNotifierProvider(create: (_) => getIt<ThemeManager>()),
+        ChangeNotifierProvider(create: (_) => getIt<CalendarManager>()),
+        ChangeNotifierProvider(create: (_) => getIt<CategoryStateController>()),
       ],
-      child: Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
+      child: Consumer<ThemeManager>(builder: (context, themeVM, _) {
         return MaterialApp(
           navigatorKey: MinimalTodo.navigatorKey,
           theme: FlexColorScheme.light(colors: themeVM.selectedScheme).toTheme,

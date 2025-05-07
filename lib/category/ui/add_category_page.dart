@@ -3,7 +3,9 @@ import 'package:minimaltodo/category/category_model.dart';
 import 'package:minimaltodo/category/logic/category_state_controller.dart';
 import 'package:minimaltodo/category/logic/category_view_model.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
+import 'package:minimaltodo/helpers/utils.dart';
 import 'package:provider/provider.dart';
+import 'package:toastification/toastification.dart';
 
 class AddCategoryPage extends StatefulWidget {
   const AddCategoryPage({super.key, required this.edit, this.category}) : assert(!edit || category != null);
@@ -19,7 +21,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   @override
   void initState() {
     super.initState();
-      context.read<CategoryStateController>().initState(widget.edit,widget.category!);
+      context.read<CategoryStateController>().initState(widget.edit,widget.edit? widget.category! : null);
   }
 
   @override
@@ -111,7 +113,8 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           CategoryModel category = controller.buildModel(edit: widget.edit, model: widget.category);
-          final message = context.read<CategoryViewModel>().putCategory(category, edit: widget.edit);
+          final message = context.read<CategoryViewModel>().putItem(category, edit: widget.edit);
+          showToast(context, type: ToastificationType.success, description: message);
           Navigator.pop(context);
         },
         child: const Icon(Icons.done),

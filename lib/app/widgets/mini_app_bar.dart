@@ -30,7 +30,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   lastDate: getMaxDate(),
                   onDateChanged: (selectedDate) {
                     final date = DateUtils.dateOnly(selectedDate);
-                    context.read<CalendarViewModel>().scrollToDate(date);
+                    context.read<CalendarManager>().scrollToDate(date);
                   },
                 ),
               );
@@ -39,7 +39,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
         },
         child: Row(
           children: [
-            Selector<CalendarViewModel, DateTime>(
+            Selector<CalendarManager, DateTime>(
                 selector: (context, calVM) => calVM.selectedDate,
                 builder: (context, selectedDate, _) {
                   final isBefore = selectedDate.isBefore(DateTime.now());

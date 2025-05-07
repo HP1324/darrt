@@ -60,7 +60,7 @@ class _TaskItemState extends State<TaskItem> {
                       padding: const EdgeInsets.only(left: 2),
                       child: Transform.scale(
                         scale: 1.09,
-                        child: Consumer2<TaskViewModel, CalendarViewModel>(
+                        child: Consumer2<TaskViewModel, CalendarManager>(
                             builder: (context, taskVM, calVM, _) {
                               final repeat = widget.task.isRepeating;
                               final stc = taskVM.singleTaskCompletions, rtc = taskVM.recurringTaskCompletions;
@@ -92,7 +92,7 @@ class _TaskItemState extends State<TaskItem> {
                             Row(
                               children: [
                                 Expanded(
-                                  child: Consumer2<CalendarViewModel, TaskViewModel>(
+                                  child: Consumer2<CalendarManager, TaskViewModel>(
                                       builder: (context, calVM, taskVM, _) {
                                         final date = DateUtils.dateOnly(calVM.selectedDate).millisecondsSinceEpoch;
                                         final repeat = widget.task.isRepeating;

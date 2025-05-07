@@ -1,35 +1,31 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/category/category_model.dart';
-import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/helpers/messages.dart';
+import 'package:minimaltodo/state/view_model.dart';
 
-class CategoryViewModel extends ChangeNotifier {
-  CategoryViewModel() {
-    _categories = ObjectBox.store.box<CategoryModel>().getAll();
-  }
-  List<CategoryModel> _categories = [];
-  final _box = ObjectBox.store.box<CategoryModel>();
-  List<CategoryModel> get categories => _categories;
+class CategoryViewModel extends ViewModel<CategoryModel> {
 
-  String putCategory(CategoryModel category,{required bool edit}) {
-    if (category.name.trim().isEmpty) return 'Enter a category name first';
-    final id = _box.put(category);
-    if(edit){
-      int index = _categories.indexWhere((c)=>c.id == id);
-      if(index != -1){
-        _categories[index]=category;
-      }
-    }else{
-      _categories.add(category);
-    }
+  List<CategoryModel> get categories => items;
+  @override
+  String putItem(CategoryModel item,{required bool edit}) {
+    final category = item;
+    if (category.name.trim().isEmpty) return Messages.mCategoryEmpty;
+    final message = super.putItem(category, edit: edit);
     notifyListeners();
-    debugPrint('Category added with id: $id - ${category.name} ${category.color} ${category.icon}');
-    return edit ? 'Category updated' : 'Category added';
+    return message;
   }
-  void deleteCategory(int id){
-    _box.remove(id);
-    final index = _categories.indexWhere((c)=> c.id == id);
-    _categories.removeAt(index);
-    notifyListeners();
-  }
+
+
+  @override
+  int getItemId(CategoryModel item) =>item.id;
+
+  @override
+  String getCreateSuccessMessage() => Messages.mCategoryAdded;
+
+  @override
+  String getUpdateSuccessMessage() => Messages.mCategoryEdited;
+
+  @override
+  String getDeleteSuccessMessage(int length) => length == 1 ? '1 ${Messages.mCategoryDeleted}' : '$length ${Messages.mCategoriesDeleted}';
 }
