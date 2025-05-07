@@ -3,8 +3,11 @@ import 'dart:isolate';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/services/notification_service.dart';
 import 'package:minimaltodo/category/category_model.dart';
+import 'package:minimaltodo/category/logic/category_view_model.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/objectbox.g.dart';
+import 'package:minimaltodo/task/logic/task_state_controller.dart';
 import 'package:minimaltodo/task/task.dart';
 import 'package:minimaltodo/task/task_completion.dart';
 
@@ -34,11 +37,14 @@ class TaskViewModel extends ChangeNotifier {
   Map<int, Set<int>> recurringTaskCompletions = {};
 
   ///Adds or updates a task, put means 'Update' when edit is true, 'Add New' otherwise
-  String putTask(Task task, {List<CategoryModel>? categories, required bool edit}) {
+  String putTask(Task task, {required bool edit}) {
     if (task.title.trim().isEmpty) {
       return 'Enter a task first';
     }
-    if (categories != null) {
+    final controller = getIt<TaskStateController>();
+    final catVm = getIt<CategoryViewModel>();
+    final categories = catVm.categories.where((c) => controller.categorySelection[c] == true).toList();
+    if (edit) {
       task.categories.clear();
       task.categories.addAll(categories);
       if (categories.isEmpty) {

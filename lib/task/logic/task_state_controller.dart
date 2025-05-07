@@ -46,6 +46,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       reminders: edit ? task!.reminderObjects : [],
       currentPriority: 3,
     );
+    debugPrint('state: ${state.priority}');
   }
 
   @override
