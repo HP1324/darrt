@@ -17,45 +17,55 @@ class TasksPage extends StatefulWidget {
 }
 
 class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+  // late TabController _tabController;
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    // _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer2<TaskViewModel, CalendarManager>(builder: (context, taskVM, calVM, _) {
-      final tasks = taskVM.items.where((t) => t.isActiveOn(calVM.selectedDate)).toList();
-      return Column(
-        children: [
-          SizedBox(
-            height: MediaQuery.sizeOf(context).height * 0.080,
-            child: ScrollableDateBar(),
-          )
-          ,
-          TabBar(
-            controller: _tabController,
-            splashBorderRadius: BorderRadius.circular(10),
-            dividerHeight: 0,
-            labelStyle:Theme.of(context).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
-            unselectedLabelStyle:Theme.of(context).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w500),
-            tabs: [Tab(text: 'All'), Tab(text: 'Single'), Tab(text: 'Recurring')],
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                TaskList(tasks: tasks),
-                TaskList(tasks: tasks, isRepeating: false),
-                TaskList(tasks: tasks, isRepeating: true),
-              ],
+      final tasks = taskVM.tasks.where((t) => t.isActiveOn(calVM.selectedDate)).toList();
+      return DefaultTabController(
+        length: 3,
+        child: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: MediaQuery.sizeOf(context).height * 0.080,
+                child: ScrollableDateBar(),
+              ),
             ),
+            SliverPersistentHeader(
+              floating: true,
+              delegate:  _TabBarDelegate(
+                TabBar(
+                  splashBorderRadius: BorderRadius.circular(10),
+                  dividerHeight: 0,
+                  labelStyle: Theme.of(context).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
+                  unselectedLabelStyle: Theme.of(context).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w500),
+                  tabs: const [
+                    Tab(text: 'All'),
+                    Tab(text: 'Single'),
+                    Tab(text: 'Recurring'),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          body: TabBarView(
+            children: [
+              TaskList(tasks: tasks),
+              TaskList(tasks: tasks, isRepeating: false),
+              TaskList(tasks: tasks, isRepeating: true),
+            ],
           ),
-        ],
+        ),
       );
     });
+
   }
 }
 
@@ -83,17 +93,14 @@ class DateItem extends StatelessWidget {
           Color dateTextColor;
 
           if (isSelected) {
-            // Selected state styling
             dayTextColor = scheme.primary;
             dateBackgroundColor = scheme.primary;
             dateTextColor = scheme.onPrimary;
           } else if (isToday) {
-            // Today but not selected styling
             dayTextColor = scheme.secondary;
             dateBackgroundColor = scheme.secondaryContainer.withValues(alpha:0.5);
             dateTextColor = scheme.onSecondaryContainer;
           } else {
-            // Default state styling
             dayTextColor = scheme.onSurface.withValues(alpha:0.8);
             dateBackgroundColor = Colors.transparent;
             dateTextColor = scheme.onSurface;
@@ -231,18 +238,43 @@ class ScrollableDateBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<CalendarManager>(
-      builder: (context, calVM, _) {
+      builder: (context, manager, _) {
         return ListView.builder(
-          controller: calVM.dateScrollController,
+          controller: manager.dateScrollController,
           scrollDirection: Axis.horizontal,
-          itemExtent: calVM.dateItemWidth,
+          itemExtent: manager.dateItemWidth,
           physics: const BouncingScrollPhysics(),
-          itemCount: calVM.dates.length,
+          itemCount: manager.dates.length,
           itemBuilder: (context, index) => DateItem(
-            date: calVM.dates[index],
+            date: manager.dates[index],
           ),
         );
       },
     );
+  }
+}
+
+class _TabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar _tabBar;
+
+  _TabBarDelegate(this._tabBar);
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Material(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: _tabBar,
+    );
+  }
+
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+
+  @override
+  bool shouldRebuild(_TabBarDelegate oldDelegate) {
+    return false;
   }
 }
