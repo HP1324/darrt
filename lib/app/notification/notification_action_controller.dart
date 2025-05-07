@@ -1,4 +1,3 @@
-import 'dart:isolate';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +6,8 @@ import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/main.dart';
-import 'package:minimaltodo/task/logic/task_view_model.dart';
-import 'package:minimaltodo/task/task.dart';
+import 'package:minimaltodo/task/state/task_view_model.dart';
+import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
 
 @pragma("vm:entry-point")
@@ -23,7 +22,7 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     if (receivedAction.buttonKeyPressed == 'FINISHED') {
       getIt<TaskViewModel>().toggleStatus(task, true, DateTime.now());
     } else {
-      MinimalTodo.navigatorKey.currentState
+      MiniTodo.navigatorKey.currentState
           ?.push(MaterialPageRoute(builder: (_) => AddTaskPage(edit: true, task: task)));
     }
   } catch (e, t) {

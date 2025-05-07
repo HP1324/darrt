@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/category/category_model.dart';
-import 'package:minimaltodo/category/logic/category_view_model.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/tasks_for_category_page.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
-import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/task/logic/task_view_model.dart';
+import 'package:minimaltodo/task/state/task_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
@@ -119,7 +118,7 @@ class _CategoryItemState extends State<CategoryItem> {
                                           final message = context
                                               .read<CategoryViewModel>()
                                               .deleteItem(widget.category.id);
-                                          showToast(context, type: ToastificationType.success, description: Messages.mCategoryDeleted);
+                                          showToast(context, type: ToastificationType.success, description: message);
                                           Navigator.pop(context);
                                         },
                                         child: const Text('Delete'),

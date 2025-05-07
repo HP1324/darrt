@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart' show DateFormat;
-import 'package:minimaltodo/app/calendar_view_model.dart';
+import 'package:minimaltodo/app/state/managers/calendar_manager.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/task/logic/task_view_model.dart';
-import 'package:minimaltodo/task/task.dart';
+import 'package:minimaltodo/task/state/task_view_model.dart';
+import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
 import 'package:provider/provider.dart';
 

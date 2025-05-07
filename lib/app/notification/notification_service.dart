@@ -1,11 +1,10 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
-import 'package:minimaltodo/app/services/notification_action_controller.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/consts.dart';
-import 'package:minimaltodo/task/reminder.dart';
-import 'package:minimaltodo/task/repeat_config.dart';
-import 'package:minimaltodo/task/task.dart';
+import 'package:minimaltodo/task/models/reminder.dart';
+import 'package:minimaltodo/task/models/repeat_config.dart';
+import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 

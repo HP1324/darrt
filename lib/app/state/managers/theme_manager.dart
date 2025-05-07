@@ -7,8 +7,8 @@ import 'package:minimaltodo/helpers/mini_logger.dart';
 
 class ThemeManager extends ChangeNotifier {
 
-
   late ThemeColors _selectedColor;
+
   late ThemePreference _themePreference;
 
   ThemeManager() {
@@ -24,6 +24,7 @@ class ThemeManager extends ChangeNotifier {
   }
 
   ThemeColors get selectedColor => _selectedColor;
+
   ThemePreference get themePreference => _themePreference;
 
   bool get isDarkMode {
@@ -51,6 +52,14 @@ class ThemeManager extends ChangeNotifier {
   FlexSchemeColor get selectedScheme => FlexSchemeColor.from(
     primary: _selectedColor.color,
   );
+
+  ThemeData get lightTheme => FlexColorScheme.light(colors: selectedScheme).toTheme;
+  ThemeData get darkTheme => FlexColorScheme.dark(
+    colors: selectedScheme.toDark(),
+    surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+    appBarStyle: FlexAppBarStyle.background,
+    darkIsTrueBlack: false,
+  ).toTheme;
 
   Future<void> setThemePreference(ThemePreference preference) async {
     try {

@@ -1,10 +1,13 @@
+
+// ignore_for_file: dangling_library_doc_comments
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //This file is intended to use for any general rough work, like testing a utility    //
 //function before using it inside the actual code, or anything else that is not the  //
 //part of the actual code, but rather used as a test                                 //
 ///////////////////////////////////////////////////////////////////////////////////////
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/task/task.dart';
+import 'package:minimaltodo/task/models/task.dart';
 
 
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
-import 'package:minimaltodo/app/theme_settings_page.dart';
+import 'package:minimaltodo/app/ui/theme_settings_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 
 class AppDrawer extends StatelessWidget {

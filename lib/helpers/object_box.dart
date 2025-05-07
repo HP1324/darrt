@@ -1,8 +1,7 @@
 
 import 'package:get_storage/get_storage.dart';
-import 'package:minimaltodo/category/category_model.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/objectbox.g.dart';
-import 'package:objectbox/objectbox.dart';
 
 class ObjectBox {
   static late final Store _store;

@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:minimaltodo/category/category_model.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
-import 'package:minimaltodo/state/state_controller.dart';
-import 'package:minimaltodo/task/reminder.dart';
-import 'package:minimaltodo/task/repeat_config.dart';
-import 'package:minimaltodo/task/task.dart';
+import 'package:minimaltodo/app/state/controllers/state_controller.dart';
+import 'package:minimaltodo/task/models/reminder.dart';
+import 'package:minimaltodo/task/models/repeat_config.dart';
+import 'package:minimaltodo/task/models/task.dart';
 part 'task_state_controller.freezed.dart';
 
 ///Immutable data-class to store the temporary state of the task add page

@@ -3,21 +3,21 @@
 import 'package:awesome_notifications/awesome_notifications.dart' show AwesomeNotifications;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:minimaltodo/app/services/notification_service.dart';
-import 'package:minimaltodo/app/services/settings_service.dart';
-import 'package:minimaltodo/category/category_model.dart';
-import 'package:minimaltodo/category/logic/category_view_model.dart';
+import 'package:minimaltodo/app/notification/notification_service.dart';
+import 'package:minimaltodo/app/setting/settings_service.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/task/logic/task_state_controller.dart';
-import 'package:minimaltodo/task/logic/task_view_model.dart';
-import 'package:minimaltodo/task/reminder.dart';
-import 'package:minimaltodo/task/repeat_config.dart';
-import 'package:minimaltodo/task/task.dart';
+import 'package:minimaltodo/task/state/task_state_controller.dart';
+import 'package:minimaltodo/task/state/task_view_model.dart';
+import 'package:minimaltodo/task/models/reminder.dart';
+import 'package:minimaltodo/task/models/repeat_config.dart';
+import 'package:minimaltodo/task/models/task.dart';
 
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
@@ -1291,7 +1291,7 @@ class RepeatTypeHelpButton extends StatelessWidget {
                       shape: BoxShape.circle,
                       color: selectedDays[index]
                           ? colorScheme.primary
-                          : colorScheme.surfaceVariant,
+                          : colorScheme.surfaceContainerHighest,
                     ),
                     alignment: Alignment.center,
                     child: Text(

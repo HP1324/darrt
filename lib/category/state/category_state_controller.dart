@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:minimaltodo/category/category_model.dart';
-import 'package:minimaltodo/state/state_controller.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/app/state/controllers/state_controller.dart';
 part 'category_state_controller.freezed.dart';
 
 ///Immutable data-class to store the temporary state of the category add page

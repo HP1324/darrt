@@ -1,8 +1,7 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:minimaltodo/app/calendar_view_model.dart';
+import 'package:minimaltodo/app/state/managers/calendar_manager.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:provider/provider.dart';
 

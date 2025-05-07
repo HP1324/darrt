@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app/navigation_view_model.dart';
-import 'package:minimaltodo/app/search_page.dart';
+import 'package:minimaltodo/app/state/managers/navigation_manager.dart';
+import 'package:minimaltodo/note/ui/notes_page.dart';
+import 'package:minimaltodo/task/ui/task_search_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
 class MiniBottomNavBar extends StatefulWidget {
@@ -69,7 +71,9 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
           onTapCancel: () => setState(() => _isPressed = false),
           onTap: () {
             if(widget.i == -1){
-              MiniRouter.to(context,SearchPage());
+              MiniRouter.to(context,TaskSearchPage(),type: PageTransitionType.bottomToTop);
+            } else if(widget.i == -2){
+              MiniRouter.to(context,NotesPage(),type: PageTransitionType.rightToLeft);
             } else {
               navVM.onDestinationChanged(widget.i);
             }

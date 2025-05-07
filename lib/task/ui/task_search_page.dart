@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/category/category_model.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
-import 'package:minimaltodo/task/task.dart';
+import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
 import 'package:provider/provider.dart';
 
@@ -82,8 +82,8 @@ class SearchController extends ChangeNotifier {
   }
 }
 
-class SearchPage extends StatelessWidget {
-  const SearchPage({super.key});
+class TaskSearchPage extends StatelessWidget {
+  const TaskSearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {

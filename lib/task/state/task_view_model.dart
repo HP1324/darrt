@@ -1,16 +1,16 @@
 
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app/services/notification_service.dart';
-import 'package:minimaltodo/category/category_model.dart';
-import 'package:minimaltodo/category/logic/category_view_model.dart';
+import 'package:minimaltodo/app/notification/notification_service.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/objectbox.g.dart';
-import 'package:minimaltodo/state/view_model.dart';
-import 'package:minimaltodo/task/logic/task_state_controller.dart';
-import 'package:minimaltodo/task/task.dart';
-import 'package:minimaltodo/task/task_completion.dart';
+import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
+import 'package:minimaltodo/task/state/task_state_controller.dart';
+import 'package:minimaltodo/task/models/task.dart';
+import 'package:minimaltodo/task/models/task_completion.dart';
 
 class TaskViewModel extends ViewModel<Task> {
   TaskViewModel() {
