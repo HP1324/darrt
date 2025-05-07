@@ -143,7 +143,7 @@ class IconColorStorage extends ChangeNotifier{
       'binoculars': FontAwesomeIcons.binoculars,
       'earth': FontAwesomeIcons.earthAmericas,
       'signpost': FontAwesomeIcons.signsPost,
-      'luggage_cart': FontAwesomeIcons.luggageCart,
+      'luggage_cart': FontAwesomeIcons.cartFlatbedSuitcase,
     },
     'Nature & Weather': {
       'tree': Iconsax.tree,
@@ -237,7 +237,7 @@ class IconColorStorage extends ChangeNotifier{
       'unlock': FontAwesomeIcons.unlock,
       'shield': Iconsax.shield,
       'fire_extinguisher': FontAwesomeIcons.fireExtinguisher,
-      'hardhat': FontAwesomeIcons.hardHat,
+      'hardhat': FontAwesomeIcons.helmetSafety,
       'ruler_combined': FontAwesomeIcons.rulerCombined,
       'blueprint': FontAwesomeIcons.drawPolygon,
       'wrench': FontAwesomeIcons.wrench,

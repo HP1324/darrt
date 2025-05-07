@@ -3,27 +3,30 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:minimaltodo/app/calendar_view_model.dart';
-import 'package:minimaltodo/app/navigation_view_model.dart';
-import 'package:minimaltodo/app/services/notification_action_controller.dart';
-import 'package:minimaltodo/app/theme_view_model.dart';
-import 'package:minimaltodo/category/logic/category_state_controller.dart';
-import 'package:minimaltodo/category/logic/category_view_model.dart';
+import 'package:minimaltodo/app/state/managers/calendar_manager.dart';
+import 'package:minimaltodo/app/state/managers/navigation_manager.dart';
+import 'package:minimaltodo/app/notification/notification_action_controller.dart';
+import 'package:minimaltodo/app/state/managers/theme_manager.dart';
+import 'package:minimaltodo/category/state/category_state_controller.dart';
+import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/task/logic/task_state_controller.dart';
-import 'package:minimaltodo/task/logic/task_view_model.dart';
-import 'package:minimaltodo/views/home.dart';
+import 'package:minimaltodo/task/state/task_state_controller.dart';
+import 'package:minimaltodo/task/state/task_view_model.dart';
+import 'package:minimaltodo/home.dart';
 import 'package:provider/provider.dart';
-import 'package:minimaltodo/app/services/notification_service.dart';
+import 'package:minimaltodo/app/notification/notification_service.dart';
 void registerSingletons(){
   getIt.registerSingleton<TaskViewModel>(TaskViewModel());
   getIt.registerSingleton<CategoryViewModel>(CategoryViewModel());
   getIt.registerSingleton<TaskStateController>(TaskStateController());
   getIt.registerSingleton<CategoryStateController>(CategoryStateController());
-  getIt.registerSingleton<CalendarManager>(CalendarManager());
+  //Registering CalendarManager as a lazy singleton to force initialization until first use
+  //without lazy it will get initialized in place and then the scroll controller's
+  //scroll logic does not work properly
+  getIt.registerLazySingleton<CalendarManager>(()=>CalendarManager());
   getIt.registerSingleton<ThemeManager>(ThemeManager());
   getIt.registerSingleton<NavigationManager>(NavigationManager());
 }
@@ -44,17 +47,17 @@ Future<void> initApp() async {
 
 void main() async {
   await initApp();
-  runApp(MinimalTodo());
+  runApp(MiniTodo());
 }
 
-class MinimalTodo extends StatefulWidget {
-  const MinimalTodo({super.key});
+class MiniTodo extends StatefulWidget {
+  const MiniTodo({super.key});
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   @override
-  State<MinimalTodo> createState() => _MinimalTodoState();
+  State<MiniTodo> createState() => _MiniTodoState();
 }
 
-class _MinimalTodoState extends State<MinimalTodo> {
+class _MiniTodoState extends State<MiniTodo> {
   @override
   void initState() {
     super.initState();
@@ -70,22 +73,17 @@ class _MinimalTodoState extends State<MinimalTodo> {
         ChangeNotifierProvider(create: (_) => getIt<TaskViewModel>()),
         ChangeNotifierProvider(create: (_) => getIt<CategoryViewModel>()),
         ChangeNotifierProvider(create: (_) => getIt<TaskStateController>()),
+        ChangeNotifierProvider(create: (_) => getIt<CategoryStateController>()),
         ChangeNotifierProvider(create: (_) => getIt<NavigationManager>()),
         ChangeNotifierProvider(create: (_) => getIt<ThemeManager>()),
         ChangeNotifierProvider(create: (_) => getIt<CalendarManager>()),
-        ChangeNotifierProvider(create: (_) => getIt<CategoryStateController>()),
       ],
-      child: Consumer<ThemeManager>(builder: (context, themeVM, _) {
+      child: Consumer<ThemeManager>(builder: (context, manager, _) {
         return MaterialApp(
-          navigatorKey: MinimalTodo.navigatorKey,
-          theme: FlexColorScheme.light(colors: themeVM.selectedScheme).toTheme,
-          darkTheme: FlexColorScheme.dark(
-            colors: themeVM.selectedScheme.toDark(),
-            surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-            appBarStyle: FlexAppBarStyle.background,
-            darkIsTrueBlack: false,
-          ).toTheme,
-          themeMode: themeVM.themeMode,
+          navigatorKey: MiniTodo.navigatorKey,
+          theme: manager.lightTheme,
+          darkTheme: manager.darkTheme,
+          themeMode: manager.themeMode,
           debugShowCheckedModeBanner: false,
           title: 'MiniTodo',
           home: const Home(),

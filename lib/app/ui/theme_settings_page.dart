@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app/theme_view_model.dart';
+import 'package:minimaltodo/app/state/managers/theme_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:minimaltodo/helpers/mini_enums.dart';
 class ThemeSettingsPage extends StatelessWidget {
@@ -149,8 +149,8 @@ class _ColorOption extends StatelessWidget {
               width: 20,
               decoration: BoxDecoration(
                 color: color.computeLuminance() > 0.5
-                    ? Colors.black.withOpacity(0.5)
-                    : Colors.white.withOpacity(0.8),
+                    ? Colors.black.withValues(alpha:0.5)
+                    : Colors.white.withValues(alpha:0.8),
                 shape: BoxShape.circle,
               ),
               child: Icon(

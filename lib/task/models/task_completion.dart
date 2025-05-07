@@ -1,4 +1,4 @@
-import 'package:minimaltodo/task/task.dart';
+import 'package:minimaltodo/task/models/task.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()

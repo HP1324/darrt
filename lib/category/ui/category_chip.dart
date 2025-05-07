@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/category/category_model.dart';
-import 'package:minimaltodo/category/logic/category_view_model.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:provider/provider.dart';
 

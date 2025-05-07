@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/category/category_model.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
-import 'package:minimaltodo/task/logic/task_view_model.dart';
+import 'package:minimaltodo/task/state/task_view_model.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
 import 'package:provider/provider.dart';
 

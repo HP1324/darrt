@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
-import 'package:minimaltodo/category/category_model.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/objectbox.g.dart';
-import 'package:minimaltodo/task/reminder.dart';
-import 'package:minimaltodo/task/repeat_config.dart';
-import 'package:minimaltodo/task/task_completion.dart';
+import 'package:minimaltodo/task/models/reminder.dart';
+import 'package:minimaltodo/task/models/repeat_config.dart';
+import 'package:minimaltodo/task/models/task_completion.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()

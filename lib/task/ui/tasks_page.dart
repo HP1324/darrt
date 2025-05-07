@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:minimaltodo/app/calendar_view_model.dart';
-import 'package:minimaltodo/app/widgets/empty_tasks_indicator.dart';
-import 'package:minimaltodo/helpers/consts.dart';
-import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:minimaltodo/app/state/managers/calendar_manager.dart';
+import 'package:minimaltodo/app/ui/empty_tasks_indicator.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/task/logic/task_view_model.dart';
-import 'package:minimaltodo/task/task.dart';
+import 'package:minimaltodo/task/state/task_view_model.dart';
+import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
@@ -30,11 +28,10 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
   Widget build(BuildContext context) {
     return Consumer2<TaskViewModel, CalendarManager>(builder: (context, taskVM, calVM, _) {
       final tasks = taskVM.items.where((t) => t.isActiveOn(calVM.selectedDate)).toList();
-      final firstDate = DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate));
       return Column(
         children: [
           SizedBox(
-            height: 60,
+            height: MediaQuery.sizeOf(context).height * 0.080,
             child: ScrollableDateBar(),
           )
           ,

@@ -1,8 +1,6 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:minimaltodo/category/category_model.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/messages.dart';
-import 'package:minimaltodo/state/view_model.dart';
+import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 
 class CategoryViewModel extends ViewModel<CategoryModel> {
 

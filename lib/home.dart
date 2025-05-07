@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:minimaltodo/app/navigation_view_model.dart';
-import 'package:minimaltodo/app/widgets/app_drawer.dart';
-import 'package:minimaltodo/app/widgets/mini_app_bar.dart';
-import 'package:minimaltodo/app/widgets/mini_bottom_nav_bar.dart';
+import 'package:minimaltodo/app/state/managers/navigation_manager.dart';
+import 'package:minimaltodo/app/ui/app_drawer.dart';
+import 'package:minimaltodo/app/ui/mini_app_bar.dart';
+import 'package:minimaltodo/app/ui/mini_bottom_nav_bar.dart';
 import 'package:minimaltodo/category/ui/categories_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
@@ -18,10 +18,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  @override
-  void initState() {
-    super.initState();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +51,9 @@ class _BottomNavBarWidget extends StatelessWidget {
         children: [
           // const SizedBox.shrink(),
           MiniBottomNavBarItem(icon: Icons.calendar_month, label: 'Calendar', i: 0),
-          // MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Wishlist', i: 1),
           MiniBottomNavBarItem(icon: Icons.search, label: 'Search', i: -1),
           MiniBottomNavBarItem(icon: Iconsax.category, label: 'Categories', i: 1),
+          MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Notes', i: -2),
           // MiniBottomNavBarItem(icon: Iconsax.book, label: 'Journal', i: -2),
           // const SizedBox.shrink(),
         ],
