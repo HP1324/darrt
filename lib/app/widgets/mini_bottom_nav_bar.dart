@@ -56,7 +56,7 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
     final primary = Theme.of(context).colorScheme.primary;
     final onSurface = Theme.of(context).colorScheme.onSurface;
 
-    return Consumer<NavigationViewModel>(
+    return Consumer<NavigationManager>(
       builder: (context, navVM, _) {
         final isSelected = widget.i == navVM.currentDestination;
 

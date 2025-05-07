@@ -1,4 +1,3 @@
-// theme_view_model.dart
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
@@ -6,13 +5,13 @@ import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/mini_enums.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 
-class ThemeViewModel extends ChangeNotifier {
+class ThemeManager extends ChangeNotifier {
 
 
   late ThemeColors _selectedColor;
   late ThemePreference _themePreference;
 
-  ThemeViewModel() {
+  ThemeManager() {
     final storedColorIndex = MiniBox.read(mThemeColor);
     _selectedColor = storedColorIndex != null
         ? ThemeColors.values[storedColorIndex]

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 
-class CalendarViewModel extends ChangeNotifier {
+class CalendarManager extends ChangeNotifier {
   DateTime selectedDate = DateTime.now();
   final maxDate = DateTime.now().add(Duration(days: maxExtentDateDays));
   final initialDate = DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate))
@@ -28,7 +28,7 @@ class CalendarViewModel extends ChangeNotifier {
     }
   }
 
-  CalendarViewModel() {
+  CalendarManager() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (dateScrollController.hasClients) {
         scrollToDate(DateTime.now());

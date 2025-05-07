@@ -30,18 +30,14 @@ class _HomeState extends State<Home> {
       child: Scaffold(
         appBar: MiniAppBar(),
         drawer: const AppDrawer(),
-        body: Selector<NavigationViewModel, int>(
-            selector: (_, navVM) => navVM.currentDestination,
-            builder: (context, currentDestination, _) {
-              return IndexedStack(
-                index: currentDestination,
-                children: [
-                  const TasksPage(),
-                  // const WishListPage(),
-                  const CategoriesPage(),
-                ],
-              );
-            }),
+        body: IndexedStack(
+          index: context.watch<NavigationManager>().currentDestination,
+          children: [
+            const TasksPage(),
+            // const WishListPage(),
+            const CategoriesPage(),
+          ],
+        ),
         floatingActionButton: _FloatingActionButtonWidget(),
         bottomNavigationBar: const _BottomNavBarWidget(),
       ),
@@ -53,7 +49,7 @@ class _BottomNavBarWidget extends StatelessWidget {
   const _BottomNavBarWidget();
   @override
   Widget build(BuildContext context) {
-    return Consumer<NavigationViewModel>(builder: (context, navVM, _) {
+    return Consumer<NavigationManager>(builder: (context, navVM, _) {
       return MiniBottomNavBar(
         children: [
           // const SizedBox.shrink(),

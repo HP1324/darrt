@@ -109,11 +109,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
   }
   void _putTask(BuildContext context){
     final controller = context.read<TaskStateController>();
-    final catVM = context.read<CategoryViewModel>();
     final taskVM = context.read<TaskViewModel>();
-    final categories = catVM.categories.where((c) => controller.categorySelection[c] == true).toList();
     Task newTask =controller.buildModel(edit: widget.edit, model: widget.task);
-    final message = taskVM.putTask(newTask,edit: widget.edit);
+    final message = taskVM.putItem(newTask,edit: widget.edit);
     var type = ToastificationType.success;
     if (message == Messages.mTaskAdded || message == Messages.mTaskEdited) {
       Navigator.pop(context);

@@ -4,10 +4,12 @@ import 'package:minimaltodo/app/calendar_view_model.dart';
 import 'package:minimaltodo/app/widgets/empty_tasks_indicator.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/logic/task_view_model.dart';
 import 'package:minimaltodo/task/task.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
 import 'package:provider/provider.dart';
+import 'package:toastification/toastification.dart';
 
 class TasksPage extends StatefulWidget {
   const TasksPage({super.key});
@@ -26,8 +28,8 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<TaskViewModel, CalendarViewModel>(builder: (context, taskVM, calVM, _) {
-      final tasks = taskVM.tasks.where((t) => t.isActiveOn(calVM.selectedDate)).toList();
+    return Consumer2<TaskViewModel, CalendarManager>(builder: (context, taskVM, calVM, _) {
+      final tasks = taskVM.items.where((t) => t.isActiveOn(calVM.selectedDate)).toList();
       final firstDate = DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate));
       return Column(
         children: [
@@ -72,7 +74,7 @@ class DateItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 1.0),
-      child: Consumer<CalendarViewModel>(
+      child: Consumer<CalendarManager>(
         builder: (context, calVM, _) {
           final bool isSelected = calVM.selectedDate == date;
           final bool isToday = DateUtils.isSameDay(date, DateTime.now());
@@ -102,7 +104,7 @@ class DateItem extends StatelessWidget {
 
           return InkWell(
             onTap: () {
-              context.read<CalendarViewModel>().updateSelectedDate(date);
+              context.read<CalendarManager>().updateSelectedDate(date);
             },
             borderRadius: BorderRadius.circular(12),
             child: Container(
@@ -206,7 +208,8 @@ class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin{
               ),
               IconButton(
                 onPressed: () {
-                  context.read<TaskViewModel>().deleteSelectedTasks();
+                  final message = context.read<TaskViewModel>().deleteMultipleItems();
+                  showToast(context, type: ToastificationType.success, description: message);
                 },
                 icon: Icon(Icons.delete),
               ),
@@ -230,7 +233,7 @@ class ScrollableDateBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<CalendarViewModel>(
+    return Consumer<CalendarManager>(
       builder: (context, calVM, _) {
         return ListView.builder(
           controller: calVM.dateScrollController,
