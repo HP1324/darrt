@@ -18,6 +18,7 @@ import 'package:minimaltodo/task/logic/task_view_model.dart';
 import 'package:minimaltodo/views/home.dart';
 import 'package:provider/provider.dart';
 import 'package:minimaltodo/app/services/notification_service.dart';
+
 Future<void> initApp() async {
   try {
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +26,9 @@ Future<void> initApp() async {
     await GetStorage.init();
     await MiniBox.initStorage();
     await ObjectBox.init();
+    getIt.registerSingleton<TaskStateController>(TaskStateController());
     getIt.registerSingleton<TaskViewModel>(TaskViewModel());
+    getIt.registerSingleton<CategoryViewModel>(CategoryViewModel());
     await NotificationService.initNotifications();
     FlutterNativeSplash.remove();
   } catch (e) {
@@ -59,11 +62,11 @@ class _MinimalTodoState extends State<MinimalTodo> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => getIt<TaskViewModel>()),
-        ChangeNotifierProvider(create: (_) => CategoryViewModel()),
+        ChangeNotifierProvider(create: (_) => getIt<CategoryViewModel>()),
+        ChangeNotifierProvider(create: (_) => getIt<TaskStateController>()),
         ChangeNotifierProvider(create: (_) => NavigationViewModel()),
         ChangeNotifierProvider(create: (_) => ThemeViewModel()),
         ChangeNotifierProvider(create: (_) => CalendarViewModel()),
-        ChangeNotifierProvider(create: (_) => TaskStateController()),
         ChangeNotifierProvider(create: (_) => CategoryStateController()),
       ],
       child: Consumer<ThemeViewModel>(builder: (context, themeVM, _) {
