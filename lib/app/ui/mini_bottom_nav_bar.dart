@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/state/managers/navigation_manager.dart';
+import 'package:minimaltodo/helpers/utils.dart' show getIt;
 import 'package:minimaltodo/note/ui/notes_page.dart';
+import 'package:minimaltodo/task/state/task_view_model.dart' show TaskViewModel;
 import 'package:minimaltodo/task/ui/task_search_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:page_transition/page_transition.dart';
@@ -70,6 +72,7 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
           onTapUp: (_) => setState(() => _isPressed = false),
           onTapCancel: () => setState(() => _isPressed = false),
           onTap: () {
+            getIt<TaskViewModel>().clearSelection();
             if(widget.i == -1){
               MiniRouter.to(context,TaskSearchPage(),type: PageTransitionType.bottomToTop);
             } else if(widget.i == -2){

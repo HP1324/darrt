@@ -6,6 +6,7 @@ import 'package:minimaltodo/app/ui/mini_app_bar.dart';
 import 'package:minimaltodo/app/ui/mini_bottom_nav_bar.dart';
 import 'package:minimaltodo/category/ui/categories_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/helpers/utils.dart' show getIt;
 import 'package:minimaltodo/task/ui/add_task_page.dart';
 import 'package:minimaltodo/task/ui/tasks_page.dart';
 import 'package:provider/provider.dart';
@@ -35,7 +36,7 @@ class _HomeState extends State<Home> {
             const CategoriesPage(),
           ],
         ),
-        floatingActionButton: _FloatingActionButtonWidget(),
+        floatingActionButton: context.watch<NavigationManager>().currentDestination == 0 ? const _FloatingActionButtonWidget():null,
         bottomNavigationBar: const _BottomNavBarWidget(),
       ),
     );
