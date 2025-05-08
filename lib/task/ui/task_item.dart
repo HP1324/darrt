@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:minimaltodo/app/state/managers/calendar_manager.dart';
+import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/state/task_view_model.dart';
@@ -163,16 +164,22 @@ class _TaskItemState extends State<TaskItem> {
                                         ).createShader(bounds);
                                       },
                                       blendMode: BlendMode.dstIn,
-                                      child: ListView.separated(
-                                        scrollDirection: Axis.horizontal,
-                                        shrinkWrap: true,
-                                        physics: BouncingScrollPhysics(),
-                                        separatorBuilder: (context, index) => const SizedBox(width: 2),
-                                        itemCount: widget.task.categories.length,
-                                        itemBuilder: (context, index) {
-                                          final category = widget.task.categories[index];
-                                          return CategoryChip(category:category);
-                                        },
+                                      child: Consumer<CategoryViewModel>(
+                                        builder: (context,catVM,_) {
+                                          var categories = catVM.categories;
+                                          widget.task.categories.removeWhere((c) => !categories.contains(c));
+                                          return ListView.separated(
+                                            scrollDirection: Axis.horizontal,
+                                            shrinkWrap: true,
+                                            physics: BouncingScrollPhysics(),
+                                            separatorBuilder: (context, index) => const SizedBox(width: 2),
+                                            itemCount: widget.task.categories.length,
+                                            itemBuilder: (context, index) {
+                                              final category = widget.task.categories[index];
+                                              return CategoryChip(category:category);
+                                            },
+                                          );
+                                        }
                                       ),
                                     ),
                                   ),

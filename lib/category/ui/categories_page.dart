@@ -19,7 +19,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   @override
   void dispose() {
-    // Dispose controllers
+    debugPrint('Categories page dispose called');
     _searchController.dispose();
     _focusNode.dispose();
     super.dispose();
