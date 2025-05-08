@@ -16,12 +16,11 @@ class TasksPage extends StatefulWidget {
   State<TasksPage> createState() => _TasksPageState();
 }
 
-class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMixin {
-  // late TabController _tabController;
+class _TasksPageState extends State<TasksPage> {
   @override
-  void initState() {
-    super.initState();
-    // _tabController = TabController(length: 3, vsync: this);
+  void dispose() {
+    debugPrint('Tasks page dispose called');
+    super.dispose();
   }
 
   @override
@@ -39,7 +38,7 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
               ),
             ),
             SliverPersistentHeader(
-              floating: true,
+              pinned: true,
               delegate:  _TabBarDelegate(
                 TabBar(
                   splashBorderRadius: BorderRadius.circular(10),
