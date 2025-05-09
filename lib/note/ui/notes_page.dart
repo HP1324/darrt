@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/note/ui/add_note_page.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
 
@@ -15,10 +17,28 @@ class _NotesPageState extends State<NotesPage> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(title: Text('Notes'),floating: true,expandedHeight: 200),
-          SliverList(delegate: SliverChildBuilderDelegate((context, index) => TaskItem(task: Task(title: 'Title')),childCount: 1000)),
+          SliverAppBar(
+            leading: BackButton(),
+            title: Text('Notes'),
+            floating: true,
+            expandedHeight: 200,
+          ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          MiniRouter.to(context, AddNotePage());
+        },
+        shape: StadiumBorder(),
+        label: Row(
+          children: [
+            Icon(Icons.add),
+            const SizedBox(width: 8),
+            Text('Add Note'),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
