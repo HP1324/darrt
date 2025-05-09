@@ -40,7 +40,7 @@ dependencies:
   intl: ^0.19.0
   get_storage: ^2.1.1
   awesome_notifications_core: any
-  awesome_notifications: ^0.10.0
+  awesome_notifications: ^0.10.1
   toastification: ^3.0.2
   logger: ^2.5.0
   fl_chart: ^0.65.0
@@ -73,7 +73,8 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
+dependency_overrides:
+  intl: ^0.19.0
 # The following section is specific to Flutter packages.
 flutter:
 
