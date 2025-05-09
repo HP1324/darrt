@@ -19,13 +19,8 @@ class MiniBottomNavBar extends StatefulWidget {
 class _MiniBottomNavBarState extends State<MiniBottomNavBar> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // margin: EdgeInsets.only(right: 20,left: 20,bottom: 7),
+    return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.075,
-      decoration: BoxDecoration(
-        // color: Theme.of(context).colorScheme.primary.withAlpha(20),
-        // borderRadius: BorderRadius.circular(30),
-      ),
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -73,10 +68,10 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
           onTapCancel: () => setState(() => _isPressed = false),
           onTap: () {
             getIt<TaskViewModel>().clearSelection();
-            if(widget.i == -1){
-              MiniRouter.to(context,TaskSearchPage(),type: PageTransitionType.bottomToTop);
-            } else if(widget.i == -2){
-              MiniRouter.to(context,NotesPage(),type: PageTransitionType.rightToLeft);
+            if (widget.i == -1) {
+              MiniRouter.to(context, TaskSearchPage(), type: PageTransitionType.bottomToTop);
+            } else if (widget.i == -2) {
+              MiniRouter.to(context, NotesPage(), type: PageTransitionType.rightToLeft);
             } else {
               navVM.onDestinationChanged(widget.i);
             }
@@ -99,17 +94,15 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
                     ),
                   ),
                 ),
-                if(widget.label != null)
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 200),
-                  style: TextStyle(
-                    fontSize:
-                    Theme.of(context).textTheme.labelSmall!.fontSize! + 1,
-                    color: isSelected ? primary : onSurface.withAlpha(150),
-                    fontWeight: FontWeight.bold,
+                if (widget.label != null)
+                  Text(
+                    widget.label!,
+                    style: TextStyle(
+                      fontSize: Theme.of(context).textTheme.labelSmall!.fontSize! + 1,
+                      color: isSelected ? primary : onSurface.withAlpha(150),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  child: Text(widget.label!),
-                ),
               ],
             ),
           ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:iconsax/iconsax.dart';
+import 'package:minimaltodo/app/state/managers/general_state_manager.dart';
 import 'package:minimaltodo/app/state/managers/navigation_manager.dart';
 import 'package:minimaltodo/app/ui/app_drawer.dart';
 import 'package:minimaltodo/app/ui/mini_app_bar.dart';
@@ -20,7 +22,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -32,11 +33,18 @@ class _HomeState extends State<Home> {
           index: context.watch<NavigationManager>().currentDestination,
           children: [
             const TasksPage(),
-            // const WishListPage(),
             const CategoriesPage(),
           ],
         ),
-        floatingActionButton: context.watch<NavigationManager>().currentDestination == 0 ? const _FloatingActionButtonWidget():null,
+        floatingActionButton: Consumer2<NavigationManager,GeneralStateManager>(
+          builder: (context, navManager,genManager, _) {
+            if (navManager.currentDestination == 0 && genManager.isFabVisible) {
+              return const _FloatingActionButtonWidget();
+            }
+            return const SizedBox.shrink(); // Return an invisible widget instead of null
+          },
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         bottomNavigationBar: const _BottomNavBarWidget(),
       ),
     );
@@ -48,16 +56,24 @@ class _BottomNavBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<NavigationManager>(builder: (context, navVM, _) {
-      return MiniBottomNavBar(
-        children: [
-          // const SizedBox.shrink(),
-          MiniBottomNavBarItem(icon: Icons.calendar_month, label: 'Calendar', i: 0),
-          MiniBottomNavBarItem(icon: Icons.search, label: 'Search', i: -1),
-          MiniBottomNavBarItem(icon: Iconsax.category, label: 'Categories', i: 1),
-          MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Notes', i: -2),
-          // MiniBottomNavBarItem(icon: Iconsax.book, label: 'Journal', i: -2),
-          // const SizedBox.shrink(),
-        ],
+      return Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+             color: Theme.of(context).colorScheme.primary.withAlpha(20), width: 0.5,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: MiniBottomNavBar(
+          children: [
+            // const SizedBox.shrink(),
+            MiniBottomNavBarItem(icon: Icons.calendar_month, label: 'Calendar', i: 0),
+            MiniBottomNavBarItem(icon: Icons.search, label: 'Search', i: -1),
+            MiniBottomNavBarItem(icon: Iconsax.category, label: 'Categories', i: 1),
+            MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Notes', i: -2),
+            // MiniBottomNavBarItem(icon: Iconsax.book, label: 'Journal', i: -2),
+            // const SizedBox.shrink(),
+          ],
+        ),
       );
     });
   }
@@ -76,6 +92,7 @@ class _FloatingActionButtonWidget extends StatelessWidget {
           onPressed: () {
             MiniRouter.to(context, AddTaskPage(edit: false));
           },
+          shape: StadiumBorder(),
           tooltip: 'Add Task',
           elevation: 5,
           child: const Icon(Icons.add),

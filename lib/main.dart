@@ -4,7 +4,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:minimaltodo/app/state/managers/calendar_manager.dart';
+import 'package:minimaltodo/app/state/managers/general_state_manager.dart';
 import 'package:minimaltodo/app/state/managers/navigation_manager.dart';
 import 'package:minimaltodo/app/notification/notification_action_controller.dart';
 import 'package:minimaltodo/app/state/managers/theme_manager.dart';
@@ -30,6 +32,7 @@ void registerSingletons(){
   getIt.registerLazySingleton<CalendarManager>(()=>CalendarManager());
   getIt.registerSingleton<ThemeManager>(ThemeManager());
   getIt.registerSingleton<NavigationManager>(NavigationManager());
+  getIt.registerSingleton<GeneralStateManager>(GeneralStateManager());
 }
 Future<void> initApp() async {
   try {
@@ -78,6 +81,7 @@ class _MiniTodoState extends State<MiniTodo> {
         ChangeNotifierProvider(create: (_) => getIt<NavigationManager>()),
         ChangeNotifierProvider(create: (_) => getIt<ThemeManager>()),
         ChangeNotifierProvider(create: (_) => getIt<CalendarManager>()),
+        ChangeNotifierProvider(create: (_) => getIt<GeneralStateManager>()),
       ],
       child: Consumer<ThemeManager>(builder: (context, manager, _) {
         return MaterialApp(
@@ -88,8 +92,12 @@ class _MiniTodoState extends State<MiniTodo> {
             FlutterQuillLocalizations.delegate,
           ],
           navigatorKey: MiniTodo.navigatorKey,
-          theme: manager.lightTheme,
-          darkTheme: manager.darkTheme,
+          theme: manager.lightTheme.copyWith(
+            textTheme: GoogleFonts.gabaritoTextTheme(manager.lightTheme.textTheme)
+          ),
+          darkTheme: manager.darkTheme.copyWith(
+              textTheme: GoogleFonts.gabaritoTextTheme(manager.darkTheme.textTheme)
+          ),
           themeMode: manager.themeMode,
           debugShowCheckedModeBanner: false,
           title: 'MiniTodo',
