@@ -38,13 +38,13 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <receiver android:name="me.carda.awesome_notifications.core.broadcasters.receivers.ScheduledNotificationReceiver" android:exported="true" />
-        <receiver android:name="me.carda.awesome_notifications.core.broadcasters.receivers.RefreshSchedulesReceiver" android:exported="true">
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-                <action android:name="FLUTTER_NOTIFICATION_CLICK" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
         <provider
