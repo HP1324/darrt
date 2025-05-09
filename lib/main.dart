@@ -1,6 +1,8 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minimaltodo/app/state/managers/calendar_manager.dart';
 import 'package:minimaltodo/app/state/managers/navigation_manager.dart';
@@ -79,6 +81,12 @@ class _MiniTodoState extends State<MiniTodo> {
       ],
       child: Consumer<ThemeManager>(builder: (context, manager, _) {
         return MaterialApp(
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            FlutterQuillLocalizations.delegate,
+          ],
           navigatorKey: MiniTodo.navigatorKey,
           theme: manager.lightTheme,
           darkTheme: manager.darkTheme,
