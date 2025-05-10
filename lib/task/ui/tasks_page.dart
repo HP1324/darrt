@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/app/state/managers/calendar_manager.dart';
-import 'package:minimaltodo/app/state/managers/general_state_manager.dart';
 import 'package:minimaltodo/app/ui/empty_tasks_indicator.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/state/task_view_model.dart';
@@ -221,7 +220,6 @@ class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin{
           ),
         Expanded(
           child: list.isEmpty ? getEmptyIndicator() : ListView.builder(
-            controller: context.read<GeneralStateManager>().scrollController,
             itemCount: list.length,
             itemBuilder: (context, index) {
               return TaskItem(task: list[index]);
