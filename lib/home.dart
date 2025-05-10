@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:iconsax/iconsax.dart';
-import 'package:minimaltodo/app/state/managers/general_state_manager.dart';
+
 import 'package:minimaltodo/app/state/managers/navigation_manager.dart';
 import 'package:minimaltodo/app/ui/app_drawer.dart';
 import 'package:minimaltodo/app/ui/mini_app_bar.dart';
@@ -36,9 +36,9 @@ class _HomeState extends State<Home> {
             const CategoriesPage(),
           ],
         ),
-        floatingActionButton: Consumer2<NavigationManager,GeneralStateManager>(
-          builder: (context, navManager,genManager, _) {
-            if (navManager.currentDestination == 0 && genManager.isFabVisible) {
+        floatingActionButton: Consumer<NavigationManager>(
+          builder: (context, manager, _) {
+            if (manager.currentDestination == 0) {
               return const _FloatingActionButtonWidget();
             }
             return const SizedBox.shrink(); // Return an invisible widget instead of null
