@@ -15,6 +15,8 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'category/models/category_model.dart';
+import 'note/models/folder.dart';
+import 'note/models/note.dart';
 import 'task/models/task.dart';
 import 'task/models/task_completion.dart';
 
@@ -185,6 +187,74 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(4, 8867042065594792655),
+    name: 'Folder',
+    lastPropertyId: const obx_int.IdUid(2, 258328508912231986),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 8374239025444042069),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 258328508912231986),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[
+      obx_int.ModelBacklink(
+        name: 'notes',
+        srcEntity: 'Note',
+        srcField: 'folders',
+      ),
+    ],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(5, 1091526975409140722),
+    name: 'Note',
+    lastPropertyId: const obx_int.IdUid(4, 3896664754239967175),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 8077787761880950014),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 1386711038256437477),
+        name: 'content',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 4405219377992249128),
+        name: 'createdAt',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 3896664754239967175),
+        name: 'updatedAt',
+        type: 10,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[
+      obx_int.ModelRelation(
+        id: const obx_int.IdUid(2, 752695274466247110),
+        name: 'folders',
+        targetId: const obx_int.IdUid(4, 8867042065594792655),
+      ),
+    ],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -225,9 +295,9 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(3, 2058329802195215529),
+    lastEntityId: const obx_int.IdUid(5, 1091526975409140722),
     lastIndexId: const obx_int.IdUid(1, 7157772403585420880),
-    lastRelationId: const obx_int.IdUid(1, 5424052804524184019),
+    lastRelationId: const obx_int.IdUid(2, 752695274466247110),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
     retiredIndexUids: const [],
@@ -465,6 +535,111 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    Folder: obx_int.EntityDefinition<Folder>(
+      model: _entities[3],
+      toOneRelations: (Folder object) => [],
+      toManyRelations:
+          (Folder object) => {
+            obx_int.RelInfo<Note>.toManyBacklink(2, object.id): object.notes,
+          },
+      getId: (Folder object) => object.id,
+      setId: (Folder object, int id) {
+        object.id = id;
+      },
+      objectToFB: (Folder object, fb.Builder fbb) {
+        final nameOffset = fbb.writeString(object.name);
+        fbb.startTable(3);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, nameOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final object = Folder(id: idParam, name: nameParam);
+        obx_int.InternalToManyAccess.setRelInfo<Folder>(
+          object.notes,
+          store,
+          obx_int.RelInfo<Note>.toManyBacklink(2, object.id),
+        );
+        return object;
+      },
+    ),
+    Note: obx_int.EntityDefinition<Note>(
+      model: _entities[4],
+      toOneRelations: (Note object) => [],
+      toManyRelations:
+          (Note object) => {
+            obx_int.RelInfo<Note>.toMany(2, object.id): object.folders,
+          },
+      getId: (Note object) => object.id,
+      setId: (Note object, int id) {
+        object.id = id;
+      },
+      objectToFB: (Note object, fb.Builder fbb) {
+        final contentOffset = fbb.writeString(object.content);
+        fbb.startTable(5);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, contentOffset);
+        fbb.addInt64(2, object.createdAt?.millisecondsSinceEpoch);
+        fbb.addInt64(3, object.updatedAt?.millisecondsSinceEpoch);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final createdAtValue = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          8,
+        );
+        final updatedAtValue = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          10,
+        );
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final contentParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final createdAtParam =
+            createdAtValue == null
+                ? null
+                : DateTime.fromMillisecondsSinceEpoch(createdAtValue);
+        final updatedAtParam =
+            updatedAtValue == null
+                ? null
+                : DateTime.fromMillisecondsSinceEpoch(updatedAtValue);
+        final object = Note(
+          id: idParam,
+          content: contentParam,
+          createdAt: createdAtParam,
+          updatedAt: updatedAtParam,
+        );
+        obx_int.InternalToManyAccess.setRelInfo<Note>(
+          object.folders,
+          store,
+          obx_int.RelInfo<Note>.toMany(2, object.id),
+        );
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -579,5 +754,44 @@ class TaskCompletion_ {
   /// See [TaskCompletion.task].
   static final task = obx.QueryRelationToOne<TaskCompletion, Task>(
     _entities[2].properties[3],
+  );
+}
+
+/// [Folder] entity fields to define ObjectBox queries.
+class Folder_ {
+  /// See [Folder.id].
+  static final id = obx.QueryIntegerProperty<Folder>(
+    _entities[3].properties[0],
+  );
+
+  /// See [Folder.name].
+  static final name = obx.QueryStringProperty<Folder>(
+    _entities[3].properties[1],
+  );
+}
+
+/// [Note] entity fields to define ObjectBox queries.
+class Note_ {
+  /// See [Note.id].
+  static final id = obx.QueryIntegerProperty<Note>(_entities[4].properties[0]);
+
+  /// See [Note.content].
+  static final content = obx.QueryStringProperty<Note>(
+    _entities[4].properties[1],
+  );
+
+  /// See [Note.createdAt].
+  static final createdAt = obx.QueryDateProperty<Note>(
+    _entities[4].properties[2],
+  );
+
+  /// See [Note.updatedAt].
+  static final updatedAt = obx.QueryDateProperty<Note>(
+    _entities[4].properties[3],
+  );
+
+  /// see [Note.folders]
+  static final folders = obx.QueryRelationToMany<Note, Folder>(
+    _entities[4].relations[0],
   );
 }
