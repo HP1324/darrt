@@ -27,7 +27,7 @@ class _NotesPageState extends State<NotesPage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          MiniRouter.to(context, AddNotePage());
+          MiniRouter.to(context, AddNotePage(edit: false));
         },
         shape: StadiumBorder(),
         label: Row(
