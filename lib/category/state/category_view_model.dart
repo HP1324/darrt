@@ -3,6 +3,7 @@ import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
+import 'package:minimaltodo/objectbox.g.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/state/task_view_model.dart';
 
@@ -17,7 +18,12 @@ class CategoryViewModel extends ViewModel<CategoryModel> {
     notifyListeners();
     return message;
   }
+@override
+  String deleteItem(int id) {
 
+    final message = super.deleteItem(id);
+    return message;
+  }
   @override
   int getItemId(CategoryModel item) =>item.id;
 
