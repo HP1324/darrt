@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:minimaltodo/app/state/managers/calendar_manager.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
+import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/state/task_view_model.dart';
 import 'package:minimaltodo/task/models/task.dart';
@@ -168,6 +170,10 @@ class _TaskItemState extends State<TaskItem> {
                                         builder: (context,catVM,_) {
                                           var categories = catVM.categories;
                                           widget.task.categories.removeWhere((c) => !categories.contains(c));
+                                          if(widget.task.categories.isEmpty){
+                                            widget.task.categories.add(CategoryModel(id: 1, name: 'General'));
+                                            ObjectBox.store.box<Task>().put(widget.task);
+                                          }
                                           return ListView.separated(
                                             scrollDirection: Axis.horizontal,
                                             shrinkWrap: true,

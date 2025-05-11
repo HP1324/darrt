@@ -15,6 +15,7 @@ import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
+import 'package:minimaltodo/note/state/note_state_controller.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart';
 import 'package:minimaltodo/task/state/task_view_model.dart';
 import 'package:minimaltodo/home.dart';
@@ -25,6 +26,7 @@ void registerSingletons(){
   getIt.registerSingleton<CategoryViewModel>(CategoryViewModel());
   getIt.registerSingleton<TaskStateController>(TaskStateController());
   getIt.registerSingleton<CategoryStateController>(CategoryStateController());
+  getIt.registerSingleton<NoteStateController>(NoteStateController());
   //Registering CalendarManager as a lazy singleton to force initialization until first use
   //without lazy it will get initialized in place and then the scroll controller's
   //scroll logic does not work properly
@@ -79,6 +81,7 @@ class _MiniTodoState extends State<MiniTodo> {
         ChangeNotifierProvider(create: (_) => getIt<NavigationManager>()),
         ChangeNotifierProvider(create: (_) => getIt<ThemeManager>()),
         ChangeNotifierProvider(create: (_) => getIt<CalendarManager>()),
+        ChangeNotifierProvider(create: (_) => getIt<NoteStateController>()),
       ],
       child: Consumer<ThemeManager>(builder: (context, manager, _) {
         return MaterialApp(
