@@ -31,8 +31,8 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return Scaffold(
           backgroundColor: isDark
-              ? Color.lerp(Theme.of(context).colorScheme.surface, color, 0.14)
-              : Color.lerp(Colors.white, color, 0.05),
+              ? Color.lerp(Theme.of(context).colorScheme.surface, color, 0.1)
+              : Color.lerp(Colors.white, color, 0.03),
           appBar: AppBar(
             title: Text(widget.category.name),
             backgroundColor: color.withAlpha(25),

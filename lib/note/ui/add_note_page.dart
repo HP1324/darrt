@@ -14,12 +14,13 @@ class AddNotePage extends StatefulWidget {
 }
 
 class _AddNotePageState extends State<AddNotePage> {
-
-@override
+  @override
   void initState() {
     super.initState();
     context.read<NoteStateController>().initState(widget.edit, widget.edit ? widget.note : null);
+    final c = context.read<NoteStateController>().controller;
   }
+
   @override
   void dispose() {
     super.dispose();
@@ -55,34 +56,30 @@ class _AddNotePageState extends State<AddNotePage> {
                 config: QuillEditorConfig(
                   placeholder: 'Enter your note here...',
                   autoFocus: true,
+                  textCapitalization: TextCapitalization.sentences,
                 ),
               ),
             ),
           ),
-          Container(
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              boxShadow: [
-                BoxShadow(
-                  color: colorScheme.shadow.withValues(alpha:0.1),
-                  blurRadius: 3,
-                  offset: const Offset(0, -1),
-                ),
-              ],
-              border: Border(
-                top: BorderSide(
-                  color: colorScheme.outlineVariant.withValues(alpha:0.2),
-                  width: 1,
-                ),
-              ),
-            ),
-            child: QuillSimpleToolbar(
-              controller: getIt<NoteStateController>().controller,
-              config: QuillSimpleToolbarConfig(
-
-                multiRowsDisplay: false,
-                toolbarIconAlignment: WrapAlignment.start,
-              ),
+          QuillSimpleToolbar(
+            controller: getIt<NoteStateController>().controller,
+            config: QuillSimpleToolbarConfig(
+              multiRowsDisplay: false,
+              toolbarIconAlignment: WrapAlignment.start,
+              buttonOptions: QuillSimpleToolbarButtonOptions(
+                  selectHeaderStyleDropdownButton:
+                      QuillToolbarSelectHeaderStyleDropdownButtonOptions(
+                    attributes: [
+                      Attribute.h1,
+                      Attribute.h2,
+                      Attribute.h3,
+                      Attribute.h4,
+                      Attribute.h5,
+                      Attribute.h6,
+                    ],
+                  ),
+                  fontFamily: QuillToolbarFontFamilyButtonOptions(attribute: Attribute.font),
+                  fontSize: QuillToolbarFontSizeButtonOptions(attribute: Attribute.size)),
             ),
           ),
         ],

@@ -332,8 +332,8 @@ class DuedateSelector extends StatelessWidget {
           onTap: () async {
             final date = await showDatePicker(
               context: context,
-              firstDate: DateTime.now(),
-              lastDate: DateTime.now().add(Duration(days: 30)),
+              firstDate: DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate)),
+              lastDate: DateTime.now().add(Duration(days: maxExtentDateDays)),
             );
             if (date != null) {
               controller.setDueDate(date);
@@ -442,8 +442,8 @@ class DateRangeSelector extends StatelessWidget {
                 controller.textFieldNode.unfocus();
                 final date = await showDatePicker(
                   context: context,
-                  firstDate: DateTime(1, 1, 2024),
-                  lastDate: DateTime.now().add(Duration(days: 300)),
+                  firstDate: DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate)),
+                  lastDate: DateTime.now().add(Duration(days: maxExtentDateDays)),
                 );
                 if (date != null) {
                   controller.setStartDate(date);
@@ -462,7 +462,7 @@ class DateRangeSelector extends StatelessWidget {
                 final date = await showDatePicker(
                   context: context,
                   firstDate: controller.startDate.add(Duration(days: 1)),
-                  lastDate: DateTime.now().add(Duration(days: 300)),
+                  lastDate: DateTime.now().add(Duration(days: maxExtentDateDays)),
                 );
                 if (date != null) {
                   controller.setEndDate(date);
