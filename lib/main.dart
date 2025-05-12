@@ -16,6 +16,7 @@ import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/note/state/note_state_controller.dart';
+import 'package:minimaltodo/note/state/note_view_model.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart';
 import 'package:minimaltodo/task/state/task_view_model.dart';
 import 'package:minimaltodo/home.dart';
@@ -24,6 +25,7 @@ import 'package:minimaltodo/app/notification/notification_service.dart';
 void registerSingletons(){
   getIt.registerSingleton<TaskViewModel>(TaskViewModel());
   getIt.registerSingleton<CategoryViewModel>(CategoryViewModel());
+  getIt.registerSingleton<NoteViewModel>(NoteViewModel());
   getIt.registerSingleton<TaskStateController>(TaskStateController());
   getIt.registerSingleton<CategoryStateController>(CategoryStateController());
   getIt.registerSingleton<NoteStateController>(NoteStateController());
@@ -76,6 +78,7 @@ class _MiniTodoState extends State<MiniTodo> {
       providers: [
         ChangeNotifierProvider(create: (_) => getIt<TaskViewModel>()),
         ChangeNotifierProvider(create: (_) => getIt<CategoryViewModel>()),
+        ChangeNotifierProvider(create: (_) => getIt<NoteViewModel>()),
         ChangeNotifierProvider(create: (_) => getIt<TaskStateController>()),
         ChangeNotifierProvider(create: (_) => getIt<CategoryStateController>()),
         ChangeNotifierProvider(create: (_) => getIt<NavigationManager>()),
