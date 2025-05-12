@@ -19,6 +19,14 @@ class Messages {
 
   static final mCategoriesDeleted = 'Categories Deleted';
 
+  static final mNoteAdded = 'Note added';
+
+  static final mNoteEdited = 'Note edited';
+
+  static final mNoteDeleted = 'Note deleted';
+
+  static final mNotesDeleted = 'Notes deleted';
+
   static final mAtleastOneDaySelected = 'At least one day must be selected!';
 
   static final mNotifAlarmDifference =

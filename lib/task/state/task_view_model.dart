@@ -107,8 +107,6 @@ class TaskViewModel extends ViewModel<Task> {
     notifyListeners();
   }
 
-
-
   void toggleSelection(int id) {
     if (selectedTaskIds.contains(id)) {
       selectedTaskIds.remove(id);
@@ -117,7 +115,6 @@ class TaskViewModel extends ViewModel<Task> {
     }
     notifyListeners();
   }
-
 
   @override
   int getItemId(task) => task.id;

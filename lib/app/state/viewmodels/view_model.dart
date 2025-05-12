@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/objectbox.g.dart' show Box;
@@ -40,7 +41,6 @@ abstract class ViewModel<T> extends ChangeNotifier {
   /// Returns a message indicating success or failure.
   /// Child classes may override this method for implementing custom behavior (i.e., Validating [item])
   String putItem(T item, {required bool edit}) {
-
     final id = _box.put(item);
     if(edit){
       int index = _items.indexWhere((i)=>getItemId(i) == id);
@@ -49,6 +49,9 @@ abstract class ViewModel<T> extends ChangeNotifier {
       }
     }else{
       _items.add(item);
+    }
+    if(kDebugMode){
+      debugPrint('Item added/updated with id: $id, item type: ${item.runtimeType}');
     }
     notifyListeners();
     return edit ? getUpdateSuccessMessage() : getCreateSuccessMessage();
