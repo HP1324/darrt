@@ -6,7 +6,7 @@ class RepeatConfig{
   final String? type;
   List<int> days;
 
-  RepeatConfig({ this.type = 'weekly', List<int>? days}): days = days ?? [1,2,3,4,5,6];
+  RepeatConfig({ this.type = 'weekly',List<int>? days}): days = days ?? [1,2,3,4,5,6];
 
   RepeatConfig copyWith({String? type, List<int>? days}) {
     return RepeatConfig(

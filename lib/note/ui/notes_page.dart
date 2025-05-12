@@ -21,7 +21,6 @@ class _NotesPageState extends State<NotesPage> {
             leading: BackButton(),
             title: Text('Notes'),
             floating: true,
-            expandedHeight: 200,
           ),
         ],
       ),
