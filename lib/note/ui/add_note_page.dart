@@ -21,6 +21,9 @@ class _AddNotePageState extends State<AddNotePage> {
   void initState() {
     super.initState();
     context.read<NoteStateController>().initState(widget.edit, widget.edit ? widget.note : null);
+    Future.delayed(Duration(milliseconds: 500),(){
+      getIt<NoteStateController>().focusNode.requestFocus();
+    });
   }
 
   @override
@@ -30,7 +33,6 @@ class _AddNotePageState extends State<AddNotePage> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Hero(
       tag: '${widget.note?.id}',
       child: Scaffold(
@@ -67,7 +69,7 @@ class _AddNotePageState extends State<AddNotePage> {
                   focusNode: getIt<NoteStateController>().focusNode,
                   config: QuillEditorConfig(
                     placeholder: 'Enter your note here...',
-                    autoFocus: true,
+                    autoFocus:widget.edit ? false :  true,
                     textCapitalization: TextCapitalization.sentences,
                   ),
                 ),
