@@ -34,9 +34,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
     _items = _box.getAll();
   }
 
-  ///Validate the item before saving
   // bool validateItem(T item);
-
   /// Add or update an item in the database and the local list.
   /// Returns a message indicating success or failure.
   /// Child classes may override this method for implementing custom behavior (i.e., Validating [item])
@@ -46,6 +44,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
       int index = _items.indexWhere((i)=>getItemId(i) == id);
       if(index != -1){
         _items[index] = item;
+        debugPrint('Item id: ${getItemId(item)}');
       }
     }else{
       _items.add(item);
@@ -75,6 +74,14 @@ abstract class ViewModel<T> extends ChangeNotifier {
     return getDeleteSuccessMessage(length);
   }
 
+  void toggleSelection(int id) {
+    if (selectedItemIds.contains(id)) {
+      selectedItemIds.remove(id);
+    } else {
+      selectedItemIds.add(id);
+    }
+    notifyListeners();
+  }
   void clearSelection() {
     _selectedItemIds.clear();
     notifyListeners();

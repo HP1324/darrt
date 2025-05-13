@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:minimaltodo/helpers/utils.dart' show getIt;
+import 'package:minimaltodo/helpers/messages.dart' show Messages;
+import 'package:minimaltodo/helpers/utils.dart' show getIt, showToast;
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/note/state/note_state_controller.dart';
 import 'package:minimaltodo/note/state/note_view_model.dart';
 import 'package:provider/provider.dart';
+import 'package:toastification/toastification.dart';
 
 class AddNotePage extends StatefulWidget {
   const AddNotePage({super.key, required this.edit, this.note}) : assert(!edit || note != null);
@@ -19,7 +21,6 @@ class _AddNotePageState extends State<AddNotePage> {
   void initState() {
     super.initState();
     context.read<NoteStateController>().initState(widget.edit, widget.edit ? widget.note : null);
-    final c = context.read<NoteStateController>().controller;
   }
 
   @override
@@ -40,9 +41,17 @@ class _AddNotePageState extends State<AddNotePage> {
             IconButton(
               icon: const Icon(Icons.check),
               onPressed: () {
-                final note = context.read<NoteStateController>().buildModel(edit: widget.edit, model:widget.edit ? widget.note : null);
-                final message = context.read<NoteViewModel>().putItem(note, edit: widget.edit);
-                Navigator.pop(context);
+                var message = '';
+                final stateController = context.read<NoteStateController>();
+                if (!stateController.controller.document.isEmpty()) {
+                  final note = stateController.buildModel(
+                      edit: widget.edit, model: widget.edit ? widget.note : null);
+                  message = context.read<NoteViewModel>().putItem(note, edit: widget.edit);
+                  Navigator.pop(context);
+                } else {
+                  message = Messages.mNoteEmpty;
+                }
+                showToast(context, type:message == Messages.mNoteEmpty ? ToastificationType.error : ToastificationType.success, description: message);
               },
             ),
           ],

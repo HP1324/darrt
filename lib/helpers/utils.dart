@@ -35,6 +35,10 @@ String formatTime(TimeOfDay time) {
 
   String formatDate(DateTime date, String format)=> DateFormat(format).format(date);
 
+  String formatDateAndTime(DateTime dateTime, String format) {
+    return DateFormat(format).add_jm().format(dateTime);
+  }
+
   DateTime getFirstDate(){
     return DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate))
         .subtract(const Duration(days: 365));

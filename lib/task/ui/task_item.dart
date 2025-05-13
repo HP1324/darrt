@@ -5,6 +5,7 @@ import 'package:minimaltodo/app/state/managers/calendar_manager.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
+import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/state/task_view_model.dart';
@@ -47,7 +48,7 @@ class _TaskItemState extends State<TaskItem> {
               borderRadius: BorderRadius.circular(12),
               onTap: () {
                 if (ids.isEmpty) {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddTaskPage(edit: true, task: widget.task)));
+                  MiniRouter.to(context, AddTaskPage(edit: true, task: widget.task));
                 } else {
                   context.read<TaskViewModel>().toggleSelection(widget.task.id);
                 }

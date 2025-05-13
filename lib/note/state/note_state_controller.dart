@@ -27,7 +27,9 @@ class NoteStateController extends StateController<NoteState,Note>{
 
   @override
   Note buildModel({required bool edit, Note? model}) {
-    return Note.fromQuillController(controller);
+    var note = Note.fromQuillController(controller);
+    note.id = edit ? model!.id : 0;
+    return note;
   }
 
   @override
@@ -38,6 +40,7 @@ class NoteStateController extends StateController<NoteState,Note>{
   @override
   void initState(bool edit, [Note? model]) {
       controller =  edit ? model!.toQuillController() : QuillController.basic();
+      controller.moveCursorToEnd();
   }
 
 }

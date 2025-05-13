@@ -27,6 +27,8 @@ class Messages {
 
   static final mNotesDeleted = 'Notes deleted';
 
+  static final mNoteEmpty = 'Please enter something';
+
   static final mAtleastOneDaySelected = 'At least one day must be selected!';
 
   static final mNotifAlarmDifference =

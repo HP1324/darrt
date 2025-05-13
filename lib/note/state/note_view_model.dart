@@ -1,10 +1,20 @@
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:minimaltodo/helpers/messages.dart';
+import 'package:minimaltodo/helpers/utils.dart' show getIt;
 import 'package:minimaltodo/note/models/note.dart';
+import 'package:minimaltodo/note/state/note_state_controller.dart';
 
 class NoteViewModel extends ViewModel<Note>{
 
   List<Note> get notes => items;
+  @override
+  String putItem(Note item, {required bool edit}) {
+    final note = item;
+    print('id: ${note.id}');
+    note.updatedAt = DateTime.now();
+    final message = super.putItem(note, edit: edit);
+    return message;
+  }
 
   @override
   int getItemId(Note item) => item.id;
