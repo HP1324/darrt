@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart' show formatDate, formatDateAndTime, formatTime;
 import 'package:minimaltodo/note/models/note.dart';
+import 'package:minimaltodo/note/state/note_state_controller.dart';
 import 'package:minimaltodo/note/state/note_view_model.dart';
 import 'package:minimaltodo/note/ui/add_note_page.dart';
 import 'package:provider/provider.dart'; // Import your Note model here
@@ -36,11 +37,12 @@ class _NoteItemState extends State<NoteItem> {
     return Consumer<NoteViewModel>(builder: (context, noteVM, _) {
       final note = noteVM.notes.firstWhere((t) => t.id == widget.note.id);
       initialContent = _extractInitialContent(note);
+      final isSelected = noteVM.selectedItemIds.contains(widget.note.id);
       return Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: theme.colorScheme.outline.withAlpha(60)),
-
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: theme.colorScheme.outline.withAlpha(isSelected ? 255 : 60)),
+          color: isSelected ? theme.colorScheme.outline.withAlpha(150) : null,
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withValues(alpha: 0.1),
@@ -65,32 +67,35 @@ class _NoteItemState extends State<NoteItem> {
                 context.read<NoteViewModel>().toggleSelection(widget.note.id);
               }
             },
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    initialContent,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+            child: Hero(
+              tag: '${widget.note.id}',
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      initialContent,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Builder(builder: (context) {
-                    final updatedAt = note.updatedAt!;
-                    final isToday = DateUtils.isSameDay(DateTime.now(), updatedAt);
-                    final timeOfDay = TimeOfDay.fromDateTime(updatedAt);
-                    final lastUpdatedText = isToday
-                        ? 'Today ${formatTime(timeOfDay)}'
-                        : formatDateAndTime(updatedAt, 'dd/M/yyyy');
-                    return FittedBox(
-                        child: Text(
-                      'Modified: $lastUpdatedText',
-                      style: theme.textTheme.labelSmall?.copyWith(),
-                    ));
-                  }),
-                ],
+                    const SizedBox(height: 12),
+                    Builder(builder: (context) {
+                      final updatedAt = note.updatedAt!;
+                      final isToday = DateUtils.isSameDay(DateTime.now(), updatedAt);
+                      final timeOfDay = TimeOfDay.fromDateTime(updatedAt);
+                      final lastUpdatedText = isToday
+                          ? 'Today ${formatTime(timeOfDay)}'
+                          : formatDateAndTime(updatedAt, 'dd/M/yyyy');
+                      return FittedBox(
+                          child: Text(
+                        'Modified: $lastUpdatedText',
+                        style: theme.textTheme.labelSmall?.copyWith(),
+                      ));
+                    }),
+                  ],
+                ),
               ),
             ),
           ),

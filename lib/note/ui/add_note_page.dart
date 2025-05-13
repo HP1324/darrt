@@ -31,9 +31,8 @@ class _AddNotePageState extends State<AddNotePage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
-    return PopScope(
-      onPopInvokedWithResult: (didPop, result) {},
+    return Hero(
+      tag: '${widget.note?.id}',
       child: Scaffold(
         appBar: AppBar(
           leading: BackButton(),
@@ -58,6 +57,7 @@ class _AddNotePageState extends State<AddNotePage> {
         ),
         body: Column(
           children: [
+            SizedBox(height: 15),
             Expanded(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
