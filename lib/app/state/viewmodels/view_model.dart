@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/note/models/folder.dart';
 import 'package:minimaltodo/objectbox.g.dart' show Box;
 
 /// Generic abstract class for view models that manage collections of model objects
@@ -11,6 +13,8 @@ abstract class ViewModel<T> extends ChangeNotifier {
 
   /// Getter for the list of model objects
   List<T> get items => _items;
+
+  void set setItems(List<T> items) => _items = items;
 
   /// The ObjectBox store box for database operations
   final _box = ObjectBox.store.box<T>();
@@ -32,6 +36,10 @@ abstract class ViewModel<T> extends ChangeNotifier {
   /// Child classes may override this method for implementing custom behavior
   void initializeItems() {
     _items = _box.getAll();
+    //Reverse the list for all items except categories and folders, to show latest items first
+    if(T != CategoryModel && T != Folder){
+      _items = _items.reversed.toList();
+    }
   }
 
   // bool validateItem(T item);
@@ -47,7 +55,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
         debugPrint('Item id: ${getItemId(item)}');
       }
     }else{
-      _items.add(item);
+      _items.insert(0,item);
     }
     if(kDebugMode){
       debugPrint('Item added/updated with id: $id, item type: ${item.runtimeType}');
