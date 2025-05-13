@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart' show TextSelection;
 import 'package:flutter_quill/flutter_quill.dart' show Document, QuillController;
 import 'package:flutter_quill/quill_delta.dart' show Delta;
+import 'package:minimaltodo/helpers/mini_logger.dart' show MiniLogger;
 import 'package:minimaltodo/note/models/folder.dart';
 import 'package:objectbox/objectbox.dart';
 

@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/note/models/note.dart'; // Import your Note model here
+import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/helpers/utils.dart' show formatDate, formatDateAndTime, formatTime;
+import 'package:minimaltodo/note/models/note.dart';
+import 'package:minimaltodo/note/state/note_view_model.dart';
+import 'package:minimaltodo/note/ui/add_note_page.dart';
+import 'package:provider/provider.dart'; // Import your Note model here
 
 class NoteItem extends StatefulWidget {
   final Note note;
@@ -27,52 +32,70 @@ class _NoteItemState extends State<NoteItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            spreadRadius: 1,
-            blurRadius: 7,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
-          onTap: () {
-            // Handle note tap
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  initialContent,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+    final theme = Theme.of(context);
+    return Consumer<NoteViewModel>(builder: (context, noteVM, _) {
+      final note = noteVM.notes.firstWhere((t) => t.id == widget.note.id);
+      initialContent = _extractInitialContent(note);
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: theme.colorScheme.outline.withAlpha(60)),
+
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withValues(alpha: 0.1),
+              spreadRadius: 1,
+              blurRadius: 7,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: InkWell(
+            onLongPress: () {
+              context.read<NoteViewModel>().toggleSelection(widget.note.id);
+            },
+            borderRadius: BorderRadius.circular(12),
+            onTap: () {
+              final ids = context.read<NoteViewModel>().selectedItemIds;
+              if (ids.isEmpty) {
+                MiniRouter.to(context, AddNotePage(edit: true, note: widget.note));
+              } else {
+                context.read<NoteViewModel>().toggleSelection(widget.note.id);
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    initialContent,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Created on: ${widget.note.createdAt?.toLocal().toString().split(" ")[0]}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  Builder(builder: (context) {
+                    final updatedAt = note.updatedAt!;
+                    final isToday = DateUtils.isSameDay(DateTime.now(), updatedAt);
+                    final timeOfDay = TimeOfDay.fromDateTime(updatedAt);
+                    final lastUpdatedText = isToday
+                        ? 'Today ${formatTime(timeOfDay)}'
+                        : formatDateAndTime(updatedAt, 'dd/M/yyyy');
+                    return FittedBox(
+                        child: Text(
+                      'Modified: $lastUpdatedText',
+                      style: theme.textTheme.labelSmall?.copyWith(),
+                    ));
+                  }),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
