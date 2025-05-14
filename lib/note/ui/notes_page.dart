@@ -5,6 +5,7 @@ import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/note/state/note_state_controller.dart';
 import 'package:minimaltodo/note/state/note_view_model.dart';
 import 'package:minimaltodo/note/ui/add_note_page.dart';
+import 'package:minimaltodo/note/ui/folders_page.dart';
 import 'package:minimaltodo/note/ui/note_item.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
@@ -33,7 +34,6 @@ class _NotesPageState extends State<NotesPage> {
             return SliverAppBar(
               leading: BackButton(),
               title: Text('Notes'),
-              // floating: true,
               pinned: true,
               actions: [
                 if (noteVM.selectedItemIds.isNotEmpty) ...[
@@ -73,6 +73,12 @@ class _NotesPageState extends State<NotesPage> {
                     icon: Icon(Icons.delete),
                   ),
                 ],
+                IconButton(
+                  onPressed: () {
+                    MiniRouter.to(context, FoldersPage());
+                  },
+                  icon: Icon(Icons.folder_open),
+                ),
               ],
             );
           }),

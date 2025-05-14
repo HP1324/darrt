@@ -15,10 +15,10 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$NoteState {
-  String get content;
   String get color;
   DateTime get createdAt;
   DateTime get updatedAt;
+  Map<Folder, bool> get folderSelection;
 
   /// Create a copy of NoteState
   /// with the given fields replaced by the non-null parameter values.
@@ -32,21 +32,22 @@ mixin _$NoteState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is NoteState &&
-            (identical(other.content, content) || other.content == content) &&
             (identical(other.color, color) || other.color == color) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality()
+                .equals(other.folderSelection, folderSelection));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, content, color, createdAt, updatedAt);
+  int get hashCode => Object.hash(runtimeType, color, createdAt, updatedAt,
+      const DeepCollectionEquality().hash(folderSelection));
 
   @override
   String toString() {
-    return 'NoteState(content: $content, color: $color, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'NoteState(color: $color, createdAt: $createdAt, updatedAt: $updatedAt, folderSelection: $folderSelection)';
   }
 }
 
@@ -56,7 +57,10 @@ abstract mixin class $NoteStateCopyWith<$Res> {
       _$NoteStateCopyWithImpl;
   @useResult
   $Res call(
-      {String content, String color, DateTime createdAt, DateTime updatedAt});
+      {String color,
+      DateTime createdAt,
+      DateTime updatedAt,
+      Map<Folder, bool> folderSelection});
 }
 
 /// @nodoc
@@ -71,16 +75,12 @@ class _$NoteStateCopyWithImpl<$Res> implements $NoteStateCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? content = null,
     Object? color = null,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? folderSelection = null,
   }) {
     return _then(_self.copyWith(
-      content: null == content
-          ? _self.content
-          : content // ignore: cast_nullable_to_non_nullable
-              as String,
       color: null == color
           ? _self.color
           : color // ignore: cast_nullable_to_non_nullable
@@ -93,6 +93,10 @@ class _$NoteStateCopyWithImpl<$Res> implements $NoteStateCopyWith<$Res> {
           ? _self.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      folderSelection: null == folderSelection
+          ? _self.folderSelection
+          : folderSelection // ignore: cast_nullable_to_non_nullable
+              as Map<Folder, bool>,
     ));
   }
 }
@@ -101,20 +105,26 @@ class _$NoteStateCopyWithImpl<$Res> implements $NoteStateCopyWith<$Res> {
 
 class _NoteState extends NoteState {
   const _NoteState(
-      {required this.content,
-      required this.color,
+      {required this.color,
       required this.createdAt,
-      required this.updatedAt})
-      : super._();
+      required this.updatedAt,
+      required final Map<Folder, bool> folderSelection})
+      : _folderSelection = folderSelection,
+        super._();
 
-  @override
-  final String content;
   @override
   final String color;
   @override
   final DateTime createdAt;
   @override
   final DateTime updatedAt;
+  final Map<Folder, bool> _folderSelection;
+  @override
+  Map<Folder, bool> get folderSelection {
+    if (_folderSelection is EqualUnmodifiableMapView) return _folderSelection;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_folderSelection);
+  }
 
   /// Create a copy of NoteState
   /// with the given fields replaced by the non-null parameter values.
@@ -129,21 +139,22 @@ class _NoteState extends NoteState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _NoteState &&
-            (identical(other.content, content) || other.content == content) &&
             (identical(other.color, color) || other.color == color) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality()
+                .equals(other._folderSelection, _folderSelection));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, content, color, createdAt, updatedAt);
+  int get hashCode => Object.hash(runtimeType, color, createdAt, updatedAt,
+      const DeepCollectionEquality().hash(_folderSelection));
 
   @override
   String toString() {
-    return 'NoteState(content: $content, color: $color, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'NoteState(color: $color, createdAt: $createdAt, updatedAt: $updatedAt, folderSelection: $folderSelection)';
   }
 }
 
@@ -156,7 +167,10 @@ abstract mixin class _$NoteStateCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String content, String color, DateTime createdAt, DateTime updatedAt});
+      {String color,
+      DateTime createdAt,
+      DateTime updatedAt,
+      Map<Folder, bool> folderSelection});
 }
 
 /// @nodoc
@@ -171,16 +185,12 @@ class __$NoteStateCopyWithImpl<$Res> implements _$NoteStateCopyWith<$Res> {
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? content = null,
     Object? color = null,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? folderSelection = null,
   }) {
     return _then(_NoteState(
-      content: null == content
-          ? _self.content
-          : content // ignore: cast_nullable_to_non_nullable
-              as String,
       color: null == color
           ? _self.color
           : color // ignore: cast_nullable_to_non_nullable
@@ -193,6 +203,10 @@ class __$NoteStateCopyWithImpl<$Res> implements _$NoteStateCopyWith<$Res> {
           ? _self.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      folderSelection: null == folderSelection
+          ? _self._folderSelection
+          : folderSelection // ignore: cast_nullable_to_non_nullable
+              as Map<Folder, bool>,
     ));
   }
 }

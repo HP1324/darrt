@@ -13,7 +13,7 @@ class NoteItem extends StatefulWidget {
   const NoteItem({super.key, required this.note});
 
   @override
-  _NoteItemState createState() => _NoteItemState();
+  State<NoteItem> createState() => _NoteItemState();
 }
 
 class _NoteItemState extends State<NoteItem> {
@@ -67,35 +67,32 @@ class _NoteItemState extends State<NoteItem> {
                 context.read<NoteViewModel>().toggleSelection(widget.note.id);
               }
             },
-            child: Hero(
-              tag: '${widget.note.id}',
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      initialContent,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    initialContent,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
-                    const SizedBox(height: 12),
-                    Builder(builder: (context) {
-                      final updatedAt = note.updatedAt!;
-                      final isToday = DateUtils.isSameDay(DateTime.now(), updatedAt);
-                      final timeOfDay = TimeOfDay.fromDateTime(updatedAt);
-                      final lastUpdatedText = isToday
-                          ? 'Today ${formatTime(timeOfDay)}'
-                          : formatDateAndTime(updatedAt, 'dd/M/yyyy');
-                      return FittedBox(
-                          child: Text(
-                        'Modified: $lastUpdatedText',
-                        style: theme.textTheme.labelSmall?.copyWith(),
-                      ));
-                    }),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 12),
+                  Builder(builder: (context) {
+                    final updatedAt = note.updatedAt!;
+                    final isToday = DateUtils.isSameDay(DateTime.now(), updatedAt);
+                    final timeOfDay = TimeOfDay.fromDateTime(updatedAt);
+                    final lastUpdatedText = isToday
+                        ? 'Today ${formatTime(timeOfDay)}'
+                        : formatDateAndTime(updatedAt, 'dd/M/yyyy');
+                    return FittedBox(
+                        child: Text(
+                      'Modified: $lastUpdatedText',
+                      style: theme.textTheme.labelSmall?.copyWith(),
+                    ));
+                  }),
+                ],
               ),
             ),
           ),

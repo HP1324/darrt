@@ -12,6 +12,7 @@ import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart';
 import 'package:minimaltodo/task/state/task_view_model.dart';
@@ -36,7 +37,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   @override
   void initState() {
     super.initState();
-      context.read<TaskStateController>().initState(widget.edit, widget.edit ? widget.task : null);
+    context.read<TaskStateController>().initState(widget.edit, widget.edit ? widget.task : null);
   }
 
   late TaskStateController controller;
@@ -107,11 +108,12 @@ class _AddTaskPageState extends State<AddTaskPage> {
       ),
     );
   }
-  void _putTask(BuildContext context){
+
+  void _putTask(BuildContext context) {
     final controller = context.read<TaskStateController>();
     final taskVM = context.read<TaskViewModel>();
-    Task newTask =controller.buildModel(edit: widget.edit, model: widget.task);
-    final message = taskVM.putItem(newTask,edit: widget.edit);
+    Task newTask = controller.buildModel(edit: widget.edit, model: widget.task);
+    final message = taskVM.putItem(newTask, edit: widget.edit);
     var type = ToastificationType.success;
     if (message == Messages.mTaskAdded || message == Messages.mTaskEdited) {
       Navigator.pop(context);
@@ -153,8 +155,7 @@ class AddRemindersWidget extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
                   content: Text(
                     Messages.mNotifAlarmDifference,
-                    style:
-                    TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
+                    style: TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
                   ),
                   actions: [
                     FilledButton(
@@ -183,7 +184,8 @@ class AddRemindersWidget extends StatelessWidget {
       },
     );
   }
-  void showBottomSheet(BuildContext context){
+
+  void showBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -223,32 +225,31 @@ class AddRemindersWidget extends StatelessWidget {
                   Flexible(
                     child: reminders.isEmpty
                         ? Center(
-                      child: Text(
-                        'No reminders set',
-                        style:
-                        textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
-                      ),
-                    )
+                            child: Text(
+                              'No reminders set',
+                              style: textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
+                            ),
+                          )
                         : ListView.builder(
-                      itemCount: reminders.length,
-                      itemBuilder: (context, index) {
-                        debugPrint(
-                            'Reminder ${index + 1} time in list: ${reminders[index].time.hour}:${reminders[index].time.minute}');
-                        return ReminderItem(
-                          reminder: reminders[index],
-                          onTap: () {
-                            showReminderDialog(
-                              context,
-                              edit: true,
-                              reminder: reminders[index],
-                            );
-                          },
-                          onRemove: () {
-                            controller.removeReminder(reminders[index]);
-                          },
-                        );
-                      },
-                    ),
+                            itemCount: reminders.length,
+                            itemBuilder: (context, index) {
+                              debugPrint(
+                                  'Reminder ${index + 1} time in list: ${reminders[index].time.hour}:${reminders[index].time.minute}');
+                              return ReminderItem(
+                                reminder: reminders[index],
+                                onTap: () {
+                                  showReminderDialog(
+                                    context,
+                                    edit: true,
+                                    reminder: reminders[index],
+                                  );
+                                },
+                                onRemove: () {
+                                  controller.removeReminder(reminders[index]);
+                                },
+                              );
+                            },
+                          ),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
@@ -269,6 +270,7 @@ class AddRemindersWidget extends StatelessWidget {
       },
     );
   }
+
   bool _showNotificationRationale(BuildContext context) {
     bool userAllowed = false;
     showAdaptiveDialog(
@@ -369,7 +371,8 @@ class WeekdaySelector extends StatelessWidget {
                   shape: CircleBorder(),
                   showCheckmark: false,
                   label: Text(days[index]),
-                  labelStyle: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium?.fontSize),
+                  labelStyle:
+                      TextStyle(fontSize: Theme.of(context).textTheme.labelMedium?.fontSize),
                   selected: weekdays.contains(index + 1) &&
                       context.read<TaskStateController>().isWeekdayValid(index + 1),
                   onSelected: (selected) {
@@ -412,8 +415,7 @@ class RepeatTypeSelector extends StatelessWidget {
                   context.read<TaskStateController>().setRepeatType(selected.first);
                 },
                 style: ButtonStyle(
-                  textStyle: WidgetStatePropertyAll(Theme.of(context).textTheme.labelMedium)
-                ),
+                    textStyle: WidgetStatePropertyAll(Theme.of(context).textTheme.labelMedium)),
               ),
               RepeatTypeHelpButton(),
             ],
@@ -702,7 +704,8 @@ class TaskTypeSelector extends StatelessWidget {
                         child: Text(
                           'Single Task',
                           style: theme.textTheme.labelMedium?.copyWith(
-                            color: !repeat ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                            color:
+                                !repeat ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
                             fontWeight: !repeat ? FontWeight.bold : FontWeight.normal,
                           ),
                         ),
@@ -720,7 +723,8 @@ class TaskTypeSelector extends StatelessWidget {
                         child: Text(
                           'Recurring Task',
                           style: theme.textTheme.labelMedium?.copyWith(
-                            color: repeat ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                            color:
+                                repeat ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
                             fontWeight: repeat ? FontWeight.bold : FontWeight.normal,
                           ),
                         ),
@@ -739,7 +743,8 @@ class TaskTypeSelector extends StatelessWidget {
                   style: const ButtonStyle(
                     // Using static values instead of deprecated MaterialStateProperty
                     shape: WidgetStatePropertyAll(StadiumBorder()),
-                    padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 12, horizontal: 8)),
+                    padding:
+                        WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 12, horizontal: 8)),
                   ),
                 ),
               );
@@ -774,10 +779,7 @@ class CategorySelector extends StatelessWidget {
               children: [
                 const SizedBox(height: 8),
                 ListTile(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => AddCategoryPage(edit: false)),
-                  ),
+                  onTap: () => MiniRouter.to(context, AddCategoryPage(edit: false)),
                   title: const Text('Create New Category',
                       style: TextStyle(fontWeight: FontWeight.w500)),
                   leading: Container(
@@ -1104,7 +1106,6 @@ class ReminderItem extends StatelessWidget {
   }
 }
 
-
 class RepeatTypeHelpButton extends StatelessWidget {
   const RepeatTypeHelpButton({super.key});
 
@@ -1174,14 +1175,16 @@ class RepeatTypeHelpButton extends StatelessWidget {
                   context: context,
                   title: 'Monthly',
                   icon: Icons.calendar_month_rounded,
-                  description: 'Task repeats on the same date as start date every month (e.g., on the 15th of each month).',
+                  description:
+                      'Task repeats on the same date as start date every month (e.g., on the 15th of each month).',
                 ),
                 const Divider(),
                 _buildRepeatTypeSection(
                   context: context,
                   title: 'Yearly',
                   icon: Icons.event_repeat_rounded,
-                  description: 'Task repeats on the same date as start date every year (e.g., January 1st each year).',
+                  description:
+                      'Task repeats on the same date as start date every year (e.g., January 1st each year).',
                 ),
               ],
             ),
@@ -1282,7 +1285,7 @@ class RepeatTypeHelpButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: List.generate(
                 weekDays.length,
-                    (index) => Padding(
+                (index) => Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: Container(
                     width: 28,

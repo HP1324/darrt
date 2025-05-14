@@ -12,4 +12,12 @@ class Folder {
   String name;
   @Backlink('folders')
   final notes = ToMany<Note>();
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Folder && other.id == id && other.name == name;
+  }
+  @override
+  int get hashCode => Object.hash(id, name);
 }

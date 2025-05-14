@@ -15,6 +15,8 @@ import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
+import 'package:minimaltodo/note/state/folder_state_controller.dart';
+import 'package:minimaltodo/note/state/folder_view_model.dart';
 import 'package:minimaltodo/note/state/note_state_controller.dart';
 import 'package:minimaltodo/note/state/note_view_model.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart';
@@ -26,9 +28,11 @@ void registerSingletons(){
   getIt.registerSingleton<TaskViewModel>(TaskViewModel());
   getIt.registerSingleton<CategoryViewModel>(CategoryViewModel());
   getIt.registerSingleton<NoteViewModel>(NoteViewModel());
+  getIt.registerSingleton<FolderViewModel>(FolderViewModel());
   getIt.registerSingleton<TaskStateController>(TaskStateController());
   getIt.registerSingleton<CategoryStateController>(CategoryStateController());
   getIt.registerSingleton<NoteStateController>(NoteStateController());
+  getIt.registerSingleton<FolderStateController>(FolderStateController());
   //Registering CalendarManager as a lazy singleton to force initialization until first use
   //without lazy it will get initialized in place and then the scroll controller's
   //scroll logic does not work properly
@@ -79,12 +83,14 @@ class _MiniTodoState extends State<MiniTodo> {
         ChangeNotifierProvider(create: (_) => getIt<TaskViewModel>()),
         ChangeNotifierProvider(create: (_) => getIt<CategoryViewModel>()),
         ChangeNotifierProvider(create: (_) => getIt<NoteViewModel>()),
+        ChangeNotifierProvider(create: (_) => getIt<FolderViewModel>()),
         ChangeNotifierProvider(create: (_) => getIt<TaskStateController>()),
         ChangeNotifierProvider(create: (_) => getIt<CategoryStateController>()),
         ChangeNotifierProvider(create: (_) => getIt<NavigationManager>()),
         ChangeNotifierProvider(create: (_) => getIt<ThemeManager>()),
         ChangeNotifierProvider(create: (_) => getIt<CalendarManager>()),
         ChangeNotifierProvider(create: (_) => getIt<NoteStateController>()),
+        ChangeNotifierProvider(create: (_) => getIt<FolderStateController>()),
       ],
       child: Consumer<ThemeManager>(builder: (context, manager, _) {
         return MaterialApp(

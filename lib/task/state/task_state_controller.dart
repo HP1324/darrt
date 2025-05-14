@@ -2,8 +2,10 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/state/category_view_model.dart' show CategoryViewModel;
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/app/state/controllers/state_controller.dart';
+import 'package:minimaltodo/helpers/utils.dart' show getIt;
 import 'package:minimaltodo/task/models/reminder.dart';
 import 'package:minimaltodo/task/models/repeat_config.dart';
 import 'package:minimaltodo/task/models/task.dart';
@@ -65,18 +67,27 @@ class TaskStateController extends StateController<TaskState, Task> {
   }
   @override
   Task buildModel({required bool edit, Task? model}) {
-    final task = model;
-    return Task(
+    var task = Task(
       title: textController.text,
       dueDate: dueDate,
       priority: priority,
-      id: edit ? task!.id : 0,
+      id: edit ? model!.id : 0,
       startDate: startDate,
       endDate: endDate,
       isRepeating: isRepeating,
       repeatConfig: repeatConfig.toJsonString(),
       reminders: Reminder.remindersToJsonString(reminders),
     );
+    final controller = getIt<TaskStateController>();
+    final catVm = getIt<CategoryViewModel>();
+    final categories = catVm.categories.where((c) => controller.categorySelection[c] == true).toList();
+    task.categories.clear();
+    if (categories.isEmpty) {
+      task.categories.add(CategoryModel(id: 1, name: 'General'));
+    } else {
+      task.categories.addAll(categories);
+    }
+    return task;
   }
 
   void setCategory(CategoryModel category, bool value) {

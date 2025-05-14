@@ -55,7 +55,11 @@ abstract class ViewModel<T> extends ChangeNotifier {
         debugPrint('Item id: ${getItemId(item)}');
       }
     }else{
-      _items.insert(0,item);
+      if(T != CategoryModel && T != Folder){
+        _items.insert(0,item);
+      }else{
+        _items.add(item);
+      }
     }
     if(kDebugMode){
       debugPrint('Item added/updated with id: $id, item type: ${item.runtimeType}');
