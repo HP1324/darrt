@@ -22,7 +22,7 @@ class CategoryModel {
   }
 
   @override
-  int get hashCode => id.hashCode ^ name.hashCode ^ icon.hashCode ^ color.hashCode;
+  int get hashCode => Object.hash(id, name, icon, color);
 
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(

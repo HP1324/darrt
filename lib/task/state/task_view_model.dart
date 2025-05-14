@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
@@ -36,18 +35,9 @@ class TaskViewModel extends ViewModel<Task> {
   @override
   String putItem(Task item, {required bool edit}) {
     final task = item;
-    if (task.title.trim().isEmpty) return Messages.mTaskEmpty;
-
-    final controller = getIt<TaskStateController>();
-    final catVm = getIt<CategoryViewModel>();
-    final categories = catVm.categories.where((c) => controller.categorySelection[c] == true).toList();
-    task.categories.clear();
-    if (categories.isEmpty) {
-      task.categories.add(CategoryModel(id: 1, name: 'General'));
-    } else {
-      task.categories.addAll(categories);
-    }
-
+    final title = task.title.trim();
+    if (title.isEmpty) return Messages.mTaskEmpty;
+    task.title = title;
     final message = super.putItem(task, edit: edit);
 
     NotificationService.removeAllTaskNotifications(task).then((_) {
@@ -107,8 +97,6 @@ class TaskViewModel extends ViewModel<Task> {
     notifyListeners();
   }
 
-
-
   @override
   int getItemId(task) => task.id;
 
@@ -119,5 +107,6 @@ class TaskViewModel extends ViewModel<Task> {
   String getUpdateSuccessMessage() => Messages.mTaskEdited;
 
   @override
-  String getDeleteSuccessMessage(int length) => length == 1 ? '1 ${Messages.mTaskDeleted}' : '$length ${Messages.mTasksDeleted}';
+  String getDeleteSuccessMessage(int length) =>
+      length == 1 ? '1 ${Messages.mTaskDeleted}' : '$length ${Messages.mTasksDeleted}';
 }

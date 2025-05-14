@@ -29,6 +29,16 @@ class Messages {
 
   static final mNoteEmpty = 'Please enter something';
 
+  static final mFolderAdded = 'Folder added';
+
+  static final mFolderEdited = 'Folder edited';
+
+  static final mFolderDeleted = 'Folder deleted';
+
+  static final mFoldersDeleted = 'Folders deleted';
+
+  static final mFolderEmpty = 'Enter a folder name first';
+
   static final mAtleastOneDaySelected = 'At least one day must be selected!';
 
   static final mNotifAlarmDifference =
