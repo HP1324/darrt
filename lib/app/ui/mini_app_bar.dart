@@ -131,7 +131,6 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
             final (position, size) = getPositionAndSize(_popupKey);
             showMenu(
               context: context,
-              color: Theme.of(context).colorScheme.onPrimary,
               elevation: 1,
               popUpAnimationStyle: AnimationStyle(duration: Duration(milliseconds: 100)),
               position: RelativeRect.fromLTRB(

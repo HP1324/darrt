@@ -24,6 +24,7 @@ import 'package:minimaltodo/task/state/task_view_model.dart';
 import 'package:minimaltodo/home.dart';
 import 'package:provider/provider.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
+///This function registers all the change notifiers and other singleton classes
 void registerSingletons(){
   getIt.registerSingleton<TaskViewModel>(TaskViewModel());
   getIt.registerSingleton<CategoryViewModel>(CategoryViewModel());
@@ -33,7 +34,7 @@ void registerSingletons(){
   getIt.registerSingleton<CategoryStateController>(CategoryStateController());
   getIt.registerSingleton<NoteStateController>(NoteStateController());
   getIt.registerSingleton<FolderStateController>(FolderStateController());
-  //Registering CalendarManager as a lazy singleton to force initialization until first use
+  //Registering CalendarManager as a lazy singleton to force initialization until first use,
   //without lazy it will get initialized in place and then the scroll controller's
   //scroll logic does not work properly
   getIt.registerLazySingleton<CalendarManager>(()=>CalendarManager());

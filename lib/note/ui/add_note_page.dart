@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/helpers/messages.dart' show Messages;
 import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/helpers/utils.dart' show getIt, showToast;
+import 'package:minimaltodo/helpers/utils.dart' show generateNotePdf, getIt, savePdf, savePdfToDownloads, showToast;
 import 'package:minimaltodo/note/models/folder.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/note/state/folder_view_model.dart';
@@ -38,6 +40,16 @@ class _AddNotePageState extends State<AddNotePage> {
       appBar: AppBar(
         leading: BackButton(),
         actions: [
+          IconButton(
+            onPressed: ()async {
+              final file = await generateNotePdf(getIt<NoteStateController>().controller);
+              final path = await savePdfToDownloads(file, 'note${DateTime.now().millisecondsSinceEpoch}.pdf');
+              if(context.mounted) {
+                showToast( context, type: ToastificationType.success,  description: 'PDF saved');
+              }
+            },
+            icon: const Icon(FontAwesomeIcons.filePdf),
+          ),
           const FolderSelector(),
           SaveNoteButton(widget: widget),
         ],
@@ -128,7 +140,7 @@ class FolderSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.folder),
+      icon: const Icon(Icons.folder_open),
       onPressed: () {
         showModalBottomSheet(
           context: context,
