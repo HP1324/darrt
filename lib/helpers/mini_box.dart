@@ -21,6 +21,7 @@ class MiniBox{
   }
   ///Set global preferences and other settings like first time install date etc.
   static Future<void> initStorage()async {
+    await GetStorage.init();
     await writeIfNull(mDefaultTaskList, 0);
     await writeIfNull(mFirstTimeInstall, true);
     await writeIfNull(mFirstInstallDate, DateUtils.dateOnly(DateTime.now()).millisecondsSinceEpoch);

@@ -11,7 +11,7 @@ import 'package:minimaltodo/helpers/mini_logger.dart';
 class NotificationService {
   static final _notif = AwesomeNotifications();
 
-  static Future<void> initNotifications() async {
+  static Future<void> init() async {
     try {
       bool permissionGranted = await _notif.isNotificationAllowed();
 
