@@ -82,9 +82,10 @@ class _NoteItemState extends State<NoteItem> {
                   Builder(builder: (context) {
                     final updatedAt = note.updatedAt!;
                     final isToday = DateUtils.isSameDay(DateTime.now(), updatedAt);
+                    final isYesterday = DateUtils.isSameDay(DateTime.now().subtract(const Duration(days: 1)), updatedAt);
                     final timeOfDay = TimeOfDay.fromDateTime(updatedAt);
-                    final lastUpdatedText = isToday
-                        ? 'Today ${formatTime(timeOfDay)}'
+                    final lastUpdatedText = isToday || isYesterday
+                        ? '${isYesterday ? 'Yesterday' : 'Today'} ${formatTime(timeOfDay)}'
                         : formatDateAndTime(updatedAt, 'dd/M/yyyy');
                     return FittedBox(
                         child: Text(

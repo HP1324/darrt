@@ -55,6 +55,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('Task page build');
     return Scaffold(
       appBar: AppBar(title: Text(widget.edit ? widget.task!.title : 'Add New Task')),
       body: Padding(
@@ -83,17 +84,24 @@ class _AddTaskPageState extends State<AddTaskPage> {
               const CategorySelector(),
               const PrioritySelector(),
               const TaskTypeSelector(),
-              if (context.select((TaskStateController controller) => controller.isRepeating)) ...[
-                const DateRangeSelector(),
-                const RepeatTypeSelector(),
-                if (context
-                        .select((TaskStateController controller) => controller.repeatConfig)
-                        .type ==
-                    'weekly')
-                  const WeekdaySelector(),
-              ] else ...[
-                const DuedateSelector(),
-              ],
+              Selector<TaskStateController, (bool, RepeatConfig)>(
+                selector: (context, controller) =>(controller.isRepeating, controller.repeatConfig),
+                builder: (context, value, _) {
+                  final repeat = value.$1;
+                  final config = value.$2;
+                  return Column(
+                    children: [
+                      if (repeat) ...[
+                        const DateRangeSelector(),
+                        const RepeatTypeSelector(),
+                        if (config.type == 'weekly') const WeekdaySelector(),
+                      ] else ...[
+                        const DuedateSelector(),
+                      ],
+                    ],
+                  );
+                },
+              ),
               const AddRemindersWidget(),
               const SizedBox(height: 100),
             ],

@@ -21,8 +21,9 @@ class NotesPage extends StatefulWidget {
 
 class _NotesPageState extends State<NotesPage> {
   @override
-  void initState() {
-    super.initState();
+  void dispose() {
+    super.dispose();
+    getIt<NoteViewModel>().selectedItemIds.clear();
   }
 
   @override
@@ -31,12 +32,13 @@ class _NotesPageState extends State<NotesPage> {
       body: CustomScrollView(
         slivers: [
           Consumer<NoteViewModel>(builder: (context, noteVM, _) {
+            final ids = noteVM.selectedItemIds;
             return SliverAppBar(
               leading: BackButton(),
               title: Text('Notes'),
               pinned: true,
               actions: [
-                if (noteVM.selectedItemIds.isNotEmpty) ...[
+                if (ids.isNotEmpty) ...[
                   IconButton(
                     onPressed: () {
                       noteVM.clearSelection();
@@ -50,7 +52,7 @@ class _NotesPageState extends State<NotesPage> {
                         context: context,
                         builder: (context) => AlertDialog(
                           title: const Text('Delete Notes'),
-                          content: Text('Delete ${noteVM.selectedItemIds.length} notes?'),
+                          content: Text('Delete ${ids.length > 1 ? '${ids.length} notes' : '1 note'}?'),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context),
@@ -75,6 +77,7 @@ class _NotesPageState extends State<NotesPage> {
                 ],
                 IconButton(
                   onPressed: () {
+                    noteVM.clearSelection();
                     MiniRouter.to(context, FoldersPage());
                   },
                   icon: Icon(Icons.folder_open),

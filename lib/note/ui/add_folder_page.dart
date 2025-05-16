@@ -17,6 +17,16 @@ class AddFolderPage extends StatefulWidget {
 
 class _AddFolderPageState extends State<AddFolderPage> {
   @override
+  void initState() {
+    super.initState();
+    context.read<FolderStateController>().initState(widget.edit, widget.edit ? widget.folder : null);
+  }
+  @override
+  void dispose() {
+    super.dispose();
+    getIt<FolderStateController>().clearState();
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.edit ? widget.folder!.name : 'Add Folder')),
@@ -33,7 +43,8 @@ class _AddFolderPageState extends State<AddFolderPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           final controller = context.read<FolderStateController>();
-          final message = context.read<FolderViewModel>().putItem(Folder(name: controller.textController.text), edit: widget.edit);
+          final folder = controller.buildModel(edit: widget.edit, model: widget.folder);
+          final message = context.read<FolderViewModel>().putItem(folder, edit: widget.edit);
           if(message != Messages.mFolderEmpty) {
             showToast(context, type: ToastificationType.success, description: message);
             Navigator.pop(context);
