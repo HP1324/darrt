@@ -70,10 +70,6 @@ Future<Uint8List> generateNotePdf(QuillController controller) async {
   );
 
   final doc = await pdfConverter.createDocument();
-  final pw.Widget? widget = await pdfConverter.generateWidget(
-    maxHeight: pdfPageFormat.height,
-    maxWidth: pdfPageFormat.width,
-  );
   return doc!.save();
 }
 
@@ -87,10 +83,3 @@ Future<void> savePdfToDownloads(Uint8List pdfBytes, String fileName) async {
   }
 }
 
-PdfColor _hexToPdfColor(String hex) {
-  final buffer = StringBuffer();
-  if (hex.length == 6 || hex.length == 7) buffer.write('ff');
-  buffer.write(hex.replaceFirst('#', ''));
-  final colorInt = int.parse(buffer.toString(), radix: 16);
-  return PdfColor.fromInt(colorInt);
-}
