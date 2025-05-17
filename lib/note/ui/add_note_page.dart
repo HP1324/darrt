@@ -23,9 +23,11 @@ class AddNotePage extends StatefulWidget {
 }
 
 class _AddNotePageState extends State<AddNotePage> {
+  late final QuillController _controller;
   @override
   void initState() {
     super.initState();
+    _controller = getIt<NoteStateController>().controller;
     context.read<NoteStateController>().initState(widget.edit, widget.edit ? widget.note : null);
   }
 
@@ -38,18 +40,9 @@ class _AddNotePageState extends State<AddNotePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(),
+        leading:const BackButton(),
         actions: [
-          IconButton(
-            onPressed: ()async {
-              final file = await generateNotePdf(getIt<NoteStateController>().controller);
-              final path = await savePdfToDownloads(file, 'note${DateTime.now().millisecondsSinceEpoch}.pdf');
-              if(context.mounted) {
-                showToast( context, type: ToastificationType.success,  description: 'PDF saved');
-              }
-            },
-            icon: const Icon(FontAwesomeIcons.filePdf),
-          ),
+          const SaveNotePdfButton(),
           const FolderSelector(),
           SaveNoteButton(widget: widget),
         ],
@@ -95,6 +88,26 @@ class _AddNotePageState extends State<AddNotePage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class SaveNotePdfButton extends StatelessWidget {
+  const SaveNotePdfButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: ()async {
+        final file = await generateNotePdf(getIt<NoteStateController>().controller);
+        final path = await savePdfToDownloads(file, 'note${DateTime.now().millisecondsSinceEpoch}.pdf');
+        if(context.mounted) {
+          showToast( context, type: ToastificationType.success,  description: 'PDF saved');
+        }
+      },
+      icon: const Icon(FontAwesomeIcons.filePdf),
     );
   }
 }
