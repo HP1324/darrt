@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
-import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/tasks_for_category_page.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
 class CategoryItem extends StatefulWidget {
@@ -115,8 +113,7 @@ class _CategoryItemState extends State<CategoryItem> {
                                       ),
                                       FilledButton(
                                         onPressed: () async {
-                                          final message = context
-                                              .read<CategoryViewModel>()
+                                          final message = g.catVm
                                               .deleteItem(widget.category.id);
                                           showToast(context,
                                               type: ToastificationType.success,
