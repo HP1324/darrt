@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart' show showToast;
 import 'package:minimaltodo/note/models/folder.dart';
-import 'package:minimaltodo/note/state/folder_view_model.dart' show FolderViewModel;
 import 'package:minimaltodo/note/ui/add_folder_page.dart';
 import 'package:minimaltodo/note/ui/notes_for_folder_page.dart';
-import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart' show ToastificationType;
 
 class FolderItem extends StatefulWidget {
@@ -49,7 +48,7 @@ class _FolderItemState extends State<FolderItem> {
                     ),
                     TextButton(
                       onPressed: () {
-                        final message = context.read<FolderViewModel>().deleteItem(widget.folder.id);
+                        final message = g.folderVm.deleteItem(widget.folder.id);
                         showToast(context, type: ToastificationType.success, description: message);
                         Navigator.pop(context);
                       },

@@ -5,13 +5,10 @@ import 'package:minimaltodo/helpers/messages.dart' show Messages;
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart' show generateNotePdf, getIt, savePdfToDownloads, showToast;
 import 'package:minimaltodo/note/models/note.dart';
-import 'package:minimaltodo/note/state/folder_view_model.dart';
 import 'package:minimaltodo/note/state/note_state_controller.dart';
-import 'package:minimaltodo/note/state/note_view_model.dart';
 import 'package:minimaltodo/note/ui/add_folder_page.dart';
-import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
-
+import 'package:minimaltodo/helpers/globals.dart' as g;
 class AddNotePage extends StatefulWidget {
   const AddNotePage({super.key, required this.edit, this.note}) : assert(!edit || note != null);
   final bool edit;
@@ -24,7 +21,7 @@ class _AddNotePageState extends State<AddNotePage> {
   @override
   void initState() {
     super.initState();
-    context.read<NoteStateController>().initState(widget.edit, widget.edit ? widget.note : null);
+    g.noteSc.initState(widget.edit, widget.edit ? widget.note : null);
   }
 
   @override
@@ -122,11 +119,10 @@ class SaveNoteButton extends StatelessWidget {
       icon: const Icon(Icons.check),
       onPressed: () {
         var message = '';
-        final stateController = context.read<NoteStateController>();
-        if (!stateController.controller.document.isEmpty()) {
-          final note = stateController.buildModel(
+        if (!g.noteSc.controller.document.isEmpty()) {
+          final note = g.noteSc.buildModel(
               edit: widget.edit, model: widget.edit ? widget.note : null);
-          message = context.read<NoteViewModel>().putItem(note, edit: widget.edit);
+          message = g.noteVm.putItem(note, edit: widget.edit);
           Navigator.pop(context);
         } else {
           message = Messages.mNoteEmpty;
@@ -170,9 +166,10 @@ class FolderSelector extends StatelessWidget {
                   },
                 ),
                 const Divider(),
-                Consumer2<FolderViewModel, NoteStateController>(
-                  builder: (context, folderVM,controller, _) {
-                    final folders = folderVM.folders;
+                ListenableBuilder(
+                  listenable: Listenable.merge([g.folderVm,g.noteSc]),
+                  builder: (context, child) {
+                    final folders = g.folderVm.folders;
                     return ListView.builder(
                       shrinkWrap: true,
                       itemCount: folders.length,
@@ -181,10 +178,10 @@ class FolderSelector extends StatelessWidget {
                         // print('Folder Selection: ${controller.folderSelection}');
                         return CheckboxListTile(
                           title: Text(folder.name),
-                          value: controller.folderSelection[folder] ?? false,
+                          value: g.noteSc.folderSelection[folder] ?? false,
                           onChanged: (value) {
                             if (value != null) {
-                              context.read<NoteStateController>().setFolder(folder, value);
+                              g.noteSc.setFolder(folder, value);
                             }
                           },
                         );

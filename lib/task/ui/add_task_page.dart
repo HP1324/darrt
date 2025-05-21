@@ -15,7 +15,6 @@ import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart';
 import 'package:minimaltodo/task/models/reminder.dart';
 import 'package:minimaltodo/task/models/task.dart';
-import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 
@@ -48,10 +47,10 @@ class _AddTaskPageState extends State<AddTaskPage> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.edit ? widget.task!.title : 'Add New Task')),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        padding: const EdgeInsets.symmetric(horizontal: 13.0),
         child: SingleChildScrollView(
           child: Column(
-            spacing: 15,
+            spacing: 20,
             children: [
               Row(
                 spacing: 10,
@@ -129,51 +128,7 @@ class AddRemindersWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        "Reminders",
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 14),
-      ),
-      subtitle: ListenableBuilder(
-          listenable: g.taskSc,
-          builder: (context, widget) {
-            final reminders = g.taskSc.reminders;
-            return Text(
-              reminders.isEmpty
-                  ? 'Click here to add reminders per day'
-                  : reminders.map((r) => r.time.format(context)).join(', '),
-              style: Theme.of(context).textTheme.bodySmall,
-            );
-          }),
-      trailing: InkWell(
-        onTap: () {
-          g.taskSc.textFieldNode.unfocus();
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                content: Text(
-                  Messages.mNotifAlarmDifference,
-                  style: TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
-                ),
-                actions: [
-                  FilledButton(
-                      onPressed: () async {
-                        await SettingsService.openBatterySettings();
-                      },
-                      child: Text('Go to settings')),
-                ],
-              );
-            },
-          );
-        },
-        child: CircleAvatar(
-          radius: 15,
-          backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-          child: Icon(Icons.question_mark, color: Theme.of(context).colorScheme.primary),
-        ),
-      ),
+    return InkWell(
       onTap: () async {
         g.taskSc.textFieldNode.unfocus();
         final allowed = await AwesomeNotifications().isNotificationAllowed();
@@ -183,6 +138,60 @@ class AddRemindersWidget extends StatelessWidget {
           }
         }
       },
+      child: Row(
+        children: [
+          Icon(Icons.notification_add_outlined,size:20,),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Reminders",
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 14),
+                ),
+                ListenableBuilder(
+                  listenable: g.taskSc,
+                  builder: (context, widget) {
+                    final reminders = g.taskSc.reminders;
+                    return Text(
+                      reminders.isEmpty
+                          ? 'Click here to add reminders per day'
+                          : reminders.map((r) => r.time.format(context)).join(', '),
+                      style: Theme.of(context).textTheme.bodySmall,
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              g.taskSc.textFieldNode.unfocus();
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                    content: Text(
+                      Messages.mNotifAlarmDifference,
+                      style: TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
+                    ),
+                    actions: [
+                      FilledButton(
+                          onPressed: () async {
+                            await SettingsService.openBatterySettings();
+                          },
+                          child: Text('Go to settings')),
+                    ],
+                  );
+                },
+              );
+            },
+            child: Icon(Icons.info_outline),
+          ),
+        ],
+      ),
     );
   }
 
@@ -320,9 +329,7 @@ class AddRemindersWidget extends StatelessWidget {
 }
 
 class DuedateSelector extends StatelessWidget {
-  const DuedateSelector({
-    super.key,
-  });
+  const DuedateSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -1120,7 +1127,6 @@ class RepeatTypeHelpButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
@@ -1128,7 +1134,7 @@ class RepeatTypeHelpButton extends StatelessWidget {
         g.taskSc.textFieldNode.unfocus();
         _showRepeatTypeDialog(context);
       },
-      child: Icon(Icons.help_outline_rounded, size: 18),
+      child: Icon(Icons.info_outline, size: 18),
     );
   }
 

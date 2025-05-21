@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/category_item.dart';
-import 'package:provider/provider.dart';
-
+import 'package:minimaltodo/helpers/globals.dart' as g;
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
 
@@ -37,7 +35,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
               Expanded(
                 child: ListTile(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => AddCategoryPage(edit: false)));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => AddCategoryPage(edit: false)));
                   },
                   leading: Icon(Icons.list_alt_sharp),
                   title: Text('Add New Category'),
@@ -98,51 +97,54 @@ class _CategoriesPageState extends State<CategoriesPage> {
           ),
         ),
 
-        Consumer<CategoryViewModel>(builder: (context, catVM, _) {
-          final categories = catVM.categories;
+        ListenableBuilder(
+          listenable: g.catVm,
+          builder: (context, child) {
+            final categories = g.catVm.categories;
 
-          // Filter categories based on search query
-          final filteredCategories = categories.where((category) {
-            if (_searchQuery.isEmpty) return true;
-            return category.name.toLowerCase().contains(_searchQuery.toLowerCase());
-          }).toList();
+            // Filter categories based on search query
+            final filteredCategories = categories.where((category) {
+              if (_searchQuery.isEmpty) return true;
+              return category.name.toLowerCase().contains(_searchQuery.toLowerCase());
+            }).toList();
 
-          return Expanded(
-            child: filteredCategories.isEmpty && _searchQuery.isNotEmpty
-                ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.search,
-                    size: 48,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No categories found',
-                    style: TextStyle(
-                      fontSize: 16,
+            return Expanded(
+              child: filteredCategories.isEmpty && _searchQuery.isNotEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search,
+                            size: 48,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No categories found',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisExtent: 70,
+                        mainAxisSpacing: 8,
+                      ),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: filteredCategories.length,
+                      itemBuilder: (context, index) {
+                        final c = filteredCategories[index];
+                        return CategoryItem(category: c);
+                      },
                     ),
-                  ),
-                ],
-              ),
-            )
-                : GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisExtent: 70,
-                mainAxisSpacing: 8,
-              ),
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: filteredCategories.length,
-              itemBuilder: (context, index) {
-                final c = filteredCategories[index];
-                return CategoryItem(category: c);
-              },
-            ),
-          );
-        }),
+            );
+          },
+        ),
       ],
     );
   }

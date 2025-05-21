@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
-import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
-import 'package:provider/provider.dart';
-
+import 'package:minimaltodo/helpers/globals.dart' as g;
 class CategoryChip extends StatelessWidget {
   const CategoryChip({super.key, required this.category});
   final CategoryModel category;
@@ -11,9 +9,10 @@ class CategoryChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
     final textTheme = Theme.of(context).textTheme;
-    return Consumer<CategoryViewModel>(
-      builder: (_,catVM,___) {
-        final thisCategory = catVM.categories.firstWhere((c) => c.id == category.id);
+    return ListenableBuilder(
+      listenable: g.catVm,
+      builder: (_,child) {
+        final thisCategory = g.catVm.categories.firstWhere((c) => c.id == category.id);
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
           decoration: BoxDecoration(

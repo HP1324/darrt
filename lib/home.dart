@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-
-import 'package:minimaltodo/app/state/managers/navigation_manager.dart';
 import 'package:minimaltodo/app/ui/app_drawer.dart';
 import 'package:minimaltodo/app/ui/mini_app_bar.dart';
 import 'package:minimaltodo/app/ui/mini_bottom_nav_bar.dart';
@@ -9,34 +7,32 @@ import 'package:minimaltodo/category/ui/categories_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
 import 'package:minimaltodo/task/ui/tasks_page.dart';
-import 'package:provider/provider.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   const Home({super.key});
-
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
       child: Scaffold(
-        appBar: MiniAppBar(),
+        appBar:  MiniAppBar(),
         drawer: const AppDrawer(),
-        body: IndexedStack(
-          index: context.watch<NavigationManager>().currentDestination,
-          children: [
-            const TasksPage(),
-            const CategoriesPage(),
-          ],
-        ),
-        floatingActionButton: Consumer<NavigationManager>(
-          builder: (context, manager, _) {
-            if (manager.currentDestination == 0) {
+        body: ListenableBuilder(
+            listenable: g.navMan,
+            builder: (context, child) {
+              return IndexedStack(
+                index: g.navMan.currentDestination,
+                children: [
+                  const TasksPage(),
+                  const CategoriesPage(),
+                ],
+              );
+            }),
+        floatingActionButton: ListenableBuilder(
+          listenable: g.navMan,
+          builder: (context, child) {
+            if (g.navMan.currentDestination == 0) {
               return const _FloatingActionButtonWidget();
             }
             return const SizedBox.shrink(); // Return an invisible widget instead of null
@@ -52,27 +48,28 @@ class _BottomNavBarWidget extends StatelessWidget {
   const _BottomNavBarWidget();
   @override
   Widget build(BuildContext context) {
-    return Consumer<NavigationManager>(builder: (context, navVM, _) {
-      return Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-             color: Theme.of(context).colorScheme.primary.withAlpha(20), width: 0.5,
+    return ListenableBuilder(
+      listenable: g.navMan,
+      builder: (context, child) {
+        return Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary.withAlpha(20),
+              width: 0.5,
+            ),
+            borderRadius: BorderRadius.circular(20),
           ),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: MiniBottomNavBar(
-          children: [
-            // const SizedBox.shrink(),
-            MiniBottomNavBarItem(icon: Icons.calendar_month, label: 'Calendar', i: 0),
-            MiniBottomNavBarItem(icon: Icons.search, label: 'Search', i: -1),
-            MiniBottomNavBarItem(icon: Iconsax.category, label: 'Categories', i: 1),
-            MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Notes', i: -2),
-            // MiniBottomNavBarItem(icon: Iconsax.book, label: 'Journal', i: -2),
-            // const SizedBox.shrink(),
-          ],
-        ),
-      );
-    });
+          child: MiniBottomNavBar(
+            children: [
+              MiniBottomNavBarItem(icon: Icons.calendar_month, label: 'Calendar', i: 0),
+              MiniBottomNavBarItem(icon: Icons.search, label: 'Search', i: -1),
+              MiniBottomNavBarItem(icon: Iconsax.category, label: 'Categories', i: 1),
+              MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Notes', i: -2),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -86,10 +83,7 @@ class _FloatingActionButtonWidget extends StatelessWidget {
       child: Transform.scale(
         scale: 0.9,
         child: FloatingActionButton(
-          onPressed: () {
-            MiniRouter.to(context, AddTaskPage(edit: false));
-          },
-          // shape: StadiumBorder(),
+          onPressed: () => MiniRouter.to(context, AddTaskPage(edit: false)),
           tooltip: 'Add Task',
           elevation: 5,
           child: const Icon(Icons.add),

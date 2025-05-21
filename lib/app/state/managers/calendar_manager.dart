@@ -4,6 +4,7 @@ import 'package:minimaltodo/helpers/mini_box.dart';
 
 class CalendarManager extends ChangeNotifier {
   DateTime selectedDate = DateTime.now();
+  DateTime previousSelectedDate = DateTime.now();
   final maxDate = DateTime.now().add(Duration(days: maxExtentDateDays));
   final initialDate = DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate))
       .subtract(const Duration(days: 365));
@@ -13,6 +14,7 @@ class CalendarManager extends ChangeNotifier {
   );
   final dateItemWidth = 43.0;
   void updateSelectedDate(DateTime date) {
+    previousSelectedDate = selectedDate;
     selectedDate = DateTime(date.year, date.month, date.day);
     notifyListeners();
   }

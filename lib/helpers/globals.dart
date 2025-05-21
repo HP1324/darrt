@@ -1,4 +1,5 @@
 import 'package:minimaltodo/app/state/managers/calendar_manager.dart' show CalendarManager;
+import 'package:minimaltodo/app/state/managers/navigation_manager.dart' show NavigationManager;
 import 'package:minimaltodo/app/state/managers/theme_manager.dart' show ThemeManager;
 import 'package:minimaltodo/category/state/category_state_controller.dart' show CategoryStateController;
 import 'package:minimaltodo/category/state/category_view_model.dart' show CategoryViewModel;
@@ -10,25 +11,28 @@ import 'package:minimaltodo/task/state/task_state_controller.dart' show TaskStat
 import 'package:minimaltodo/task/state/task_view_model.dart' show TaskViewModel;
 
 
-late final taskSc = TaskStateController();
+final taskSc = TaskStateController();
 
-late final taskVm = TaskViewModel();
+final taskVm = TaskViewModel();
 
-late final catSc = CategoryStateController();
+final catSc = CategoryStateController();
 
-late final catVm = CategoryViewModel();
+final catVm = CategoryViewModel();
 
-late final noteSc = NoteStateController();
+final noteSc = NoteStateController();
 
-late final noteVm = NoteViewModel();
+final noteVm = NoteViewModel();
 
-late final folderSc = FolderStateController();
+final folderSc = FolderStateController();
 
-late final folderVm = FolderViewModel();
+final folderVm = FolderViewModel();
 
-late final themeM = ThemeManager();
+final themeM = ThemeManager();
 
-late final calMan = CalendarManager();
+final calMan = CalendarManager();
+
+final navMan = NavigationManager();
+
 
 
 

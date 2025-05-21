@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app/state/managers/navigation_manager.dart';
-import 'package:minimaltodo/helpers/utils.dart' show getIt;
 import 'package:minimaltodo/note/ui/notes_page.dart';
-import 'package:minimaltodo/task/state/task_view_model.dart' show TaskViewModel;
 import 'package:minimaltodo/task/ui/task_search_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:provider/provider.dart';
-
+import 'package:minimaltodo/helpers/globals.dart' as g;
 class MiniBottomNavBar extends StatefulWidget {
   const MiniBottomNavBar({super.key, required this.children});
   final List<Widget> children;
@@ -55,9 +51,10 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
     final primary = Theme.of(context).colorScheme.primary;
     final onSurface = Theme.of(context).colorScheme.onSurface;
 
-    return Consumer<NavigationManager>(
-      builder: (context, navVM, _) {
-        final isSelected = widget.i == navVM.currentDestination;
+    return ListenableBuilder(
+      listenable: g.navMan,
+      builder: (context, child) {
+        final isSelected = widget.i == g.navMan.currentDestination;
 
         return InkWell(
           splashColor: primary.withAlpha(26),
@@ -67,13 +64,13 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
           onTapUp: (_) => setState(() => _isPressed = false),
           onTapCancel: () => setState(() => _isPressed = false),
           onTap: () {
-            getIt<TaskViewModel>().clearSelection();
+            g.taskVm.clearSelection();
             if (widget.i == -1) {
               MiniRouter.to(context, TaskSearchPage(), type: PageTransitionType.bottomToTop);
             } else if (widget.i == -2) {
               MiniRouter.to(context, NotesPage(), type: PageTransitionType.rightToLeft);
             } else {
-              navVM.onDestinationChanged(widget.i);
+              g.navMan.onDestinationChanged(widget.i);
             }
           },
           child: AnimatedScale(
