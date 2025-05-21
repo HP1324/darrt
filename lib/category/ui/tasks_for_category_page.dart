@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
-import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/task/state/task_view_model.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 class TasksForCategoryPage extends StatefulWidget {
@@ -15,7 +13,7 @@ class TasksForCategoryPage extends StatefulWidget {
 class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
   @override
   void dispose() {
-    getIt<TaskViewModel>().selectedItemIds.clear();
+    g.taskVm.selectedItemIds.clear();
     super.dispose();
   }
 

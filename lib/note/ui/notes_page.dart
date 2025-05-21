@@ -3,7 +3,6 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/note/state/note_view_model.dart';
 import 'package:minimaltodo/note/ui/add_note_page.dart';
 import 'package:minimaltodo/note/ui/folders_page.dart';
 import 'package:minimaltodo/note/ui/note_item.dart';
@@ -20,7 +19,7 @@ class _NotesPageState extends State<NotesPage> {
   @override
   void dispose() {
     super.dispose();
-    getIt<NoteViewModel>().selectedItemIds.clear();
+    g.noteVm.selectedItemIds.clear();
   }
 
   @override

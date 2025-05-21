@@ -5,9 +5,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
-import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/main.dart';
-import 'package:minimaltodo/task/state/task_view_model.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
 
@@ -17,7 +15,6 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     final appState = SchedulerBinding.instance.lifecycleState;
     if (appState == AppLifecycleState.detached) {
       await ObjectBox.init();
-      getIt.registerSingleton<TaskViewModel>(TaskViewModel());
     }
     Task task = ObjectBox.store.box<Task>().get(int.parse(receivedAction.payload!['id']!))!;
     if (receivedAction.buttonKeyPressed == 'FINISHED') {

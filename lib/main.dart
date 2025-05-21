@@ -3,52 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import 'package:minimaltodo/app/state/managers/calendar_manager.dart';
-import 'package:minimaltodo/app/state/managers/navigation_manager.dart';
-import 'package:minimaltodo/app/state/managers/theme_manager.dart';
 import 'package:minimaltodo/app/notification/notification_action_controller.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
-
-import 'package:minimaltodo/category/state/category_state_controller.dart';
-import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
-
-import 'package:minimaltodo/note/state/folder_state_controller.dart';
-import 'package:minimaltodo/note/state/folder_view_model.dart';
-import 'package:minimaltodo/note/state/note_state_controller.dart';
-import 'package:minimaltodo/note/state/note_view_model.dart';
-
-import 'package:minimaltodo/task/state/task_state_controller.dart';
-import 'package:minimaltodo/task/state/task_view_model.dart';
-
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
-import 'package:minimaltodo/helpers/utils.dart';
-
 import 'package:minimaltodo/home.dart';
 
-
-/// Registers all ChangeNotifiers and singletons
-void registerSingletons() {
-  // ViewModels
-  getIt.registerSingleton<TaskViewModel>(TaskViewModel());
-  getIt.registerSingleton<CategoryViewModel>(CategoryViewModel());
-  getIt.registerSingleton<NoteViewModel>(NoteViewModel());
-  getIt.registerSingleton<FolderViewModel>(FolderViewModel());
-
-  // State Controllers
-  getIt.registerSingleton<TaskStateController>(TaskStateController());
-  getIt.registerSingleton<CategoryStateController>(CategoryStateController());
-  getIt.registerSingleton<NoteStateController>(NoteStateController());
-  getIt.registerSingleton<FolderStateController>(FolderStateController());
-
-  // Managers
-  getIt.registerLazySingleton<CalendarManager>(() => CalendarManager());
-  getIt.registerSingleton<ThemeManager>(ThemeManager());
-  getIt.registerSingleton<NavigationManager>(NavigationManager());
-}
 
 /// Initializes app services and state
 Future<void> initApp() async {
@@ -58,9 +20,6 @@ Future<void> initApp() async {
     // Initialize local storage & database
     await MiniBox.initStorage();
     await ObjectBox.init();
-
-    // Register singleton instances
-    registerSingletons();
 
     // Initialize notifications
     await NotificationService.init();

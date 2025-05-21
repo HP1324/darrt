@@ -51,7 +51,6 @@ dependencies:
   path_provider: ^2.1.5
   objectbox: ^4.2.0
   objectbox_flutter_libs: ^4.2.0
-  get_it: ^8.0.3
   freezed_annotation: ^3.0.0
   flutter_quill: ^11.4.0
   flutter_quill_extensions: ^11.0.0
