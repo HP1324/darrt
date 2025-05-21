@@ -29,7 +29,6 @@ import 'package:minimaltodo/helpers/utils.dart';
 
 import 'package:minimaltodo/home.dart';
 
-import 'package:provider/provider.dart';
 
 /// Registers all ChangeNotifiers and singletons
 void registerSingletons() {
@@ -95,21 +94,7 @@ class _MiniTodoState extends State<MiniTodo> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => getIt<TaskViewModel>()),
-        ChangeNotifierProvider(create: (_) => getIt<CategoryViewModel>()),
-        ChangeNotifierProvider(create: (_) => getIt<NoteViewModel>()),
-        ChangeNotifierProvider(create: (_) => getIt<FolderViewModel>()),
-        ChangeNotifierProvider(create: (_) => getIt<TaskStateController>()),
-        ChangeNotifierProvider(create: (_) => getIt<CategoryStateController>()),
-        ChangeNotifierProvider(create: (_) => getIt<NoteStateController>()),
-        ChangeNotifierProvider(create: (_) => getIt<FolderStateController>()),
-        ChangeNotifierProvider(create: (_) => getIt<NavigationManager>()),
-        ChangeNotifierProvider(create: (_) => getIt<ThemeManager>()),
-        ChangeNotifierProvider(create: (_) => getIt<CalendarManager>()),
-      ],
-      child: ListenableBuilder(
+    return  ListenableBuilder(
         listenable: g.themeM,
         builder: (context, widget) {
           final lightTheme = g.themeM.lightTheme;
@@ -135,7 +120,6 @@ class _MiniTodoState extends State<MiniTodo> {
             home: const Home(),
           );
         }
-      ),
     );
   }
 }
