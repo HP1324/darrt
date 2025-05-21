@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app/state/managers/theme_manager.dart';
-import 'package:provider/provider.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_enums.dart';
 class ThemeSettingsPage extends StatelessWidget {
   const ThemeSettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeManager>(
-      builder: (context, themeVM, _) {
-        return Scaffold(
-          // backgroundColor: Colors.transparent,
+    return  Scaffold(
           appBar: AppBar(
             backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(50),
             title: Text('Theme Colors'),
@@ -21,7 +17,7 @@ class ThemeSettingsPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildThemeSelector(context, themeVM),
+                _buildThemeSelector(context),
                 const SizedBox(height: 32),
                 Text(
                   'Select Your Theme Color',
@@ -31,16 +27,14 @@ class ThemeSettingsPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                _buildColorGrid(themeVM),
+                _buildColorGrid(),
               ],
             ),
           ),
         );
-      },
-    );
   }
 
-  Widget _buildColorGrid(ThemeManager themeVM) {
+  Widget _buildColorGrid() {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -53,17 +47,17 @@ class ThemeSettingsPage extends StatelessWidget {
       itemCount: ThemeColors.values.length,
       itemBuilder: (context, index) {
         final color = ThemeColors.values[index];
-        final isSelected = themeVM.selectedColor == color;
+        final isSelected = g.themeM.selectedColor == color;
 
         return _ColorOption(
           color: color.color,
           isSelected: isSelected,
-          onTap: () => themeVM.setThemeColor(color),
+          onTap: () => g.themeM.setThemeColor(color),
         );
       },
     );
   }
-  Widget _buildThemeSelector(BuildContext context, ThemeManager themeVM) {
+  Widget _buildThemeSelector(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -75,34 +69,38 @@ class ThemeSettingsPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        SegmentedButton<ThemePreference>(
-          segments: const [
-            ButtonSegment<ThemePreference>(
-              value: ThemePreference.system,
-              icon: Icon(Icons.brightness_auto),
-              label: Text('System'),
-            ),
-            ButtonSegment<ThemePreference>(
-              value: ThemePreference.light,
-              icon: Icon(Icons.light_mode),
-              label: Text('Light'),
-            ),
-            ButtonSegment<ThemePreference>(
-              value: ThemePreference.dark,
-              icon: Icon(Icons.dark_mode),
-              label: Text('Dark'),
-            ),
-          ],
-          selected: {themeVM.themePreference},
-          onSelectionChanged: (Set<ThemePreference> newSelection) {
-            themeVM.setThemePreference(newSelection.first);
-          },
+        ListenableBuilder(
+          listenable: g.themeM,
+          builder: (context,child) {
+            return SegmentedButton<ThemePreference>(
+              segments: const [
+                ButtonSegment<ThemePreference>(
+                  value: ThemePreference.system,
+                  icon: Icon(Icons.brightness_auto),
+                  label: Text('System'),
+                ),
+                ButtonSegment<ThemePreference>(
+                  value: ThemePreference.light,
+                  icon: Icon(Icons.light_mode),
+                  label: Text('Light'),
+                ),
+                ButtonSegment<ThemePreference>(
+                  value: ThemePreference.dark,
+                  icon: Icon(Icons.dark_mode),
+                  label: Text('Dark'),
+                ),
+              ],
+              selected: {g.themeM.themePreference},
+              onSelectionChanged: (Set<ThemePreference> newSelection) {
+                g.themeM.setThemePreference(newSelection.first);
+              },
+            );
+          }
         ),
       ],
     );
   }
 }
-
 class _ColorOption extends StatelessWidget {
   final Color color;
   final bool isSelected;

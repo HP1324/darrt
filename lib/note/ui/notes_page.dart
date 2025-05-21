@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/note/state/note_state_controller.dart';
 import 'package:minimaltodo/note/state/note_view_model.dart';
 import 'package:minimaltodo/note/ui/add_note_page.dart';
 import 'package:minimaltodo/note/ui/folders_page.dart';
 import 'package:minimaltodo/note/ui/note_item.dart';
-import 'package:minimaltodo/task/models/task.dart';
-import 'package:minimaltodo/task/ui/task_item.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart' show ToastificationType;
 

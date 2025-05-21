@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/app/setting/settings_service.dart';
-import 'package:minimaltodo/category/models/category_model.dart';
-import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/consts.dart';
@@ -15,13 +13,11 @@ import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart';
-import 'package:minimaltodo/task/state/task_view_model.dart';
 import 'package:minimaltodo/task/models/reminder.dart';
-import 'package:minimaltodo/task/models/repeat_config.dart';
 import 'package:minimaltodo/task/models/task.dart';
-
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 
 class AddTaskPage extends StatefulWidget {
   const AddTaskPage({super.key, required this.edit, this.task}) : assert(!edit || task != null);
@@ -37,19 +33,12 @@ class _AddTaskPageState extends State<AddTaskPage> {
   @override
   void initState() {
     super.initState();
-    context.read<TaskStateController>().initState(widget.edit, widget.edit ? widget.task : null);
-  }
-
-  late TaskStateController controller;
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    controller = context.read<TaskStateController>();
+    g.taskSc.initState(widget.edit, widget.edit ? widget.task : null);
   }
 
   @override
   void dispose() {
-    controller.clearState();
+    g.taskSc.clearState();
     super.dispose();
   }
 
@@ -62,7 +51,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         padding: const EdgeInsets.symmetric(horizontal: 15.0),
         child: SingleChildScrollView(
           child: Column(
-            spacing: 20,
+            spacing: 15,
             children: [
               Row(
                 spacing: 10,
@@ -71,25 +60,27 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   Expanded(
                     child: TextField(
                       textCapitalization: TextCapitalization.sentences,
-                      controller: context.read<TaskStateController>().textController,
+                      controller: g.taskSc.textController,
                       autofocus: true,
-                      focusNode: context.read<TaskStateController>().textFieldNode,
+                      maxLines: null,
+                      focusNode: g.taskSc.textFieldNode,
+                      keyboardType: TextInputType.multiline,
                       decoration: InputDecoration(
-                        hintText: 'Enter your task here',
-                      ),
+                          hintText: 'Enter your task here', border: UnderlineInputBorder()),
                     ),
                   ),
                 ],
               ),
               const CategorySelector(),
-              const PrioritySelector(),
+              // const PrioritySelector(),
               const TaskTypeSelector(),
-              Selector<TaskStateController, (bool, RepeatConfig)>(
-                selector: (context, controller) =>(controller.isRepeating, controller.repeatConfig),
-                builder: (context, value, _) {
-                  final repeat = value.$1;
-                  final config = value.$2;
+              ListenableBuilder(
+                listenable: g.taskSc,
+                builder: (context, child) {
+                  final repeat = g.taskSc.isRepeating;
+                  final config = g.taskSc.repeatConfig;
                   return Column(
+                    spacing: 10.0,
                     children: [
                       if (repeat) ...[
                         const DateRangeSelector(),
@@ -108,20 +99,21 @@ class _AddTaskPageState extends State<AddTaskPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _putTask(context);
-        },
-        child: Icon(Icons.done),
+      floatingActionButton: Transform.scale(
+        scale: 0.9,
+        child: FloatingActionButton(
+          onPressed: () {
+            _putTask(context);
+          },
+          child: Icon(Icons.done),
+        ),
       ),
     );
   }
 
   void _putTask(BuildContext context) {
-    final controller = context.read<TaskStateController>();
-    final taskVM = context.read<TaskViewModel>();
-    Task newTask = controller.buildModel(edit: widget.edit, model: widget.task);
-    final message = taskVM.putItem(newTask, edit: widget.edit);
+    Task newTask = g.taskSc.buildModel(edit: widget.edit, model: widget.task);
+    final message = g.taskVm.putItem(newTask, edit: widget.edit);
     var type = ToastificationType.success;
     if (message == Messages.mTaskAdded || message == Messages.mTaskEdited) {
       Navigator.pop(context);
@@ -133,9 +125,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
 }
 
 class AddRemindersWidget extends StatelessWidget {
-  const AddRemindersWidget({
-    super.key,
-  });
+  const AddRemindersWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -144,34 +134,37 @@ class AddRemindersWidget extends StatelessWidget {
         "Reminders",
         style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 14),
       ),
-      subtitle: Consumer<TaskStateController>(builder: (context, controller, _) {
-        final reminders = controller.reminders;
-        return Text(
-          reminders.isEmpty
-              ? 'Click here to add reminders per day'
-              : reminders.map((r) => r.time.format(context)).join(', '),
-          style: Theme.of(context).textTheme.bodySmall,
-        );
-      }),
+      subtitle: ListenableBuilder(
+          listenable: g.taskSc,
+          builder: (context, widget) {
+            final reminders = g.taskSc.reminders;
+            return Text(
+              reminders.isEmpty
+                  ? 'Click here to add reminders per day'
+                  : reminders.map((r) => r.time.format(context)).join(', '),
+              style: Theme.of(context).textTheme.bodySmall,
+            );
+          }),
       trailing: InkWell(
         onTap: () {
-          context.read<TaskStateController>().textFieldNode.unfocus();
+          g.taskSc.textFieldNode.unfocus();
           showDialog(
             context: context,
             builder: (context) {
               return AlertDialog(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                  content: Text(
-                    Messages.mNotifAlarmDifference,
-                    style: TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
-                  ),
-                  actions: [
-                    FilledButton(
-                        onPressed: () async {
-                          await SettingsService.openBatterySettings();
-                        },
-                        child: Text('Go to settings')),
-                  ]);
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                content: Text(
+                  Messages.mNotifAlarmDifference,
+                  style: TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
+                ),
+                actions: [
+                  FilledButton(
+                      onPressed: () async {
+                        await SettingsService.openBatterySettings();
+                      },
+                      child: Text('Go to settings')),
+                ],
+              );
             },
           );
         },
@@ -182,18 +175,18 @@ class AddRemindersWidget extends StatelessWidget {
         ),
       ),
       onTap: () async {
-        context.read<TaskStateController>().textFieldNode.unfocus();
+        g.taskSc.textFieldNode.unfocus();
         final allowed = await AwesomeNotifications().isNotificationAllowed();
         if (context.mounted) {
           if (allowed || _showNotificationRationale(context)) {
-            showBottomSheet(context);
+            _showRemindersBottomSheet(context);
           }
         }
       },
     );
   }
 
-  void showBottomSheet(BuildContext context) {
+  void _showRemindersBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -206,12 +199,12 @@ class AddRemindersWidget extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
           constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
-          child: Consumer<TaskStateController>(
-            builder: (context, controller, _) {
+          child: ListenableBuilder(
+            listenable: g.taskSc,
+            builder: (context, child) {
               final textTheme = Theme.of(context).textTheme;
               final scheme = Theme.of(context).colorScheme;
-              final reminders = controller.reminders;
-
+              final reminders = g.taskSc.reminders;
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,7 +246,7 @@ class AddRemindersWidget extends StatelessWidget {
                                   );
                                 },
                                 onRemove: () {
-                                  controller.removeReminder(reminders[index]);
+                                  g.taskSc.removeReminder(reminders[index]);
                                 },
                               );
                             },
@@ -333,12 +326,13 @@ class DuedateSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TaskStateController>(
-      builder: (context, controller, _) {
+    return ListenableBuilder(
+      listenable: g.taskSc,
+      builder: (context, child) {
         return DateSelector(
           icon: Icons.calendar_today,
-          title: 'Set Date',
-          date: controller.dueDate,
+          title: 'Date',
+          date: g.taskSc.dueDate,
           onTap: () async {
             final date = await showDatePicker(
               context: context,
@@ -346,10 +340,10 @@ class DuedateSelector extends StatelessWidget {
               lastDate: DateTime.now().add(Duration(days: maxExtentDateDays)),
             );
             if (date != null) {
-              controller.setDueDate(date);
+              g.taskSc.setDueDate(date);
             }
           },
-          onClear: () => controller.resetDueDate(),
+          onClear: () => g.taskSc.resetDueDate(),
         );
       },
     );
@@ -357,9 +351,7 @@ class DuedateSelector extends StatelessWidget {
 }
 
 class WeekdaySelector extends StatelessWidget {
-  const WeekdaySelector({
-    super.key,
-  });
+  const WeekdaySelector({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -371,23 +363,42 @@ class WeekdaySelector extends StatelessWidget {
           7,
           (index) {
             final List<String> days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-            return Selector<TaskStateController, List<int>>(
-              selector: (context, controller) => controller.repeatConfig.days,
-              builder: (context, weekdays, _) {
-                return ChoiceChip(
-                  labelPadding: EdgeInsets.zero,
-                  shape: CircleBorder(),
-                  showCheckmark: false,
-                  label: Text(days[index]),
-                  labelStyle:
-                      TextStyle(fontSize: Theme.of(context).textTheme.labelMedium?.fontSize),
-                  selected: weekdays.contains(index + 1) &&
-                      context.read<TaskStateController>().isWeekdayValid(index + 1),
-                  onSelected: (selected) {
-                    final isValid = context.read<TaskStateController>().isWeekdayValid(index + 1);
+            return ListenableBuilder(
+              listenable: g.taskSc,
+              builder: (context, child) {
+                final weekdays = g.taskSc.repeatConfig.days;
+                final isSelected =
+                    weekdays.contains(index + 1) && g.taskSc.isWeekdayValid(index + 1);
+                final colorScheme = Theme.of(context).colorScheme;
+
+                return InkWell(
+                  onTap: () {
+                    final isValid = g.taskSc.isWeekdayValid(index + 1);
                     if (!isValid) return;
-                    context.read<TaskStateController>().toggleWeekday(index + 1, selected);
+                    g.taskSc.toggleWeekday(index + 1, !isSelected);
                   },
+                  customBorder: CircleBorder(),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
+                    child: Container(
+                      width: 25,
+                      height: 25,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color:
+                            isSelected ? colorScheme.primary : colorScheme.surfaceContainerHighest,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        days[index],
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ),
                 );
               },
             );
@@ -399,36 +410,93 @@ class WeekdaySelector extends StatelessWidget {
 }
 
 class RepeatTypeSelector extends StatelessWidget {
-  const RepeatTypeSelector({
-    super.key,
-  });
+  const RepeatTypeSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Selector<TaskStateController, RepeatConfig>(
-        selector: (context, controller) => controller.repeatConfig,
-        builder: (context, config, _) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              SegmentedButton(
-                showSelectedIcon: false,
-                segments: [
-                  ButtonSegment(value: 'weekly', label: Text('Weekly')),
-                  ButtonSegment(value: 'monthly', label: Text('Monthly')),
-                  ButtonSegment(value: 'yearly', label: Text('Yearly')),
-                ],
-                selected: {config.type ?? 'weekly'},
-                onSelectionChanged: (selected) {
-                  context.read<TaskStateController>().setRepeatType(selected.first);
-                },
-                style: ButtonStyle(
-                    textStyle: WidgetStatePropertyAll(Theme.of(context).textTheme.labelMedium)),
+    return ListenableBuilder(
+      listenable: g.taskSc,
+      builder: (context, child) {
+        final config = g.taskSc.repeatConfig;
+        final selectedType = config.type ?? 'weekly';
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Make the radio options expand to fill available space
+            Expanded(
+              flex: 5,
+              child: Card(
+                margin: const EdgeInsets.only(right: 8),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Theme.of(context).dividerColor),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    children: [
+                      // Each option takes equal space within the card
+                      Expanded(
+                        child: _buildRadioOption(context, 'Weekly', 'weekly', selectedType),
+                      ),
+                      Expanded(
+                        child: _buildRadioOption(context, 'Monthly', 'monthly', selectedType),
+                      ),
+                      Expanded(
+                        child: _buildRadioOption(context, 'Yearly', 'yearly', selectedType),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              RepeatTypeHelpButton(),
-            ],
-          );
-        });
+            ),
+            // Help button takes less space
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: RepeatTypeHelpButton(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildRadioOption(BuildContext context, String label, String value, String selectedType) {
+    final isSelected = value == selectedType;
+    final theme = Theme.of(context);
+
+    // Make the tap area cover the entire width of each section
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: () => g.taskSc.setRepeatType(value),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Use visualDensity to make radio buttons more compact if needed
+          Radio<String>(
+            value: value,
+            groupValue: selectedType,
+            onChanged: (val) => g.taskSc.setRepeatType(val!),
+            visualDensity: VisualDensity.compact,
+          ),
+          // Use shorter text when width is limited
+          Flexible(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13, // Slightly smaller font
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? theme.colorScheme.primary : theme.textTheme.bodyLarge?.color,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -439,47 +507,48 @@ class DateRangeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TaskStateController>(
-      builder: (context, controller, _) {
+    return ListenableBuilder(
+      listenable: g.taskSc,
+      builder: (context, child) {
         return Column(
           spacing: 10,
           children: [
             DateSelector(
               icon: Icons.calendar_today_outlined,
               title: 'Start Date',
-              date: controller.startDate,
+              date: g.taskSc.startDate,
               onTap: () async {
-                controller.textFieldNode.unfocus();
+                g.taskSc.textFieldNode.unfocus();
                 final date = await showDatePicker(
                   context: context,
                   firstDate: DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate)),
                   lastDate: DateTime.now().add(Duration(days: maxExtentDateDays)),
                 );
                 if (date != null) {
-                  controller.setStartDate(date);
+                  g.taskSc.setStartDate(date);
                 }
               },
               onClear: () {
-                controller.resetStartDate();
+                g.taskSc.resetStartDate();
               },
             ),
             DateSelector(
               icon: Icons.event_repeat,
               title: 'End Date (Optional)',
-              date: controller.endDate,
+              date: g.taskSc.endDate,
               onTap: () async {
-                controller.textFieldNode.unfocus();
+                g.taskSc.textFieldNode.unfocus();
                 final date = await showDatePicker(
                   context: context,
-                  firstDate: controller.startDate.add(Duration(days: 1)),
+                  firstDate: g.taskSc.startDate.add(Duration(days: 1)),
                   lastDate: DateTime.now().add(Duration(days: maxExtentDateDays)),
                 );
                 if (date != null) {
-                  controller.setEndDate(date);
+                  g.taskSc.setEndDate(date);
                 }
               },
               onClear: () {
-                controller.resetEndDate();
+                g.taskSc.resetEndDate();
               },
             ),
           ],
@@ -676,221 +745,109 @@ void showReminderDialog(BuildContext context, {bool edit = false, Reminder? remi
       edit: edit,
       reminder: reminder,
       onSaved: (newReminder) {
-        context
-            .read<TaskStateController>()
-            .putReminder(edit: edit, reminder: newReminder, oldReminder: reminder);
+        g.taskSc.putReminder(edit: edit, reminder: newReminder, oldReminder: reminder);
       },
     ),
   );
 }
 
 class TaskTypeSelector extends StatelessWidget {
-  const TaskTypeSelector({
-    super.key,
-  });
+  const TaskTypeSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Selector<TaskStateController, bool>(
-            selector: (context, controller) => controller.isRepeating,
-            builder: (context, repeat, _) {
-              return SizedBox(
-                width: constraints.maxWidth,
-                child: SegmentedButton(
-                  showSelectedIcon: false,
-                  segments: [
-                    ButtonSegment(
-                      value: false,
-                      label: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          'Single Task',
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color:
-                                !repeat ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
-                            fontWeight: !repeat ? FontWeight.bold : FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                      icon: Icon(
-                        Icons.calendar_today,
-                        size: 18,
-                        color: !repeat ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    ButtonSegment(
-                      value: true,
-                      label: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          'Recurring Task',
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color:
-                                repeat ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
-                            fontWeight: repeat ? FontWeight.bold : FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                      icon: Icon(
-                        Icons.repeat,
-                        size: 18,
-                        color: repeat ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
-                      ),
-                    ),
-                  ],
-                  selected: {repeat},
-                  onSelectionChanged: (selected) {
-                    context.read<TaskStateController>().toggleRepeat(selected.first);
-                  },
-                  style: const ButtonStyle(
-                    // Using static values instead of deprecated MaterialStateProperty
-                    shape: WidgetStatePropertyAll(StadiumBorder()),
-                    padding:
-                        WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 12, horizontal: 8)),
+    return Row(
+      children: [
+        Icon(Icons.repeat, size: 20),
+        Expanded(
+          child: ListenableBuilder(
+            listenable: g.taskSc,
+            builder: (context, child) {
+              final repeat = g.taskSc.isRepeating;
+              return Container(
+                decoration: BoxDecoration(),
+                child: CheckboxListTile.adaptive(
+                  contentPadding: EdgeInsets.only(left: 9),
+                  title: Text(
+                    'Repeat Task',
+                    style: theme.textTheme.titleMedium!.copyWith(),
                   ),
+                  value: repeat,
+                  onChanged: (value) {
+                    if (value != null) g.taskSc.toggleRepeat(value);
+                  },
                 ),
               );
             },
-          );
-        },
-      ),
+          ),
+        ),
+      ],
     );
   }
 }
 
 class CategorySelector extends StatelessWidget {
-  const CategorySelector({
-    super.key,
-  });
+  const CategorySelector({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return InkWell(
       onTap: () {
-        context.read<TaskStateController>().textFieldNode.unfocus();
-        showModalBottomSheet(
-          context: context,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          builder: (context) => Container(
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 8),
-                ListTile(
-                  onTap: () => MiniRouter.to(context, AddCategoryPage(edit: false)),
-                  title: const Text('Create New Category',
-                      style: TextStyle(fontWeight: FontWeight.w500)),
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
-                    child: const Icon(Icons.add),
-                  ),
-                  trailing: const Icon(Icons.list_alt),
-                ),
-                Expanded(
-                  child: Scrollbar(
-                    thickness: 8,
-                    radius: const Radius.circular(4),
-                    child: Consumer<CategoryViewModel>(
-                      builder: (context, catVM, _) => ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        itemCount: catVM.categories.length,
-                        itemBuilder: (_, index) {
-                          final cat = catVM.categories[index];
-                          return Selector<TaskStateController, Map<CategoryModel, bool>>(
-                            selector: (_, controller) => controller.categorySelection,
-                            builder: (context, map, _) => CheckboxListTile(
-                              value: map[cat] ?? false,
-                              title: Text(cat.name,
-                                  style: const TextStyle(overflow: TextOverflow.ellipsis)),
-                              onChanged: (selected) {
-                                if (selected != null) {
-                                  context.read<TaskStateController>().setCategory(cat, selected);
-                                }
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+        g.taskSc.textFieldNode.unfocus();
+        _showCategorySelectionBottomSheet(context);
       },
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(Icons.folder_outlined, size: 18),
-          const SizedBox(width: 8),
+          Icon(Icons.category_outlined, size: 20),
+          const SizedBox(width: 5),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0),
-                ),
+                border: Border(bottom: BorderSide(color: scheme.outline)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Text(
-                        'Categories',
-                        style: TextStyle(
-                            fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                            fontWeight: FontWeight.w500),
+                      const SizedBox(width: 4),
+                      Row(
+                        children: [
+                          Text(
+                            'Categories',
+                            style: TextStyle(fontSize: textTheme.labelLarge!.fontSize),
+                          ),
+                          Icon(Icons.arrow_drop_down, size: 20)
+                        ],
                       ),
-                      Icon(Icons.keyboard_arrow_down_rounded, size: 22),
                     ],
                   ),
+                  const SizedBox(),
                   SizedBox(
                     height: 20,
-                    child: ShaderMask(
-                      shaderCallback: (bounds) {
-                        return LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            Colors.transparent,
-                            Colors.black,
-                            Colors.black,
-                            Colors.transparent
-                          ],
-                          stops: [0.0, 0.05, 0.95, 1.0],
-                        ).createShader(bounds);
+                    child: ListenableBuilder(
+                      listenable: g.taskSc,
+                      builder: (context, child) {
+                        final map = g.taskSc.categorySelection;
+                        final categories =
+                            map.entries.where((e) => e.value).map((e) => e.key).toList();
+                        return ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          physics: BouncingScrollPhysics(),
+                          separatorBuilder: (context, index) => const SizedBox(width: 2),
+                          itemCount: categories.length,
+                          itemBuilder: (context, index) {
+                            final category = categories[index];
+                            return CategoryChip(category: category);
+                          },
+                        );
                       },
-                      blendMode: BlendMode.dstIn,
-                      child: Selector<TaskStateController, Map<CategoryModel, bool>>(
-                        selector: (context, controller) => controller.categorySelection,
-                        builder: (context, map, _) {
-                          final categories =
-                              map.entries.where((e) => e.value).map((e) => e.key).toList();
-                          return ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            physics: BouncingScrollPhysics(),
-                            separatorBuilder: (context, index) => const SizedBox(width: 2),
-                            itemCount: categories.length,
-                            itemBuilder: (context, index) {
-                              final category = categories[index];
-                              return CategoryChip(category: category);
-                            },
-                          );
-                        },
-                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -899,6 +856,63 @@ class CategorySelector extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<dynamic> _showCategorySelectionBottomSheet(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 8),
+            ListTile(
+              onTap: () => MiniRouter.to(context, AddCategoryPage(edit: false)),
+              title:
+                  const Text('Create New Category', style: TextStyle(fontWeight: FontWeight.w500)),
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                child: const Icon(Icons.add),
+              ),
+              trailing: const Icon(Icons.list_alt),
+            ),
+            Expanded(
+              child: Scrollbar(
+                thickness: 8,
+                radius: const Radius.circular(4),
+                child: ListenableBuilder(
+                  listenable: Listenable.merge([g.taskSc, g.taskVm]),
+                  builder: (context, child) => ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    itemCount: g.catVm.categories.length,
+                    itemBuilder: (_, index) {
+                      final cat = g.catVm.categories[index];
+                      final map = g.taskSc.categorySelection;
+                      return CheckboxListTile(
+                        value: map[cat] ?? false,
+                        title:
+                            Text(cat.name, style: const TextStyle(overflow: TextOverflow.ellipsis)),
+                        onChanged: (selected) {
+                          if (selected != null) {
+                            g.taskSc.setCategory(cat, selected);
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -934,7 +948,7 @@ class PrioritySelector extends StatelessWidget {
                   child: Row(
                     children: [
                       GestureDetector(
-                        onTap: () => context.read<TaskStateController>().navigatePriority(false),
+                        onTap: () => g.taskSc.navigatePriority(false),
                         child: Container(
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.primary.withAlpha(20),
@@ -945,10 +959,10 @@ class PrioritySelector extends StatelessWidget {
                       ),
                       Expanded(
                         child: Center(
-                          child: Selector<TaskStateController, String>(
-                            selector: (_, controller) => controller.priority,
-                            builder: (context, priority, _) => Text(
-                              priority,
+                          child: ListenableBuilder(
+                            listenable: g.taskSc,
+                            builder: (context, child) => Text(
+                              g.taskSc.priority,
                               style: TextStyle(
                                 fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
                                 fontWeight: FontWeight.w400,
@@ -958,7 +972,7 @@ class PrioritySelector extends StatelessWidget {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => context.read<TaskStateController>().navigatePriority(true),
+                        onTap: () => g.taskSc.navigatePriority(true),
                         child: Container(
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.primary.withAlpha(20),
@@ -997,54 +1011,41 @@ class DateSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: colorScheme.outline.withAlpha(50)),
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: textTheme.labelLarge?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  Text(
-                    date == null ? 'No end date' : DateFormat.yMMMd().format(date!),
-                    style: textTheme.labelMedium,
-                  ),
-                ],
-              ),
-            ),
-            if (date != null)
-              IconButton(
-                icon: Icon(
-                  Icons.clear,
-                  size: 18,
-                  color: colorScheme.error,
+      child: Row(
+        children: [
+          Icon(icon, size: 18),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: textTheme.labelLarge?.copyWith(),
                 ),
-                onPressed: onClear,
+                Text(
+                  date == null ? 'No end date' : DateFormat.yMMMd().format(date!),
+                  style: textTheme.labelMedium!.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (date != null)
+            IconButton(
+              icon: Icon(
+                Icons.clear,
+                size: 18,
+                color: scheme.error,
               ),
-          ],
-        ),
+              onPressed: onClear,
+            ),
+        ],
       ),
     );
   }
@@ -1123,19 +1124,11 @@ class RepeatTypeHelpButton extends StatelessWidget {
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: () => _showRepeatTypeDialog(context),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: colorScheme.secondaryContainer,
-        ),
-        child: Icon(
-          Icons.help_outline_rounded,
-          size: 18,
-          color: colorScheme.onSecondaryContainer,
-        ),
-      ),
+      onTap: () {
+        g.taskSc.textFieldNode.unfocus();
+        _showRepeatTypeDialog(context);
+      },
+      child: Icon(Icons.help_outline_rounded, size: 18),
     );
   }
 
@@ -1175,7 +1168,8 @@ class RepeatTypeHelpButton extends StatelessWidget {
                   context: context,
                   title: 'Weekly',
                   icon: Icons.view_week_rounded,
-                  description: 'Select specific days of the week for your task to repeat on.',
+                  description:
+                      'Select specific days of the week for your task to repeat on. At least one day must be selected',
                 ),
                 _buildWeeklyExample(context),
                 const Divider(),

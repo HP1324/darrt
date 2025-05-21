@@ -1,5 +1,4 @@
-import 'dart:io' show File, Platform;
-import 'dart:typed_data';
+import 'dart:io' show  Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,12 +7,7 @@ import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
-import 'package:path_provider/path_provider.dart'
-    show getApplicationDocumentsDirectory, getExternalStorageDirectory, getTemporaryDirectory;
-import 'package:pdf/pdf.dart' show PdfColor, PdfPageFormat;
 import 'package:toastification/toastification.dart';
-import 'package:pdf/widgets.dart' as pw;
-
 import 'consts.dart';
 
 final getIt = GetIt.instance;

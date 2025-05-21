@@ -13,6 +13,7 @@ import 'package:minimaltodo/app/notification/notification_service.dart';
 
 import 'package:minimaltodo/category/state/category_state_controller.dart';
 import 'package:minimaltodo/category/state/category_view_model.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 
 import 'package:minimaltodo/note/state/folder_state_controller.dart';
 import 'package:minimaltodo/note/state/folder_view_model.dart';
@@ -55,7 +56,6 @@ void registerSingletons() {
 Future<void> initApp() async {
   try {
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
     // Initialize local storage & database
     await MiniBox.initStorage();
@@ -67,7 +67,6 @@ Future<void> initApp() async {
     // Initialize notifications
     await NotificationService.init();
 
-    FlutterNativeSplash.remove();
   } catch (e) {
     MiniLogger.e('Failed to initialize app: ${e.toString()}, Error type: ${e.runtimeType}');
   }
@@ -111,27 +110,33 @@ class _MiniTodoState extends State<MiniTodo> {
         ChangeNotifierProvider(create: (_) => getIt<ThemeManager>()),
         ChangeNotifierProvider(create: (_) => getIt<CalendarManager>()),
       ],
-      child: Consumer<ThemeManager>(builder: (context, manager, _) {
-        return MaterialApp(
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            FlutterQuillLocalizations.delegate,
-          ],
-          navigatorKey: MiniTodo.navigatorKey,
-          theme: manager.lightTheme.copyWith(
-            textTheme: GoogleFonts.gabaritoTextTheme(manager.lightTheme.textTheme),
-          ),
-          darkTheme: manager.darkTheme.copyWith(
-            textTheme: GoogleFonts.gabaritoTextTheme(manager.darkTheme.textTheme),
-          ),
-          themeMode: manager.themeMode,
-          debugShowCheckedModeBanner: false,
-          title: 'MiniTodo',
-          home: const Home(),
-        );
-      }),
+      child: ListenableBuilder(
+        listenable: g.themeM,
+        builder: (context, widget) {
+          final lightTheme = g.themeM.lightTheme;
+          final darkTheme = g.themeM.darkTheme;
+          final themeMode = g.themeM.themeMode;
+          return MaterialApp(
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              FlutterQuillLocalizations.delegate,
+            ],
+            navigatorKey: MiniTodo.navigatorKey,
+            theme: lightTheme.copyWith(
+              textTheme: GoogleFonts.gabaritoTextTheme(lightTheme.textTheme),
+            ),
+            darkTheme: darkTheme.copyWith(
+              textTheme: GoogleFonts.gabaritoTextTheme(darkTheme.textTheme),
+            ),
+            themeMode: themeMode,
+            debugShowCheckedModeBanner: false,
+            title: 'MiniTodo',
+            home: const Home(),
+          );
+        }
+      ),
     );
   }
 }

@@ -2,13 +2,12 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
-import 'package:minimaltodo/category/state/category_view_model.dart' show CategoryViewModel;
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/app/state/controllers/state_controller.dart';
-import 'package:minimaltodo/helpers/utils.dart' show getIt;
 import 'package:minimaltodo/task/models/reminder.dart';
 import 'package:minimaltodo/task/models/repeat_config.dart';
 import 'package:minimaltodo/task/models/task.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 part 'task_state_controller.freezed.dart';
 
 ///Immutable data-class to store the temporary state of the task add page
@@ -44,7 +43,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       isRepeating: edit ? task!.isRepeating : false,
       startDate: edit ? task!.startDate : DateTime.now(),
       endDate: edit ? task!.endDate : null,
-      repeatConfig: edit ? RepeatConfig.fromJsonString(task!.repeatConfig!) : RepeatConfig(),
+      repeatConfig: edit  && task!.isRepeating ? RepeatConfig.fromJsonString(task!.repeatConfig!) : RepeatConfig(),
       reminders: edit ? task!.reminderObjects : [],
       currentPriority: 3,
     );
@@ -75,12 +74,10 @@ class TaskStateController extends StateController<TaskState, Task> {
       startDate: startDate,
       endDate: endDate,
       isRepeating: isRepeating,
-      repeatConfig: repeatConfig.toJsonString(),
+      repeatConfig: isRepeating ? repeatConfig.toJsonString() :null,
       reminders: Reminder.remindersToJsonString(reminders),
     );
-    final controller = getIt<TaskStateController>();
-    final catVm = getIt<CategoryViewModel>();
-    final categories = catVm.categories.where((c) => controller.categorySelection[c] == true).toList();
+    final categories = g.catVm.categories.where((c) => g.taskSc.categorySelection[c] == true).toList();
     task.categories.clear();
     if (categories.isEmpty) {
       task.categories.add(CategoryModel(id: 1, name: 'General'));

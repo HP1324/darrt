@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/note/models/folder.dart';
@@ -14,7 +13,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
   /// Getter for the list of model objects
   List<T> get items => _items;
 
-  void set setItems(List<T> items) => _items = items;
+  set setItems(List<T> items) => _items = items;
 
   /// The ObjectBox store box for database operations
   final _box = ObjectBox.store.box<T>();

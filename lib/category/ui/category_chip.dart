@@ -10,6 +10,7 @@ class CategoryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
+    final textTheme = Theme.of(context).textTheme;
     return Consumer<CategoryViewModel>(
       builder: (_,catVM,___) {
         final thisCategory = catVM.categories.firstWhere((c) => c.id == category.id);
@@ -24,7 +25,7 @@ class CategoryChip extends StatelessWidget {
             children: [
               Icon(IconColorStorage.flattenedIcons[thisCategory.icon],size:12,color: IconColorStorage.colors[thisCategory.color]),
               const SizedBox(width: 4),
-              Text(category.name, style: Theme.of(context).textTheme.labelSmall),
+              Text(category.name, style: textTheme.labelMedium),
             ],
           ),
         );

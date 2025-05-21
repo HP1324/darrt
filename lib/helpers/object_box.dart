@@ -1,10 +1,8 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
-import 'package:get_storage/get_storage.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
-import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/objectbox.g.dart';
-
+late final Admin admin;
 class ObjectBox {
   static late final Store _store;
   static bool _initialized = false;
@@ -14,7 +12,6 @@ class ObjectBox {
     _initialized = true;
     _putInitialCategories();
     if (kDebugMode) {
-      var admin;
       if (Admin.isAvailable()) {
         admin = Admin(ObjectBox.store);
       }
