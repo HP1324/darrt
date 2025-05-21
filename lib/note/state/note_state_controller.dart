@@ -2,13 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Colors, FocusNode;
 import 'package:flutter_quill/flutter_quill.dart' show QuillController;
 import 'package:minimaltodo/app/state/controllers/state_controller.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
-import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/note/models/folder.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:minimaltodo/note/state/folder_view_model.dart';
 
 part 'note_state_controller.freezed.dart';
 
@@ -32,9 +31,7 @@ class NoteStateController extends StateController<NoteState, Note> {
   Note buildModel({required bool edit, Note? model}) {
     var note = Note.fromQuillController(controller);
     note.id = edit ? model!.id : 0;
-    final folderVm = getIt<FolderViewModel>();
-    final noteStateController = getIt<NoteStateController>();
-    final folders = folderVm.folders.where((f) => noteStateController.folderSelection[f] == true).toList();
+    final folders = g.folderVm.folders.where((f) =>g.noteSc.folderSelection[f] == true).toList();
     note.folders.clear();
     note.folders.addAll(folders);
     return note;

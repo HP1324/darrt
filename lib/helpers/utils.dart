@@ -4,13 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' show QuillController;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
-import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:toastification/toastification.dart';
 import 'consts.dart';
 
-final getIt = GetIt.instance;
 
 void showToast(BuildContext context,
     {required ToastificationType type, required String description, Duration? duration}) {

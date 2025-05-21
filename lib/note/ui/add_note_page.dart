@@ -3,7 +3,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:minimaltodo/helpers/messages.dart' show Messages;
 import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/helpers/utils.dart' show generateNotePdf, getIt, savePdfToDownloads, showToast;
+import 'package:minimaltodo/helpers/utils.dart' show generateNotePdf, savePdfToDownloads, showToast;
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/note/state/note_state_controller.dart';
 import 'package:minimaltodo/note/ui/add_folder_page.dart';
@@ -47,9 +47,9 @@ class _AddNotePageState extends State<AddNotePage> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: QuillEditor(
-                scrollController: getIt<NoteStateController>().scrollController,
-                controller: getIt<NoteStateController>().controller,
-                focusNode: getIt<NoteStateController>().focusNode,
+                scrollController: g.noteSc.scrollController,
+                controller: g.noteSc.controller,
+                focusNode: g.noteSc.focusNode,
                 config: QuillEditorConfig(
                   placeholder: 'Enter your note here...',
                   autoFocus:  true,
@@ -59,7 +59,7 @@ class _AddNotePageState extends State<AddNotePage> {
             ),
           ),
           QuillSimpleToolbar(
-            controller: getIt<NoteStateController>().controller,
+            controller: g.noteSc.controller,
             config: QuillSimpleToolbarConfig(
               multiRowsDisplay: false,
               toolbarIconAlignment: WrapAlignment.start,
@@ -94,7 +94,7 @@ class SaveNotePdfButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: ()async {
-        final file = await generateNotePdf(getIt<NoteStateController>().controller);
+        final file = await generateNotePdf(g.noteSc.controller);
         await savePdfToDownloads(file, 'note${DateTime.now().millisecondsSinceEpoch}.pdf');
         if(context.mounted) {
           showToast( context, type: ToastificationType.success,  description: 'PDF saved');
