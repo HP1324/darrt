@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/note/models/folder.dart';
-import 'package:minimaltodo/note/state/note_view_model.dart';
 import 'package:minimaltodo/note/ui/note_item.dart';
-import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart' show ToastificationType;
 
 class NotesForFolderPage extends StatefulWidget {
@@ -16,21 +15,18 @@ class NotesForFolderPage extends StatefulWidget {
 
 class _NotesForFolderPageState extends State<NotesForFolderPage> {
   @override
-  void dispose() {
-    super.dispose();
-  }
-  @override
   Widget build(BuildContext context) {
     return PopScope(
-      onPopInvokedWithResult: (_,__){
-        context.read<NoteViewModel>().clearSelection();
+      onPopInvokedWithResult: (_, __) {
+        g.noteVm.clearSelection();
       },
       child: Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            Consumer<NoteViewModel>(
-              builder: (context, noteVm, _) {
-                final ids = noteVm.selectedItemIds;
+          body: CustomScrollView(
+        slivers: [
+          ListenableBuilder(
+              listenable: g.noteVm,
+              builder: (context, child) {
+                final ids = g.noteVm.selectedItemIds;
                 return SliverAppBar(
                   leading: BackButton(),
                   title: Text(widget.folder.name),
@@ -39,7 +35,7 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
                     if (ids.isNotEmpty) ...[
                       IconButton(
                         onPressed: () {
-                          noteVm.clearSelection();
+                          g.noteVm.clearSelection();
                         },
                         icon: Icon(Icons.cancel),
                       ),
@@ -50,7 +46,8 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
                             context: context,
                             builder: (context) => AlertDialog(
                               title: const Text('Delete Notes'),
-                              content: Text('Delete ${ids.length > 1 ? '${ids.length} notes' : '1 note'}?'),
+                              content: Text(
+                                  'Delete ${ids.length > 1 ? '${ids.length} notes' : '1 note'}?'),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
@@ -58,8 +55,9 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    message = noteVm.deleteMultipleItems();
-                                    showToast(context, type: ToastificationType.success, description: message);
+                                    message = g.noteVm.deleteMultipleItems();
+                                    showToast(context,
+                                        type: ToastificationType.success, description: message);
                                     Navigator.pop(context);
                                   },
                                   child: const Text('Delete'),
@@ -73,10 +71,12 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
                     ],
                   ],
                 );
-              }
-            ),
-            Consumer<NoteViewModel>(builder: (context, noteVM, _) {
-              final notes = noteVM.notes.where((n) => n.folders.contains(widget.folder)).toList();
+              }),
+          ListenableBuilder(
+            listenable: g.noteVm,
+
+            builder: (context, child) {
+              final notes = g.noteVm.notes.where((n) => n.folders.contains(widget.folder)).toList();
               return SliverPadding(
                 padding: const EdgeInsets.all(12),
                 sliver: SliverMasonryGrid.count(
@@ -90,10 +90,10 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
                   },
                 ),
               );
-            }),
-          ],
-        )
-      ),
+            },
+          ),
+        ],
+      )),
     );
   }
 }

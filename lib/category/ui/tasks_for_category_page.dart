@@ -4,8 +4,7 @@ import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/state/task_view_model.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
-import 'package:provider/provider.dart';
-
+import 'package:minimaltodo/helpers/globals.dart' as g;
 class TasksForCategoryPage extends StatefulWidget {
   const TasksForCategoryPage({super.key, required this.category});
   final CategoryModel category;
@@ -22,9 +21,10 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TaskViewModel>(
-      builder: (context, taskVM, _) {
-        final tasks = taskVM.tasks.where((t) => t.categories.contains(widget.category)).toList();
+    return ListenableBuilder(
+      listenable: g.taskVm,
+      builder: (context, child) {
+        final tasks = g.taskVm.tasks.where((t) => t.categories.contains(widget.category)).toList();
         final color =
             IconColorStorage.colors[widget.category.color] ?? Theme.of(context).colorScheme.primary;
         final icon = IconColorStorage.flattenedIcons[widget.category.icon];
@@ -48,19 +48,19 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
               : Column(
                   children: [
                     const SizedBox(height: 15),
-                    if (taskVM.selectedTaskIds.isNotEmpty)
+                    if (g.taskVm.selectedTaskIds.isNotEmpty)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(
                             onPressed: () {
-                              context.read<TaskViewModel>().clearSelection();
+                              g.taskVm.clearSelection();
                             },
                             icon: Icon(Icons.cancel),
                           ),
                           IconButton(
                             onPressed: () {
-                              context.read<TaskViewModel>().deleteMultipleItems();
+                              g.taskVm.deleteMultipleItems();
                             },
                             icon: Icon(Icons.delete),
                           ),

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/category/state/category_state_controller.dart';
-import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
-
+import 'package:minimaltodo/helpers/globals.dart' as g;
 class AddCategoryPage extends StatefulWidget {
   const AddCategoryPage({super.key, required this.edit, this.category}) : assert(!edit || category != null);
   final bool edit;
@@ -16,23 +14,17 @@ class AddCategoryPage extends StatefulWidget {
 }
 
 class _AddCategoryPageState extends State<AddCategoryPage> {
-  late final CategoryStateController controller;
 
   @override
   void initState() {
     super.initState();
-      context.read<CategoryStateController>().initState(widget.edit,widget.edit? widget.category! : null);
+      g.catSc.initState(widget.edit,widget.edit? widget.category! : null);
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    controller = context.read<CategoryStateController>();
-  }
 
   @override
   void dispose() {
-    controller.clearState();
+    g.catSc.clearState();
     super.dispose();
   }
 
@@ -50,7 +42,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
             const SizedBox(height: 20),
             TextField(
               textCapitalization: TextCapitalization.sentences,
-              controller: controller.textController,
+              controller: g.catSc.textController,
               autofocus: true,
               decoration: const InputDecoration(
                 hintText: 'Enter Category Name Here',
@@ -64,17 +56,18 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 16),
-            Consumer<CategoryStateController>(
-              builder: (context, controller, _) {
+            ListenableBuilder(
+              listenable: g.catSc,
+              builder: (context, child) {
                 return Row(
                   children: [
                     Expanded(
                       child: _SelectionTile(
                         title: 'Icon',
-                        selectedValue: controller.icon,
+                        selectedValue: g.catSc.icon,
                         onTap: () => _showIconPicker(context),
                         builder: (context) {
-                          final iconData = IconColorStorage.flattenedIcons[controller.icon];
+                          final iconData = IconColorStorage.flattenedIcons[g.catSc.icon];
                           return Icon(
                             iconData ?? Icons.folder,
                             size: 28,
@@ -87,10 +80,10 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                     Expanded(
                       child: _SelectionTile(
                         title: 'Color',
-                        selectedValue: controller.color,
+                        selectedValue: g.catSc.color,
                         onTap: () => _showColorPicker(context),
                         builder: (context) {
-                          final selectedColor = IconColorStorage.colors[controller.color] ??
+                          final selectedColor = IconColorStorage.colors[g.catSc.color] ??
                               Theme.of(context).colorScheme.primary;
                           return Container(
                             width: 28,
@@ -112,8 +105,8 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          CategoryModel category = controller.buildModel(edit: widget.edit, model: widget.category);
-          final message = context.read<CategoryViewModel>().putItem(category, edit: widget.edit);
+          CategoryModel category = g.catSc.buildModel(edit: widget.edit, model: widget.category);
+          final message = g.catVm.putItem(category, edit: widget.edit);
           showToast(context, type: ToastificationType.success, description: message);
           Navigator.pop(context);
         },
@@ -127,7 +120,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
       context: context,
       builder: (context) => IconPickerDialog(
         onIconSelected: (iconKey) {
-          controller.setIcon(iconKey);
+          g.catSc.setIcon(iconKey);
           Navigator.pop(context);
         },
       ),
@@ -139,7 +132,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
       context: context,
       builder: (context) => ColorPickerDialog(
         onColorSelected: (colorKey) {
-          controller.setColor(colorKey);
+          g.catSc.setColor(colorKey);
           Navigator.pop(context);
         },
       ),

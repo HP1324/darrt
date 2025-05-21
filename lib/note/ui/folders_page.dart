@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/note/state/folder_view_model.dart';
 import 'package:minimaltodo/note/ui/add_folder_page.dart';
 import 'package:minimaltodo/note/ui/folder_item.dart';
-import 'package:provider/provider.dart';
 
 class FoldersPage extends StatefulWidget {
   const FoldersPage({super.key});
-
   @override
   State<FoldersPage> createState() => _FoldersPageState();
 }
@@ -17,9 +15,10 @@ class _FoldersPageState extends State<FoldersPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Folders')),
-      body: Consumer<FolderViewModel>(
-        builder: (context, folderVM, _) {
-          final folders = folderVM.folders;
+      body: ListenableBuilder(
+        listenable: g.folderVm,
+        builder: (context, child) {
+          final folders = g.folderVm.folders;
           return ListView.builder(
             itemCount: folders.length,
             itemBuilder: (context, index) {

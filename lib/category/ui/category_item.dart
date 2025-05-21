@@ -3,18 +3,15 @@ import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/tasks_for_category_page.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/task/state/task_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
 class CategoryItem extends StatefulWidget {
-  const CategoryItem({
-    super.key,
-    required this.category,
-  });
+  const CategoryItem({super.key, required this.category});
 
   final CategoryModel category;
 
@@ -27,7 +24,8 @@ class _CategoryItemState extends State<CategoryItem> {
 
   @override
   Widget build(BuildContext context) {
-    final color = IconColorStorage.colors[widget.category.color] ?? Theme.of(context).colorScheme.primary;
+    final color =
+        IconColorStorage.colors[widget.category.color] ?? Theme.of(context).colorScheme.primary;
     final icon = IconColorStorage.flattenedIcons[widget.category.icon];
 
     return Card(
@@ -35,7 +33,9 @@ class _CategoryItemState extends State<CategoryItem> {
       elevation: 0,
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       shape: RoundedRectangleBorder(
-          side: BorderSide(width: 0.1,color: color), borderRadius: BorderRadius.circular(10),),
+        side: BorderSide(width: 0.1, color: color),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -118,7 +118,9 @@ class _CategoryItemState extends State<CategoryItem> {
                                           final message = context
                                               .read<CategoryViewModel>()
                                               .deleteItem(widget.category.id);
-                                          showToast(context, type: ToastificationType.success, description: message);
+                                          showToast(context,
+                                              type: ToastificationType.success,
+                                              description: message);
                                           Navigator.pop(context);
                                         },
                                         child: const Text('Delete'),
@@ -150,21 +152,26 @@ class _CategoryItemState extends State<CategoryItem> {
               Flexible(
                 child: Container(
                   alignment: Alignment.bottomRight,
-                  child: Builder(builder: (context) {
-                    return Consumer<TaskViewModel>(builder: (context, taskVM, _) {
-                      final tasks = taskVM.tasks;
-                      final count = tasks
-                          .where((t) => t.categories.contains(widget.category))
-                          .toList()
-                          .length;
-                      return Text(
-                        '$count tasks',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: TextStyle(fontSize: 12),
+                  child: Builder(
+                    builder: (context) {
+                      return ListenableBuilder(
+                        listenable: g.taskVm,
+                        builder: (context, child) {
+                          final tasks = g.taskVm.tasks;
+                          final count = tasks
+                              .where((t) => t.categories.contains(widget.category))
+                              .toList()
+                              .length;
+                          return Text(
+                            '$count tasks',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(fontSize: 12),
+                          );
+                        },
                       );
-                    });
-                  }),
+                    },
+                  ),
                 ),
               )
             ],

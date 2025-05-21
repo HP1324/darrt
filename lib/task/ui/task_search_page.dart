@@ -3,10 +3,12 @@ import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
-import 'package:provider/provider.dart';
+
+///This state controller is used only within this file that's why not put in globals.dart
+final _controller = SearchStateController();
 
 // Controller class to handle all state and business logic
-class SearchController extends ChangeNotifier {
+class SearchStateController extends ChangeNotifier {
   String _searchQuery = '';
   CategoryModel? _selectedCategory;
   String? _selectedPriority;
@@ -15,7 +17,7 @@ class SearchController extends ChangeNotifier {
   List<CategoryModel> _categories = [];
   final List<String> priorities = ['Low', 'Medium', 'High', 'Urgent'];
 
-  SearchController() {
+  SearchStateController() {
     _loadData();
   }
 
@@ -31,13 +33,14 @@ class SearchController extends ChangeNotifier {
     if (_searchQuery.isEmpty) return [];
 
     // Get tasks based on category selection
-    List<Task> baseTasks =_selectedCategory != null ? _selectedCategory!.tasks.toList() : _allTasks;
+    List<Task> baseTasks =
+        _selectedCategory != null ? _selectedCategory!.tasks.toList() : _allTasks;
 
     // Apply search and priority filters
     return baseTasks.where((task) {
       // Search query filter
       bool matchesTitle = task.title.toLowerCase().contains(_searchQuery.toLowerCase());
-      bool matchesPriority =task.priority.toLowerCase().contains(_searchQuery.toLowerCase());
+      bool matchesPriority = task.priority.toLowerCase().contains(_searchQuery.toLowerCase());
 
       if (!matchesTitle && !matchesPriority) return false;
 
@@ -87,10 +90,7 @@ class TaskSearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => SearchController(),
-      child: const _SearchPageContent(),
-    );
+    return const _SearchPageContent();
   }
 }
 
@@ -115,8 +115,9 @@ class _SearchPageContentState extends State<_SearchPageContent> {
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(),
-        title: Consumer<SearchController>(
-          builder: (context, controller, _) => TextField(
+        title: ListenableBuilder(
+          listenable: _controller,
+          builder: (context, child) => TextField(
             controller: _searchController,
             autofocus: true,
             decoration: InputDecoration(
@@ -124,29 +125,31 @@ class _SearchPageContentState extends State<_SearchPageContent> {
               border: InputBorder.none,
               suffixIcon: IconButton(
                 icon: const Icon(Icons.filter_list),
-                onPressed: controller.toggleFilters,
+                onPressed: _controller.toggleFilters,
               ),
             ),
-            onChanged: controller.updateSearchQuery,
+            onChanged: _controller.updateSearchQuery,
           ),
         ),
       ),
       body: Column(
         children: [
           // Filters Section
-          Selector<SearchController, bool>(
-            selector: (_, controller) => controller.showFilters,
-            builder: (context, showFilters, _) {
+          ListenableBuilder(
+            listenable: _controller,
+            builder: (context, child) {
+              final showFilters = _controller.showFilters;
               if (!showFilters) return const SizedBox.shrink();
               return const _FiltersSection();
             },
           ),
           // Tasks List
           Expanded(
-            child: Consumer<SearchController>(
-              builder: (context, controller, _) {
-                final tasks = controller.filteredTasks;
-                final searchQuery = controller.searchQuery;
+            child: ListenableBuilder(
+              listenable: _controller,
+              builder: (context, child) {
+                final tasks = _controller.filteredTasks;
+                final searchQuery = _controller.searchQuery;
 
                 if (searchQuery.isEmpty) {
                   return const _EmptySearchState();
@@ -183,8 +186,8 @@ class _FiltersSection extends StatelessWidget {
           Text(
             'Filter by:',
             style: Theme.of(context).textTheme.labelLarge!.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           SizedBox(
             height: MediaQuery.sizeOf(context).height * 0.1,
@@ -203,15 +206,16 @@ class _CategoryFilters extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<SearchController, List<CategoryModel>>(
-      selector: (_, controller) => controller.categories,
-      builder: (context, categories, _) {
+    return ListenableBuilder(
+      listenable: _controller,
+      builder: (context, child) {
+        final categories = _controller.categories;
         return ListView(
           scrollDirection: Axis.horizontal,
           children: [
             _buildCategoryChip(context, null, 'All Categories'),
             ...categories.map(
-                  (category) => Padding(
+              (category) => Padding(
                 padding: const EdgeInsets.only(left: 6.0),
                 child: _buildCategoryChip(context, category, category.name),
               ),
@@ -223,12 +227,12 @@ class _CategoryFilters extends StatelessWidget {
   }
 
   Widget _buildCategoryChip(BuildContext context, CategoryModel? category, String label) {
-    return Selector<SearchController, CategoryModel?>(
-      selector: (_, controller) => controller.selectedCategory,
-      builder: (context, selectedCategory, _) {
-        final controller = context.read<SearchController>();
+    return ListenableBuilder(
+      listenable: _controller,
+      builder: (context, child) {
+        final selectedCategory = _controller.selectedCategory;
         final isSelected =
-        category == null ? selectedCategory == null : selectedCategory?.id == category.id;
+            category == null ? selectedCategory == null : selectedCategory?.id == category.id;
 
         return FilterChip(
           showCheckmark: false,
@@ -237,7 +241,7 @@ class _CategoryFilters extends StatelessWidget {
             style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium!.fontSize),
           ),
           selected: isSelected,
-          onSelected: (_) => controller.setCategory(isSelected ? null : category),
+          onSelected: (_) => _controller.setCategory(isSelected ? null : category),
         );
       },
     );
@@ -250,11 +254,10 @@ class _PriorityFilters extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.read<SearchController>();
-
-    return Selector<SearchController, String?>(
-      selector: (_, controller) => controller.selectedPriority,
-      builder: (context, selectedPriority, _) {
+    return ListenableBuilder(
+      listenable: _controller,
+      builder: (context, child) {
+        final selectedPriority = _controller.selectedPriority;
         return Wrap(
           spacing: 7,
           children: [
@@ -265,17 +268,17 @@ class _PriorityFilters extends StatelessWidget {
                 style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium!.fontSize),
               ),
               selected: selectedPriority == null,
-              onSelected: (_) => controller.setPriority(null),
+              onSelected: (_) => _controller.setPriority(null),
             ),
-            ...controller.priorities.map((priority) => FilterChip(
-              showCheckmark: false,
-              label: Text(
-                priority,
-                style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium!.fontSize),
-              ),
-              selected: selectedPriority == priority,
-              onSelected: (selected) => controller.setPriority(selected ? priority : null),
-            )),
+            ..._controller.priorities.map((priority) => FilterChip(
+                  showCheckmark: false,
+                  label: Text(
+                    priority,
+                    style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium!.fontSize),
+                  ),
+                  selected: selectedPriority == priority,
+                  onSelected: (selected) => _controller.setPriority(selected ? priority : null),
+                )),
           ],
         );
       },

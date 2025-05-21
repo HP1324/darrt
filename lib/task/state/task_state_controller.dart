@@ -43,7 +43,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       isRepeating: edit ? task!.isRepeating : false,
       startDate: edit ? task!.startDate : DateTime.now(),
       endDate: edit ? task!.endDate : null,
-      repeatConfig: edit  && task!.isRepeating ? RepeatConfig.fromJsonString(task!.repeatConfig!) : RepeatConfig(),
+      repeatConfig: edit  && task!.isRepeating ? RepeatConfig.fromJsonString(task.repeatConfig!) : RepeatConfig(),
       reminders: edit ? task!.reminderObjects : [],
       currentPriority: 3,
     );

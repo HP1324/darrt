@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/note/models/folder.dart';
-import 'package:minimaltodo/note/state/folder_state_controller.dart';
-import 'package:minimaltodo/note/state/folder_view_model.dart';
-import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
-
+import 'package:minimaltodo/helpers/globals.dart' as g;
 class AddFolderPage extends StatefulWidget {
   const AddFolderPage({super.key, required this.edit, this.folder}):assert(!edit || folder != null);
   final bool edit;
@@ -19,12 +16,12 @@ class _AddFolderPageState extends State<AddFolderPage> {
   @override
   void initState() {
     super.initState();
-    context.read<FolderStateController>().initState(widget.edit, widget.edit ? widget.folder : null);
+    g.folderSc.initState(widget.edit, widget.edit ? widget.folder : null);
   }
   @override
   void dispose() {
     super.dispose();
-    getIt<FolderStateController>().clearState();
+    g.folderSc.clearState();
   }
   @override
   Widget build(BuildContext context) {
@@ -33,7 +30,7 @@ class _AddFolderPageState extends State<AddFolderPage> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15.0),
         child: TextField(
-          controller: context.read<FolderStateController>().textController,
+          controller: g.folderSc.textController,
           autofocus: true,
           decoration: InputDecoration(
             hintText: 'Enter Folder Name Here',
@@ -42,9 +39,8 @@ class _AddFolderPageState extends State<AddFolderPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          final controller = context.read<FolderStateController>();
-          final folder = controller.buildModel(edit: widget.edit, model: widget.folder);
-          final message = context.read<FolderViewModel>().putItem(folder, edit: widget.edit);
+          final folder = g.folderSc.buildModel(edit: widget.edit, model: widget.folder);
+          final message = g.folderVm.putItem(folder, edit: widget.edit);
           if(message != Messages.mFolderEmpty) {
             showToast(context, type: ToastificationType.success, description: message);
             Navigator.pop(context);

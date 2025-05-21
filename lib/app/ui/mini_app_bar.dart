@@ -1,9 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:minimaltodo/app/state/managers/calendar_manager.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:provider/provider.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   MiniAppBar({super.key});
@@ -29,7 +28,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   lastDate: getMaxDate(),
                   onDateChanged: (selectedDate) {
                     final date = DateUtils.dateOnly(selectedDate);
-                    context.read<CalendarManager>().scrollToDate(date);
+                    g.calMan.scrollToDate(date);
                   },
                 ),
               );
@@ -38,11 +37,14 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
         },
         child: Row(
           children: [
-            Selector<CalendarManager, DateTime>(
-                selector: (context, calVM) => calVM.selectedDate,
-                builder: (context, selectedDate, _) {
-                  final isBefore = selectedDate.isBefore(DateTime.now());
-                  final title = DateUtils.isSameDay(selectedDate, DateTime.now()) ? 'Today': formatDate(selectedDate, 'EEE, d MMM, yyyy');
+            ListenableBuilder(
+                listenable: g.calMan,
+                builder: (context, child) {
+                  final selectedDate = g.calMan.selectedDate;
+                  final isBefore = selectedDate.isBefore(g.calMan.previousSelectedDate);
+                  final title = DateUtils.isSameDay(selectedDate, DateTime.now())
+                      ? 'Today'
+                      : formatDate(selectedDate, 'EEE, d MMM, yyyy');
                   return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
                     transitionBuilder: (Widget child, animation) {
@@ -91,7 +93,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
         _MiniAppBarAction(
           icon: Icon(Icons.flutter_dash),
           onTap: () async {
-            if(kDebugMode){
+            if (kDebugMode) {
               debugPrint('${SchedulerBinding.instance.lifecycleState}');
               debugPrint('${WidgetsBinding.instance.lifecycleState}');
             }

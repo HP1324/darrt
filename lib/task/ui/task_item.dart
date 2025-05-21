@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:minimaltodo/category/models/category_model.dart';
-import 'package:minimaltodo/category/state/category_view_model.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
-import 'package:provider/provider.dart';
 
 class TaskItem extends StatefulWidget {
   const TaskItem({super.key, required this.task});
@@ -24,7 +22,7 @@ class _TaskItemState extends State<TaskItem> {
     final scheme = Theme.of(context).colorScheme;
     return ListenableBuilder(
       listenable: g.taskVm,
-      builder: (context,child) {
+      builder: (context, child) {
         final ids = g.taskVm.selectedTaskIds;
         final isSelected = ids.contains(widget.task.id);
         final isUrgent = widget.task.priority.toLowerCase() == 'urgent';
@@ -32,19 +30,17 @@ class _TaskItemState extends State<TaskItem> {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-            color: isSelected
-                ? scheme.outline.withAlpha(130)
-                : scheme.surface.withAlpha(100),
+            color: isSelected ? scheme.outline.withAlpha(130) : scheme.surface.withAlpha(100),
             borderRadius: BorderRadius.circular(5),
-            border:  Border.all(
-                    color: scheme.outline.withAlpha(60),
-                    width: 0.5,
-                  ),
+            border: Border.all(
+              color: scheme.outline.withAlpha(60),
+              width: 0.5,
+            ),
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              splashFactory: InkSparkle.splashFactory,
+              splashFactory: NoSplash.splashFactory,
               borderRadius: BorderRadius.circular(5),
               onTap: () {
                 if (ids.isEmpty) {
@@ -150,25 +146,28 @@ class _TaskItemState extends State<TaskItem> {
             ).createShader(bounds);
           },
           blendMode: BlendMode.dstIn,
-          child: Consumer<CategoryViewModel>(builder: (context, catVM, _) {
-            var categories = catVM.categories;
-            widget.task.categories.removeWhere((c) => !categories.contains(c));
-            if (widget.task.categories.isEmpty) {
-              widget.task.categories.add(CategoryModel(id: 1, name: 'General'));
-              ObjectBox.store.box<Task>().put(widget.task);
-            }
-            return ListView.separated(
-              scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-              physics: BouncingScrollPhysics(),
-              separatorBuilder: (context, index) => const SizedBox(width: 2),
-              itemCount: widget.task.categories.length,
-              itemBuilder: (context, index) {
-                final category = widget.task.categories[index];
-                return CategoryChip(category: category);
-              },
-            );
-          }),
+          child: ListenableBuilder(
+            listenable: g.catVm,
+            builder: (context, child) {
+              var categories = g.catVm.categories;
+              widget.task.categories.removeWhere((c) => !categories.contains(c));
+              if (widget.task.categories.isEmpty) {
+                widget.task.categories.add(CategoryModel(id: 1, name: 'General'));
+                ObjectBox.store.box<Task>().put(widget.task);
+              }
+              return ListView.separated(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                physics: BouncingScrollPhysics(),
+                separatorBuilder: (context, index) => const SizedBox(width: 2),
+                itemCount: widget.task.categories.length,
+                itemBuilder: (context, index) {
+                  final category = widget.task.categories[index];
+                  return CategoryChip(category: category);
+                },
+              );
+            },
+          ),
         ),
       ),
     );
