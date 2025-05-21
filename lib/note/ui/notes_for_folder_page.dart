@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/note/models/folder.dart';
-import 'package:minimaltodo/note/state/folder_view_model.dart';
 import 'package:minimaltodo/note/state/note_view_model.dart';
 import 'package:minimaltodo/note/ui/note_item.dart';
 import 'package:provider/provider.dart';

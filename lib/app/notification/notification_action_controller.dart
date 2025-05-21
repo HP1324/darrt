@@ -2,6 +2,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
@@ -20,7 +21,7 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     }
     Task task = ObjectBox.store.box<Task>().get(int.parse(receivedAction.payload!['id']!))!;
     if (receivedAction.buttonKeyPressed == 'FINISHED') {
-      getIt<TaskViewModel>().toggleStatus(task, true, DateTime.now());
+      g.taskVm.toggleStatus(task, true, DateTime.now());
     } else {
       MiniTodo.navigatorKey.currentState
           ?.push(MaterialPageRoute(builder: (_) => AddTaskPage(edit: true, task: task)));

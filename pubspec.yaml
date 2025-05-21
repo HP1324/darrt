@@ -127,6 +127,7 @@ flutter_native_splash:
   android: true
   ios: true
   color: "#007BA7"
+  image: assets/icon/play_store_512.png
   android_12:
     color: "#007BA7"
 

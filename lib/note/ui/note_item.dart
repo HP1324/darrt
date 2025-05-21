@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/helpers/utils.dart' show formatDate, formatDateAndTime, formatTime;
+import 'package:minimaltodo/helpers/utils.dart' show  formatDateAndTime, formatTime;
 import 'package:minimaltodo/note/models/note.dart';
-import 'package:minimaltodo/note/state/note_state_controller.dart';
 import 'package:minimaltodo/note/state/note_view_model.dart';
 import 'package:minimaltodo/note/ui/add_note_page.dart';
 import 'package:provider/provider.dart'; // Import your Note model here

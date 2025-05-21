@@ -23,8 +23,8 @@ class Task {
     this.isRepeating = false,
     this.isDone = false,
     this.priority = 'Low',
-    this.repeatConfig = '{"type" : "weekly","days" : [1,2,3,4,5,6,7]}',
-    this.reminders = "{}",
+    this.repeatConfig,
+    this.reminders,
   })  : dueDate = dueDate ?? DateTime.now(),
         startDate = startDate ?? DateTime.now();
   @Id()

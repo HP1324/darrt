@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:iconsax/iconsax.dart';
 
 import 'package:minimaltodo/app/state/managers/navigation_manager.dart';
@@ -8,7 +7,6 @@ import 'package:minimaltodo/app/ui/mini_app_bar.dart';
 import 'package:minimaltodo/app/ui/mini_bottom_nav_bar.dart';
 import 'package:minimaltodo/category/ui/categories_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/helpers/utils.dart' show getIt;
 import 'package:minimaltodo/task/ui/add_task_page.dart';
 import 'package:minimaltodo/task/ui/tasks_page.dart';
 import 'package:provider/provider.dart';
@@ -44,7 +42,6 @@ class _HomeState extends State<Home> {
             return const SizedBox.shrink(); // Return an invisible widget instead of null
           },
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         bottomNavigationBar: const _BottomNavBarWidget(),
       ),
     );
@@ -92,7 +89,7 @@ class _FloatingActionButtonWidget extends StatelessWidget {
           onPressed: () {
             MiniRouter.to(context, AddTaskPage(edit: false));
           },
-          shape: StadiumBorder(),
+          // shape: StadiumBorder(),
           tooltip: 'Add Task',
           elevation: 5,
           child: const Icon(Icons.add),

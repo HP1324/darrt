@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Colors, FocusNode;
-import 'package:flutter/services.dart';
-import 'package:flutter_quill/flutter_quill.dart' show Document, QuillClipboardConfig, QuillController, QuillControllerConfig;
+import 'package:flutter_quill/flutter_quill.dart' show QuillController;
 import 'package:minimaltodo/app/state/controllers/state_controller.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
@@ -25,14 +24,7 @@ abstract class NoteState with _$NoteState {
 }
 
 class NoteStateController extends StateController<NoteState, Note> {
-  // final config = QuillControllerConfig(
-  //   clipboardConfig: QuillClipboardConfig(
-  //     onClipboardPaste:()async{
-  //       final clipBoardData = await Clipboard.getData('text')
-  //
-  //     }
-  //   )
-  // );
+
   QuillController controller = QuillController.basic();
   ScrollController scrollController = ScrollController();
 

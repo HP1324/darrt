@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:minimaltodo/helpers/messages.dart' show Messages;
 import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/helpers/utils.dart' show generateNotePdf, getIt, savePdf, savePdfToDownloads, showToast;
-import 'package:minimaltodo/note/models/folder.dart';
+import 'package:minimaltodo/helpers/utils.dart' show generateNotePdf, getIt, savePdfToDownloads, showToast;
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/note/state/folder_view_model.dart';
 import 'package:minimaltodo/note/state/note_state_controller.dart';
@@ -23,11 +21,9 @@ class AddNotePage extends StatefulWidget {
 }
 
 class _AddNotePageState extends State<AddNotePage> {
-  late final QuillController _controller;
   @override
   void initState() {
     super.initState();
-    _controller = getIt<NoteStateController>().controller;
     context.read<NoteStateController>().initState(widget.edit, widget.edit ? widget.note : null);
   }
 
@@ -102,7 +98,7 @@ class SaveNotePdfButton extends StatelessWidget {
     return IconButton(
       onPressed: ()async {
         final file = await generateNotePdf(getIt<NoteStateController>().controller);
-        final path = await savePdfToDownloads(file, 'note${DateTime.now().millisecondsSinceEpoch}.pdf');
+        await savePdfToDownloads(file, 'note${DateTime.now().millisecondsSinceEpoch}.pdf');
         if(context.mounted) {
           showToast( context, type: ToastificationType.success,  description: 'PDF saved');
         }
