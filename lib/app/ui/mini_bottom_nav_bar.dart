@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/note/ui/notes_page.dart';
-import 'package:minimaltodo/task/ui/task_search_page.dart';
-import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+
 class MiniBottomNavBar extends StatefulWidget {
   const MiniBottomNavBar({super.key, required this.children});
   final List<Widget> children;
@@ -32,13 +29,17 @@ class MiniBottomNavBarItem extends StatefulWidget {
     super.key,
     required this.icon,
     required this.label,
-    required this.i,
+    required this.onTap,
+    this.i,
   });
 
   final IconData icon;
-  final String? label;
-  final int i;
 
+  final String? label;
+
+  final VoidCallback onTap;
+
+  final int? i;
   @override
   State<MiniBottomNavBarItem> createState() => _MiniBottomNavBarItemState();
 }
@@ -63,16 +64,7 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
           onTapDown: (_) => setState(() => _isPressed = true),
           onTapUp: (_) => setState(() => _isPressed = false),
           onTapCancel: () => setState(() => _isPressed = false),
-          onTap: () {
-            g.taskVm.clearSelection();
-            if (widget.i == -1) {
-              MiniRouter.to(context, TaskSearchPage(), type: PageTransitionType.bottomToTop);
-            } else if (widget.i == -2) {
-              MiniRouter.to(context, NotesPage(), type: PageTransitionType.rightToLeft);
-            } else {
-              g.navMan.onDestinationChanged(widget.i);
-            }
-          },
+          onTap: widget.onTap,
           child: AnimatedScale(
             duration: const Duration(milliseconds: 100),
             scale: _isPressed ? 0.6 : 1.0,

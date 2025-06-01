@@ -4,10 +4,15 @@ import 'package:minimaltodo/app/ui/app_drawer.dart';
 import 'package:minimaltodo/app/ui/mini_app_bar.dart';
 import 'package:minimaltodo/app/ui/mini_bottom_nav_bar.dart';
 import 'package:minimaltodo/category/ui/categories_page.dart';
+import 'package:minimaltodo/focus_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/note/ui/add_note_page.dart';
+import 'package:minimaltodo/note/ui/notes_page.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
+import 'package:minimaltodo/task/ui/task_search_page.dart';
 import 'package:minimaltodo/task/ui/tasks_page.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:page_transition/page_transition.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -16,7 +21,7 @@ class Home extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Scaffold(
-        appBar:  MiniAppBar(),
+        appBar: MiniAppBar(),
         drawer: const AppDrawer(),
         body: ListenableBuilder(
             listenable: g.navMan,
@@ -61,10 +66,36 @@ class _BottomNavBarWidget extends StatelessWidget {
           ),
           child: MiniBottomNavBar(
             children: [
-              MiniBottomNavBarItem(icon: Icons.calendar_month, label: 'Calendar', i: 0),
-              MiniBottomNavBarItem(icon: Icons.search, label: 'Search', i: -1),
-              MiniBottomNavBarItem(icon: Iconsax.category, label: 'Categories', i: 1),
-              MiniBottomNavBarItem(icon: Icons.assignment_outlined, label: 'Notes', i: -2),
+              MiniBottomNavBarItem(
+                icon: Icons.calendar_month,
+                label: 'Calendar',
+                onTap: () => g.navMan.onDestinationChanged(0),
+                i: 0,
+              ),
+              MiniBottomNavBarItem(
+                icon: Icons.search,
+                label: 'Search',
+                onTap: ()=>MiniRouter.to(context, const TaskSearchPage()),
+                i: -1,
+              ),
+              MiniBottomNavBarItem(
+                icon: Iconsax.category,
+                label: 'Categories',
+                onTap: () => g.navMan.onDestinationChanged(1),
+                i: 1,
+              ),
+              MiniBottomNavBarItem(
+                icon: Icons.assignment_outlined,
+                label: 'Notes',
+                onTap: () => MiniRouter.to(context, NotesPage()),
+                i: -2,
+              ),
+              MiniBottomNavBarItem(
+                icon: Icons.filter_center_focus,
+                label: 'Focus',
+                onTap: () => MiniRouter.to(context, FocusTimerPage()),
+                i: -3,
+              ),
             ],
           ),
         );
