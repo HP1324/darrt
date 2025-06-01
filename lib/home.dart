@@ -4,9 +4,7 @@ import 'package:minimaltodo/app/ui/app_drawer.dart';
 import 'package:minimaltodo/app/ui/mini_app_bar.dart';
 import 'package:minimaltodo/app/ui/mini_bottom_nav_bar.dart';
 import 'package:minimaltodo/category/ui/categories_page.dart';
-import 'package:minimaltodo/focus_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/note/ui/add_note_page.dart';
 import 'package:minimaltodo/note/ui/notes_page.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
 import 'package:minimaltodo/task/ui/task_search_page.dart';
@@ -75,7 +73,7 @@ class _BottomNavBarWidget extends StatelessWidget {
               MiniBottomNavBarItem(
                 icon: Icons.search,
                 label: 'Search',
-                onTap: ()=>MiniRouter.to(context, const TaskSearchPage()),
+                onTap: () => MiniRouter.to(context, const TaskSearchPage()),
                 i: -1,
               ),
               MiniBottomNavBarItem(
@@ -89,12 +87,6 @@ class _BottomNavBarWidget extends StatelessWidget {
                 label: 'Notes',
                 onTap: () => MiniRouter.to(context, NotesPage()),
                 i: -2,
-              ),
-              MiniBottomNavBarItem(
-                icon: Icons.filter_center_focus,
-                label: 'Focus',
-                onTap: () => MiniRouter.to(context, FocusTimerPage()),
-                i: -3,
               ),
             ],
           ),
