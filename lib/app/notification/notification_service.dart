@@ -101,39 +101,45 @@ class NotificationService {
           debugPrint('Reminder: ${reminder.time.hour}:${reminder.time.minute}');
         }
         await _notif.createNotification(
-            content: NotificationContent(
-              id: reminder.id,
-              groupKey: task.id.toString(),
-              channelKey: isAlarm ? 'task_alarm' : 'task_notif',
-              title: 'Task Due at ${formatTime(time)}',
-              body: task.title,
-              actionType: ActionType.Default,
-              payload: {'id': task.id.toString()}, //task.toNotificationPayload(),
-              notificationLayout: NotificationLayout.BigText,
-              category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
-              wakeUpScreen: true,
-              criticalAlert: true,
+          content: NotificationContent(
+            id: reminder.id,
+            groupKey: task.id.toString(),
+            channelKey: isAlarm ? 'task_alarm' : 'task_notif',
+            title: 'Task Due at ${formatTime(time)}',
+            body: task.title,
+            actionType: ActionType.Default,
+            payload: {'id': task.id.toString()}, //task.toNotificationPayload(),
+            notificationLayout: NotificationLayout.BigText,
+            category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
+            wakeUpScreen: true,
+            criticalAlert: true,
+          ),
+          schedule: NotificationCalendar(
+            day: task.dueDate.day,
+            month: task.dueDate.month,
+            year: task.dueDate.year,
+            hour: time.hour,
+            minute: time.minute,
+            second: 0,
+            millisecond: 0,
+            repeats: false,
+            allowWhileIdle: true,
+            preciseAlarm: true,
+            timeZone: await _notif.getLocalTimeZoneIdentifier(),
+          ),
+          actionButtons: [
+            NotificationActionButton(
+              key: 'FINISHED',
+              label: 'Finished',
+              actionType: ActionType.SilentAction,
             ),
-            schedule: NotificationCalendar(
-              day: task.dueDate.day,
-              month: task.dueDate.month,
-              year: task.dueDate.year,
-              hour: time.hour,
-              minute: time.minute,
-              second: 0,
-              millisecond: 0,
-              repeats: false,
-              allowWhileIdle: true,
-              preciseAlarm: true,
-              timeZone: await _notif.getLocalTimeZoneIdentifier(),
+            NotificationActionButton(
+              key: 'SNOOZE',
+              label: 'Snooze',
+              actionType: ActionType.SilentAction,
             ),
-            actionButtons: [
-              NotificationActionButton(
-                key: 'FINISHED',
-                label: 'Finished',
-                actionType: ActionType.SilentAction,
-              ),
-            ]);
+          ],
+        );
       }
     } catch (e) {
       MiniLogger.e('Failed to create task notification: ${e.toString()}');
