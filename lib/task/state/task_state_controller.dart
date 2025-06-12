@@ -68,17 +68,35 @@ class TaskStateController extends StateController<TaskState, Task> {
 
   @override
   Task buildModel({required bool edit, Task? model}) {
-    var task = Task(
-      title: textController.text,
-      dueDate: dueDate,
-      priority: priority,
-      id: edit ? model!.id : 0,
-      startDate: startDate,
-      endDate: endDate,
-      isRepeating: isRepeating,
-      repeatConfig: isRepeating ? repeatConfig.toJsonString() : null,
-      reminders: Reminder.remindersToJsonString(reminders),
-    );
+
+    Task task;
+
+    if (edit) {
+      // Use the existing task object to preserve relationships
+      task = model!;
+      // Update the fields
+      task.title = textController.text;
+      task.dueDate = dueDate;
+      task.priority = priority;
+      task.startDate = startDate;
+      task.endDate = endDate;
+      task.isRepeating = isRepeating;
+      task.repeatConfig = isRepeating ? repeatConfig.toJsonString() : null;
+      task.reminders = Reminder.remindersToJsonString(reminders);
+    } else {
+      // Create new task
+      task = Task(
+        id: 0,
+        title: textController.text,
+        dueDate: dueDate,
+        priority: priority,
+        startDate: startDate,
+        endDate: endDate,
+        isRepeating: isRepeating,
+        repeatConfig: isRepeating ? repeatConfig.toJsonString() : null,
+        reminders: Reminder.remindersToJsonString(reminders),
+      );
+    }
     final categories = g.catVm.categories.where((c) => g.taskSc.categorySelection[c] == true).toList();
     task.categories.clear();
     if (categories.isEmpty) {

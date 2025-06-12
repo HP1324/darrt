@@ -3,7 +3,9 @@ import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/note/models/folder.dart';
+import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/objectbox.g.dart' show Box;
+import 'package:minimaltodo/task/models/task.dart';
 
 /// Generic abstract class for view models that manage collections of model objects
 /// T is the model type (e.g., CategoryModel, Task)
@@ -37,7 +39,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
   void initializeItems() {
     _items = _box.getAll();
     //Reverse the list for all items except categories and folders, to show latest items first
-    if (T != CategoryModel && T != Folder) {
+    if (T == Task || T == Note) {
       _items = _items.reversed.toList();
     }
   }
