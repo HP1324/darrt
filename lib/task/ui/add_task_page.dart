@@ -2,6 +2,7 @@
 
 import 'package:awesome_notifications/awesome_notifications.dart' show AwesomeNotifications;
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/app/setting/settings_service.dart';
@@ -132,6 +133,10 @@ class TitleTextField extends StatelessWidget {
           decoration:
               InputDecoration(hintText: 'Enter your task here', border: UnderlineInputBorder()),
         ),
+      ),
+      trailing: IconButton(
+        onPressed: () {},
+        icon: Icon(Icons.keyboard_voice),
       ),
     );
   }
@@ -854,7 +859,7 @@ class CategorySelector extends StatelessWidget {
             _showCategorySelectionBottomSheet(context);
           },
           icon: Icon(Icons.add),
-        ));
+        ),);
   }
 
   Future<dynamic> _showCategorySelectionBottomSheet(BuildContext context) {

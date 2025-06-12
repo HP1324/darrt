@@ -119,7 +119,7 @@ flutter_launcher_icons:
   ios: true      # Enables iOS platform
   image_path: "assets/icon/play_store_512.png"  # Path to your icon image
   min_sdk_android: 21 # android min sdk min:16, default 21
-
+  adaptive_icon_background: "#007BA7"
 
 flutter_native_splash:
   android: true
