@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 class EmptyTasksIndicator extends StatelessWidget {
-  const EmptyTasksIndicator({
-    super.key,
-    required this.icon,
-    required this.message,
-  });
+  const EmptyTasksIndicator({super.key, required this.icon, required this.message});
 
   final IconData icon;
   final String message;
@@ -13,7 +9,7 @@ class EmptyTasksIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -21,7 +17,7 @@ class EmptyTasksIndicator extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: colorScheme.primary.withValues(alpha:0.1),
+              color: colorScheme.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(

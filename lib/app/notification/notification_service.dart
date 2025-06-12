@@ -23,7 +23,7 @@ class NotificationService {
       }
 
       if (permissionGranted) {
-        await initializeNotificationChannels();
+        await initNotifChannels();
         MiniLogger.d('Notification service initialized successfully');
       } else {
         await MiniBox.write(mNotificationsEnabled, false);
@@ -44,7 +44,7 @@ class NotificationService {
     }
   }
 
-  static Future<void> initializeNotificationChannels() async {
+  static Future<void> initNotifChannels() async {
     try {
       MiniLogger.d('Initializing notification channels');
       final isInitialized = await _notif.initialize(
@@ -109,7 +109,7 @@ class NotificationService {
             body: task.title,
             actionType: ActionType.Default,
             payload: {'id': task.id.toString()}, //task.toNotificationPayload(),
-            notificationLayout: NotificationLayout.BigText,
+            notificationLayout: NotificationLayout.Default,
             category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
             wakeUpScreen: true,
             criticalAlert: true,

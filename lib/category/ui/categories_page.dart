@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/category_item.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
 
@@ -109,43 +110,57 @@ class _CategoriesPageState extends State<CategoriesPage> {
             }).toList();
 
             return Expanded(
-              child: filteredCategories.isEmpty && _searchQuery.isNotEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search,
-                            size: 48,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No categories found',
-                            style: TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisExtent: 70,
-                        mainAxisSpacing: 8,
-                      ),
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: filteredCategories.length,
-                      itemBuilder: (context, index) {
-                        final c = filteredCategories[index];
-                        return CategoryItem(category: c);
-                      },
+              child: Builder(
+                builder: (context) {
+                  if (filteredCategories.isEmpty && _searchQuery.isNotEmpty) {
+                    return CategoriesEmptyWidget();
+                  }
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisExtent: MediaQuery.sizeOf(context).height * 0.09,
+                      mainAxisSpacing: 4,
                     ),
+                    itemCount: filteredCategories.length,
+                    itemBuilder: (context, index) {
+                      final c = filteredCategories[index];
+                      return CategoryItem(category: c);
+                    },
+                  );
+                },
+              ),
             );
           },
         ),
       ],
+    );
+  }
+}
+
+class CategoriesEmptyWidget extends StatelessWidget {
+  const CategoriesEmptyWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.search,
+            size: 48,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No categories found',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

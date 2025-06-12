@@ -52,46 +52,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
           child: Column(
             spacing: 20,
             children: [
-              Row(
-                spacing: 10,
-                children: [
-                  Icon(Icons.assignment_outlined, size: 19),
-                  Expanded(
-                    child: TextField(
-                      textCapitalization: TextCapitalization.sentences,
-                      controller: g.taskSc.textController,
-                      autofocus: true,
-                      maxLines: null,
-                      focusNode: g.taskSc.textFieldNode,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                          hintText: 'Enter your task here', border: UnderlineInputBorder()),
-                    ),
-                  ),
-                ],
-              ),
+              const TitleTextField(),
               const CategorySelector(),
               // const PrioritySelector(),
               const TaskTypeSelector(),
-              ListenableBuilder(
-                listenable: g.taskSc,
-                builder: (context, child) {
-                  final repeat = g.taskSc.isRepeating;
-                  final config = g.taskSc.repeatConfig;
-                  return Column(
-                    spacing: 10.0,
-                    children: [
-                      if (repeat) ...[
-                        const DateRangeSelector(),
-                        const RepeatTypeSelector(),
-                        if (config.type == 'weekly') const WeekdaySelector(),
-                      ] else ...[
-                        const DuedateSelector(),
-                      ],
-                    ],
-                  );
-                },
-              ),
+              const DueDateOrRepeatConfigSection(),
               const AddRemindersWidget(),
               const SizedBox(height: 100),
             ],
@@ -123,6 +88,60 @@ class _AddTaskPageState extends State<AddTaskPage> {
   }
 }
 
+class DueDateOrRepeatConfigSection extends StatelessWidget {
+  const DueDateOrRepeatConfigSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: g.taskSc,
+      builder: (context, child) {
+        final isRepeating = g.taskSc.isRepeating;
+        final type = g.taskSc.repeatConfig.type;
+        return Column(
+          spacing: 10.0,
+          children: [
+            if (isRepeating) ...[
+              const DateRangeSelector(),
+              const RepeatTypeSelector(),
+              if (type == 'weekly') const WeekdaySelector(),
+            ] else
+              const DuedateSelector(),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class TitleTextField extends StatelessWidget {
+  const TitleTextField({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      spacing: 10,
+      children: [
+        Icon(Icons.assignment_outlined, size: 19),
+        Expanded(
+          child: TextField(
+            textCapitalization: TextCapitalization.sentences,
+            controller: g.taskSc.textController,
+            autofocus: true,
+            maxLines: null,
+            focusNode: g.taskSc.textFieldNode,
+            keyboardType: TextInputType.multiline,
+            decoration:
+                InputDecoration(hintText: 'Enter your task here', border: UnderlineInputBorder()),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class AddRemindersWidget extends StatelessWidget {
   const AddRemindersWidget({super.key});
 
@@ -133,14 +152,17 @@ class AddRemindersWidget extends StatelessWidget {
         g.taskSc.textFieldNode.unfocus();
         final allowed = await AwesomeNotifications().isNotificationAllowed();
         if (context.mounted) {
-          if (allowed || _showNotificationRationale(context)) {
+          if ((allowed || await _showNotificationRationale(context)) && context.mounted) {
             _showRemindersBottomSheet(context);
           }
         }
       },
       child: Row(
         children: [
-          Icon(Icons.notification_add_outlined,size:20,),
+          Icon(
+            Icons.notification_add_outlined,
+            size: 20,
+          ),
           const SizedBox(width: 9),
           Expanded(
             child: Column(
@@ -281,9 +303,9 @@ class AddRemindersWidget extends StatelessWidget {
     );
   }
 
-  bool _showNotificationRationale(BuildContext context) {
+  Future<bool> _showNotificationRationale(BuildContext context) async{
     bool userAllowed = false;
-    showAdaptiveDialog(
+    await showAdaptiveDialog(
       context: context,
       builder: (_) {
         return AlertDialog(
@@ -304,7 +326,7 @@ class AddRemindersWidget extends StatelessWidget {
                 final allowed = await AwesomeNotifications().requestPermissionToSendNotifications();
                 if (allowed && context.mounted) {
                   await MiniBox.write(mNotificationsEnabled, allowed);
-                  await NotificationService.initializeNotificationChannels();
+                  await NotificationService.initNotifChannels();
                 }
                 userAllowed = allowed;
                 navigator.pop();
@@ -776,6 +798,7 @@ class TaskTypeSelector extends StatelessWidget {
                 decoration: BoxDecoration(),
                 child: CheckboxListTile.adaptive(
                   contentPadding: EdgeInsets.only(left: 9),
+                  checkboxScaleFactor: 0.8,
                   title: Text(
                     'Repeat Task',
                     style: theme.textTheme.titleMedium!.copyWith(),
@@ -1127,7 +1150,6 @@ class RepeatTypeHelpButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: () {

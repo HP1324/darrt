@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/note/models/folder.dart';
 import 'package:minimaltodo/objectbox.g.dart' show Box;
@@ -36,38 +37,39 @@ abstract class ViewModel<T> extends ChangeNotifier {
   void initializeItems() {
     _items = _box.getAll();
     //Reverse the list for all items except categories and folders, to show latest items first
-    if(T != CategoryModel && T != Folder){
+    if (T != CategoryModel && T != Folder) {
       _items = _items.reversed.toList();
     }
   }
 
   // bool validateItem(T item);
-  /// Add or update an item in the database and the local list.
+  /// Add or update an item in the Local ObjectBox database and the in-memory list.
   /// Returns a message indicating success or failure.
   /// Child classes may override this method for implementing custom behavior (i.e., Validating [item])
   String putItem(T item, {required bool edit}) {
     final id = _box.put(item);
-    if(edit){
-      int index = _items.indexWhere((i)=>getItemId(i) == id);
-      if(index != -1){
+
+    if (edit) {
+      int index = _items.indexWhere((i) => getItemId(i) == id);
+      if (index != -1) {
         _items[index] = item;
-        debugPrint('Item id: ${getItemId(item)}');
+        MiniLogger.d('Item id: ${getItemId(item)}');
       }
-    }else{
-      if(T != CategoryModel && T != Folder){
-        _items.insert(0,item);
-      }else{
+    } else {
+      if (T != CategoryModel && T != Folder) {
+        _items.insert(0, item);
+      } else {
         _items.add(item);
       }
     }
-    if(kDebugMode){
-      debugPrint('Item added/updated with id: $id, item type: ${item.runtimeType}');
-    }
+
+    MiniLogger.d('Item added/updated with id: $id, item type: ${item.runtimeType}');
+
     notifyListeners();
     return edit ? getUpdateSuccessMessage() : getCreateSuccessMessage();
   }
 
-  /// Delete an item from the database and the local list.
+  /// Delete an item from the local ObjectBox database and the in-memory list.
   /// Child classes may override this method for implementing custom behavior
   String deleteItem(int id) {
     _box.remove(id);
@@ -93,6 +95,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
     }
     notifyListeners();
   }
+
   void clearSelection() {
     _selectedItemIds.clear();
     notifyListeners();
@@ -109,5 +112,4 @@ abstract class ViewModel<T> extends ChangeNotifier {
 
   /// Get the ID of an item
   int getItemId(T item);
-
 }

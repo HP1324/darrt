@@ -27,7 +27,7 @@ final folderSc = FolderStateController();
 
 final folderVm = FolderViewModel();
 
-final themeM = ThemeManager();
+final themeMan = ThemeManager();
 
 final calMan = CalendarManager();
 

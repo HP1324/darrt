@@ -11,7 +11,7 @@ abstract class StateController<S, M> extends ChangeNotifier {
   /// Focus node for the primary text field
   final FocusNode textFieldNode = FocusNode();
 
-  /// Initialize the state with an existing model if in edit mode
+  /// Initialize the state with default values or with an existing model if in edit mode
   void initState(bool edit, [M? model]);
 
   /// Reset the state to default values

@@ -47,7 +47,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                       : formatDate(selectedDate, 'EEE, d MMM, yyyy');
                   return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
-                    transitionBuilder: (Widget child, animation) {
+                    transitionBuilder: (child, animation) {
                       final inAnimation = Tween<Offset>(
                         begin: const Offset(-1.0, 0.0),
                         end: Offset.zero,
@@ -130,17 +130,12 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
           key: _popupKey,
           icon: Icon(Icons.more_vert),
           onTap: () {
-            final (position, size) = getPositionAndSize(_popupKey);
+            final (offset, size) = getOffsetAndSize(_popupKey);
             showMenu(
               context: context,
               elevation: 1,
               popUpAnimationStyle: AnimationStyle(duration: Duration(milliseconds: 100)),
-              position: RelativeRect.fromLTRB(
-                position.dx,
-                position.dy + size.height,
-                position.dx + size.width,
-                position.dy,
-              ),
+              position: getRelativeRectFromOffsetAndSize(offset, size),
               items: [
                 PopupMenuItem(child: Text('Notifications')),
                 PopupMenuItem(child: Text('Rate Us')),

@@ -21,15 +21,24 @@ void showToast(BuildContext context,
   );
 }
 
-(Offset, Size) getPositionAndSize(GlobalKey key) {
-  Offset position = Offset.zero;
+(Offset, Size) getOffsetAndSize(GlobalKey key) {
+  Offset offset = Offset.zero;
   Size size = Size.zero;
   if (key.currentContext != null) {
     final RenderBox renderBox = key.currentContext!.findRenderObject() as RenderBox;
-    position = renderBox.localToGlobal(Offset.zero);
+    offset = renderBox.localToGlobal(Offset.zero);
     size = renderBox.size;
   }
-  return (position, size);
+  return (offset, size);
+}
+
+RelativeRect getRelativeRectFromOffsetAndSize(Offset offset, Size size) {
+  return RelativeRect.fromLTRB(
+    offset.dx,
+    offset.dy + size.height,
+    offset.dx + size.width,
+    offset.dy,
+  );
 }
 
 String formatTime(TimeOfDay time) {

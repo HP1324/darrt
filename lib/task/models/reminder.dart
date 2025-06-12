@@ -24,7 +24,6 @@ class Reminder {
   }
 
 
-
   String toJsonString() {
     return jsonEncode({'time': timeToString(), 'type': type});
   }

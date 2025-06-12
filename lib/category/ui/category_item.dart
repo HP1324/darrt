@@ -22,33 +22,27 @@ class _CategoryItemState extends State<CategoryItem> {
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        IconColorStorage.colors[widget.category.color] ?? Theme.of(context).colorScheme.primary;
+    final color =IconColorStorage.colors[widget.category.color] ?? Theme.of(context).colorScheme.primary;
     final icon = IconColorStorage.flattenedIcons[widget.category.icon];
-
+    final textTheme = Theme.of(context).textTheme;
     return Card(
       color: color.withAlpha(10),
       elevation: 0,
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       shape: RoundedRectangleBorder(
-        side: BorderSide(width: 0.1, color: color),
+        side: BorderSide(color: color.withValues(alpha: 0.20)),
         borderRadius: BorderRadius.circular(10),
       ),
       child: InkWell(
         onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => TasksForCategoryPage(category: widget.category)));
+          MiniRouter.to(context, TasksForCategoryPage(category: widget.category));
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              // Header row with icon, title and menu
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -68,7 +62,7 @@ class _CategoryItemState extends State<CategoryItem> {
                         widget.category.name,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -76,96 +70,30 @@ class _CategoryItemState extends State<CategoryItem> {
                     InkWell(
                       key: _popupKey,
                       onTap: () {
-                        final (position, size) = getPositionAndSize(_popupKey);
-                        showMenu(
-                          context: context,
-                          position: RelativeRect.fromLTRB(
-                            position.dx,
-                            position.dy + size.height,
-                            position.dx + size.width,
-                            position.dy,
-                          ),
-                          items: [
-                            PopupMenuItem(
-                              onTap: () {
-                                MiniRouter.to(context,
-                                    AddCategoryPage(edit: true, category: widget.category));
-                              },
-                              child: Row(
-                                children: [
-                                  Icon(Icons.edit, color: color, size: 20),
-                                  const SizedBox(width: 8),
-                                  const Text('Edit'),
-                                ],
-                              ),
-                            ),
-                            PopupMenuItem(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    content:
-                                        const Text('Are you sure you want to delete the category?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.of(context).pop(),
-                                        child: const Text('Cancel'),
-                                      ),
-                                      FilledButton(
-                                        onPressed: () async {
-                                          final message = g.catVm
-                                              .deleteItem(widget.category.id);
-                                          showToast(context,
-                                              type: ToastificationType.success,
-                                              description: message);
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text('Delete'),
-                                      ),
-                                    ],
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Row(
-                                children: [
-                                  Icon(Icons.delete, color: Colors.red, size: 20),
-                                  const SizedBox(width: 8),
-                                  const Text('Delete', style: TextStyle(color: Colors.red)),
-                                ],
-                              ),
-                            ),
-                          ],
-                        );
+                        final (offset, size) = getOffsetAndSize(_popupKey);
+                        _showCategoryMenu(context, offset, size, color);
                       },
                       child: Icon(Icons.more_horiz, size: 19),
                     ),
                 ],
               ),
               // Additional content with proper constraint handling
-              const SizedBox(height: 4),
               Flexible(
-                child: Container(
+                child: Align(
                   alignment: Alignment.bottomRight,
-                  child: Builder(
-                    builder: (context) {
-                      return ListenableBuilder(
-                        listenable: g.taskVm,
-                        builder: (context, child) {
-                          final tasks = g.taskVm.tasks;
-                          final count = tasks
-                              .where((t) => t.categories.contains(widget.category))
-                              .toList()
-                              .length;
-                          return Text(
-                            '$count tasks',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: TextStyle(fontSize: 12),
-                          );
-                        },
+                  child: ListenableBuilder(
+                    listenable: g.taskVm,
+                    builder: (context, child) {
+                      final tasks = g.taskVm.tasks;
+                      final count = tasks
+                          .where((t) => t.categories.contains(widget.category))
+                          .toList()
+                          .length;
+                      return Text(
+                        '$count ${count > 1 ? 'tasks' : 'task'}',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: textTheme.labelSmall?.copyWith(),
                       );
                     },
                   ),
@@ -175,6 +103,66 @@ class _CategoryItemState extends State<CategoryItem> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showCategoryMenu(BuildContext context, Offset offset, Size size, Color color) {
+    showMenu(
+      context: context,
+      position: getRelativeRectFromOffsetAndSize(offset, size),
+      items: [
+        PopupMenuItem(
+          onTap: () {
+            MiniRouter.to(context,
+                AddCategoryPage(edit: true, category: widget.category));
+          },
+          child: Row(
+            children: [
+              Icon(Icons.edit, color: color, size: 20),
+              const SizedBox(width: 8),
+              const Text('Edit'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                content:
+                    const Text('Are you sure you want to delete the category?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancel'),
+                  ),
+                  FilledButton(
+                    onPressed: () async {
+                      final message = g.catVm
+                          .deleteItem(widget.category.id);
+                      showToast(context,
+                          type: ToastificationType.success,
+                          description: message);
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Delete'),
+                  ),
+                ],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            );
+          },
+          child: Row(
+            children: [
+              Icon(Icons.delete, color: Colors.red, size: 20),
+              const SizedBox(width: 8),
+              const Text('Delete', style: TextStyle(color: Colors.red)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

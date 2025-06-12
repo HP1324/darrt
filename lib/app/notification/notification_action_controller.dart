@@ -16,7 +16,9 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     if (appState == AppLifecycleState.detached) {
       await ObjectBox.init();
     }
-    Task task = ObjectBox.store.box<Task>().get(int.parse(receivedAction.payload!['id']!))!;
+    Task task = ObjectBox.store
+        .box<Task>()
+        .get(int.parse(receivedAction.payload!['id']!))!;
 
     switch (receivedAction.buttonKeyPressed) {
       case 'FINISHED':
@@ -24,20 +26,38 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
         break;
       case 'SNOOZE':
         final now = DateTime.now();
+        final nextTime = TimeOfDay.fromDateTime(now.add(Duration(minutes: 1)));
         AwesomeNotifications().createNotification(
           content: NotificationContent(
             id: now.millisecondsSinceEpoch.remainder(1000000),
             title: task.title,
-            body: 'Task due at ${formatDateAndTime(now.add(Duration(minutes: 1)),'fHH:mm')}',
+            body: 'Task due at ${formatTime(nextTime)}',
+            actionType: ActionType.Default,
             channelKey: receivedAction.channelKey!,
-            payload: receivedAction.payload
+            payload: receivedAction.payload,
+            category: receivedAction.category,
+            notificationLayout: NotificationLayout.Default,
           ),
-          schedule: NotificationCalendar.fromDate(date: now.add(Duration(minutes: 1))),
+          schedule: NotificationCalendar.fromDate(
+            date: now.add(Duration(minutes: 1)),
+          ),
+          actionButtons: [
+            NotificationActionButton(
+              key: 'FINISHED',
+              label: 'Finished',
+              actionType: ActionType.SilentAction,
+            ),
+            NotificationActionButton(
+              key: 'SNOOZE',
+              label: 'Snooze',
+              actionType: ActionType.SilentAction,
+            ),
+          ],
         );
         break;
       default:
-        MiniTodo.navigatorKey.currentState
-            ?.push(MaterialPageRoute(builder: (_) => AddTaskPage(edit: true, task: task)));
+        MiniTodo.navigatorKey.currentState?.push(MaterialPageRoute(
+            builder: (_) => AddTaskPage(edit: true, task: task)));
         break;
     }
   } catch (e, t) {
