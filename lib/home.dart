@@ -65,15 +65,21 @@ class _BottomNavBarWidget extends StatelessWidget {
             children: [
               MiniBottomNavBarItem(
                 icon: Icons.calendar_month,
-                label: 'Calendar',
+                label: 'Tasks',
                 onTap: () => g.navMan.onDestinationChanged(0),
                 i: 0,
+              ),
+              MiniBottomNavBarItem(
+                icon: Icons.timeline,
+                label: 'Timelines',
+                onTap: () => MiniRouter.to(context, const TaskSearchPage()),
+                i: -1,
               ),
               MiniBottomNavBarItem(
                 icon: Icons.search,
                 label: 'Search',
                 onTap: () => MiniRouter.to(context, const TaskSearchPage()),
-                i: -1,
+                i: -2,
               ),
               MiniBottomNavBarItem(
                 icon: Iconsax.category,
@@ -85,7 +91,7 @@ class _BottomNavBarWidget extends StatelessWidget {
                 icon: Icons.assignment_outlined,
                 label: 'Notes',
                 onTap: () => MiniRouter.to(context, NotesPage()),
-                i: -2,
+                i: -3,
               ),
             ],
           ),
