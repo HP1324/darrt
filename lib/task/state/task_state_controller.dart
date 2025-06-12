@@ -29,7 +29,6 @@ abstract class TaskState with _$TaskState {
 
 ///Controls the temporary state of the task add page when task is being added or updated
 class TaskStateController extends StateController<TaskState, Task> {
-
   @override
   void initState(bool edit, [Task? task]) {
     textController.text = edit ? task!.title : '';
@@ -43,7 +42,9 @@ class TaskStateController extends StateController<TaskState, Task> {
       isRepeating: edit ? task!.isRepeating : false,
       startDate: edit ? task!.startDate : DateTime.now(),
       endDate: edit ? task!.endDate : null,
-      repeatConfig: edit  && task!.isRepeating ? RepeatConfig.fromJsonString(task.repeatConfig!) : RepeatConfig(),
+      repeatConfig: edit && task!.isRepeating
+          ? RepeatConfig.fromJsonString(task.repeatConfig!)
+          : RepeatConfig(),
       reminders: edit ? task!.reminderObjects : [],
       currentPriority: 3,
     );
@@ -64,6 +65,7 @@ class TaskStateController extends StateController<TaskState, Task> {
     );
     textController.clear();
   }
+
   @override
   Task buildModel({required bool edit, Task? model}) {
     var task = Task(
@@ -74,13 +76,14 @@ class TaskStateController extends StateController<TaskState, Task> {
       startDate: startDate,
       endDate: endDate,
       isRepeating: isRepeating,
-      repeatConfig: isRepeating ? repeatConfig.toJsonString() :null,
+      repeatConfig: isRepeating ? repeatConfig.toJsonString() : null,
       reminders: Reminder.remindersToJsonString(reminders),
     );
     final categories = g.catVm.categories.where((c) => g.taskSc.categorySelection[c] == true).toList();
     task.categories.clear();
     if (categories.isEmpty) {
-      task.categories.add(CategoryModel(id: 1, name: 'General'));
+      //Add general category if user unchecked all the category checkboxes
+      task.categories.add(ObjectBox.categoryBox.get(1));
     } else {
       task.categories.addAll(categories);
     }
@@ -195,8 +198,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       }
     }
     updatedDays.sort();
-    state =
-        state.copyWith(repeatConfig: RepeatConfig(type: repeatConfig.type, days: updatedDays));
+    state = state.copyWith(repeatConfig: RepeatConfig(type: repeatConfig.type, days: updatedDays));
     notifyListeners();
   }
 

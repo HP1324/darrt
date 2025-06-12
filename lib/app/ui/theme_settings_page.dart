@@ -47,12 +47,12 @@ class ThemeSettingsPage extends StatelessWidget {
       itemCount: ThemeColors.values.length,
       itemBuilder: (context, index) {
         final color = ThemeColors.values[index];
-        final isSelected = g.themeM.selectedColor == color;
+        final isSelected = g.themeMan.selectedColor == color;
 
         return _ColorOption(
           color: color.color,
           isSelected: isSelected,
-          onTap: () => g.themeM.setThemeColor(color),
+          onTap: () => g.themeMan.setThemeColor(color),
         );
       },
     );
@@ -70,7 +70,7 @@ class ThemeSettingsPage extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         ListenableBuilder(
-          listenable: g.themeM,
+          listenable: g.themeMan,
           builder: (context,child) {
             return SegmentedButton<ThemePreference>(
               segments: const [
@@ -90,9 +90,9 @@ class ThemeSettingsPage extends StatelessWidget {
                   label: Text('Dark'),
                 ),
               ],
-              selected: {g.themeM.themePreference},
+              selected: {g.themeMan.themePreference},
               onSelectionChanged: (Set<ThemePreference> newSelection) {
-                g.themeM.setThemePreference(newSelection.first);
+                g.themeMan.setThemePreference(newSelection.first);
               },
             );
           }

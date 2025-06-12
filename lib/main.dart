@@ -54,11 +54,11 @@ class _MiniTodoState extends State<MiniTodo> {
   @override
   Widget build(BuildContext context) {
     return  ListenableBuilder(
-        listenable: g.themeM,
+        listenable: g.themeMan,
         builder: (context, widget) {
-          final lightTheme = g.themeM.lightTheme;
-          final darkTheme = g.themeM.darkTheme;
-          final themeMode = g.themeM.themeMode;
+          final lightTheme = g.themeMan.lightTheme;
+          final darkTheme = g.themeMan.darkTheme;
+          final themeMode = g.themeMan.themeMode;
           return MaterialApp(
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,

@@ -10,7 +10,6 @@ import 'package:minimaltodo/task/ui/add_task_page.dart';
 import 'package:minimaltodo/task/ui/task_search_page.dart';
 import 'package:minimaltodo/task/ui/tasks_page.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:page_transition/page_transition.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});

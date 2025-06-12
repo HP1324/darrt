@@ -9,8 +9,10 @@ class CategoryModel {
   String name;
   String icon;
   String color;
+
   @Backlink('categories')
   final tasks = ToMany<Task>();
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

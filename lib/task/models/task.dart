@@ -123,6 +123,34 @@ class Task {
       rethrow;
     }
   }
+
+  Task copyWith({
+    int? id,
+    String? title,
+    String? priority,
+    DateTime? createdAt,
+    DateTime? endDate,
+    DateTime? dueDate,
+    DateTime? startDate,
+    bool? isDone,
+    bool? isRepeating,
+    String? reminders,
+    String? repeatConfig,
+  }) {
+    return Task(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      priority: priority ?? this.priority,
+      createdAt: createdAt ?? this.createdAt,
+      endDate: endDate ?? this.endDate,
+      dueDate: dueDate ?? this.dueDate,
+      startDate: startDate ?? this.startDate,
+      isDone: isDone ?? this.isDone,
+      isRepeating: isRepeating ?? this.isRepeating,
+      reminders: reminders ?? this.reminders,
+      repeatConfig: repeatConfig ?? this.repeatConfig,
+    );
+  }
 }
 
 extension TaskUtilities on Task {
