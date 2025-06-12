@@ -54,7 +54,7 @@ class _TasksPageState extends State<TasksPage> {
                     tabs: const [
                       Tab(text: 'All'),
                       Tab(text: 'Single'),
-                      Tab(text: 'Recurring'),
+                      Tab(text: 'Repeating'),
                     ],
                   ),
                 ),

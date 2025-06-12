@@ -90,7 +90,7 @@ class _CategoryItemState extends State<CategoryItem> {
                           .toList()
                           .length;
                       return Text(
-                        '$count ${count > 1 ? 'tasks' : 'task'}',
+                        '$count ${count != 1 ? 'tasks' : 'task'}',
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: textTheme.labelSmall?.copyWith(),

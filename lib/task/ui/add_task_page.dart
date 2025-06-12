@@ -115,29 +115,24 @@ class DueDateOrRepeatConfigSection extends StatelessWidget {
 }
 
 class TitleTextField extends StatelessWidget {
-  const TitleTextField({
-    super.key,
-  });
+  const TitleTextField({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      spacing: 10,
-      children: [
-        Icon(Icons.assignment_outlined, size: 19),
-        Expanded(
-          child: TextField(
-            textCapitalization: TextCapitalization.sentences,
-            controller: g.taskSc.textController,
-            autofocus: true,
-            maxLines: null,
-            focusNode: g.taskSc.textFieldNode,
-            keyboardType: TextInputType.multiline,
-            decoration:
-                InputDecoration(hintText: 'Enter your task here', border: UnderlineInputBorder()),
-          ),
+    return StructuredRow(
+      leadingIcon: Icons.assignment_outlined,
+      expanded: Expanded(
+        child: TextField(
+          textCapitalization: TextCapitalization.sentences,
+          controller: g.taskSc.textController,
+          autofocus: true,
+          maxLines: null,
+          focusNode: g.taskSc.textFieldNode,
+          keyboardType: TextInputType.multiline,
+          decoration:
+              InputDecoration(hintText: 'Enter your task here', border: UnderlineInputBorder()),
         ),
-      ],
+      ),
     );
   }
 }
@@ -163,7 +158,7 @@ class AddRemindersWidget extends StatelessWidget {
             Icons.notification_add_outlined,
             size: 20,
           ),
-          const SizedBox(width: 9),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,8 +182,8 @@ class AddRemindersWidget extends StatelessWidget {
               ],
             ),
           ),
-          InkWell(
-            onTap: () {
+          IconButton(
+            onPressed: () {
               g.taskSc.textFieldNode.unfocus();
               showDialog(
                 context: context,
@@ -201,16 +196,17 @@ class AddRemindersWidget extends StatelessWidget {
                     ),
                     actions: [
                       FilledButton(
-                          onPressed: () async {
-                            await SettingsService.openBatterySettings();
-                          },
-                          child: Text('Go to settings')),
+                        onPressed: () async {
+                          await SettingsService.openBatterySettings();
+                        },
+                        child: Text('Go to settings'),
+                      ),
                     ],
                   );
                 },
               );
             },
-            child: Icon(Icons.info_outline),
+            icon: Icon(Icons.info_outline),
           ),
         ],
       ),
@@ -303,7 +299,7 @@ class AddRemindersWidget extends StatelessWidget {
     );
   }
 
-  Future<bool> _showNotificationRationale(BuildContext context) async{
+  Future<bool> _showNotificationRationale(BuildContext context) async {
     bool userAllowed = false;
     await showAdaptiveDialog(
       context: context,
@@ -384,54 +380,59 @@ class WeekdaySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(
-          7,
-          (index) {
-            final List<String> days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-            return ListenableBuilder(
-              listenable: g.taskSc,
-              builder: (context, child) {
-                final weekdays = g.taskSc.repeatConfig.days;
-                final isSelected =
-                    weekdays.contains(index + 1) && g.taskSc.isWeekdayValid(index + 1);
-                final colorScheme = Theme.of(context).colorScheme;
+    return Align(
+      alignment: Alignment(-0.74, 0),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: List.generate(
+            7,
+            (index) {
+              final List<String> days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+              return ListenableBuilder(
+                listenable: g.taskSc,
+                builder: (context, child) {
+                  final weekdays = g.taskSc.repeatConfig.days;
+                  final isSelected =
+                      weekdays.contains(index + 1) && g.taskSc.isWeekdayValid(index + 1);
+                  final colorScheme = Theme.of(context).colorScheme;
 
-                return InkWell(
-                  onTap: () {
-                    final isValid = g.taskSc.isWeekdayValid(index + 1);
-                    if (!isValid) return;
-                    g.taskSc.toggleWeekday(index + 1, !isSelected);
-                  },
-                  customBorder: CircleBorder(),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
-                    child: Container(
-                      width: 25,
-                      height: 25,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color:
-                            isSelected ? colorScheme.primary : colorScheme.surfaceContainerHighest,
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        days[index],
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                  return InkWell(
+                    onTap: () {
+                      final isValid = g.taskSc.isWeekdayValid(index + 1);
+                      if (!isValid) return;
+                      g.taskSc.toggleWeekday(index + 1, !isSelected);
+                    },
+                    customBorder: CircleBorder(),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
+                      child: Container(
+                        width: 25,
+                        height: 25,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isSelected
+                              ? colorScheme.primary
+                              : colorScheme.surfaceContainerHighest,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          days[index],
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color:
+                                isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
-            );
-          },
+                  );
+                },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -456,36 +457,30 @@ class RepeatTypeSelector extends StatelessWidget {
             Expanded(
               flex: 5,
               child: Card(
-                margin: const EdgeInsets.only(right: 8),
+                // margin: const EdgeInsets.only(right: 8),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(color: Theme.of(context).dividerColor),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2),
-                  child: Row(
-                    children: [
-                      // Each option takes equal space within the card
-                      Expanded(
-                        child: _buildRadioOption(context, 'Weekly', 'weekly', selectedType),
-                      ),
-                      Expanded(
-                        child: _buildRadioOption(context, 'Monthly', 'monthly', selectedType),
-                      ),
-                      Expanded(
-                        child: _buildRadioOption(context, 'Yearly', 'yearly', selectedType),
-                      ),
-                    ],
-                  ),
+                child: Row(
+                  children: [
+                    // Each option takes equal space within the card
+                    Expanded(
+                      child: _buildRadioOption(context, 'Weekly', 'weekly', selectedType),
+                    ),
+                    Expanded(
+                      child: _buildRadioOption(context, 'Monthly', 'monthly', selectedType),
+                    ),
+                    Expanded(
+                      child: _buildRadioOption(context, 'Yearly', 'yearly', selectedType),
+                    ),
+                  ],
                 ),
               ),
             ),
             // Help button takes less space
-            Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: RepeatTypeHelpButton(),
-            ),
+            RepeatTypeHelpButton(),
           ],
         );
       },
@@ -502,7 +497,7 @@ class RepeatTypeSelector extends StatelessWidget {
       onTap: () => g.taskSc.setRepeatType(value),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           // Use visualDensity to make radio buttons more compact if needed
           Radio<String>(
@@ -513,13 +508,15 @@ class RepeatTypeSelector extends StatelessWidget {
           ),
           // Use shorter text when width is limited
           Flexible(
-            child: Text(
-              label,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 13, // Slightly smaller font
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? theme.colorScheme.primary : theme.textTheme.bodyLarge?.color,
+            child: FittedBox(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color:
+                          isSelected ? theme.colorScheme.primary : theme.textTheme.bodyLarge?.color,
+                    ),
               ),
             ),
           ),
@@ -530,9 +527,7 @@ class RepeatTypeSelector extends StatelessWidget {
 }
 
 class DateRangeSelector extends StatelessWidget {
-  const DateRangeSelector({
-    super.key,
-  });
+  const DateRangeSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -789,28 +784,27 @@ class TaskTypeSelector extends StatelessWidget {
     return Row(
       children: [
         Icon(Icons.repeat, size: 20),
+        const SizedBox(width: 9),
         Expanded(
-          child: ListenableBuilder(
-            listenable: g.taskSc,
-            builder: (context, child) {
-              final repeat = g.taskSc.isRepeating;
-              return Container(
-                decoration: BoxDecoration(),
-                child: CheckboxListTile.adaptive(
-                  contentPadding: EdgeInsets.only(left: 9),
-                  checkboxScaleFactor: 0.8,
-                  title: Text(
-                    'Repeat Task',
-                    style: theme.textTheme.titleMedium!.copyWith(),
-                  ),
-                  value: repeat,
-                  onChanged: (value) {
-                    if (value != null) g.taskSc.toggleRepeat(value);
-                  },
-                ),
-              );
-            },
+          child: Text(
+            'Repeat Task',
+            style: theme.textTheme.titleMedium!.copyWith(),
           ),
+        ),
+        ListenableBuilder(
+          listenable: g.taskSc,
+          builder: (context, child) {
+            final repeat = g.taskSc.isRepeating;
+            return Transform.scale(
+              scale: 0.9,
+              child: Checkbox(
+                value: repeat,
+                onChanged: (value) {
+                  if (value != null) g.taskSc.toggleRepeat(value);
+                },
+              ),
+            );
+          },
         ),
       ],
     );
@@ -819,74 +813,64 @@ class TaskTypeSelector extends StatelessWidget {
 
 class CategorySelector extends StatelessWidget {
   const CategorySelector({super.key});
-
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    return InkWell(
-      onTap: () {
-        g.taskSc.textFieldNode.unfocus();
-        _showCategorySelectionBottomSheet(context);
-      },
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(Icons.category_outlined, size: 20),
-          const SizedBox(width: 5),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: scheme.outline)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const SizedBox(width: 4),
-                      Row(
-                        children: [
-                          Text(
-                            'Categories',
-                            style: TextStyle(fontSize: textTheme.labelLarge!.fontSize),
-                          ),
-                          Icon(Icons.arrow_drop_down, size: 20)
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(),
-                  SizedBox(
-                    height: 20,
-                    child: ListenableBuilder(
-                      listenable: g.taskSc,
-                      builder: (context, child) {
-                        final map = g.taskSc.categorySelection;
-                        final categories =
-                            map.entries.where((e) => e.value).map((e) => e.key).toList();
-                        return ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          shrinkWrap: true,
-                          physics: BouncingScrollPhysics(),
-                          separatorBuilder: (context, index) => const SizedBox(width: 2),
-                          itemCount: categories.length,
-                          itemBuilder: (context, index) {
-                            final category = categories[index];
-                            return CategoryChip(category: category);
-                          },
-                        );
-                      },
+    return StructuredRow(
+      leadingIcon: Icons.category_outlined,
+      expanded:Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const SizedBox(width: 4),
+                Row(
+                  children: [
+                    Text(
+                      'Categories',
+                      style: TextStyle(fontSize: textTheme.labelLarge!.fontSize),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                ],
+                    // Icon(Icons.arrow_drop_down, size: 20)
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(),
+            SizedBox(
+              height: 20,
+              child: ListenableBuilder(
+                listenable: g.taskSc,
+                builder: (context, child) {
+                  final map = g.taskSc.categorySelection;
+                  final categories =
+                  map.entries.where((e) => e.value).map((e) => e.key).toList();
+                  return ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    separatorBuilder: (context, index) => const SizedBox(width: 2),
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      final category = categories[index];
+                      return CategoryChip(category: category);
+                    },
+                  );
+                },
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 10),
+          ],
+        ),
       ),
+       trailing:  IconButton(
+          onPressed: () {
+            g.taskSc.textFieldNode.unfocus();
+            _showCategorySelectionBottomSheet(context);
+          },
+          icon: Icon(Icons.add),
+        )
     );
   }
 
@@ -1070,7 +1054,7 @@ class DateSelector extends StatelessWidget {
             IconButton(
               icon: Icon(
                 Icons.clear,
-                size: 18,
+                size: 20,
                 color: scheme.error,
               ),
               onPressed: onClear,
@@ -1150,13 +1134,13 @@ class RepeatTypeHelpButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: () {
+    return IconButton(
+      // borderRadius: BorderRadius.circular(16),
+      onPressed: () {
         g.taskSc.textFieldNode.unfocus();
         _showRepeatTypeDialog(context);
       },
-      child: Icon(Icons.info_outline, size: 18),
+      icon: Icon(Icons.info_outline),
     );
   }
 
@@ -1171,10 +1155,7 @@ class RepeatTypeHelpButton extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         title: Row(
           children: [
-            Icon(
-              Icons.repeat_rounded,
-              color: colorScheme.primary,
-            ),
+            Icon(Icons.repeat_rounded, color: colorScheme.primary),
             const SizedBox(width: 12),
             Text(
               'Repeat Options',
@@ -1250,19 +1231,6 @@ class RepeatTypeHelpButton extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: colorScheme.primaryContainer.withAlpha(200),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              icon,
-              size: 24,
-              color: colorScheme.onPrimaryContainer,
-            ),
-          ),
-          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1296,61 +1264,77 @@ class RepeatTypeHelpButton extends StatelessWidget {
     final weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
     final selectedDays = [true, false, true, false, true, false, false]; // Example selection
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 40, top: 8, bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Example:',
-            style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontStyle: FontStyle.italic,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Example:',
+          style: textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            fontStyle: FontStyle.italic,
           ),
-          const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: List.generate(
-                weekDays.length,
-                (index) => Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+        ),
+        const SizedBox(height: 8),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: List.generate(
+              weekDays.length,
+              (index) => Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: selectedDays[index]
+                        ? colorScheme.primary
+                        : colorScheme.surfaceContainerHighest,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    weekDays[index],
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
                       color: selectedDays[index]
-                          ? colorScheme.primary
-                          : colorScheme.surfaceContainerHighest,
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      weekDays[index],
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: selectedDays[index]
-                            ? colorScheme.onPrimary
-                            : colorScheme.onSurfaceVariant,
-                      ),
+                          ? colorScheme.onPrimary
+                          : colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Task will repeat on Monday, Wednesday and Friday until end date (if specified).',
-            style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Task will repeat on Monday, Wednesday and Friday until end date (if specified).',
+          style: textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
           ),
-        ],
-      ),
+        ),
+      ],
+    );
+  }
+}
+
+class StructuredRow extends StatelessWidget {
+  const StructuredRow(
+      {super.key, required this.leadingIcon, required this.expanded, this.trailing});
+  final IconData leadingIcon;
+  final Widget expanded;
+  final Widget? trailing;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(leadingIcon),
+        const SizedBox(width: 10),
+        Expanded(child: expanded),
+        trailing ??const SizedBox.shrink() ,
+      ],
     );
   }
 }
