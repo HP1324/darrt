@@ -58,7 +58,7 @@ class _NoteItemState extends State<NoteItem> {
               onLongPress: () {
                 g.noteVm.toggleSelection(widget.note.id);
               },
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
               onTap: () {
                 final ids = g.noteVm.selectedItemIds;
                 if (ids.isEmpty) {
