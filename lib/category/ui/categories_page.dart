@@ -115,12 +115,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                   if (filteredCategories.isEmpty && _searchQuery.isNotEmpty) {
                     return CategoriesEmptyWidget();
                   }
-                  return GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisExtent: MediaQuery.sizeOf(context).height * 0.09,
-                      mainAxisSpacing: 4,
-                    ),
+                  return ListView.builder(
                     itemCount: filteredCategories.length,
                     itemBuilder: (context, index) {
                       final c = filteredCategories[index];

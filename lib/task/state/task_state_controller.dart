@@ -32,7 +32,7 @@ class TaskStateController extends StateController<TaskState, Task> {
   @override
   void initState(bool edit, [Task? task]) {
     textController.text = edit ? task!.title : '';
-    final categories = ObjectBox.store.box<CategoryModel>().getAll();
+    final categories = g.catVm.categories;
     state = TaskState(
       categorySelection: edit
           ? {for (var cat in categories) cat: task!.categories.contains(cat)}
@@ -48,7 +48,6 @@ class TaskStateController extends StateController<TaskState, Task> {
       reminders: edit ? task!.reminderObjects : [],
       currentPriority: 3,
     );
-    debugPrint('state: ${state.priority}');
   }
 
   @override

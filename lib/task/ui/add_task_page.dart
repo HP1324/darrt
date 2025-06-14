@@ -2,7 +2,6 @@
 
 import 'package:awesome_notifications/awesome_notifications.dart' show AwesomeNotifications;
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/app/setting/settings_service.dart';
@@ -650,7 +649,7 @@ class _ReminderDialogState extends State<ReminderDialog> {
             style: SegmentedButton.styleFrom(
               backgroundColor:
                   Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(vertical: 15),
             ),
             segments: [
               ButtonSegment(
@@ -665,8 +664,8 @@ class _ReminderDialogState extends State<ReminderDialog> {
                           ? Theme.of(context).colorScheme.onPrimary
                           : Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
-                    const SizedBox(width: 8),
-                    const Text('Notification'),
+                    SizedBox(width: 6),
+                    FittedBox(child: const Text('Notification')),
                   ],
                 ),
               ),
@@ -682,8 +681,8 @@ class _ReminderDialogState extends State<ReminderDialog> {
                           ? Theme.of(context).colorScheme.onPrimary
                           : Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
-                    const SizedBox(width: 8),
-                    const Text('Alarm'),
+                    SizedBox(width: 6),
+                    FittedBox(child: const Text('Alarm')),
                   ],
                 ),
               ),
