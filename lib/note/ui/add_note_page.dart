@@ -9,6 +9,7 @@ import 'package:minimaltodo/note/state/note_state_controller.dart';
 import 'package:minimaltodo/note/ui/add_folder_page.dart';
 import 'package:toastification/toastification.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+
 class AddNotePage extends StatefulWidget {
   const AddNotePage({super.key, required this.edit, this.note}) : assert(!edit || note != null);
   final bool edit;
@@ -33,7 +34,7 @@ class _AddNotePageState extends State<AddNotePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading:const BackButton(),
+        leading: const BackButton(),
         actions: [
           const SaveNotePdfButton(),
           const FolderSelector(),
@@ -42,22 +43,6 @@ class _AddNotePageState extends State<AddNotePage> {
       ),
       body: Column(
         children: [
-          SizedBox(height: 15),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: QuillEditor(
-                scrollController: g.noteSc.scrollController,
-                controller: g.noteSc.controller,
-                focusNode: g.noteSc.focusNode,
-                config: QuillEditorConfig(
-                  placeholder: 'Enter your note here...',
-                  autoFocus:  true,
-                  textCapitalization: TextCapitalization.sentences,
-                ),
-              ),
-            ),
-          ),
           QuillSimpleToolbar(
             controller: g.noteSc.controller,
             config: QuillSimpleToolbarConfig(
@@ -65,7 +50,7 @@ class _AddNotePageState extends State<AddNotePage> {
               toolbarIconAlignment: WrapAlignment.start,
               buttonOptions: QuillSimpleToolbarButtonOptions(
                   selectHeaderStyleDropdownButton:
-                      QuillToolbarSelectHeaderStyleDropdownButtonOptions(
+                  QuillToolbarSelectHeaderStyleDropdownButtonOptions(
                     attributes: [
                       Attribute.h1,
                       Attribute.h2,
@@ -79,25 +64,39 @@ class _AddNotePageState extends State<AddNotePage> {
                   fontSize: QuillToolbarFontSizeButtonOptions(attribute: Attribute.size)),
             ),
           ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: QuillEditor(
+                scrollController: g.noteSc.scrollController,
+                controller: g.noteSc.controller,
+                focusNode: g.noteSc.focusNode,
+                config: QuillEditorConfig(
+                  placeholder: 'Enter your note here...',
+                  autoFocus: true,
+                  textCapitalization: TextCapitalization.sentences,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
+
 class SaveNotePdfButton extends StatelessWidget {
-  const SaveNotePdfButton({
-    super.key,
-  });
+  const SaveNotePdfButton({super.key});
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: ()async {
+      onPressed: () async {
         final file = await generateNotePdf(g.noteSc.controller);
         await savePdfToDownloads(file, 'note${DateTime.now().millisecondsSinceEpoch}.pdf');
-        if(context.mounted) {
-          showToast( context, type: ToastificationType.success,  description: 'PDF saved');
+        if (context.mounted) {
+          showToast(context, type: ToastificationType.success, description: 'PDF saved');
         }
       },
       icon: const Icon(FontAwesomeIcons.filePdf),
@@ -106,10 +105,7 @@ class SaveNotePdfButton extends StatelessWidget {
 }
 
 class SaveNoteButton extends StatelessWidget {
-  const SaveNoteButton({
-    super.key,
-    required this.widget,
-  });
+  const SaveNoteButton({super.key, required this.widget});
 
   final AddNotePage widget;
 
@@ -120,8 +116,8 @@ class SaveNoteButton extends StatelessWidget {
       onPressed: () {
         var message = '';
         if (!g.noteSc.controller.document.isEmpty()) {
-          final note = g.noteSc.buildModel(
-              edit: widget.edit, model: widget.edit ? widget.note : null);
+          final note =
+          g.noteSc.buildModel(edit: widget.edit, model: widget.edit ? widget.note : null);
           message = g.noteVm.putItem(note, edit: widget.edit);
           Navigator.pop(context);
         } else {
@@ -167,7 +163,7 @@ class FolderSelector extends StatelessWidget {
                 ),
                 const Divider(),
                 ListenableBuilder(
-                  listenable: Listenable.merge([g.folderVm,g.noteSc]),
+                  listenable: Listenable.merge([g.folderVm, g.noteSc]),
                   builder: (context, child) {
                     final folders = g.folderVm.folders;
                     return ListView.builder(
