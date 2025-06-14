@@ -9,6 +9,7 @@ import 'package:minimaltodo/note/state/note_state_controller.dart';
 import 'package:minimaltodo/note/state/note_view_model.dart' show NoteViewModel;
 import 'package:minimaltodo/task/state/task_state_controller.dart' show TaskStateController;
 import 'package:minimaltodo/task/state/task_view_model.dart' show TaskViewModel;
+import 'package:minimaltodo/task/ui/add_task_page.dart';
 
 
 final taskSc = TaskStateController();
@@ -32,6 +33,8 @@ final themeMan = ThemeManager();
 final calMan = CalendarManager();
 
 final navMan = NavigationManager();
+
+final sttController = SpeechToTextController();
 
 
 

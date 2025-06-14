@@ -15,9 +15,7 @@ class MiniBox{
 
   ///Necessary method for writing only when the app first time installed.if it is null then it means the app was never installed or the developer has explicitly set it to [null] in some part of the code
   static Future<void> writeIfNull(String key,dynamic value)async{
-    if(read(key) == null){
-      await write(key, value);
-    }
+      await _box.writeIfNull(key, value);
   }
   ///Set global preferences and other settings like first time install date etc.
   static Future<void> initStorage()async {
@@ -25,5 +23,7 @@ class MiniBox{
     await writeIfNull(mDefaultTaskList, 0);
     await writeIfNull(mFirstTimeInstall, true);
     await writeIfNull(mFirstInstallDate, DateUtils.dateOnly(DateTime.now()).millisecondsSinceEpoch);
+    await writeIfNull(firstTimeMicTap, true);
+    await writeIfNull(micPermissionDeniedAgain, false);
   }
 }
