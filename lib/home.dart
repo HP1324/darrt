@@ -69,12 +69,12 @@ class _BottomNavBarWidget extends StatelessWidget {
                 onTap: () => g.navMan.onDestinationChanged(0),
                 i: 0,
               ),
-              MiniBottomNavBarItem(
-                icon: Icons.timeline,
-                label: 'Timelines',
-                onTap: () => MiniRouter.to(context, const TaskSearchPage()),
-                i: -1,
-              ),
+              // MiniBottomNavBarItem(
+              //   icon: Icons.timeline,
+              //   label: 'Timelines',
+              //   onTap: () => MiniRouter.to(context, const TaskSearchPage()),
+              //   i: -1,
+              // ),
               MiniBottomNavBarItem(
                 icon: Icons.search,
                 label: 'Search',

@@ -11,13 +11,17 @@ import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart';
 import 'package:minimaltodo/task/models/reminder.dart';
 import 'package:minimaltodo/task/models/task.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:toastification/toastification.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:speech_to_text/speech_to_text.dart';
 
 class AddTaskPage extends StatefulWidget {
   const AddTaskPage({super.key, required this.edit, this.task}) : assert(!edit || task != null);
@@ -130,14 +134,157 @@ class TitleTextField extends StatelessWidget {
           maxLines: null,
           focusNode: g.taskSc.textFieldNode,
           keyboardType: TextInputType.multiline,
-          decoration:
-              InputDecoration(hintText: 'Enter your task here', border: UnderlineInputBorder()),
+          decoration: InputDecoration(
+            hintText: 'Enter your task here',
+            border: UnderlineInputBorder(),
+          ),
         ),
       ),
       trailing: IconButton(
-        onPressed: () {},
+        onPressed: () async {
+          g.taskSc.textFieldNode.unfocus();
+          await _handleSpeechToText(context);
+        },
         icon: Icon(Icons.keyboard_voice),
       ),
+    );
+  }
+
+  Future<void> _handleSpeechToText(BuildContext context) async {
+    showPermissionDeniedToast(){
+      showToast(context, type: ToastificationType.error, description: 'Microphone permission denied');
+    }
+    // Check permission status first using permission_handler
+    final micPermissionStatus = await Permission.microphone.status;
+    final nearbyDevicesStatus = await Permission.bluetoothConnect.status;
+
+    bool allPermissionsGranted = micPermissionStatus.isGranted &&
+        (nearbyDevicesStatus.isGranted);
+
+    if (allPermissionsGranted) {
+      MiniLogger.d('All required permissions are granted');
+
+      // Check if speech is initialized
+      if (!g.sttController.speech.isAvailable) {
+        MiniLogger.d('Speech not initialized, initializing...');
+        final initResult = await g.sttController.initSpeech();
+        if (initResult) {
+          MiniLogger.d('Speech initialized successfully');
+          g.sttController.startListening();
+        } else {
+          MiniLogger.d('Speech initialization failed');
+          showPermissionDeniedToast();
+        }
+      } else {
+        MiniLogger.d('Speech already initialized, starting listening');
+        g.sttController.startListening();
+      }
+    } else {
+      MiniLogger.d('Some permissions are missing');
+
+      if (MiniBox.read(firstTimeMicTap) ?? true) {
+        MiniLogger.d('First time requesting permissions');
+        await MiniBox.write(firstTimeMicTap, false);
+
+        // Request microphone permission first
+        final micResult = await Permission.microphone.request();
+
+        // Request nearby devices permission (for Bluetooth headsets)
+        final nearbyResult = await Permission.bluetoothConnect.request();
+
+        bool permissionsGranted = micResult.isGranted &&
+            (nearbyResult.isGranted);
+
+        if (permissionsGranted) {
+          MiniLogger.d('Permissions granted on first request');
+          final initResult = await g.sttController.initSpeech();
+          if (initResult) {
+            g.sttController.startListening();
+          } else {
+            showToast(context, type: ToastificationType.error, description: 'Microphone permission denied');
+          }
+        } else {
+          MiniLogger.d('Some permissions denied on first request');
+          showPermissionDeniedToast();
+        }
+      } else {
+        MiniLogger.d('Not first time, checking if denied again flag is set');
+
+        if (!(MiniBox.read(micPermissionDeniedAgain) ?? false)) {
+          MiniLogger.d('Requesting permissions second time');
+
+          // Request both permissions again
+          final micResult = await Permission.microphone.request();
+          final nearbyResult = await Permission.bluetoothConnect.request();
+
+          bool permissionsGranted = micResult.isGranted &&
+              (nearbyResult.isGranted);
+
+          if (permissionsGranted) {
+            MiniLogger.d('Permissions granted on second request');
+            // Force reinitialize speech since permission state changed
+            final initResult = await g.sttController.initSpeech();
+            if (initResult) {
+              g.sttController.startListening();
+            } else {
+              showPermissionDeniedToast();
+            }
+          } else {
+            MiniLogger.d('Some permissions denied on second request');
+            await MiniBox.write(micPermissionDeniedAgain, true);
+            showPermissionDeniedToast();
+          }
+        } else {
+          MiniLogger.d('Permissions denied multiple times, showing settings dialog');
+          if(context.mounted){
+          _showSettingsDialog(context);
+          }
+        }
+      }
+    }
+  }
+  void _showSettingsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Permissions Required'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'To use speech-to-text functionality, please allow the following permissions:',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                SizedBox(height: 12),
+                Text('• Microphone: Required to capture your voice input'),
+                SizedBox(height: 8),
+                Text('• Nearby devices (Android 12+): Required when using Bluetooth headsets or external microphones'),
+                SizedBox(height: 12),
+                Text(
+                  'Go to Settings > Permissions and enable both Microphone and Nearby devices permissions.',
+                  style: TextStyle(fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await openAppSettings();
+              },
+              child: Text('Settings'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -810,56 +957,57 @@ class CategorySelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return StructuredRow(
-        leadingIcon: Icons.category_outlined,
-        expanded: Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Categories',
-                        style: TextStyle(fontSize: textTheme.labelLarge!.fontSize),
-                      ),
-                      // Icon(Icons.arrow_drop_down, size: 20)
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: MediaQuery.sizeOf(context).height * 0.03,
-                child: ListenableBuilder(
-                  listenable: g.taskSc,
-                  builder: (context, child) {
-                    final map = g.taskSc.categorySelection;
-                    final categories = map.entries.where((e) => e.value).map((e) => e.key).toList();
-                    return ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
-                      separatorBuilder: (context, index) => const SizedBox(width: 2),
-                      itemCount: categories.length,
-                      itemBuilder: (context, index) {
-                        final category = categories[index];
-                        return CategoryChip(category: category);
-                      },
-                    );
-                  },
+      leadingIcon: Icons.category_outlined,
+      expanded: Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'Categories',
+                      style: TextStyle(fontSize: textTheme.labelLarge!.fontSize),
+                    ),
+                    // Icon(Icons.arrow_drop_down, size: 20)
+                  ],
                 ),
+              ],
+            ),
+            SizedBox(
+              height: MediaQuery.sizeOf(context).height * 0.03,
+              child: ListenableBuilder(
+                listenable: g.taskSc,
+                builder: (context, child) {
+                  final map = g.taskSc.categorySelection;
+                  final categories = map.entries.where((e) => e.value).map((e) => e.key).toList();
+                  return ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    separatorBuilder: (context, index) => const SizedBox(width: 2),
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      final category = categories[index];
+                      return CategoryChip(category: category);
+                    },
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        trailing: IconButton(
-          onPressed: () {
-            g.taskSc.textFieldNode.unfocus();
-            _showCategorySelectionBottomSheet(context);
-          },
-          icon: Icon(Icons.add),
-        ),);
+      ),
+      trailing: IconButton(
+        onPressed: () {
+          g.taskSc.textFieldNode.unfocus();
+          _showCategorySelectionBottomSheet(context);
+        },
+        icon: Icon(Icons.add),
+      ),
+    );
   }
 
   Future<dynamic> _showCategorySelectionBottomSheet(BuildContext context) {
@@ -1327,5 +1475,47 @@ class StructuredRow extends StatelessWidget {
         trailing ?? const SizedBox.shrink(),
       ],
     );
+  }
+}
+
+class SpeechToTextController extends ChangeNotifier {
+  final SpeechToText speech = SpeechToText();
+  bool speechEnabled = false;
+  String hintText = "What's on your mind? ";
+  Future<bool> initSpeech() async {
+    return await speech.initialize();
+  }
+
+  void startListening() async {
+    await speech.listen(
+      onResult: onSpeechResult,
+      pauseFor: Duration(seconds: 10),
+      listenOptions: SpeechListenOptions(
+        listenMode: ListenMode.dictation,
+        autoPunctuation: true,
+      ),
+    );
+  }
+
+  String _committedText = ''; // all the finalised speech so far
+  String _currentSessionText = ''; // the live partial result
+
+  void onSpeechResult(SpeechRecognitionResult result) {
+    // 1️⃣ Update the live-partial
+    _currentSessionText = result.recognizedWords;
+
+    // 2️⃣ If it’s the final chunk of this session, commit it:
+    if (result.finalResult) {
+      // add a space if needed, then the finalised partial
+      if (_currentSessionText.trim().isNotEmpty) {
+        _committedText = ('$_committedText $_currentSessionText').trim();
+      }
+      _currentSessionText = '';
+    }
+
+    // 3️⃣ Always write BOTH pieces into the controller,
+    //     so the user sees committed + live together
+    g.taskSc.textController.text =
+        _committedText + (_currentSessionText.isNotEmpty ? ' $_currentSessionText' : '');
   }
 }

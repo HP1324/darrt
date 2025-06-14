@@ -21,4 +21,10 @@ const mThemeColor = 'themeColor';
 
 const mThemePreference = 'themePreference';
 
+final firstTimeMicTap = 'first_time_mic_tap';
+
+final micPermissionDeniedAgain = 'mic_permission_denied_again';
+
 const maxExtentDateDays = 7305;
+
+
