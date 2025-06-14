@@ -22,99 +22,132 @@ class _CategoryItemState extends State<CategoryItem> {
 
   @override
   Widget build(BuildContext context) {
-    final color =IconColorStorage.colors[widget.category.color] ?? Theme.of(context).colorScheme.primary;
+    final color =
+        IconColorStorage.colors[widget.category.color] ?? Theme.of(context).colorScheme.primary;
     final icon = IconColorStorage.flattenedIcons[widget.category.icon];
     final textTheme = Theme.of(context).textTheme;
-    return Card(
-      color: color.withAlpha(10),
-      elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: color.withValues(alpha: 0.20)),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: InkWell(
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      height: MediaQuery.sizeOf(context).height * 0.1,
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3),
+      child: ListTile(
         onTap: () {
           MiniRouter.to(context, TasksForCategoryPage(category: widget.category));
         },
-        borderRadius: BorderRadius.circular(10),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: color.withAlpha(50),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(icon, color: color, size: 13),
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 2.0),
-                      child: Text(
-                        widget.category.name,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                  if (widget.category.id != 1)
-                    InkWell(
-                      key: _popupKey,
-                      onTap: () {
-                        final (offset, size) = getOffsetAndSize(_popupKey);
-                        _showCategoryMenu(context, offset, size, color);
-                      },
-                      child: Icon(Icons.more_horiz, size: 19),
-                    ),
-                ],
-              ),
-              // Additional content with proper constraint handling
-              Flexible(
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: ListenableBuilder(
-                    listenable: g.taskVm,
-                    builder: (context, child) {
-                      final tasks = g.taskVm.tasks;
-                      final count = tasks
-                          .where((t) => t.categories.contains(widget.category))
-                          .toList()
-                          .length;
-                      return Text(
-                        '$count ${count != 1 ? 'tasks' : 'task'}',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: textTheme.labelSmall?.copyWith(),
-                      );
-                    },
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
+        tileColor: scheme.surfaceContainer.withValues(alpha: 0.3),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16), side: BorderSide(color: color.withAlpha(50))),
+        leading: CategoryIcon(color: color, icon: icon),
+        title: CategoryNameLabel(category: widget.category, textTheme: textTheme),
+        subtitle: TaskCountLabel(category: widget.category, textTheme: textTheme),
+        trailing: widget.category.id != 1
+            ? CategoryPopupMenuButton(popupKey: _popupKey, category: widget.category, color: color)
+            : null,
       ),
     );
   }
+}
 
-  void _showCategoryMenu(BuildContext context, Offset offset, Size size, Color color) {
-    showMenu(
+class CategoryIcon extends StatelessWidget {
+  const CategoryIcon({super.key, required this.color, required this.icon});
+
+  final Color color;
+  final dynamic icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: color.withAlpha(50),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(icon, color: color, size: 13),
+    );
+  }
+}
+
+class CategoryNameLabel extends StatelessWidget {
+  const CategoryNameLabel({
+    super.key,
+    required this.category,
+    required this.textTheme,
+  });
+
+  final CategoryModel category;
+  final TextTheme textTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      category.name,
+      overflow: TextOverflow.ellipsis,
+      maxLines: 1,
+      style: textTheme.titleMedium?.copyWith(),
+    );
+  }
+}
+
+class TaskCountLabel extends StatelessWidget {
+  const TaskCountLabel({
+    super.key,
+    required this.category,
+    required this.textTheme,
+  });
+
+  final CategoryModel category;
+  final TextTheme textTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: g.taskVm,
+      builder: (context, child) {
+        final tasks = g.taskVm.tasks;
+        final count = tasks.where((t) => t.categories.contains(category)).toList().length;
+        return Text(
+          '$count ${count != 1 ? 'tasks' : 'task'}',
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          style: textTheme.labelMedium?.copyWith(),
+        );
+      },
+    );
+  }
+}
+
+class CategoryPopupMenuButton extends StatelessWidget {
+  const CategoryPopupMenuButton({
+    super.key,
+    required GlobalKey<State<StatefulWidget>> popupKey,
+    required this.category,
+    required this.color,
+  }) : _popupKey = popupKey;
+
+  final GlobalKey<State<StatefulWidget>> _popupKey;
+  final CategoryModel category;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      key: _popupKey,
+      onTap: () {
+        final (offset, size) = getOffsetAndSize(_popupKey);
+        _showCategoryMenu(context, offset, size);
+      },
+      child: Icon(Icons.more_vert),
+    );
+  }
+
+  Future<dynamic> _showCategoryMenu(BuildContext context, Offset offset, Size size) {
+    return showMenu(
       context: context,
       position: getRelativeRectFromOffsetAndSize(offset, size),
       items: [
         PopupMenuItem(
           onTap: () {
-            MiniRouter.to(context,
-                AddCategoryPage(edit: true, category: widget.category));
+            MiniRouter.to(context, AddCategoryPage(edit: true, category: category));
           },
           child: Row(
             children: [
@@ -129,8 +162,7 @@ class _CategoryItemState extends State<CategoryItem> {
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                content:
-                    const Text('Are you sure you want to delete the category?'),
+                content: const Text('Are you sure you want to delete the category?'),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -138,11 +170,8 @@ class _CategoryItemState extends State<CategoryItem> {
                   ),
                   FilledButton(
                     onPressed: () async {
-                      final message = g.catVm
-                          .deleteItem(widget.category.id);
-                      showToast(context,
-                          type: ToastificationType.success,
-                          description: message);
+                      final message = g.catVm.deleteItem(category.id);
+                      showToast(context, type: ToastificationType.success, description: message);
                       Navigator.pop(context);
                     },
                     child: const Text('Delete'),
