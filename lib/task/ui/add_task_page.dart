@@ -42,6 +42,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   @override
   void dispose() {
     g.taskSc.clearState();
+    g.sttController.clearSttState();
     super.dispose();
   }
 
@@ -148,15 +149,16 @@ class TitleTextField extends StatelessWidget {
   }
 
   Future<void> _handleSpeechToText(BuildContext context) async {
-    showPermissionDeniedToast(){
-      showToast(context, type: ToastificationType.error, description: 'Microphone permission denied');
+    showPermissionDeniedToast() {
+      showToast(context,
+          type: ToastificationType.error, description: 'Microphone permission denied');
     }
+
     // Check permission status first using permission_handler
     final micPermissionStatus = await Permission.microphone.status;
     final nearbyDevicesStatus = await Permission.bluetoothConnect.status;
 
-    bool allPermissionsGranted = micPermissionStatus.isGranted &&
-        (nearbyDevicesStatus.isGranted);
+    bool allPermissionsGranted = micPermissionStatus.isGranted && (nearbyDevicesStatus.isGranted);
 
     if (allPermissionsGranted) {
       MiniLogger.d('All required permissions are granted');
@@ -189,8 +191,7 @@ class TitleTextField extends StatelessWidget {
         // Request nearby devices permission (for Bluetooth headsets)
         final nearbyResult = await Permission.bluetoothConnect.request();
 
-        bool permissionsGranted = micResult.isGranted &&
-            (nearbyResult.isGranted);
+        bool permissionsGranted = micResult.isGranted && (nearbyResult.isGranted);
 
         if (permissionsGranted) {
           MiniLogger.d('Permissions granted on first request');
@@ -198,7 +199,8 @@ class TitleTextField extends StatelessWidget {
           if (initResult) {
             g.sttController.startListening();
           } else {
-            showToast(context, type: ToastificationType.error, description: 'Microphone permission denied');
+            showToast(context,
+                type: ToastificationType.error, description: 'Microphone permission denied');
           }
         } else {
           MiniLogger.d('Some permissions denied on first request');
@@ -214,8 +216,7 @@ class TitleTextField extends StatelessWidget {
           final micResult = await Permission.microphone.request();
           final nearbyResult = await Permission.bluetoothConnect.request();
 
-          bool permissionsGranted = micResult.isGranted &&
-              (nearbyResult.isGranted);
+          bool permissionsGranted = micResult.isGranted && (nearbyResult.isGranted);
 
           if (permissionsGranted) {
             MiniLogger.d('Permissions granted on second request');
@@ -233,13 +234,14 @@ class TitleTextField extends StatelessWidget {
           }
         } else {
           MiniLogger.d('Permissions denied multiple times, showing settings dialog');
-          if(context.mounted){
-          _showSettingsDialog(context);
+          if (context.mounted) {
+            _showSettingsDialog(context);
           }
         }
       }
     }
   }
+
   void _showSettingsDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -258,7 +260,8 @@ class TitleTextField extends StatelessWidget {
                 SizedBox(height: 12),
                 Text('• Microphone: Required to capture your voice input'),
                 SizedBox(height: 8),
-                Text('• Nearby devices (Android 12+): Required when using Bluetooth headsets or external microphones'),
+                Text(
+                    '• Nearby devices (Android 12+): Required when using Bluetooth headsets or external microphones'),
                 SizedBox(height: 12),
                 Text(
                   'Go to Settings > Permissions and enable both Microphone and Nearby devices permissions.',
@@ -1469,13 +1472,15 @@ class StructuredRow extends StatelessWidget {
 
 class SpeechToTextController extends ChangeNotifier {
   final SpeechToText speech = SpeechToText();
-  bool speechEnabled = false;
   String hintText = "What's on your mind? ";
   Future<bool> initSpeech() async {
     return await speech.initialize();
   }
 
   void startListening() async {
+    _originalTitleText = g.taskSc.textController.text.trim(); // Store once
+    _speechFinalized = '';
+    _currentLiveSpeech = '';
     await speech.listen(
       onResult: onSpeechResult,
       pauseFor: Duration(seconds: 10),
@@ -1486,25 +1491,37 @@ class SpeechToTextController extends ChangeNotifier {
     );
   }
 
-  String _committedText = ''; // all the finalised speech so far
-  String _currentSessionText = ''; // the live partial result
+  void clearSttState() async {
+    await speech.stop();
+    _speechFinalized = '';
+    _currentLiveSpeech = '';
+  }
 
+  String? _originalTitleText;
+  String _speechFinalized = '';
+  String _currentLiveSpeech = '';
   void onSpeechResult(SpeechRecognitionResult result) {
-    // 1️⃣ Update the live-partial
-    _currentSessionText = result.recognizedWords;
+    final titleController = g.taskSc.textController;
+    _currentLiveSpeech = result.recognizedWords.trim();
 
-    // 2️⃣ If it’s the final chunk of this session, commit it:
     if (result.finalResult) {
-      // add a space if needed, then the finalised partial
-      if (_currentSessionText.trim().isNotEmpty) {
-        _committedText = ('$_committedText $_currentSessionText').trim();
+      // Append only once, when final
+      if (_currentLiveSpeech.isNotEmpty) {
+        _speechFinalized = ('$_speechFinalized $_currentLiveSpeech').trim();
       }
-      _currentSessionText = '';
+      _currentLiveSpeech = '';
     }
 
-    // 3️⃣ Always write BOTH pieces into the controller,
-    //     so the user sees committed + live together
-    g.taskSc.textController.text =
-        _committedText + (_currentSessionText.isNotEmpty ? ' $_currentSessionText' : '');
+    // Combine the original + finalized + live
+    final combinedText = [
+      _originalTitleText,
+      _speechFinalized,
+      _currentLiveSpeech,
+    ].where((text) => text!.isNotEmpty).join(' ');
+
+    titleController.text = combinedText;
+    titleController.selection = TextSelection.fromPosition(
+      TextPosition(offset: combinedText.length),
+    );
   }
 }
