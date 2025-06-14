@@ -125,18 +125,16 @@ class TitleTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return StructuredRow(
       leadingIcon: Icons.assignment_outlined,
-      expanded: Expanded(
-        child: TextField(
-          textCapitalization: TextCapitalization.sentences,
-          controller: g.taskSc.textController,
-          autofocus: true,
-          maxLines: null,
-          focusNode: g.taskSc.textFieldNode,
-          keyboardType: TextInputType.multiline,
-          decoration: InputDecoration(
-            hintText: 'Enter your task here',
-            border: UnderlineInputBorder(),
-          ),
+      expanded: TextField(
+        textCapitalization: TextCapitalization.sentences,
+        controller: g.taskSc.textController,
+        autofocus: true,
+        maxLines: null,
+        focusNode: g.taskSc.textFieldNode,
+        keyboardType: TextInputType.multiline,
+        decoration: InputDecoration(
+          hintText: 'Enter your task here',
+          border: UnderlineInputBorder(),
         ),
       ),
       trailing: IconButton(
@@ -305,28 +303,26 @@ class AddRemindersWidget extends StatelessWidget {
       },
       child: StructuredRow(
         leadingIcon: Icons.notification_add_outlined,
-        expanded: Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Reminders",
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 14),
-              ),
-              ListenableBuilder(
-                listenable: g.taskSc,
-                builder: (context, widget) {
-                  final reminders = g.taskSc.reminders;
-                  return Text(
-                    reminders.isEmpty
-                        ? 'Click here to add reminders per day'
-                        : reminders.map((r) => r.time.format(context)).join(', '),
-                    style: Theme.of(context).textTheme.bodySmall,
-                  );
-                },
-              ),
-            ],
-          ),
+        expanded: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Reminders",
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 14),
+            ),
+            ListenableBuilder(
+              listenable: g.taskSc,
+              builder: (context, widget) {
+                final reminders = g.taskSc.reminders;
+                return Text(
+                  reminders.isEmpty
+                      ? 'Click here to add reminders per day'
+                      : reminders.map((r) => r.time.format(context)).join(', '),
+                  style: Theme.of(context).textTheme.bodySmall,
+                );
+              },
+            ),
+          ],
         ),
         trailing: IconButton(
           onPressed: () {
@@ -928,9 +924,7 @@ class TaskTypeSelector extends StatelessWidget {
     final theme = Theme.of(context);
     return StructuredRow(
       leadingIcon: Icons.repeat,
-      expanded: Expanded(
-        child: Text('Repeat Task', style: theme.textTheme.titleMedium!.copyWith()),
-      ),
+      expanded: Text('Repeat Task', style: theme.textTheme.titleMedium!.copyWith()),
       trailing: ListenableBuilder(
         listenable: g.taskSc,
         builder: (context, child) {
@@ -957,47 +951,45 @@ class CategorySelector extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return StructuredRow(
       leadingIcon: Icons.category_outlined,
-      expanded: Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'Categories',
-                      style: TextStyle(fontSize: textTheme.labelLarge!.fontSize),
-                    ),
-                    // Icon(Icons.arrow_drop_down, size: 20)
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(
-              height: MediaQuery.sizeOf(context).height * 0.03,
-              child: ListenableBuilder(
-                listenable: g.taskSc,
-                builder: (context, child) {
-                  final map = g.taskSc.categorySelection;
-                  final categories = map.entries.where((e) => e.value).map((e) => e.key).toList();
-                  return ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    physics: BouncingScrollPhysics(),
-                    separatorBuilder: (context, index) => const SizedBox(width: 2),
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      final category = categories[index];
-                      return CategoryChip(category: category);
-                    },
-                  );
-                },
+      expanded: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Row(
+                children: [
+                  Text(
+                    'Categories',
+                    style: TextStyle(fontSize: textTheme.labelLarge!.fontSize),
+                  ),
+                  // Icon(Icons.arrow_drop_down, size: 20)
+                ],
               ),
+            ],
+          ),
+          SizedBox(
+            height: MediaQuery.sizeOf(context).height * 0.03,
+            child: ListenableBuilder(
+              listenable: g.taskSc,
+              builder: (context, child) {
+                final map = g.taskSc.categorySelection;
+                final categories = map.entries.where((e) => e.value).map((e) => e.key).toList();
+                return ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  physics: BouncingScrollPhysics(),
+                  separatorBuilder: (context, index) => const SizedBox(width: 2),
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    final category = categories[index];
+                    return CategoryChip(category: category);
+                  },
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       trailing: IconButton(
         onPressed: () {
@@ -1166,22 +1158,20 @@ class DateSelector extends StatelessWidget {
       borderRadius: BorderRadius.circular(8),
       child: StructuredRow(
         leadingIcon: icon,
-        expanded: Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: textTheme.labelLarge?.copyWith(),
+        expanded: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: textTheme.labelLarge?.copyWith(),
+            ),
+            Text(
+              date == null ? 'No end date' : DateFormat.yMMMd().format(date!),
+              style: textTheme.labelMedium!.copyWith(
+                color: scheme.onSurfaceVariant,
               ),
-              Text(
-                date == null ? 'No end date' : DateFormat.yMMMd().format(date!),
-                style: textTheme.labelMedium!.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
         trailing: Builder(
           builder: (context) {
