@@ -55,7 +55,7 @@ class _TaskItemState extends State<TaskItem> {
                 height: 72,
                 child: Row(
                   children: [
-                    _buildCheckbox(),
+                    TaskFinishCheckbox(widget: widget),
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(0, 12, 10, 12),
@@ -65,22 +65,22 @@ class _TaskItemState extends State<TaskItem> {
                             Row(
                               spacing: 8.0,
                               children: [
-                                _buildTitle(),
-                                _buildPriority(isUrgent, context),
+                                TaskTitle(widget: widget),
+                                // TaskPrioritySection(widget: widget, isUrgent: isUrgent, context: context),
                               ],
                             ),
                             const Spacer(),
                             // Info row
                             Row(
                               children: [
-                                _buildCategories(),
-                                if (!widget.task.isRepeating) ...[
-                                  Text(
-                                    DateFormat('MMM d').format(widget.task.dueDate),
-                                    style: Theme.of(context).textTheme.labelSmall,
-                                  ),
-                                  const SizedBox(width: 4),
-                                ],
+                                TaskCategoriesSection(widget: widget),
+                                // if (!widget.task.isRepeating) ...[
+                                //   Text(
+                                //     DateFormat('MMM d').format(widget.task.dueDate),
+                                //     style: Theme.of(context).textTheme.labelSmall,
+                                //   ),
+                                //   const SizedBox(width: 4),
+                                // ],
                                 if (widget.task.isRepeating) ...[
                                   const SizedBox(width: 4),
                                   Icon(
@@ -104,8 +104,145 @@ class _TaskItemState extends State<TaskItem> {
       },
     );
   }
+}
 
-  Padding _buildCheckbox() {
+class TaskTitle extends StatelessWidget {
+  const TaskTitle({
+    super.key,
+    required this.widget,
+  });
+
+  final TaskItem widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: ListenableBuilder(
+          listenable: Listenable.merge([g.calMan, g.taskVm]),
+          builder: (context, child) {
+            final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
+            final repeat = widget.task.isRepeating;
+            final stc = g.taskVm.singleTaskCompletions, rtc = g.taskVm.recurringTaskCompletions;
+            final isFinished = repeat
+                ? rtc[widget.task.id]?.contains(date) ?? false
+                : stc[widget.task.id] ?? false;
+
+            return Text(
+              widget.task.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+                fontWeight: FontWeight.w500,
+                decorationColor: Theme.of(context).colorScheme.outline,
+                decorationThickness: 2,
+                color: isFinished
+                    ? Theme.of(context).colorScheme.outline
+                    : Theme.of(context).colorScheme.onSurface,
+              ),
+            );
+          }),
+    );
+  }
+}
+
+class TaskPrioritySection extends StatelessWidget {
+  const TaskPrioritySection({
+    super.key,
+    required this.widget,
+    required this.isUrgent,
+    required this.context,
+  });
+
+  final TaskItem widget;
+  final bool isUrgent;
+  final BuildContext context;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.flag_outlined,
+          size: 14,
+          color: isUrgent ? Colors.red.shade400 : null,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          widget.task.priority,
+          style: TextStyle(
+            fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
+            color: isUrgent ? Colors.red.shade400 : null,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class TaskCategoriesSection extends StatelessWidget {
+  const TaskCategoriesSection({
+    super.key,
+    required this.widget,
+  });
+
+  final TaskItem widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: SizedBox(
+        height: 20,
+        child: ShaderMask(
+          shaderCallback: (bounds) {
+            return LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [Colors.transparent, Colors.black, Colors.black, Colors.transparent],
+              stops: [0.0, 0.05, 0.95, 1.0],
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.dstIn,
+          child: ListenableBuilder(
+            listenable: g.catVm,
+            builder: (context, child) {
+              var categories = g.catVm.categories;
+              widget.task.categories.removeWhere((c) => !categories.contains(c));
+              if (widget.task.categories.isEmpty) {
+                debugPrint('This condition called');
+                widget.task.categories.add(CategoryModel(id: 1, name: 'General'));
+                widget.task.categories.applyToDb();
+              }
+              return ListView.separated(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                physics: BouncingScrollPhysics(),
+                separatorBuilder: (context, index) => const SizedBox(width: 2),
+                itemCount: widget.task.categories.length,
+                itemBuilder: (context, index) {
+                  final category = widget.task.categories[index];
+                  return CategoryChip(category: category);
+                },
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TaskFinishCheckbox extends StatelessWidget {
+  const TaskFinishCheckbox({
+    super.key,
+    required this.widget,
+  });
+
+  final TaskItem widget;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 2),
       child: Transform.scale(
@@ -180,99 +317,6 @@ class _TaskItemState extends State<TaskItem> {
           },
         ),
       ),
-    );
-  }
-
-  Expanded _buildCategories() {
-    return Expanded(
-      child: SizedBox(
-        height: 20,
-        child: ShaderMask(
-          shaderCallback: (bounds) {
-            return LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [Colors.transparent, Colors.black, Colors.black, Colors.transparent],
-              stops: [0.0, 0.05, 0.95, 1.0],
-            ).createShader(bounds);
-          },
-          blendMode: BlendMode.dstIn,
-          child: ListenableBuilder(
-            listenable: g.catVm,
-            builder: (context, child) {
-              var categories = g.catVm.categories;
-              widget.task.categories.removeWhere((c) => !categories.contains(c));
-              if (widget.task.categories.isEmpty) {
-                debugPrint('This condition called');
-                widget.task.categories.add(CategoryModel(id: 1, name: 'General'));
-                widget.task.categories.applyToDb();
-              }
-              return ListView.separated(
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                physics: BouncingScrollPhysics(),
-                separatorBuilder: (context, index) => const SizedBox(width: 2),
-                itemCount: widget.task.categories.length,
-                itemBuilder: (context, index) {
-                  final category = widget.task.categories[index];
-                  return CategoryChip(category: category);
-                },
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Row _buildPriority(bool isUrgent, BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          Icons.flag_outlined,
-          size: 14,
-          color: isUrgent ? Colors.red.shade400 : null,
-        ),
-        const SizedBox(width: 4),
-        Text(
-          widget.task.priority,
-          style: TextStyle(
-            fontSize: Theme.of(context).textTheme.labelSmall!.fontSize,
-            color: isUrgent ? Colors.red.shade400 : null,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Expanded _buildTitle() {
-    return Expanded(
-      child: ListenableBuilder(
-          listenable: Listenable.merge([g.calMan, g.taskVm]),
-          builder: (context, child) {
-            final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
-            final repeat = widget.task.isRepeating;
-            final stc = g.taskVm.singleTaskCompletions, rtc = g.taskVm.recurringTaskCompletions;
-            final isFinished = repeat
-                ? rtc[widget.task.id]?.contains(date) ?? false
-                : stc[widget.task.id] ?? false;
-
-            return Text(
-              widget.task.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                fontWeight: FontWeight.w500,
-                decorationColor: Theme.of(context).colorScheme.outline,
-                decorationThickness: 2,
-                color: isFinished
-                    ? Theme.of(context).colorScheme.outline
-                    : Theme.of(context).colorScheme.onSurface,
-              ),
-            );
-          }),
     );
   }
 }

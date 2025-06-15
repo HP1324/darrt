@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   MiniAppBar({super.key});
@@ -90,42 +95,24 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       actions: [
-        // _MiniAppBarAction(
-        //   icon: Icon(Icons.flutter_dash),
-        //   onTap: () async {
-        //     if (kDebugMode) {
-        //       debugPrint('${SchedulerBinding.instance.lifecycleState}');
-        //       debugPrint('${WidgetsBinding.instance.lifecycleState}');
-        //     }
-        //     // final scheduledNotifs = await AwesomeNotifications().listScheduledNotifications();
-        //     // for (var notif in scheduledNotifs) {
-        //     //   debugPrint('Group key: ${notif.content!.groupKey}');
-        //     // }
-        //     // print(
-        //     //     scheduledNotifs.where((notif) => notif.content!.groupKey == 34.toString()).length);
-        //     // scheduledNotifs.where((t) => t.content!.groupKey == 34.toString()).forEach((element) {
-        //     //   print('${element.content!.title}');
-        //     // });
-        //     // debugPrint('Active notifications: $scheduledNotifs');
-        //     // AwesomeNotifications().createNotification(
-        //     //     content: NotificationContent(
-        //     //       id: 1,
-        //     //       channelKey: 'task_alarm',
-        //     //       title: 'Test Notification',
-        //     //       body: 'This is a test notification',
-        //     //     ),
-        //     //     schedule: NotificationCalendar.fromDate(
-        //     //       date: DateTime.now().add(Duration(seconds: 5)),
-        //     //     ),
-        //     //     actionButtons: [
-        //     //       NotificationActionButton(
-        //     //         key: 'FINISHED',
-        //     //         label: 'Finished',
-        //     //         actionType: ActionType.SilentAction,
-        //     //       ),
-        //     //     ]);
-        //   },
-        // ),
+        _MiniAppBarAction(
+          icon: Icon(Icons.flutter_dash),
+          onTap: () async {
+            if (kDebugMode) {
+              final databaseDir = ObjectBox.store.directoryPath;
+              debugPrint("This is database path: $databaseDir");
+              debugPrint("App docs dir: ${await getApplicationDocumentsDirectory()}");
+              final path = join(databaseDir,'data.mdb');
+              File database = File(path);
+              if(await database.exists()){
+                debugPrint("Database exists");
+              }else{
+                debugPrint("Database does not exist");
+              }
+              debugPrint('${await database.length()}');
+            }
+          },
+        ),
         _MiniAppBarAction(
           key: _popupKey,
           icon: Icon(Icons.more_vert),
