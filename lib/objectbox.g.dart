@@ -312,10 +312,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
     CategoryModel: obx_int.EntityDefinition<CategoryModel>(
       model: _entities[0],
       toOneRelations: (CategoryModel object) => [],
-      toManyRelations:
-          (CategoryModel object) => {
-            obx_int.RelInfo<Task>.toManyBacklink(1, object.id): object.tasks,
-          },
+      toManyRelations: (CategoryModel object) => {
+        obx_int.RelInfo<Task>.toManyBacklink(1, object.id): object.tasks,
+      },
       getId: (CategoryModel object) => object.id,
       setId: (CategoryModel object, int id) {
         object.id = id;
@@ -367,16 +366,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
     Task: obx_int.EntityDefinition<Task>(
       model: _entities[1],
       toOneRelations: (Task object) => [],
-      toManyRelations:
-          (Task object) => {
-            obx_int.RelInfo<Task>.toMany(1, object.id): object.categories,
-            obx_int.RelInfo<TaskCompletion>.toOneBacklink(
-                  4,
-                  object.id,
-                  (TaskCompletion srcObject) => srcObject.task,
-                ):
-                object.completions,
-          },
+      toManyRelations: (Task object) => {
+        obx_int.RelInfo<Task>.toMany(1, object.id): object.categories,
+        obx_int.RelInfo<TaskCompletion>.toOneBacklink(
+          4,
+          object.id,
+          (TaskCompletion srcObject) => srcObject.task,
+        ): object.completions,
+      },
       getId: (Task object) => object.id,
       setId: (Task object, int id) {
         object.id = id;
@@ -384,14 +381,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
       objectToFB: (Task object, fb.Builder fbb) {
         final titleOffset = fbb.writeString(object.title);
         final priorityOffset = fbb.writeString(object.priority);
-        final remindersOffset =
-            object.reminders == null
-                ? null
-                : fbb.writeString(object.reminders!);
-        final repeatConfigOffset =
-            object.repeatConfig == null
-                ? null
-                : fbb.writeString(object.repeatConfig!);
+        final remindersOffset = object.reminders == null
+            ? null
+            : fbb.writeString(object.reminders!);
+        final repeatConfigOffset = object.repeatConfig == null
+            ? null
+            : fbb.writeString(object.repeatConfig!);
         fbb.startTable(12);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, titleOffset);
@@ -429,20 +424,18 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final titleParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 6, '');
-        final createdAtParam =
-            createdAtValue == null
-                ? null
-                : DateTime.fromMillisecondsSinceEpoch(createdAtValue);
+        final createdAtParam = createdAtValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(createdAtValue);
         final dueDateParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0),
         );
         final startDateParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0),
         );
-        final endDateParam =
-            endDateValue == null
-                ? null
-                : DateTime.fromMillisecondsSinceEpoch(endDateValue);
+        final endDateParam = endDateValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(endDateValue);
         final isRepeatingParam = const fb.BoolReader().vTableGet(
           buffer,
           rootOffset,
@@ -538,10 +531,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
     Folder: obx_int.EntityDefinition<Folder>(
       model: _entities[3],
       toOneRelations: (Folder object) => [],
-      toManyRelations:
-          (Folder object) => {
-            obx_int.RelInfo<Note>.toManyBacklink(2, object.id): object.notes,
-          },
+      toManyRelations: (Folder object) => {
+        obx_int.RelInfo<Note>.toManyBacklink(2, object.id): object.notes,
+      },
       getId: (Folder object) => object.id,
       setId: (Folder object, int id) {
         object.id = id;
@@ -578,10 +570,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
     Note: obx_int.EntityDefinition<Note>(
       model: _entities[4],
       toOneRelations: (Note object) => [],
-      toManyRelations:
-          (Note object) => {
-            obx_int.RelInfo<Note>.toMany(2, object.id): object.folders,
-          },
+      toManyRelations: (Note object) => {
+        obx_int.RelInfo<Note>.toMany(2, object.id): object.folders,
+      },
       getId: (Note object) => object.id,
       setId: (Note object, int id) {
         object.id = id;
@@ -618,14 +609,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final contentParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 6, '');
-        final createdAtParam =
-            createdAtValue == null
-                ? null
-                : DateTime.fromMillisecondsSinceEpoch(createdAtValue);
-        final updatedAtParam =
-            updatedAtValue == null
-                ? null
-                : DateTime.fromMillisecondsSinceEpoch(updatedAtValue);
+        final createdAtParam = createdAtValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(createdAtValue);
+        final updatedAtParam = updatedAtValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(updatedAtValue);
         final object = Note(
           id: idParam,
           content: contentParam,

@@ -1,8 +1,9 @@
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
-
+import 'package:flutter/material.dart';
 class CategoryViewModel extends ViewModel<CategoryModel> {
+  final ScrollController scrollController = ScrollController();
 
   List<CategoryModel> get categories => items;
   @override
@@ -10,6 +11,7 @@ class CategoryViewModel extends ViewModel<CategoryModel> {
     final category = item;
     if (category.name.trim().isEmpty) return Messages.mCategoryEmpty;
     final message = super.putItem(category, edit: edit);
+    scrollController.animateTo(scrollController.position.maxScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.easeIn);
     notifyListeners();
     return message;
   }

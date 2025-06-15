@@ -116,6 +116,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     return CategoriesEmptyWidget();
                   }
                   return ListView.builder(
+                    controller: g.catVm.scrollController,
                     itemCount: filteredCategories.length,
                     itemBuilder: (context, index) {
                       final c = filteredCategories[index];
