@@ -193,7 +193,7 @@ class _FiltersSection extends StatelessWidget {
             height: MediaQuery.sizeOf(context).height * 0.1,
             child: _CategoryFilters(),
           ),
-          _PriorityFilters(),
+          // _PriorityFilters(),
         ],
       ),
     );
