@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.8.1
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -49,8 +49,8 @@ dependencies:
   flutter_native_splash: ^2.4.4
   path: ^1.9.0
   path_provider: ^2.1.5
-  objectbox: ^4.2.0
-  objectbox_flutter_libs: ^4.2.0
+  objectbox: ^4.3.0
+  objectbox_flutter_libs: ^4.3.0
   freezed_annotation: ^3.0.0
   flutter_quill: ^11.4.0
   flutter_quill_extensions: ^11.0.0

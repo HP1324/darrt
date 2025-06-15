@@ -12,47 +12,47 @@ part of 'category_state_controller.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$CategoryState {
-  String get icon;
-  String get color;
 
-  /// Create a copy of CategoryState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $CategoryStateCopyWith<CategoryState> get copyWith =>
-      _$CategoryStateCopyWithImpl<CategoryState>(
-          this as CategoryState, _$identity);
+ String get icon; String get color;
+/// Create a copy of CategoryState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CategoryStateCopyWith<CategoryState> get copyWith => _$CategoryStateCopyWithImpl<CategoryState>(this as CategoryState, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is CategoryState &&
-            (identical(other.icon, icon) || other.icon == icon) &&
-            (identical(other.color, color) || other.color == color));
-  }
 
-  @override
-  int get hashCode => Object.hash(runtimeType, icon, color);
 
-  @override
-  String toString() {
-    return 'CategoryState(icon: $icon, color: $color)';
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CategoryState&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.color, color) || other.color == color));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,icon,color);
+
+@override
+String toString() {
+  return 'CategoryState(icon: $icon, color: $color)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $CategoryStateCopyWith<$Res> {
-  factory $CategoryStateCopyWith(
-          CategoryState value, $Res Function(CategoryState) _then) =
-      _$CategoryStateCopyWithImpl;
-  @useResult
-  $Res call({String icon, String color});
-}
+abstract mixin class $CategoryStateCopyWith<$Res>  {
+  factory $CategoryStateCopyWith(CategoryState value, $Res Function(CategoryState) _then) = _$CategoryStateCopyWithImpl;
+@useResult
+$Res call({
+ String icon, String color
+});
 
+
+
+
+}
 /// @nodoc
 class _$CategoryStateCopyWithImpl<$Res>
     implements $CategoryStateCopyWith<$Res> {
@@ -61,74 +61,66 @@ class _$CategoryStateCopyWithImpl<$Res>
   final CategoryState _self;
   final $Res Function(CategoryState) _then;
 
-  /// Create a copy of CategoryState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? icon = null,
-    Object? color = null,
-  }) {
-    return _then(_self.copyWith(
-      icon: null == icon
-          ? _self.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as String,
-      color: null == color
-          ? _self.color
-          : color // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
+/// Create a copy of CategoryState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? icon = null,Object? color = null,}) {
+  return _then(_self.copyWith(
+icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
+as String,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
 }
 
+}
+
+
 /// @nodoc
+
 
 class _CategoryState extends CategoryState {
-  const _CategoryState({required this.icon, required this.color}) : super._();
+  const _CategoryState({required this.icon, required this.color}): super._();
+  
 
-  @override
-  final String icon;
-  @override
-  final String color;
+@override final  String icon;
+@override final  String color;
 
-  /// Create a copy of CategoryState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$CategoryStateCopyWith<_CategoryState> get copyWith =>
-      __$CategoryStateCopyWithImpl<_CategoryState>(this, _$identity);
+/// Create a copy of CategoryState
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CategoryStateCopyWith<_CategoryState> get copyWith => __$CategoryStateCopyWithImpl<_CategoryState>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _CategoryState &&
-            (identical(other.icon, icon) || other.icon == icon) &&
-            (identical(other.color, color) || other.color == color));
-  }
 
-  @override
-  int get hashCode => Object.hash(runtimeType, icon, color);
 
-  @override
-  String toString() {
-    return 'CategoryState(icon: $icon, color: $color)';
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CategoryState&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.color, color) || other.color == color));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,icon,color);
+
+@override
+String toString() {
+  return 'CategoryState(icon: $icon, color: $color)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class _$CategoryStateCopyWith<$Res>
-    implements $CategoryStateCopyWith<$Res> {
-  factory _$CategoryStateCopyWith(
-          _CategoryState value, $Res Function(_CategoryState) _then) =
-      __$CategoryStateCopyWithImpl;
-  @override
-  @useResult
-  $Res call({String icon, String color});
-}
+abstract mixin class _$CategoryStateCopyWith<$Res> implements $CategoryStateCopyWith<$Res> {
+  factory _$CategoryStateCopyWith(_CategoryState value, $Res Function(_CategoryState) _then) = __$CategoryStateCopyWithImpl;
+@override @useResult
+$Res call({
+ String icon, String color
+});
 
+
+
+
+}
 /// @nodoc
 class __$CategoryStateCopyWithImpl<$Res>
     implements _$CategoryStateCopyWith<$Res> {
@@ -137,25 +129,17 @@ class __$CategoryStateCopyWithImpl<$Res>
   final _CategoryState _self;
   final $Res Function(_CategoryState) _then;
 
-  /// Create a copy of CategoryState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? icon = null,
-    Object? color = null,
-  }) {
-    return _then(_CategoryState(
-      icon: null == icon
-          ? _self.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as String,
-      color: null == color
-          ? _self.color
-          : color // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
+/// Create a copy of CategoryState
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? icon = null,Object? color = null,}) {
+  return _then(_CategoryState(
+icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
+as String,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
 }
 
 // dart format on
