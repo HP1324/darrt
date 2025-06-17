@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:app_settings/app_settings.dart';
 import 'package:awesome_notifications/awesome_notifications.dart' show AwesomeNotifications;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -342,7 +343,8 @@ class AddRemindersWidget extends StatelessWidget {
                   actions: [
                     FilledButton(
                       onPressed: () async {
-                        await SettingsService.openBatterySettings();
+                        await AppSettings.openAppSettings(type:AppSettingsType.batteryOptimization);
+                        // await SettingsService.openBatterySettings();
                       },
                       child: Text('Go to settings'),
                     ),
@@ -750,7 +752,7 @@ class _ReminderDialogState extends State<ReminderDialog> {
   void initState() {
     super.initState();
     // Initialize from existing reminder if editing, else defaults
-    _selectedType = widget.edit ? widget.reminder!.type : 'notif';
+    _selectedType = widget.edit ? widget.reminder!.type :MiniBox.read(mDefaultReminderType);
     _selectedTime = widget.edit ? widget.reminder!.time : TimeOfDay.now();
   }
 

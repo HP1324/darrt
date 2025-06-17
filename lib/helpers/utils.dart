@@ -16,7 +16,7 @@ void showToast(BuildContext context,
     context: context,
     description: Text(description),
     type: type,
-    autoCloseDuration: duration ?? const Duration(milliseconds: 1800),
+    autoCloseDuration: duration ?? const Duration(milliseconds: 1500),
     alignment: Alignment.bottomCenter,
   );
 }

@@ -113,25 +113,25 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
             }
           },
         ),
-        _MiniAppBarAction(
-          key: _popupKey,
-          icon: Icon(Icons.more_vert),
-          onTap: () {
-            final (offset, size) = getOffsetAndSize(_popupKey);
-            showMenu(
-              context: context,
-              elevation: 1,
-              popUpAnimationStyle: AnimationStyle(duration: Duration(milliseconds: 100)),
-              position: getRelativeRectFromOffsetAndSize(offset, size),
-              items: [
-                PopupMenuItem(child: Text('Notifications')),
-                PopupMenuItem(child: Text('Rate Us')),
-                PopupMenuItem(child: Text('Give Feedback')),
-                PopupMenuItem(child: Text('Settings')),
-              ],
-            );
-          },
-        ),
+        // _MiniAppBarAction(
+        //   key: _popupKey,
+        //   icon: Icon(Icons.more_vert),
+        //   onTap: () {
+        //     final (offset, size) = getOffsetAndSize(_popupKey);
+        //     showMenu(
+        //       context: context,
+        //       elevation: 1,
+        //       popUpAnimationStyle: AnimationStyle(duration: Duration(milliseconds: 100)),
+        //       position: getRelativeRectFromOffsetAndSize(offset, size),
+        //       items: [
+        //         PopupMenuItem(child: Text('Notifications')),
+        //         PopupMenuItem(child: Text('Rate Us')),
+        //         PopupMenuItem(child: Text('Give Feedback')),
+        //         PopupMenuItem(child: Text('Settings')),
+        //       ],
+        //     );
+        //   },
+        // ),
       ],
     );
   }

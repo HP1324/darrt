@@ -20,10 +20,16 @@ class MiniBox{
   ///Set global preferences and other settings like first time install date etc.
   static Future<void> initStorage()async {
     await GetStorage.init();
-    await writeIfNull(mDefaultTaskList, 0);
-    await writeIfNull(mFirstTimeInstall, true);
-    await writeIfNull(mFirstInstallDate, DateUtils.dateOnly(DateTime.now()).millisecondsSinceEpoch);
-    await writeIfNull(firstTimeMicTap, true);
-    await writeIfNull(micPermissionDeniedAgain, false);
+    await Future.wait([
+      writeIfNull(mDefaultTaskList, 0),
+      writeIfNull(mFirstTimeInstall, true),
+      writeIfNull(mFirstInstallDate, DateUtils.dateOnly(DateTime.now()).millisecondsSinceEpoch),
+      writeIfNull(firstTimeMicTap, true),
+      writeIfNull(micPermissionDeniedAgain, false),
+      writeIfNull(mSnoozeMinutes, 5),
+      writeIfNull(mDefaultReminderType, 'notif'),
+      writeIfNull(mPickedAlarmSoundResourceUri, 'System alarm sound'),
+      writeIfNull(mNotificationSound, 'System notification sound'),
+    ]);
   }
 }

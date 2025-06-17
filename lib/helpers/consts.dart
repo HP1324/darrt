@@ -17,13 +17,24 @@ const mIsNotificationsGloballyEnabled = 'is_notifications_globally_enabled';
 ///Which type of tasks to show by default, it stores 0, 1 and 2 for [TaskType.all, TaskType.single, TaskType.recurring] respectively
 const mDefaultTaskList = 'default_task_list';
 
-const mThemeColor = 'themeColor';
+const mThemeColor = 'theme_color';
 
-const mThemePreference = 'themePreference';
+const mThemePreference = 'theme_preference';
 
-final firstTimeMicTap = 'first_time_mic_tap';
+const mDefaultReminderType = 'default_reminder_type';
 
-final micPermissionDeniedAgain = 'mic_permission_denied_again';
+const mPickedAlarmSoundResourceUri = 'picked_alarm_sound_resource_uri';
+
+const mPickedAlarmSoundName = 'picked_alarm_sound_name';
+
+const mNotificationSound = 'notification_sound';
+
+const firstTimeMicTap = 'first_time_mic_tap';
+
+const micPermissionDeniedAgain = 'mic_permission_denied_again';
+
+///How much minutes to snooze when user presses snooze action button in notification
+const mSnoozeMinutes = 'snooze_minutes';
 
 const maxExtentDateDays = 7305;
 
