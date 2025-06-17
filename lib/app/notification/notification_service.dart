@@ -1,5 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
+import 'package:minimaltodo/app/notification/notification_action_controller.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/task/models/reminder.dart';
@@ -128,16 +129,8 @@ class NotificationService {
             timeZone: await _notif.getLocalTimeZoneIdentifier(),
           ),
           actionButtons: [
-            NotificationActionButton(
-              key: 'FINISHED',
-              label: 'Finished',
-              actionType: ActionType.SilentAction,
-            ),
-            NotificationActionButton(
-              key: 'SNOOZE',
-              label: 'Snooze',
-              actionType: ActionType.SilentAction,
-            ),
+            finishedActionButton,
+            snoozeActionButton,
           ],
         );
       }
@@ -263,16 +256,8 @@ class NotificationService {
           timeZone: await _notif.getLocalTimeZoneIdentifier(),
         ),
         actionButtons: [
-          NotificationActionButton(
-            key: 'FINISHED',
-            label: 'Finished',
-            actionType: ActionType.SilentAction,
-          ),
-          NotificationActionButton(
-            key: 'SNOOZE',
-            label: 'Snooze',
-            actionType: ActionType.Default,
-          ),
+          finishedActionButton,
+          snoozeActionButton,
         ],
       );
     } catch (e) {
@@ -334,16 +319,8 @@ class NotificationService {
           timeZone: await _notif.getLocalTimeZoneIdentifier(),
         ),
         actionButtons: [
-          NotificationActionButton(
-            key: 'MARK_DONE',
-            label: 'Mark Done',
-            actionType: ActionType.SilentAction,
-          ),
-          NotificationActionButton(
-            key: 'SNOOZE',
-            label: 'Snooze',
-            actionType: ActionType.Default,
-          ),
+          finishedActionButton,
+          snoozeActionButton,
         ],
       );
     } catch (e) {
@@ -406,16 +383,8 @@ class NotificationService {
           timeZone: await _notif.getLocalTimeZoneIdentifier(),
         ),
         actionButtons: [
-          NotificationActionButton(
-            key: 'MARK_DONE',
-            label: 'Mark Done',
-            actionType: ActionType.SilentAction,
-          ),
-          NotificationActionButton(
-            key: 'SNOOZE',
-            label: 'Snooze',
-            actionType: ActionType.Default,
-          ),
+          finishedActionButton,
+          snoozeActionButton,
         ],
       );
     } catch (e) {

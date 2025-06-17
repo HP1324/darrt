@@ -43,14 +43,12 @@ class _TasksPageState extends State<TasksPage> {
                   TabBar(
                     splashBorderRadius: BorderRadius.circular(10),
                     dividerHeight: 0,
-                    labelStyle: Theme.of(context)
-                        .textTheme
-                        .titleSmall!
-                        .copyWith(fontWeight: FontWeight.bold),
-                    unselectedLabelStyle: Theme.of(context)
-                        .textTheme
-                        .titleSmall!
-                        .copyWith(fontWeight: FontWeight.w500),
+                    labelStyle: Theme.of(
+                      context,
+                    ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
+                    unselectedLabelStyle: Theme.of(
+                      context,
+                    ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w500),
                     tabs: const [
                       Tab(text: 'All'),
                       Tab(text: 'Single'),
@@ -75,10 +73,7 @@ class _TasksPageState extends State<TasksPage> {
 }
 
 class DateItem extends StatelessWidget {
-  const DateItem({
-    super.key,
-    required this.date,
-  });
+  const DateItem({super.key, required this.date});
 
   final DateTime date;
 
@@ -130,9 +125,9 @@ class DateItem extends StatelessWidget {
                   Text(
                     DateFormat('EEE').format(date),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: dayTextColor,
-                          fontWeight: isSelected || isToday ? FontWeight.w600 : FontWeight.normal,
-                        ),
+                      color: dayTextColor,
+                      fontWeight: isSelected || isToday ? FontWeight.w600 : FontWeight.normal,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Container(
@@ -147,7 +142,7 @@ class DateItem extends StatelessWidget {
                                 color: scheme.primary.withValues(alpha: 0.3),
                                 blurRadius: 4,
                                 offset: const Offset(0, 1),
-                              )
+                              ),
                             ]
                           : null,
                     ),
@@ -155,9 +150,9 @@ class DateItem extends StatelessWidget {
                       child: Text(
                         '${date.day}',
                         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: dateTextColor,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          color: dateTextColor,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -225,9 +220,34 @@ class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin 
                     icon: Icon(Icons.cancel),
                   ),
                   IconButton(
-                    onPressed: () {
-                      final message = g.taskVm.deleteMultipleItems();
-                      showToast(context, type: ToastificationType.success, description: message);
+                    onPressed: () async {
+                      final message = await showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Delete Tasks'),
+                            content: const Text('Are you sure you want to delete these tasks?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  final message = g.taskVm.deleteMultipleItems();
+                                  Navigator.pop(context, message);
+                                },
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      if (context.mounted) {
+                        showToast(context, type: ToastificationType.success, description: message);
+                      }
                     },
                     icon: Icon(Icons.delete),
                   ),
@@ -266,9 +286,7 @@ class ScrollableDateBar extends StatelessWidget {
           itemExtent: g.calMan.dateItemWidth,
           physics: const BouncingScrollPhysics(),
           itemCount: g.calMan.dates.length,
-          itemBuilder: (context, index) => DateItem(
-            date: g.calMan.dates[index],
-          ),
+          itemBuilder: (context, index) => DateItem(date: g.calMan.dates[index]),
         );
       },
     );
@@ -282,10 +300,7 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Material(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: _tabBar,
-    );
+    return Material(color: Theme.of(context).scaffoldBackgroundColor, child: _tabBar);
   }
 
   @override

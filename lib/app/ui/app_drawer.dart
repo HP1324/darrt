@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:minimaltodo/app/ui/settings_page.dart';
 import 'package:minimaltodo/app/ui/theme_settings_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -23,7 +25,7 @@ class AppDrawer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Text('MinimalTodo',
+                  const Text('MiniTodo',
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   Text(
                     dateFormat.format(now),
@@ -34,8 +36,8 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Iconsax.profile_2user),
-            title: const Text('Profile'),
+            leading: const Icon(Iconsax.notification),
+            title: const Text('Notifications'),
             onTap: () {
               Navigator.pop(context);
             },
@@ -48,33 +50,43 @@ class AppDrawer extends StatelessWidget {
               MiniRouter.to(context, ThemeSettingsPage());
             },
           ),
-          ListTile(
-            leading: const Icon(Iconsax.notification),
-            title: const Text('Notifications'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
+
           const Divider(),
           ListTile(
             leading: const Icon(Iconsax.setting_2),
             title: const Text('Settings'),
             onTap: () {
-              Navigator.pop(context);
-              // Add navigation logic here if needed
+                MiniRouter.to(context, SettingsPage());
             },
           ),
           const Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Version 1.0.0',
-              style: TextStyle(
-                fontSize: 12,
-              ),
-            ),
-          ),
+          const AppVersionLabel(),
         ],
+      ),
+    );
+  }
+}
+
+class AppVersionLabel extends StatelessWidget {
+  const AppVersionLabel({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Builder(
+        builder: (context) {
+
+          // PackageInfo packageInfo = PackageInfo.fromPlatform();
+          return Text(
+            'Version 1.0.0',
+            style: TextStyle(
+              fontSize: 12,
+            ),
+          );
+        }
       ),
     );
   }
