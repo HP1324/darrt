@@ -1,5 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/notification/notification_action_controller.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/consts.dart';
@@ -52,8 +53,8 @@ class NotificationService {
         null,
         [
           NotificationChannel(
-            channelKey: 'task_notif',
-            channelName: 'task_notifications',
+            channelKey: notifChannelKey,
+            channelName: 'Task Notifications',
             channelDescription:
                 'Channel used to notify users about their tasks with simple notification',
             importance: NotificationImportance.Max,
@@ -64,8 +65,8 @@ class NotificationService {
             criticalAlerts: true,
           ),
           NotificationChannel(
-            channelKey: 'task_alarm',
-            channelName: 'task_alarms',
+            channelKey: alarmChannelKey,
+            channelName: 'Task Alarms',
             channelDescription: 'Channel used to notify users about their tasks with alarm',
             importance: NotificationImportance.Max,
             playSound: true,
@@ -425,5 +426,78 @@ class NotificationService {
     } catch (e) {
       MiniLogger.e('Error removing recurring notifications: $e');
     }
+  }
+
+  static Future<bool> showNotificationRationale(BuildContext context) async {
+    bool userAllowed = false;
+    await showAdaptiveDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+          title: const Text('Permission required'),
+          content: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Text(
+                'Please allow the application to send notifications, otherwise we won\'t be able to remind you about your tasks.'),
+          ),
+          actions: [
+            InkWell(
+              onTap: () async {
+                final navigator = Navigator.of(context);
+                final allowed = await AwesomeNotifications().requestPermissionToSendNotifications();
+                if (allowed && context.mounted) {
+                  await MiniBox.write(mNotificationsEnabled, allowed);
+                  await NotificationService.initNotifChannels();
+                }
+                userAllowed = allowed;
+                navigator.pop();
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                child: const Row(
+                  children: [
+                    Text('Go to notification settings'),
+                    Icon(Icons.chevron_right),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    return userAllowed;
+  }
+
+  static void scheduleQuickReminder(String title, int minutes) async {
+    final now = DateTime.now();
+    final reminderType = MiniBox.read(mDefaultReminderType);
+    final channelKey = reminderType == alarmReminderType ? alarmChannelKey : notifChannelKey;
+    final category = reminderType == alarmReminderType
+        ? NotificationCategory.Alarm
+        : NotificationCategory.Reminder;
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: now.millisecondsSinceEpoch.remainder(1000000),
+        channelKey: channelKey,
+        title: 'Quick Reminder',
+        body: title.isNotEmpty ? title : 'No title was set',
+        category: category,
+      ),
+      schedule: NotificationInterval(
+        interval: Duration(minutes: minutes),
+        repeats: false,
+        allowWhileIdle: true,
+        timeZone: await AwesomeNotifications().getLocalTimeZoneIdentifier(),
+      ),
+      actionButtons: [
+        quickSnoozeActionButton,
+      ],
+    );
   }
 }

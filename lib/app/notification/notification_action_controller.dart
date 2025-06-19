@@ -1,6 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
@@ -26,9 +27,8 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
         break;
       case snoozeActionKey:
         final now = DateTime.now();
-        final nextDuration = MiniBox.read(mSnoozeMinutes);
-        final nextTime = TimeOfDay.fromDateTime(now.add(Duration(minutes: nextDuration)));
-        final scheduleDate = now.add(Duration(minutes: nextDuration));
+        final minutes = MiniBox.read(mSnoozeMinutes);
+        final nextTime = TimeOfDay.fromDateTime(now.add(Duration(minutes: minutes)));
         AwesomeNotifications().createNotification(
           content: NotificationContent(
             id: now.millisecondsSinceEpoch.remainder(1000000),
@@ -40,13 +40,21 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
             category: receivedAction.category,
             notificationLayout: NotificationLayout.Default,
           ),
-          schedule: NotificationCalendar.fromDate(date: scheduleDate),
+          schedule: NotificationInterval(
+            interval: Duration(minutes: minutes),
+            repeats: false,
+            allowWhileIdle: true,
+          ),
           actionButtons: [
             finishedActionButton,
             snoozeActionButton,
           ],
         );
         break;
+      case quickSnoozeActionKey:
+        final now = DateTime.now();
+        final minutes = MiniBox.read(mSnoozeMinutes);
+        NotificationService.scheduleQuickReminder(receivedAction.body ?? '', minutes);
       default:
         MiniTodo.navigatorKey.currentState?.push(
           MaterialPageRoute(builder: (_) => AddTaskPage(edit: true, task: task)),
@@ -64,6 +72,8 @@ const String finishedActionKey = 'FINISHED';
 const String snoozeActionKey = 'SNOOZE';
 const String finishedActionLabel = 'Finished';
 const String snoozeActionLabel = 'Snooze';
+const String quickSnoozeActionKey = 'QUICK_SNOOZE';
+const String quickSnoozeActionLabel = 'Quick Snooze';
 
 final finishedActionButton = NotificationActionButton(
   key: finishedActionKey,
@@ -75,4 +85,10 @@ final snoozeActionButton = NotificationActionButton(
   key: snoozeActionKey,
   label: snoozeActionLabel,
   actionType: ActionType.SilentAction,
+);
+
+final quickSnoozeActionButton = NotificationActionButton(
+    key: quickSnoozeActionKey,
+    label: quickSnoozeActionLabel,
+    actionType: ActionType.SilentAction,
 );

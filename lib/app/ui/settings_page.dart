@@ -51,7 +51,7 @@ class SnoozeSection extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 4,
-            children: [5, 10, 15, 20, 25, 30, 45].map((minutes) {
+            children: [1,5, 10, 15, 20, 25, 30, 45,50,60].map((minutes) {
               return ValueListenableBuilder(
                 valueListenable: snoozeMinutes,
                 builder: (context, value, child) {
