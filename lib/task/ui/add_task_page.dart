@@ -300,7 +300,7 @@ class AddRemindersWidget extends StatelessWidget {
         g.taskSc.textFieldNode.unfocus();
         final allowed = await AwesomeNotifications().isNotificationAllowed();
         if (context.mounted) {
-          if ((allowed || await _showNotificationRationale(context)) && context.mounted) {
+          if ((allowed || await NotificationService.showNotificationRationale(context)) && context.mounted) {
             _showRemindersBottomSheet(context);
           }
         }
@@ -443,52 +443,6 @@ class AddRemindersWidget extends StatelessWidget {
         );
       },
     );
-  }
-
-  Future<bool> _showNotificationRationale(BuildContext context) async {
-    bool userAllowed = false;
-    await showAdaptiveDialog(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-          title: const Text('Permission required'),
-          content: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Text(
-                'Please allow the application to send notifications, otherwise we won\'t be able to remind you about your tasks.'),
-          ),
-          actions: [
-            InkWell(
-              onTap: () async {
-                final navigator = Navigator.of(context);
-                final allowed = await AwesomeNotifications().requestPermissionToSendNotifications();
-                if (allowed && context.mounted) {
-                  await MiniBox.write(mNotificationsEnabled, allowed);
-                  await NotificationService.initNotifChannels();
-                }
-                userAllowed = allowed;
-                navigator.pop();
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                child: const Row(
-                  children: [
-                    Text('Go to notification settings'),
-                    Icon(Icons.chevron_right),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-    return userAllowed;
   }
 }
 

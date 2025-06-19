@@ -38,4 +38,12 @@ const mSnoozeMinutes = 'snooze_minutes';
 
 const maxExtentDateDays = 7305;
 
+const alarmChannelKey = 'task_alarm';
+
+const notifChannelKey = 'task_notif';
+
+const notifReminderType = 'notif';
+
+const alarmReminderType = 'alarm';
+
 

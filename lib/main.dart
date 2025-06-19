@@ -59,6 +59,7 @@ class _MiniTodoState extends State<MiniTodo> {
           final lightTheme = g.themeMan.lightTheme;
           final darkTheme = g.themeMan.darkTheme;
           final themeMode = g.themeMan.themeMode;
+
           return MaterialApp(
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
