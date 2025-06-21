@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/note/models/folder.dart';

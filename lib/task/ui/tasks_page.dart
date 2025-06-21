@@ -211,13 +211,19 @@ class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin 
           builder: (context, child) {
             if (g.taskVm.selectedTaskIds.isNotEmpty) {
               return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  if (g.taskVm.selectedTaskIds.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0),
+                      child: Text('${g.taskVm.selectedTaskIds.length}'),
+                    ),
+                  Spacer(),
                   IconButton(
                     onPressed: () {
                       g.taskVm.clearSelection();
                     },
-                    icon: Icon(Icons.cancel),
+                    icon: CloseButtonIcon(),
                   ),
                   IconButton(
                     onPressed: () async {

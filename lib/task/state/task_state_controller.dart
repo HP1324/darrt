@@ -31,6 +31,7 @@ abstract class TaskState with _$TaskState {
 class TaskStateController extends StateController<TaskState, Task> {
   @override
   void initState(bool edit, [Task? task]) {
+
     textController.text = edit ? task!.title : '';
     final categories = g.catVm.categories;
     state = TaskState(
@@ -48,6 +49,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       reminders: edit ? task!.reminderObjects : [],
       currentPriority: 3,
     );
+
   }
 
   @override

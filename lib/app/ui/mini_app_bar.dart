@@ -4,10 +4,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:minimaltodo/app/notification/notification_action_controller.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
-import 'package:minimaltodo/helpers/consts.dart';
-import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
@@ -16,7 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:toastification/toastification.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
-  MiniAppBar({super.key});
+  const MiniAppBar({super.key});
   // final GlobalKey _popupKey = GlobalKey();
 
   @override
@@ -121,8 +118,8 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
           },
         ),
         _MiniAppBarAction(
-          onTap: () async{
-            showQuickReminderDialog(){
+          onTap: () async {
+            showQuickReminderDialog() {
               showDialog(
                 context: context,
                 builder: (context) {
@@ -130,17 +127,23 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                 },
               );
             }
-            showNotificationRationale()async{
+
+            showNotificationRationale() async {
               return await NotificationService.showNotificationRationale(context);
             }
+
             bool allowed = true;
-            if(!await AwesomeNotifications().isNotificationAllowed()){
+            if (!await AwesomeNotifications().isNotificationAllowed()) {
               allowed = await showNotificationRationale();
             }
-            if(allowed){
+            if (allowed) {
               showQuickReminderDialog();
-            }else if(context.mounted){
-              showToast(context, type: ToastificationType.error, description: 'Notification permission denied!');
+            } else if (context.mounted) {
+              showToast(
+                context,
+                type: ToastificationType.error,
+                description: 'Notification permission denied!',
+              );
             }
           },
           icon: Tooltip(
@@ -149,6 +152,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: Icon(Icons.alarm_add_sharp),
           ),
         ),
+
         // _MiniAppBarAction(
         //   key: _popupKey,
         //   icon: Icon(Icons.more_vert),
@@ -267,13 +271,13 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
                           TextInputFormatter.withFunction(
                             (oldValue, newValue) {
                               // Don't allow starting with 0
-                              if (newValue.text.startsWith('0') && newValue.text.length > 0) {
+                              if (newValue.text.startsWith('0') && newValue.text.isNotEmpty) {
                                 return oldValue;
                               }
 
                               if (newValue.text.isEmpty) return newValue;
                               final intValue = int.tryParse(newValue.text);
-                              if (intValue != null && intValue > 120) {
+                              if (intValue != null && intValue > 999) {
                                 return oldValue;
                               }
                               return newValue;
@@ -317,8 +321,6 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
       ],
     );
   }
-
-
 }
 
 class _MiniAppBarAction extends StatelessWidget {
