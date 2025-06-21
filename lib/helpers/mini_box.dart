@@ -13,6 +13,10 @@ class MiniBox{
     return _box.read(key);
   }
 
+  static void remove(String key)async{
+    await _box.remove(key);
+  }
+
   ///Necessary method for writing only when the app first time installed.if it is null then it means the app was never installed or the developer has explicitly set it to [null] in some part of the code
   static Future<void> writeIfNull(String key,dynamic value)async{
       await _box.writeIfNull(key, value);
