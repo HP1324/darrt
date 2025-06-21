@@ -19,4 +19,7 @@ class MiniLogger {
   static void t(String stacktrace) {
     _logger.t('[StackTrace: $stacktrace');
   }
+  static void w(String message){
+    _logger.w(message);
+  }
 }

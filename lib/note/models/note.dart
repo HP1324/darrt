@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart' show TextSelection;
 import 'package:flutter_quill/flutter_quill.dart' show Document, QuillController;
 import 'package:flutter_quill/quill_delta.dart' show Delta;
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/note/models/folder.dart';
 import 'package:objectbox/objectbox.dart';
 
@@ -32,4 +33,54 @@ class Note {
     final doc =   Document.fromDelta(delta);
     return QuillController(document: doc, selection: const TextSelection.collapsed(offset: 0));
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'content': content,
+    'createdAt': createdAt?.millisecondsSinceEpoch,
+    'updatedAt': updatedAt?.millisecondsSinceEpoch,
+    'folderIds': folders.where((f) => f.id > 0).map((f) => f.id).toList(),
+  };
+
+  factory Note.fromJson(Map<String, dynamic> json, Box<Folder> folderBox) {
+    try {
+      final note = Note(
+        id: json['id'] ?? 0,
+        content: json['content'],
+        createdAt: json['createdAt'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(json['createdAt'])
+            : DateTime.now(),
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'])
+            : DateTime.now(),
+      );
+
+      final folderIds = (json['folderIds'] as List?)?.cast<int>() ?? [];
+      final fetched = folderBox.getMany(folderIds);
+
+      final validFolders = <Folder>[];
+      final missingIds = <int>[];
+
+      for (var i = 0; i < folderIds.length; i++) {
+        final folder = fetched[i];
+        if (folder != null) {
+          validFolders.add(folder);
+        } else {
+          missingIds.add(folderIds[i]);
+        }
+      }
+
+      if (missingIds.isNotEmpty) {
+        MiniLogger.w('Note "${note.id}" has missing folder IDs: $missingIds');
+      }
+
+      note.folders.addAll(validFolders);
+      return note;
+    } catch (e, t) {
+      MiniLogger.e('Failed to parse Note from JSON: $e');
+      MiniLogger.t('Stacktrace: $t');
+      rethrow;
+    }
+  }
+
 }

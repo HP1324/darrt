@@ -1,3 +1,4 @@
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:objectbox/objectbox.dart';
 
@@ -20,4 +21,22 @@ class Folder {
   }
   @override
   int get hashCode => Object.hash(id, name);
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+  };
+  factory Folder.fromJson(Map<String, dynamic> json) {
+    try {
+      return Folder(
+        id: json['id'] ?? 0,
+        name: json['name'],
+      );
+    } catch (e, t) {
+      MiniLogger.e('Failed to parse Folder from JSON: $e');
+      MiniLogger.t('Stacktrace: $t');
+      rethrow;
+    }
+  }
+
 }

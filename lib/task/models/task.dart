@@ -25,15 +25,15 @@ class Task {
     this.priority = 'Low',
     this.repeatConfig,
     this.reminders,
-  })  : dueDate = dueDate ?? DateTime.now(),
-        startDate = startDate ?? DateTime.now();
+  }) : dueDate = dueDate ?? DateTime.now(),
+       startDate = startDate ?? DateTime.now();
   @Id()
   int id;
-  String title,priority;
+  String title, priority;
   DateTime? createdAt, endDate;
-  DateTime dueDate,startDate;
-  bool isDone,isRepeating;
-  String? reminders,repeatConfig;
+  DateTime dueDate, startDate;
+  bool isDone, isRepeating;
+  String? reminders, repeatConfig;
 
   final categories = ToMany<CategoryModel>();
   @Backlink()
@@ -82,23 +82,23 @@ class Task {
 
   // Convert Task to JSON
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'dueDate': dueDate.millisecondsSinceEpoch,
-        'isDone': isDone ? 1 : 0,
-        'isRepeating': isRepeating ? 1 : 0,
-        'startDate': startDate.millisecondsSinceEpoch,
-        'endDate': endDate?.millisecondsSinceEpoch,
-        'repeatConfig': repeatConfig,
-        'reminders': reminders,
-        'priority': priority,
-        'categoryIds' : categories.map((c)=>c.id).toList(),
-      };
+    'id': id,
+    'title': title,
+    'dueDate': dueDate.millisecondsSinceEpoch,
+    'isDone': isDone ? 1 : 0,
+    'isRepeating': isRepeating ? 1 : 0,
+    'startDate': startDate.millisecondsSinceEpoch,
+    'endDate': endDate?.millisecondsSinceEpoch,
+    'repeatConfig': repeatConfig,
+    'reminders': reminders,
+    'priority': priority,
+    'categoryIds': categories.map((c) => c.id).toList(),
+  };
 
   // Create a Task from JSON
   factory Task.fromJson(Map<String, dynamic> json) {
     try {
-      final task =  Task(
+      final task = Task(
         id: json['id'],
         title: json['title'],
         isDone: json['isDone'] == 1,
@@ -106,17 +106,35 @@ class Task {
         priority: json['priority'],
         isRepeating: json['isRepeating'] == 1,
         startDate: DateTime.fromMillisecondsSinceEpoch(json['startDate']),
-        endDate:json['endDate'] != null ? DateTime.fromMillisecondsSinceEpoch(json['endDate']) : null,
+        endDate: json['endDate'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(json['endDate'])
+            : null,
         repeatConfig: json['repeatConfig'],
         reminders: json['reminders'],
       );
-      debugPrint('Current Isolate in fromJson ${Isolate.current.debugName}');
+      // Restore category relations
       final ids = (json['categoryIds'] as List?)?.cast<int>() ?? [];
-      final fetched = ObjectBox.store.box<CategoryModel>().getMany(ids);
-      task.categories.addAll(fetched.whereType<CategoryModel>());
-      if(kDebugMode){
-        debugPrint('Task categories in notification payload: ${task.categories.length}');
+
+      final fetched = ObjectBox.categoryBox.getMany(ids);
+
+      final validCategories = <CategoryModel>[];
+      final missingIds = <int>[];
+
+      for (var i = 0; i < ids.length; i++) {
+        final cat = fetched[i];
+        if (cat != null) {
+          validCategories.add(cat);
+        } else {
+          missingIds.add(ids[i]);
+        }
       }
+
+      if (missingIds.isNotEmpty) {
+        MiniLogger.w('⚠️ Task "${task.title}" has missing categories: $missingIds. Skipping these.');
+      }
+
+      task.categories.addAll(validCategories);
+
       return task;
     } catch (e) {
       MiniLogger.e('Error parsing task from JSON: ${e.toString()}\nError type: ${e.runtimeType}');
