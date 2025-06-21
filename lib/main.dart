@@ -5,6 +5,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:minimaltodo/app/notification/notification_action_controller.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
+import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
@@ -21,6 +22,7 @@ Future<void> initApp() async {
     await MiniBox.initStorage();
     await ObjectBox.init();
 
+    await GoogleSignInService().restoreGoogleAccount();
     // Initialize notifications
     await NotificationService.init();
 
