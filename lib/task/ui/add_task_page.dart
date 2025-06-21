@@ -5,7 +5,6 @@ import 'package:awesome_notifications/awesome_notifications.dart' show AwesomeNo
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
-import 'package:minimaltodo/app/setting/settings_service.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/consts.dart';
@@ -49,9 +48,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('Task page build');
     return Scaffold(
-      appBar: AppBar(title: Text(widget.edit ? widget.task!.title : 'Add New Task')),
+      appBar: AppBar(title: Text(widget.edit ? widget.task!.title.replaceAll('\n', ' ') : 'Add New Task')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 13.0),
         child: SingleChildScrollView(

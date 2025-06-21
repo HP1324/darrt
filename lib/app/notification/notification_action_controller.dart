@@ -19,7 +19,10 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     if (appState == AppLifecycleState.detached) {
       await ObjectBox.init();
     }
-    Task task = ObjectBox.taskBox.get(int.parse(receivedAction.payload!['id']!))!;
+    late Task task;
+    if(receivedAction.payload != null) {
+      task = ObjectBox.taskBox.get(int.parse(receivedAction.payload!['id']!))!;
+    }
 
     switch (receivedAction.buttonKeyPressed) {
       case finishedActionKey:
@@ -52,7 +55,6 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
         );
         break;
       case quickSnoozeActionKey:
-        final now = DateTime.now();
         final minutes = MiniBox.read(mSnoozeMinutes);
         NotificationService.scheduleQuickReminder(receivedAction.body ?? '', minutes);
       default:
@@ -89,6 +91,6 @@ final snoozeActionButton = NotificationActionButton(
 
 final quickSnoozeActionButton = NotificationActionButton(
     key: quickSnoozeActionKey,
-    label: quickSnoozeActionLabel,
+    label: snoozeActionLabel,
     actionType: ActionType.SilentAction,
 );
