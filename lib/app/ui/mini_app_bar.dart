@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
+import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
@@ -103,17 +104,8 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
           icon: Icon(Icons.flutter_dash),
           onTap: () async {
             if (kDebugMode) {
-              final databaseDir = ObjectBox.store.directoryPath;
-              debugPrint("This is database path: $databaseDir");
-              debugPrint("App docs dir: ${await getApplicationDocumentsDirectory()}");
-              final path = join(databaseDir, 'data.mdb');
-              File database = File(path);
-              if (await database.exists()) {
-                debugPrint("Database exists");
-              } else {
-                debugPrint("Database does not exist");
-              }
-              debugPrint('${await database.length()}');
+             final user = GoogleSignInService().currentUser;
+             debugPrint(user?.email ?? 'null is there in user' );
             }
           },
         ),
