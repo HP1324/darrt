@@ -46,4 +46,8 @@ const notifReminderType = 'notif';
 
 const alarmReminderType = 'alarm';
 
+const googleClientId = "569574442549-543mjpqcfhsivrn5atcoblifvbkvg0vp.apps.googleusercontent.com";
+
+const mGoogleEmail = 'google_email';
+
 
