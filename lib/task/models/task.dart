@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'dart:isolate';
 
-import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
@@ -39,6 +37,7 @@ class Task {
   @Backlink()
   final completions = ToMany<TaskCompletion>();
 
+  ///Whether this task comes under this date
   bool isActiveOn(DateTime targetDate) {
     DateTime onlyDate(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
     final d = onlyDate(targetDate);

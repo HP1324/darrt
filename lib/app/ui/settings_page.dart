@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:minimaltodo/app/services/backup_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/app/state/value_notifiers.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:toastification/toastification.dart';
 import '../../helpers/consts.dart';
 
@@ -49,8 +52,9 @@ class DriveBackupSection extends StatefulWidget {
 
 class _DriveBackupSectionState extends State<DriveBackupSection> {
   final GoogleSignInService _googleService = GoogleSignInService();
-  final ValueNotifier<String> currentEmail =
-  ValueNotifier(MiniBox.read(mGoogleEmail) ?? 'Sign in');
+  final ValueNotifier<String> currentEmail = ValueNotifier(MiniBox.read(mGoogleEmail) ?? 'Sign in');
+  final ValueNotifier<bool> isBackingUp = ValueNotifier(false);
+  final ValueNotifier<bool> isRestoring = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
@@ -74,10 +78,49 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
               valueListenable: currentEmail,
               builder: (context, value, _) => Text(value),
             ),
-            trailing: OutlinedButton.icon(
-              onPressed: () {},
-              label: Text('Backup'),
-              icon: Icon(Icons.backup),
+            trailing: ValueListenableBuilder<bool>(
+              valueListenable: isBackingUp,
+              builder: (context, backingUp, _) {
+                return OutlinedButton.icon(
+                  onPressed: backingUp
+                      ? null // optional: disable button while backing up
+                      : () async {
+                          final backupService = BackupService();
+                          if (await GoogleSignInService().isSignedIn()) {
+                            isBackingUp.value = true;
+                            try {
+                              final backupFile = await backupService.generateBackupFile();
+                              await backupService.uploadFileToGoogleDrive(backupFile);
+                              if (context.mounted) {
+                                showToast(
+                                  context,
+                                  type: ToastificationType.success,
+                                  description: 'Backup successful',
+                                );
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                showToast(
+                                  context,
+                                  type: ToastificationType.error,
+                                  description: 'Backup failed',
+                                );
+                              }
+                            } finally {
+                              isBackingUp.value = false;
+                            }
+                          }
+                        },
+                  icon: const Icon(Icons.backup),
+                  label: backingUp
+                      ? const SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Backup'),
+                );
+              },
             ),
           ),
           CheckboxListTile(
@@ -91,11 +134,71 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              OutlinedButton.icon(
-                onPressed: () {},
-                icon: Icon(Icons.settings_backup_restore_sharp),
-                label: Text('Restore data'),
+              ValueListenableBuilder<bool>(
+                valueListenable: isRestoring,
+                builder: (context, restoring, _) {
+                  return OutlinedButton.icon(
+                    onPressed: restoring
+                        ? null
+                        : () async {
+                            isRestoring.value = true;
+                            try {
+                              final backupFile = await BackupService()
+                                  .downloadFileFromGoogleDrive();
+                              await BackupService().restoreDataFromBackupFile(backupFile);
+
+                              if (context.mounted) {
+                                //Rationale dialog to restart the app using restart_app package
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text('Restart app'),
+                                    content: Text(
+                                      'Backup successful, you must restart the application to apply the changes.',
+                                    ),
+                                    actions: [
+                                      FilledButton.icon(
+                                        onPressed: () async{
+                                          await Restart.restartApp();
+                                        },
+                                        label: Text('Restart'),
+                                        icon: Icon(Icons.restart_alt),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                // showToast(
+                                //   context,
+                                //   type: ToastificationType.success,
+                                //   description: 'Restore completed successfully',
+                                // );
+                              }
+                            } catch (e, t) {
+                              MiniLogger.e('Error restoring data: ${e.toString()}');
+                              MiniLogger.t('Stacktrace: $t');
+                              if (context.mounted) {
+                                showToast(
+                                  context,
+                                  type: ToastificationType.error,
+                                  description: 'Restore failed',
+                                );
+                              }
+                            } finally {
+                              isRestoring.value = false;
+                            }
+                          },
+                    icon: const Icon(Icons.settings_backup_restore_sharp),
+                    label: restoring
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Restore data'),
+                  );
+                },
               ),
+
               OutlinedButton.icon(
                 onPressed: () async {
                   await _googleService.signOut();
@@ -152,7 +255,7 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
         final email = account.email;
         currentEmail.value = email;
         await MiniBox.write(mGoogleEmail, email);
-        if(context.mounted) {
+        if (context.mounted) {
           showSignInToast(context, ToastificationType.success, 'Signed in to $email');
         }
 
@@ -177,7 +280,6 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
     );
   }
 }
-
 
 class SnoozeSection extends StatelessWidget {
   const SnoozeSection({super.key});

@@ -16,14 +16,14 @@ class TaskViewModel extends ViewModel<Task> {
       singleTaskCompletions[task.id] = task.isDone;
     }
     recurringTaskCompletions.clear();
-    for (var completion in ObjectBox.store.box<TaskCompletion>().getAll()) {
+    for (var completion in _completionBox.getAll()) {
       int id = completion.task.targetId;
       int date = completion.date.millisecondsSinceEpoch;
       recurringTaskCompletions.putIfAbsent(id, () => {}).add(date);
     }
   }
 
-  final _completionBox = ObjectBox.store.box<TaskCompletion>();
+  final _completionBox = ObjectBox.completionBox;
   Set<int> get selectedTaskIds => selectedItemIds;
   final Map<int, bool> singleTaskCompletions = {};
   final Map<int, Set<int>> recurringTaskCompletions = {};
@@ -33,8 +33,6 @@ class TaskViewModel extends ViewModel<Task> {
   String putItem(Task item, {required bool edit}) {
     final task = item;
     final title = task.title.trim();
-
-
 
     if (title.isEmpty) return Messages.mTaskEmpty;
     task.title = title;

@@ -11,13 +11,13 @@ import 'consts.dart';
 
 
 void showToast(BuildContext context,
-    {required ToastificationType type, required String description, Duration? duration}) {
+    {required ToastificationType type, required String description, Duration? duration, Alignment? alignment}) {
   toastification.show(
     context: context,
     description: Text(description),
     type: type,
     autoCloseDuration: duration ?? const Duration(milliseconds: 1500),
-    alignment: Alignment.bottomCenter,
+    alignment: alignment?? Alignment.bottomCenter,
   );
 }
 
