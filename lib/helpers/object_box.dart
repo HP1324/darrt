@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/note/models/folder.dart';
 import 'package:minimaltodo/note/models/note.dart';
@@ -40,7 +41,7 @@ class ObjectBox {
   }
 
   static void _putInitialData() async {
-    if (MiniBox.read('first_time') == null) {
+    if (MiniBox.read(mFirstTimeInstall) == null) {
       if (categoryBox.isEmpty()) {
         categoryBox.putMany(_getInitialCategories());
       }
@@ -48,7 +49,7 @@ class ObjectBox {
       if (folderBox.isEmpty()) {
         folderBox.putMany(_getInitialFolders());
       }
-      await MiniBox.write('first_time', false);
+      await MiniBox.write(mFirstTimeInstall, false);
     }
   }
 

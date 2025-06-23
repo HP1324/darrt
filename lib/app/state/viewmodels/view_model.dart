@@ -71,6 +71,35 @@ abstract class ViewModel<T> extends ChangeNotifier {
     return edit ? getUpdateSuccessMessage() : getCreateSuccessMessage();
   }
 
+  void putManyItems(List<T> manyItems) {
+    if(_box.isEmpty()){
+      for(final item in manyItems){
+        if(item is Task) item.id = 0;
+        if(item is Note) item.id = 0;
+        if(item is Folder) item.id = 0;
+        if(item is CategoryModel) item.id = 0;
+      }
+    }else{
+      // final count = _box.count();
+      // int id = count + 1;
+      // for(final item in manyItems) {
+      //   if(item is Task) item.id = id;
+      //   if(item is Note) item.id = id;
+      //   if(item is Folder) item.id = id;
+      //   if(item is CategoryModel) item.id = id;
+      //   id++;
+      // }
+    }
+    final ids = _box.putMany(manyItems);
+
+    final existingIds = _items.map((e) => getItemId(e)).toSet();
+    final newItems = manyItems.where((item) => !existingIds.contains(getItemId(item)));
+    _items.addAll(newItems);
+
+    MiniLogger.d('Items added/updated with ids: $ids');
+    notifyListeners();
+  }
+
   /// Delete an item from the local ObjectBox database and the in-memory list.
   /// Child classes may override this method for implementing custom behavior
   String deleteItem(int id) {

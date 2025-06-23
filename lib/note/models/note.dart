@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' show TextSelection;
 import 'package:flutter_quill/flutter_quill.dart' show Document, QuillController;
 import 'package:flutter_quill/quill_delta.dart' show Delta;
 import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/note/models/folder.dart';
 import 'package:objectbox/objectbox.dart';
 
@@ -42,7 +43,7 @@ class Note {
     'folderIds': folders.where((f) => f.id > 0).map((f) => f.id).toList(),
   };
 
-  factory Note.fromJson(Map<String, dynamic> json, Box<Folder> folderBox) {
+  factory Note.fromJson(Map<String, dynamic> json) {
     try {
       final note = Note(
         id: json['id'] ?? 0,
@@ -56,7 +57,7 @@ class Note {
       );
 
       final folderIds = (json['folderIds'] as List?)?.cast<int>() ?? [];
-      final fetched = folderBox.getMany(folderIds);
+      final fetched = ObjectBox.folderBox.getMany(folderIds);
 
       final validFolders = <Folder>[];
       final missingIds = <int>[];
