@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/category/state/category_state_controller.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
+import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:toastification/toastification.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+
 class AddCategoryPage extends StatefulWidget {
-  const AddCategoryPage({super.key, required this.edit, this.category}) : assert(!edit || category != null);
+  const AddCategoryPage({super.key, required this.edit, this.category})
+    : assert(!edit || category != null);
   final bool edit;
   final CategoryModel? category;
   @override
@@ -14,13 +17,11 @@ class AddCategoryPage extends StatefulWidget {
 }
 
 class _AddCategoryPageState extends State<AddCategoryPage> {
-
   @override
   void initState() {
     super.initState();
-      g.catSc.initState(widget.edit,widget.edit? widget.category! : null);
+    g.catSc.initState(widget.edit, widget.edit ? widget.category! : null);
   }
-
 
   @override
   void dispose() {
@@ -83,7 +84,8 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                         selectedValue: g.catSc.color,
                         onTap: () => _showColorPicker(context),
                         builder: (context) {
-                          final selectedColor = IconColorStorage.colors[g.catSc.color] ??
+                          final selectedColor =
+                              IconColorStorage.colors[g.catSc.color] ??
                               Theme.of(context).colorScheme.primary;
                           return Container(
                             width: 28,
@@ -107,8 +109,12 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
         onPressed: () {
           CategoryModel category = g.catSc.buildModel(edit: widget.edit, model: widget.category);
           final message = g.catVm.putItem(category, edit: widget.edit);
-          showToast(context, type: ToastificationType.success, description: message);
-          Navigator.pop(context);
+          if (message == Messages.mCategoryExists) {
+            showToast(context, type: ToastificationType.error, description: message);
+          } else {
+            showToast(context, type: ToastificationType.success, description: message);
+            Navigator.pop(context);
+          }
         },
         child: const Icon(Icons.done),
       ),
@@ -226,9 +232,7 @@ class _IconPickerDialogState extends State<IconPickerDialog> with SingleTickerPr
     if (_searchQuery.isEmpty) return icons;
 
     return Map.fromEntries(
-        icons.entries.where((entry) =>
-            entry.key.toLowerCase().contains(_searchQuery)
-        )
+      icons.entries.where((entry) => entry.key.toLowerCase().contains(_searchQuery)),
     );
   }
 
@@ -285,8 +289,8 @@ class _IconPickerDialogState extends State<IconPickerDialog> with SingleTickerPr
               controller: _tabController,
               children: [
                 _buildIconGrid(filteredAllIcons),
-                ...IconColorStorage.icons.keys.map((category) =>
-                    _buildIconGrid(getFilteredIcons(IconColorStorage.icons[category]!))
+                ...IconColorStorage.icons.keys.map(
+                  (category) => _buildIconGrid(getFilteredIcons(IconColorStorage.icons[category]!)),
                 ),
               ],
             ),
@@ -390,7 +394,7 @@ class ColorPickerDialog extends StatelessWidget {
                                 border: Border.all(color: Colors.grey.shade300),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha:0.1),
+                                    color: Colors.black.withValues(alpha: 0.1),
                                     spreadRadius: 1,
                                     blurRadius: 2,
                                     offset: const Offset(0, 1),
@@ -418,4 +422,3 @@ class ColorPickerDialog extends StatelessWidget {
     );
   }
 }
-

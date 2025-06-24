@@ -72,32 +72,36 @@ abstract class ViewModel<T> extends ChangeNotifier {
   }
 
   void putManyItems(List<T> manyItems) {
-    if(_box.isEmpty()){
-      for(final item in manyItems){
-        if(item is Task) item.id = 0;
-        if(item is Note) item.id = 0;
-        if(item is Folder) item.id = 0;
-        if(item is CategoryModel) item.id = 0;
-      }
-    }else{
-      // final count = _box.count();
-      // int id = count + 1;
-      // for(final item in manyItems) {
-      //   if(item is Task) item.id = id;
-      //   if(item is Note) item.id = id;
-      //   if(item is Folder) item.id = id;
-      //   if(item is CategoryModel) item.id = id;
-      //   id++;
-      // }
+    //Making ids zero so that objectbox can continue from the next id
+    for (final item in manyItems) {
+      if (item is Task) item.id = 0;
+      if (item is Note) item.id = 0;
+      if (item is Folder) item.id = 0;
+      if (item is CategoryModel) item.id = 0;
     }
-    final ids = _box.putMany(manyItems);
 
-    final existingIds = _items.map((e) => getItemId(e)).toSet();
-    final newItems = manyItems.where((item) => !existingIds.contains(getItemId(item)));
+    final itemsFromDatabase = _box.getAll();
+    final existingIds = itemsFromDatabase.map((e) => getItemId(e)).toSet();
+    final existingLabels = itemsFromDatabase.map((e)=> _getPrimaryLabel(e)).toSet();
+
+    final newItems = manyItems.where((item) {
+      final id = getItemId(item);
+      final label = _getPrimaryLabel(item);
+      return !existingIds.contains(id) && !existingLabels.contains(label);
+    }).toList();
+    final ids = _box.putMany(newItems);
     _items.addAll(newItems);
 
     MiniLogger.d('Items added/updated with ids: $ids');
     notifyListeners();
+  }
+
+  String _getPrimaryLabel(T item) {
+    if (item is Task) return item.title;
+    if (item is Note) return item.content;
+    if (item is Folder) return item.name;
+    if (item is CategoryModel) return item.name;
+    return '';
   }
 
   /// Delete an item from the local ObjectBox database and the in-memory list.

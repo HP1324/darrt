@@ -1,6 +1,7 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
+import 'package:minimaltodo/helpers/consts.dart';
 
 import '../../helpers/mini_logger.dart';
 class GoogleSignInService {
@@ -11,7 +12,7 @@ class GoogleSignInService {
   GoogleSignInService._internal();
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: [drive.DriveApi.driveFileScope],
+    scopes: [drive.DriveApi.driveAppdataScope],
   );
 
   Future<GoogleSignInAccount?> signIn() async {

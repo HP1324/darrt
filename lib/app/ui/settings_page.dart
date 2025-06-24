@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:minimaltodo/app/services/backup_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
@@ -89,7 +91,7 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
                           if (await GoogleSignInService().isSignedIn()) {
                             isBackingUp.value = true;
                             try {
-                              final backupFile = await backupService.generateBackupFile();
+                              final backupFile = await backupService.generateBackupJsonFile();
                               await backupService.uploadFileToGoogleDrive(backupFile);
                               if (context.mounted) {
                                 showToast(
@@ -144,7 +146,7 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
                             isRestoring.value = true;
                             try {
                               final backupFile = await BackupService()
-                                  .downloadFileFromGoogleDrive();
+                                  .downloadCompressedFileFromGoogleDrive();
                               await BackupService().restoreDataFromBackupFile(backupFile);
 
                               if (context.mounted) {
@@ -154,14 +156,18 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
                                   builder: (context) => AlertDialog(
                                     title: Text('Restart app'),
                                     content: Text(
-                                      'Backup successful, you must restart the application to apply the changes.',
+                                      "Don't forget to restart the app to see restored data correctly.",
                                     ),
                                     actions: [
                                       FilledButton.icon(
                                         onPressed: () async{
-                                          await Restart.restartApp();
+                                          // ObjectBox.store.close();
+                                          // if(ObjectBox.store.isClosed()) {
+                                          //   await Restart.restartApp();
+                                          // }
+                                          Navigator.pop(context);
                                         },
-                                        label: Text('Restart'),
+                                        label: Text('Got it'),
                                         icon: Icon(Icons.restart_alt),
                                       ),
                                     ],
@@ -198,7 +204,6 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
                   );
                 },
               ),
-
               OutlinedButton.icon(
                 onPressed: () async {
                   await _googleService.signOut();
@@ -220,11 +225,116 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
               ),
             ],
           ),
+          //Widget to delete backup from google drive
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.error.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            title: Text(
+              'Delete Backup',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            trailing: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: IconButton(
+                onPressed: () async {
+                  // Show confirmation dialog first
+                  final shouldDelete = await _showDeleteConfirmationDialog(context);
+                  if (shouldDelete) {
+                    try {
+                      await BackupService().deleteBackupFromGoogleDrive();
+                      if (context.mounted) {
+                        showToast(
+                          context,
+                          type: ToastificationType.success,
+                          description: 'Backup deleted successfully.',
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        showToast(
+                          context,
+                          type: ToastificationType.error,
+                          description: 'Failed to delete backup',
+                        );
+                      }
+                    }
+                  }
+                },
+                icon: Icon(
+                  Icons.delete,
+                  color: Theme.of(context).colorScheme.error,
+                  size: 20,
+                ),
+                tooltip: 'Delete backup',
+              ),
+            ),
+          ),
+        ),
         ],
       ),
     );
   }
+// Add this helper method to show confirmation dialog
+  Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: Theme.of(context).colorScheme.error,
+                size: 28,
+              ),
+              const SizedBox(width: 12),
+              const Text('Delete Backup?'),
+            ],
+          ),
+          content: const Text(
+            'This will permanently delete your backup from Google Drive. This action cannot be undone.',
+          ),
+          actions: [
 
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: const Text('Delete'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
+  }
   Future<void> handleGoogleSignIn(BuildContext context) async {
     try {
       if (await _googleService.isSignedIn()) {

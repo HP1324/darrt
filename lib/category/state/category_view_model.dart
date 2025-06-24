@@ -9,12 +9,12 @@ class CategoryViewModel extends ViewModel<CategoryModel> {
   @override
   String putItem(CategoryModel item,{required bool edit}) {
     final category = item;
+    if(items.indexWhere((c) => c.name == category.name) != -1) return Messages.mCategoryExists;
     if (category.name.trim().isEmpty) return Messages.mCategoryEmpty;
     final message = super.putItem(category, edit: edit);
 
     scrollController.animateTo(scrollController.position.maxScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.easeIn);
 
-    notifyListeners();
     return message;
   }
 @override
