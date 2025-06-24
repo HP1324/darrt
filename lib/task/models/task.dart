@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
@@ -112,14 +113,17 @@ class Task {
         reminders: json['reminders'],
       );
       // Restore category relations
-      final ids = (json['categoryIds'] as List?)?.cast<int>() ?? [];
 
+
+      final ids = List<int>.from(json['categoryIds'] ?? []);
+      //The following won't work and give a TypeError: type List<dynamic> is not a subtype of type List<int> in type cast, the above line works well and got this solution from [https://stackoverflow.com/a/68079173/28525347]
+      // final ids = (json['categoryIds'] as List<int>?)?.cast<int>() ?? [];
       final fetched = ObjectBox.categoryBox.getMany(ids);
 
       final validCategories = <CategoryModel>[];
       final missingIds = <int>[];
 
-      for (var i = 0; i < ids.length; i++) {
+      for (int i = 0; i < ids.length; i++) {
         final cat = fetched[i];
         if (cat != null) {
           validCategories.add(cat);

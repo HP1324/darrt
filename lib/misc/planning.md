@@ -134,5 +134,12 @@ Color(0xff78290F)
 2. Update
 3. Delete
    1. If task has only that category, update that task's category to general
+
+
+Backup & restore
+
+1. Generate backup file
+   1. Get previous backup file from google drive
+   2. Convert this file to json  
       
    

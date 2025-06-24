@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:objectbox/objectbox.dart';
@@ -17,7 +18,10 @@ class Folder {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is Folder && other.id == id && other.name == name;
+    return other is Folder && other.id == id && other.name == name && listEquals(
+        other.notes.map((n) => n.id).toList()..sort(),
+        notes.map((n) => n.id).toList()..sort()
+    );
   }
   @override
   int get hashCode => Object.hash(id, name);

@@ -244,6 +244,9 @@ class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin 
                                 onPressed: () {
                                   final message = g.taskVm.deleteMultipleItems();
                                   Navigator.pop(context, message);
+                                  if (context.mounted) {
+                                    showToast(context, type: ToastificationType.success, description: message);
+                                  }
                                 },
                                 child: const Text('Delete'),
                               ),
@@ -251,9 +254,6 @@ class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin 
                           );
                         },
                       );
-                      if (context.mounted) {
-                        showToast(context, type: ToastificationType.success, description: message);
-                      }
                     },
                     icon: Icon(Icons.delete),
                   ),

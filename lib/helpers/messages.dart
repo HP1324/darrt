@@ -19,6 +19,8 @@ class Messages {
 
   static final mCategoriesDeleted = 'Categories Deleted';
 
+  static final mCategoryExists = 'Category already exists';
+
   static final mNoteAdded = 'Note added';
 
   static final mNoteEdited = 'Note edited';
