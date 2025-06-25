@@ -28,4 +28,10 @@ class TaskCompletion{
     return completion;
   }
 
+  bool equals(TaskCompletion other) {
+    return date.millisecondsSinceEpoch == other.date.millisecondsSinceEpoch &&
+        isDone == other.isDone;
+    // Note: Not comparing task relation to avoid circular reference
+  }
+
 }

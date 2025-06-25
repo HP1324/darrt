@@ -2,6 +2,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:minimaltodo/helpers/consts.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
 
 import '../../helpers/mini_logger.dart';
 class GoogleSignInService {
@@ -40,8 +41,10 @@ class GoogleSignInService {
   Future<void> restoreGoogleAccount() async {
     final account = await _googleSignIn.signInSilently();
     if (account != null) {
+      await MiniBox.write(mGoogleEmail, account.email);
       MiniLogger.d("Restored user: ${account.email}");
     } else {
+      await MiniBox.write(mGoogleEmail, null);
       MiniLogger.d("No previous session found");
     }
   }

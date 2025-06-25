@@ -84,4 +84,30 @@ class Note {
     }
   }
 
+  bool equals(Note other) {
+    // Compare basic fields
+    if (content != other.content ||
+        createdAt?.millisecondsSinceEpoch != other.createdAt?.millisecondsSinceEpoch ||
+        updatedAt?.millisecondsSinceEpoch != other.updatedAt?.millisecondsSinceEpoch) {
+      return false;
+    }
+
+    // Compare folders (ToMany relation)
+    if (folders.length != other.folders.length) {
+      return false;
+    }
+
+    final thisFoldersSorted = folders.toList()..sort((a, b) => a.name.compareTo(b.name));
+    final otherFoldersSorted = other.folders.toList()..sort((a, b) => a.name.compareTo(b.name));
+
+    for (int i = 0; i < thisFoldersSorted.length; i++) {
+      if (!thisFoldersSorted[i].equals(otherFoldersSorted[i])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
 }

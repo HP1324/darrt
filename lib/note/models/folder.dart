@@ -43,4 +43,9 @@ class Folder {
     }
   }
 
+  bool equals(Folder other) {
+    return name == other.name;
+    // Note: Not comparing notes backlink to avoid circular reference
+  }
+
 }
