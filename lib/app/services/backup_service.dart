@@ -1,15 +1,16 @@
 import 'dart:convert';
 import 'dart:io' as dart;
 import 'package:archive/archive_io.dart';
-import 'package:flutter/cupertino.dart';
+import 'dart:developer' as dev;
 import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:minimaltodo/app/exceptions.dart';
+import 'package:minimaltodo/app/services/content_comparator.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
-import 'package:path/path.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
@@ -53,13 +54,8 @@ class BackupService {
         final oldData = await parseBackupJsonFileAsMap(oldDecompressedFile);
 
         // Merge the old and new data
-        mergedData = {
-          for (final key in newData.keys)
-            key: _mergeUniqueById(
-              oldData[key] as List<dynamic>? ?? [],
-              newData[key] ?? [],
-            ),
-        };
+        BackupMergeService.mergeData(oldData, newData);
+        // mergedData = _mergeData(oldData, newData);
       } catch (e, t) {
         MiniLogger.e('Error downloading old backup file ${e.toString()}, type: ${e.runtimeType}');
         MiniLogger.t(t.toString());
@@ -81,16 +77,42 @@ class BackupService {
     }
   }
 
-  List<Map<String, dynamic>> _mergeUniqueById(List oldList, List newList) {
-    final merged = [...oldList.cast<Map<String, dynamic>>()];
-    final existingIds = merged.map((e) => e['id']).toSet();
+  Map<String, dynamic> _mergeData(Map<String, dynamic> oldData, Map<String, dynamic> newData) {
+    final merged = Map<String, dynamic>.from(oldData);
 
-    for (final item in newList) {
-      final mapItem = item as Map<String, dynamic>;
-      if (!existingIds.contains(mapItem['id'])) {
-        merged.add(mapItem);
+    newData.forEach((key, newList) {
+      if (merged.containsKey(key)) {
+        final oldList = List<Map<String, dynamic>>.from(merged[key]);
+        final newItems = List<Map<String, dynamic>>.from(newList);
+
+        // Create a map for quick lookup of existing items by ID
+        final existingItems = <String, Map<String, dynamic>>{};
+        for (var item in oldList) {
+          if (item['id'] != null) {
+            existingItems[item['id'].toString()] = item;
+          }
+        }
+
+        // Update existing items or add new ones
+        for (var newItem in newItems) {
+          if (newItem['id'] != null) {
+            final id = newItem['id'].toString();
+            if (existingItems.containsKey(id)) {
+              // Update existing item
+              existingItems[id]!.addAll(newItem);
+            } else {
+              // Add new item
+              oldList.add(newItem);
+            }
+          }
+        }
+
+        merged[key] = oldList;
+      } else {
+        // Key doesn't exist in old data, add entire list
+        merged[key] = newList;
       }
-    }
+    });
 
     return merged;
   }
@@ -102,13 +124,14 @@ class BackupService {
       final client = await GoogleSignInService().getAuthenticatedClient();
 
       if (client == null) {
-        throw Exception('Google client is not authenticated');
+        throw GoogleClientNotAuthenticatedError();
       }
       final driveApi = drive.DriveApi(client);
 
       //Check if file already exists
       final existingFiles = await driveApi.files.list(
         q: "name='$backupFileZipName' and trashed=false",
+        spaces: 'appDataFolder'
       );
 
       if (existingFiles.files != null && existingFiles.files!.isNotEmpty) {
@@ -145,8 +168,9 @@ class BackupService {
   ///Downloads the compressed backup file(not json) from google drive,stores it in the platform's temporary directory and returns it as a dart [File] object. The temporary directory is retrieved using [getTemporaryDirectory] method from the path_provider package.
   Future<dart.File> downloadCompressedFileFromGoogleDrive() async {
     final client = await GoogleSignInService().getAuthenticatedClient();
+
     if (client == null) {
-      throw Exception('Google client is not authenticated');
+      throw GoogleClientNotAuthenticatedError();
     }
     final driveApi = drive.DriveApi(client);
 
@@ -158,13 +182,17 @@ class BackupService {
     );
 
     if (searchResult.files == null || searchResult.files!.isEmpty) {
-      throw Exception('No backup file "$backupFileZipName" found in Google Drive.');
+      throw BackupFileNotFoundError();
     }
 
     final fileId = searchResult.files!.first.id;
+
     final tempDir = await getTemporaryDirectory();
-    // Here we are just creating a reference to an empty file object with the same name as the backup file, we will write data to the file using stream
+
+    // Here we are just creating a reference to an empty file object with the
+    // same name as the backup file, we will write data to the file using stream
     final localPath = '${tempDir.path}/$backupFileZipName';
+
     final outFile = dart.File(localPath);
 
     //2.Download file as media
@@ -187,19 +215,19 @@ class BackupService {
     //Parse the json file as map to work on it
     Map<String, dynamic> backupMap = await parseBackupJsonFileAsMap(jsonBackupFile);
 
-    final tasks = (backupMap['tasks'] as List).map((e) => Task.fromJson(e)).toList();
-    g.taskVm.putManyItems(tasks);
-
     final categories = (backupMap['categories'] as List)
         .map((e) => CategoryModel.fromJson(e))
         .toList();
     g.catVm.putManyItems(categories);
 
-    final notes = (backupMap['notes'] as List).map((e) => Note.fromJson(e)).toList();
-    g.noteVm.putManyItems(notes);
+    final tasks = (backupMap['tasks'] as List).map((e) => Task.fromJson(e)).toList();
+    g.taskVm.putManyItems(tasks);
 
     final folders = (backupMap['folders'] as List).map((e) => Folder.fromJson(e)).toList();
     g.folderVm.putManyItems(folders);
+
+    final notes = (backupMap['notes'] as List).map((e) => Note.fromJson(e)).toList();
+    g.noteVm.putManyItems(notes);
 
     final completions = (backupMap['completions'] as List)
         .map((e) => TaskCompletion.fromJson(e))
@@ -218,10 +246,10 @@ class BackupService {
       final jsonMap = jsonDecode(jsonString);
 
       if (jsonMap is Map<String, dynamic>) {
-        debugPrint('JSON Map: $jsonMap');
+        dev.log('JSON Map: $jsonMap');
         return jsonMap;
       } else {
-        throw Exception('Invalid JSON structure: not a Map');
+        throw FormatException('Invalid JSON structure: not a Map');
       }
     } catch (e) {
       throw Exception('Failed to parse backup JSON: $e');
@@ -266,11 +294,11 @@ class BackupService {
     return jsonFile;
   }
 
-  Future<void> deleteBackupFromGoogleDrive()async{
+  Future<void> deleteBackupFromGoogleDrive() async {
     final client = await GoogleSignInService().getAuthenticatedClient();
 
     if (client == null) {
-      throw Exception('Google client is not authenticated');
+      throw GoogleClientNotAuthenticatedError();
     }
 
     final driveApi = drive.DriveApi(client);
@@ -278,13 +306,61 @@ class BackupService {
     final searchResult = await driveApi.files.list(
       q: "name='$backupFileZipName' and trashed=false",
       spaces: 'appDataFolder',
-      $fields: 'files(id,name)'
+      $fields: 'files(id,name)',
     );
 
     if (searchResult.files != null && searchResult.files!.isNotEmpty) {
       await driveApi.files.delete(searchResult.files!.first.id!);
+    } else {
+      throw BackupFileNotFoundError('No backup to delete');
     }
   }
+}
 
+class BackupMergeService {
+  static Map<String, dynamic> mergeData(
+    Map<String, dynamic> oldData,
+    Map<String, dynamic> newData,
+  ) {
+    final merged = Map<String, dynamic>.from(oldData);
 
+    newData.forEach((key, newList) {
+      if (merged.containsKey(key)) {
+        final oldList = List<Map<String, dynamic>>.from(merged[key]);
+        final newItems = List<Map<String, dynamic>>.from(newList);
+
+        // Add items from newData that don't exist in oldData (content-wise)
+        for (var newItem in newItems) {
+          if (!_itemExistsInList(key, newItem, oldList)) {
+            oldList.add(newItem);
+          }
+        }
+
+        merged[key] = oldList;
+      } else {
+        // Key doesn't exist in old data, add entire list
+        merged[key] = List<Map<String, dynamic>>.from(newList);
+      }
+    });
+
+    return merged;
+  }
+
+  static bool _itemExistsInList(
+    String entityType,
+    Map<String, dynamic> newItem,
+    List<Map<String, dynamic>> existingList,
+  ) {
+    try {
+      return existingList.any(
+        (existingItem) => EntityTypeResolver.areItemsEqual(entityType, newItem, existingItem),
+      );
+    } catch (e) {
+      // Fallback to ID comparison if entity type is unknown
+      final newId = newItem['id']?.toString();
+      if (newId == null) return false;
+
+      return existingList.any((existingItem) => existingItem['id']?.toString() == newId);
+    }
+  }
 }

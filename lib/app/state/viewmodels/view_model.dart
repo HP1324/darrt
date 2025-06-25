@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/note/models/folder.dart';
@@ -72,27 +73,49 @@ abstract class ViewModel<T> extends ChangeNotifier {
   }
 
   void putManyItems(List<T> manyItems) {
-    //Making ids zero so that objectbox can continue from the next id
+    MiniLogger.d('items length: ${manyItems.length}');
+    bool isEmptyDatabase = _box.getAll().isEmpty;
+
+    //List to be put in database based on conditions
+    List<T> newItems = [];
+
+    //Assign 0 to item id if database is empty or item is not in the database, so that objectbox doesn't throw id not valid error
     for (final item in manyItems) {
-      if (item is Task) item.id = 0;
-      if (item is Note) item.id = 0;
-      if (item is Folder) item.id = 0;
-      if (item is CategoryModel) item.id = 0;
-    }
-
-    final itemsFromDatabase = _box.getAll();
-    final existingIds = itemsFromDatabase.map((e) => getItemId(e)).toSet();
-    final existingLabels = itemsFromDatabase.map((e)=> _getPrimaryLabel(e)).toSet();
-
-    final newItems = manyItems.where((item) {
       final id = getItemId(item);
-      final label = _getPrimaryLabel(item);
-      return !existingIds.contains(id) && !existingLabels.contains(label);
-    }).toList();
-    final ids = _box.putMany(newItems);
-    _items.addAll(newItems);
+      if (!isEmptyDatabase) {
+        if (_box.contains(id)) {
+          if (item is CategoryModel) {
+            g.catVm.putItem(item, edit: true, scrollToBottom: false);
+          } else {
+            putItem(item, edit: true);
+          }
+        } else {
+          debugPrint('');
+          setItemId(item, 0);
+          if (item is CategoryModel) {
+            g.catVm.putItem(item, edit: false, scrollToBottom: false);
+          } else {
+            putItem(item, edit: false);
+          }
+        }
+      }else{
+        setItemId(item, 0);
+        putItem(item, edit: false);
+      }
+    }
+    // for (final item in manyItems) {
+    //   if (item is Task && (!_box.contains(item.id) || isEmptyDatabase)) item.id = 0;
+    //   if (item is Note && (!_box.contains(item.id) || isEmptyDatabase)) item.id = 0;
+    //   if (item is Folder && (!_box.contains(item.id) || isEmptyDatabase)) item.id = 0;
+    //   if (item is CategoryModel && (!_box.contains(item.id) || isEmptyDatabase)) item.id = 0;
+    // }
+    // newItems = List.from(manyItems);
+    //
+    // final ids = _box.putMany(newItems);
+    //
+    // _items.addAll(newItems);
 
-    MiniLogger.d('Items added/updated with ids: $ids');
+    // MiniLogger.d('Items added/updated with ids: $ids');
     notifyListeners();
   }
 
@@ -147,4 +170,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
 
   /// Get the ID of an item
   int getItemId(T item);
+
+  /// Set the ID of an item
+  void setItemId(T item, int id);
 }

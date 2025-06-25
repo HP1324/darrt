@@ -28,4 +28,9 @@ class NoteViewModel extends ViewModel<Note>{
   @override
   String getUpdateSuccessMessage() => Messages.mNoteEdited;
 
+  @override
+  void setItemId(Note item, int id) {
+    item.id = id;
+  }
+
 }

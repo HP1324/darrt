@@ -17,6 +17,7 @@ class TaskItem extends StatefulWidget {
 class _TaskItemState extends State<TaskItem> {
   @override
   Widget build(BuildContext context) {
+  debugPrint('Task: title: ${widget.task.title}, id: ${widget.task.id}');
     final scheme = Theme.of(context).colorScheme;
     return ListenableBuilder(
       listenable: g.taskVm,

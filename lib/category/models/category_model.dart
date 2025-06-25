@@ -40,4 +40,10 @@ class CategoryModel {
         "icon_code": icon,
         "color": color,
       };
+
+  bool equals(CategoryModel other) {
+    return name == other.name &&
+        icon == other.icon &&
+        color == other.color;
+  }
 }

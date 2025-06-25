@@ -28,4 +28,9 @@ class FolderViewModel extends ViewModel<Folder> {
 
   @override
   String getUpdateSuccessMessage() => Messages.mFolderEdited;
+
+  @override
+  void setItemId(Folder item, int id) {
+    item.id = id;
+  }
 }

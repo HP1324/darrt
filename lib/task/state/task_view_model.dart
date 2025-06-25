@@ -114,4 +114,9 @@ class TaskViewModel extends ViewModel<Task> {
   @override
   String getDeleteSuccessMessage(int length) =>
       length == 1 ? '1 ${Messages.mTaskDeleted}' : '$length ${Messages.mTasksDeleted}';
+
+  @override
+  void setItemId(Task item, int id) {
+    item.id = id;
+  }
 }
