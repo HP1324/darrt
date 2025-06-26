@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/helpers/messages.dart';
@@ -36,22 +35,14 @@ class TaskViewModel extends ViewModel<Task> {
 
     if (title.isEmpty) return Messages.mTaskEmpty;
     task.title = title;
-    debugPrint('Categories before putting item');
-    for (var c in task.categories.toList()) {
-      debugPrint(c.name);
-    }
+
     final message = super.putItem(task, edit: edit);
 
-    final dbTask = box.get(getItemId(task)) as Task;
-    debugPrint('Categories after putting item');
-    for (var c in dbTask.categories.toList()) {
-      debugPrint(c.name);
-    }
-    NotificationService.removeAllTaskNotifications(task).then((_) {
+    NotificationService.removeAllTaskNotifications(task).then((_) async {
       if (task.isRepeating) {
-        NotificationService.createRepeatingTaskNotifications(task);
+        await NotificationService.createRepeatingTaskNotifications(task);
       } else {
-        NotificationService.createTaskNotification(task);
+        await NotificationService.createTaskNotification(task);
       }
     });
 

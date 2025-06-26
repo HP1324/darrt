@@ -96,8 +96,9 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       actions: [
+        if(kDebugMode)
         _MiniAppBarAction(
-          icon: Icon(Icons.flutter_dash),
+          icon: Icon(Icons.handyman),
           onTap: () async {
             if (kDebugMode) {
              final user = GoogleSignInService().currentUser;
@@ -327,6 +328,3 @@ class _MiniAppBarAction extends StatelessWidget {
   }
 }
 
-class QuickReminderController extends ChangeNotifier {
-  final TextEditingController minutesController = TextEditingController();
-}

@@ -152,11 +152,11 @@ class NotificationService {
     if (task.endDate != null && task.endDate!.difference(task.startDate) > Duration(days: 365)) {
       await compute(scheduleRepeatNotifications, task);
     } else {
-      scheduleRepeatNotifications(task);
+      await scheduleRepeatNotifications(task);
     }
   }
 
-  static void scheduleRepeatNotifications(Task task) async {
+  static Future<void> scheduleRepeatNotifications(Task task) async {
     try {
       RepeatConfig config = RepeatConfig.fromJsonString(task.repeatConfig!);
       final type = config.type;
@@ -442,7 +442,7 @@ class NotificationService {
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Text(
-                'Please allow the application to send notifications, otherwise we won\'t be able to remind you about your tasks.'),
+                "Allow the application to send notifications, otherwise we won't be able to remind you about your tasks."),
           ),
           actions: [
             InkWell(
@@ -481,7 +481,8 @@ class NotificationService {
     final category = reminderType == alarmReminderType
         ? NotificationCategory.Alarm
         : NotificationCategory.Reminder;
-    AwesomeNotifications().createNotification(
+
+    await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: now.millisecondsSinceEpoch.remainder(1000000),
         channelKey: channelKey,
