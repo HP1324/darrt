@@ -18,7 +18,7 @@ class Home extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Scaffold(
-        appBar: MiniAppBar(),
+        appBar: const MiniAppBar(),
         drawer: const AppDrawer(),
         body: ValueListenableBuilder(
             valueListenable: g.navMan.currentDestination,

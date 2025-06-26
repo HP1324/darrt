@@ -39,8 +39,8 @@ class TaskStateController extends StateController<TaskState, Task> {
           ? {for (var cat in categories) cat: task!.categories.contains(cat)}
           : {CategoryModel(id: 1, name: 'General'): true},
       priority: edit ? task!.priority : priorities[3],
-      dueDate: edit ? task!.dueDate : DateTime.now(),
-      isRepeating: edit ? task!.isRepeating : false,
+      dueDate: edit ? task!.dueDate : g.calMan.selectedDate,
+      isRepeating: edit ? task!.isRepeating : g.navMan.currentTab.value == 2 ? true : false,
       startDate: edit ? task!.startDate : DateTime.now(),
       endDate: edit ? task!.endDate : null,
       repeatConfig: edit && task!.isRepeating

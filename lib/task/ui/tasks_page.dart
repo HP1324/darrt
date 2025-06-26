@@ -15,7 +15,17 @@ class TasksPage extends StatefulWidget {
   State<TasksPage> createState() => _TasksPageState();
 }
 
-class _TasksPageState extends State<TasksPage> {
+class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMixin{
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this,initialIndex: 0);
+    _tabController.addListener((){
+      g.navMan.currentTab.value = _tabController.index;
+    });
+  }
   @override
   void dispose() {
     debugPrint('Tasks page dispose called');
@@ -28,53 +38,52 @@ class _TasksPageState extends State<TasksPage> {
       listenable: Listenable.merge([g.taskVm, g.calMan]),
       builder: (context, child) {
         final tasks = g.taskVm.tasks.where((t) => t.isActiveOn(g.calMan.selectedDate)).toList();
-        return DefaultTabController(
-          length: 3,
-          child: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) => [
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: MediaQuery.sizeOf(context).height * 0.080,
-                  child: ScrollableDateBar(),
-                ),
+        return NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: MediaQuery.sizeOf(context).height * 0.080,
+                child: ScrollableDateBar(),
               ),
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _TabBarDelegate(
-                  TabBar(
-                    splashBorderRadius: BorderRadius.circular(10),
-                    dividerHeight: 0,
-                    labelStyle: Theme.of(
-                      context,
-                    ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
-                    unselectedLabelStyle: Theme.of(
-                      context,
-                    ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w500),
-                    tabs: const [
-                      Tab(text: 'All'),
-                      Tab(text: 'Single'),
-                      Tab(text: 'Repeating'),
-                    ],
-                  ),
-                ),
-              ),
-              ListenableBuilder(
-                listenable: g.taskVm,
-                builder: (context, child) {
-                  if (g.taskVm.selectedTaskIds.isNotEmpty) {
-                    return TasksSelectedActions();
-                  }
-                  return const SliverToBoxAdapter(child: SizedBox.shrink());
-                },
-              ),
-            ],
-            body: TabBarView(
-              children: [
-                TaskList(tasks: tasks),
-                TaskList(tasks: tasks, isRepeating: false),
-                TaskList(tasks: tasks, isRepeating: true),
-              ],
             ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _TabBarDelegate(
+                TabBar(
+                  controller: _tabController,
+                  splashBorderRadius: BorderRadius.circular(10),
+                  dividerHeight: 0,
+                  labelStyle: Theme.of(
+                    context,
+                  ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
+                  unselectedLabelStyle: Theme.of(
+                    context,
+                  ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w500),
+                  tabs: const [
+                    Tab(text: 'All'),
+                    Tab(text: 'Single'),
+                    Tab(text: 'Repeating'),
+                  ],
+                ),
+              ),
+            ),
+            ListenableBuilder(
+              listenable: g.taskVm,
+              builder: (context, child) {
+                if (g.taskVm.selectedTaskIds.isNotEmpty) {
+                  return TasksSelectedActions();
+                }
+                return const SliverToBoxAdapter(child: SizedBox.shrink());
+              },
+            ),
+          ],
+          body: TabBarView(
+            controller: _tabController,
+            children: [
+              TaskList(tasks: tasks),
+              TaskList(tasks: tasks, isRepeating: false),
+              TaskList(tasks: tasks, isRepeating: true),
+            ],
           ),
         );
       },
@@ -352,7 +361,11 @@ class _TasksSelectedActionsDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(color: Theme.of(context).scaffoldBackgroundColor,height: kToolbarHeight, child: _child);
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      height: kToolbarHeight,
+      child: _child,
+    );
   }
 
   @override

@@ -1,4 +1,3 @@
-
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +8,7 @@ import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:toastification/toastification.dart';
 import 'package:minimaltodo/app/services/backup_service.dart';
+
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MiniAppBar({super.key});
   // final GlobalKey _popupKey = GlobalKey();
@@ -16,152 +16,162 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
   @override
-  AppBar build(BuildContext context) {
-    return AppBar(
-      elevation: 0,
-      title: InkWell(
-        splashFactory: NoSplash.splashFactory,
-        onTap: () {
-          showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return Container(
-                decoration: BoxDecoration(),
-                child: CalendarDatePicker(
-                  initialDate: DateTime.now(),
-                  firstDate: getFirstDate(),
-                  lastDate: getMaxDate(),
-                  onDateChanged: (selectedDate) {
-                    final date = DateUtils.dateOnly(selectedDate);
-                    g.calMan.scrollToDate(date);
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: g.navMan.currentDestination,
+      builder: (context, value, child) {
+        if (value == 0) {
+          return AppBar(
+            elevation: 0,
+            title: InkWell(
+              splashFactory: NoSplash.splashFactory,
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) {
+                    return Container(
+                      decoration: BoxDecoration(),
+                      child: CalendarDatePicker(
+                        initialDate: DateTime.now(),
+                        firstDate: getFirstDate(),
+                        lastDate: getMaxDate(),
+                        onDateChanged: (selectedDate) {
+                          final date = DateUtils.dateOnly(selectedDate);
+                          g.calMan.scrollToDate(date);
+                        },
+                      ),
+                    );
                   },
-                ),
-              );
-            },
-          );
-        },
-        child: Row(
-          children: [
-            ListenableBuilder(
-              listenable: g.calMan,
-              builder: (context, child) {
-                final selectedDate = g.calMan.selectedDate;
-                final isBefore = selectedDate.isBefore(g.calMan.previousSelectedDate);
-                final title = DateUtils.isSameDay(selectedDate, DateTime.now())
-                    ? 'Today'
-                    : formatDate(selectedDate, 'EEE, d MMM, yyyy');
-                return AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) {
-                    final inAnimation = Tween<Offset>(
-                      begin: const Offset(-1.0, 0.0),
-                      end: Offset.zero,
-                    ).animate(animation);
-
-                    final outAnimation = Tween<Offset>(
-                      begin: const Offset(1.0, 0.0),
-                      end: Offset.zero,
-                    ).animate(animation);
-
-                    if (child.key == ValueKey<DateTime>(selectedDate)) {
-                      // This is the new date coming in
-                      return ClipRect(
-                        child: SlideTransition(
-                          position: isBefore ? inAnimation : outAnimation,
-                          child: child,
-                        ),
-                      );
-                    } else {
-                      // This is the old date going out
-                      return ClipRect(
-                        child: SlideTransition(
-                          position: isBefore ? outAnimation : inAnimation,
-                          child: child,
-                        ),
-                      );
-                    }
-                  },
-                  child: Text(
-                    title,
-                    key: ValueKey<DateTime>(selectedDate),
-                    style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 );
               },
+              child: Row(
+                children: [
+                  ListenableBuilder(
+                    listenable: g.calMan,
+                    builder: (context, child) {
+                      final selectedDate = g.calMan.selectedDate;
+                      final isBefore = selectedDate.isBefore(g.calMan.previousSelectedDate);
+                      final title = DateUtils.isSameDay(selectedDate, DateTime.now())
+                          ? 'Today'
+                          : formatDate(selectedDate, 'EEE, d MMM, yyyy');
+                      return AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder: (child, animation) {
+                          final inAnimation = Tween<Offset>(
+                            begin: const Offset(-1.0, 0.0),
+                            end: Offset.zero,
+                          ).animate(animation);
+
+                          final outAnimation = Tween<Offset>(
+                            begin: const Offset(1.0, 0.0),
+                            end: Offset.zero,
+                          ).animate(animation);
+
+                          if (child.key == ValueKey<DateTime>(selectedDate)) {
+                            // This is the new date coming in
+                            return ClipRect(
+                              child: SlideTransition(
+                                position: isBefore ? inAnimation : outAnimation,
+                                child: child,
+                              ),
+                            );
+                          } else {
+                            // This is the old date going out
+                            return ClipRect(
+                              child: SlideTransition(
+                                position: isBefore ? outAnimation : inAnimation,
+                                child: child,
+                              ),
+                            );
+                          }
+                        },
+                        child: Text(
+                          title,
+                          key: ValueKey<DateTime>(selectedDate),
+                          style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  Icon(Icons.arrow_drop_down_rounded),
+                ],
+              ),
             ),
-            Icon(Icons.arrow_drop_down_rounded),
-          ],
-        ),
-      ),
-      actions: [
-        if(kDebugMode)
-        _MiniAppBarAction(
-          icon: Icon(Icons.handyman),
-          onTap: () async {
-            if (kDebugMode) {
-             final user = GoogleSignInService().currentUser;
-             debugPrint(user?.email ?? 'null is there in user' );
-            }
-          },
-        ),
-        _MiniAppBarAction(
-          onTap: () async {
-            showQuickReminderDialog() {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return QuickReminderDialog();
+            actions: [
+              if (kDebugMode)
+                _MiniAppBarAction(
+                  icon: Icon(Icons.handyman),
+                  onTap: () async {
+                    if (kDebugMode) {
+                      final user = GoogleSignInService().currentUser;
+                      debugPrint(user?.email ?? 'null is there in user');
+                    }
+                  },
+                ),
+              _MiniAppBarAction(
+                onTap: () async {
+                  showQuickReminderDialog() {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return QuickReminderDialog();
+                      },
+                    );
+                  }
+
+                  showNotificationRationale() async {
+                    return await NotificationService.showNotificationRationale(context);
+                  }
+
+                  bool allowed = true;
+                  if (!await AwesomeNotifications().isNotificationAllowed()) {
+                    allowed = await showNotificationRationale();
+                  }
+                  if (allowed) {
+                    showQuickReminderDialog();
+                  } else if (context.mounted) {
+                    showToast(
+                      context,
+                      type: ToastificationType.error,
+                      description: 'Notification permission denied!',
+                    );
+                  }
                 },
-              );
-            }
+                icon: Tooltip(
+                  waitDuration: Duration(milliseconds: 500),
+                  message: 'Quick reminder',
+                  child: Icon(Icons.alarm_add_sharp),
+                ),
+              ),
 
-            showNotificationRationale() async {
-              return await NotificationService.showNotificationRationale(context);
-            }
-
-            bool allowed = true;
-            if (!await AwesomeNotifications().isNotificationAllowed()) {
-              allowed = await showNotificationRationale();
-            }
-            if (allowed) {
-              showQuickReminderDialog();
-            } else if (context.mounted) {
-              showToast(
-                context,
-                type: ToastificationType.error,
-                description: 'Notification permission denied!',
-              );
-            }
-          },
-          icon: Tooltip(
-            waitDuration: Duration(milliseconds: 500),
-            message: 'Quick reminder',
-            child: Icon(Icons.alarm_add_sharp),
-          ),
-        ),
-
-        // _MiniAppBarAction(
-        //   key: _popupKey,
-        //   icon: Icon(Icons.more_vert),
-        //   onTap: () {
-        //     final (offset, size) = getOffsetAndSize(_popupKey);
-        //     showMenu(
-        //       context: context,
-        //       elevation: 1,
-        //       popUpAnimationStyle: AnimationStyle(duration: Duration(milliseconds: 100)),
-        //       position: getRelativeRectFromOffsetAndSize(offset, size),
-        //       items: [
-        //         PopupMenuItem(child: Text('Notifications')),
-        //         PopupMenuItem(child: Text('Rate Us')),
-        //         PopupMenuItem(child: Text('Give Feedback')),
-        //         PopupMenuItem(child: Text('Settings')),
-        //       ],
-        //     );
-        //   },
-        // ),
-      ],
+              // _MiniAppBarAction(
+              //   key: _popupKey,
+              //   icon: Icon(Icons.more_vert),
+              //   onTap: () {
+              //     final (offset, size) = getOffsetAndSize(_popupKey);
+              //     showMenu(
+              //       context: context,
+              //       elevation: 1,
+              //       popUpAnimationStyle: AnimationStyle(duration: Duration(milliseconds: 100)),
+              //       position: getRelativeRectFromOffsetAndSize(offset, size),
+              //       items: [
+              //         PopupMenuItem(child: Text('Notifications')),
+              //         PopupMenuItem(child: Text('Rate Us')),
+              //         PopupMenuItem(child: Text('Give Feedback')),
+              //         PopupMenuItem(child: Text('Settings')),
+              //       ],
+              //     );
+              //   },
+              // ),
+            ],
+          );
+        }
+        return AppBar(
+          title: Text('Categories', style: Theme.of(context).textTheme.titleMedium),
+        );
+      },
     );
   }
 }
@@ -327,4 +337,3 @@ class _MiniAppBarAction extends StatelessWidget {
     );
   }
 }
-
