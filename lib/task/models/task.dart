@@ -114,7 +114,6 @@ class Task {
       );
       // Restore category relations
 
-
       final ids = List<int>.from(json['categoryIds'] ?? []);
       //The following won't work and give a TypeError: type List<dynamic> is not a subtype of type List<int> in type cast, the above line works well and got this solution from [https://stackoverflow.com/a/68079173/28525347]
       // final ids = (json['categoryIds'] as List<int>?)?.cast<int>() ?? [];
@@ -173,9 +172,33 @@ class Task {
     );
   }
 
+  /// Compares this [Task] with another [Task] to determine equality.
+  ///
+  /// This method performs a deep comparison between two [Task] objects,
+  /// including all primitive fields, nullable [DateTime] fields,
+  /// and [ToMany] relations such as [categories] and [completions].
+  ///
+  /// The [checkIdEquality] parameter allows control over whether the `id`
+  /// field is included in the equality check:
+  ///
+  /// - If `checkIdEquality` is `true`, the `id` values of both tasks
+  ///   must match for them to be considered equal.
+  /// - If `false` (default), the `id` is ignored, and only the content
+  ///   of the task is compared.
+  ///
+  /// Two [Task]s are considered equal if:
+  /// - Their primitive fields (e.g., `title`, `priority`, `isDone`) are equal,
+  /// - Their [DateTime] fields (e.g., `createdAt`, `startDate`, `dueDate`) match by value,
+  /// - Their [categories] lists contain the same elements (matched by their own `.equals()`),
+  /// - Their [completions] lists contain the same elements (also matched by `.equals()`),
+  /// - And optionally, their `id` values match (when `checkIdEquality` is `true`).
+  ///
+  /// Returns `true` if all comparisons match, `false` otherwise.
 
-// Task equals method
-  bool equals(Task other) {
+  bool equals(Task other, {bool? checkIdEquality = false}) {
+    if (checkIdEquality! && id != other.id) {
+      return false;
+    }
     // Compare basic fields
     if (title != other.title ||
         priority != other.priority ||
@@ -200,7 +223,8 @@ class Task {
     }
 
     final thisCategoriesSorted = categories.toList()..sort((a, b) => a.name.compareTo(b.name));
-    final otherCategoriesSorted = other.categories.toList()..sort((a, b) => a.name.compareTo(b.name));
+    final otherCategoriesSorted = other.categories.toList()
+      ..sort((a, b) => a.name.compareTo(b.name));
 
     for (int i = 0; i < thisCategoriesSorted.length; i++) {
       if (!thisCategoriesSorted[i].equals(otherCategoriesSorted[i])) {
@@ -214,7 +238,8 @@ class Task {
     }
 
     final thisCompletionsSorted = completions.toList()..sort((a, b) => a.date.compareTo(b.date));
-    final otherCompletionsSorted = other.completions.toList()..sort((a, b) => a.date.compareTo(b.date));
+    final otherCompletionsSorted = other.completions.toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
 
     for (int i = 0; i < thisCompletionsSorted.length; i++) {
       if (!thisCompletionsSorted[i].equals(otherCompletionsSorted[i])) {

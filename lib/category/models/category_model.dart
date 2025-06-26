@@ -41,7 +41,25 @@ class CategoryModel {
         "color": color,
       };
 
-  bool equals(CategoryModel other) {
+  /// Compares this [CategoryModel] with another to determine equality.
+  ///
+  /// This method checks whether two [CategoryModel] instances have identical
+  /// values across their key fields: [name], [icon], and [color].
+  ///
+  /// The optional [checkIdEquality] flag controls whether the [id] field
+  /// should be included in the comparison:
+  ///
+  /// - If `checkIdEquality` is `true`, the [id] values must match for the two
+  ///   categories to be considered equal.
+  /// - If `false` (default), the [id] is ignored and only the content fields
+  ///   are compared.
+  ///
+  /// Returns `true` if all relevant fields match; otherwise, returns `false`.
+
+  bool equals(CategoryModel other, {bool? checkIdEquality = false}) {
+    if (checkIdEquality! && id != other.id) {
+      return false;
+    }
     return name == other.name &&
         icon == other.icon &&
         color == other.color;

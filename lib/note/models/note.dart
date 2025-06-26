@@ -84,7 +84,28 @@ class Note {
     }
   }
 
-  bool equals(Note other) {
+  /// Compares this [Note] with another to determine deep equality.
+  ///
+  /// This method checks whether two [Note] instances are equal by comparing:
+  /// - Their [content] fields,
+  /// - Their [createdAt] and [updatedAt] timestamps (in milliseconds),
+  /// - And their associated [folders] (a [ToMany] relation), comparing
+  ///   folder lists by name using each folder's own `.equals()` method.
+  ///
+  /// The [checkIdEquality] parameter controls whether the [id] field is included:
+  ///
+  /// - If `true`, the [id] values must match for the notes to be considered equal.
+  /// - If `false` (default), [id] is ignored and only the content and relations
+  ///   are compared.
+  ///
+  /// Folders are sorted by name before comparison to ensure order-independent equality.
+  ///
+  /// Returns `true` if all compared fields and folders match; otherwise, `false`.
+
+  bool equals(Note other, {bool? checkIdEquality = false}) {
+    if (checkIdEquality! && id != other.id) {
+      return false;
+    }
     // Compare basic fields
     if (content != other.content ||
         createdAt?.millisecondsSinceEpoch != other.createdAt?.millisecondsSinceEpoch ||

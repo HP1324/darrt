@@ -203,56 +203,9 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
     );
   }
 
-  // Add this helper method to show confirmation dialog
-  Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
-    return await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: Row(
-                children: [
-                  Icon(
-                    Icons.warning_amber_rounded,
-                    color: Theme.of(context).colorScheme.error,
-                    size: 28,
-                  ),
-                  const SizedBox(width: 12),
-                  const Text('Delete Backup?'),
-                ],
-              ),
-              content: const Text(
-                'This will permanently delete your backup from Google Drive. This action cannot be undone.',
-              ),
-              actions: [
-                FilledButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.error,
-                  ),
-                  child: const Text('Delete'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ) ??
-        false;
-  }
-
   Future<void> handleGoogleSignIn(BuildContext context) async {
     try {
-      if (await _googleService.isSignedIn()) {
+      if (await _googleService.getCurrentUserEmail() != null) {
         if (context.mounted) {
           final shouldContinue = await showDialog<bool>(
             context: context,

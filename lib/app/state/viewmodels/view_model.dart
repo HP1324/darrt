@@ -39,10 +39,11 @@ abstract class ViewModel<T> extends ChangeNotifier {
   /// Child classes may override this method for implementing custom behavior
   void initializeItems() {
     _items = _box.getAll();
-    //Reverse the list for all items except categories and folders, to show latest items first
-    if (T == Task || T == Note) {
-      _items = _items.reversed.toList();
-    }
+  }
+
+  void initializeItemsWithRebuilding() {
+    _items = _box.getAll();
+    notifyListeners();
   }
 
   // bool validateItem(T item);
@@ -59,11 +60,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
         MiniLogger.d('Item id: ${getItemId(item)}');
       }
     } else {
-      if (T != CategoryModel && T != Folder) {
-        _items.insert(0, item);
-      } else {
-        _items.add(item);
-      }
+      _items.add(item);
     }
 
     MiniLogger.d('Item added/updated with id: $id, item type: ${item.runtimeType}');
@@ -72,51 +69,83 @@ abstract class ViewModel<T> extends ChangeNotifier {
     return edit ? getUpdateSuccessMessage() : getCreateSuccessMessage();
   }
 
-  void putManyItems(List<T> manyItems) {
-    MiniLogger.d('items length: ${manyItems.length}');
+  void putManyItems(List<T> restoredItems) {
+    MiniLogger.d('items length: ${restoredItems.length}');
     bool isEmptyDatabase = _box.getAll().isEmpty;
 
     //List to be put in database based on conditions
-    List<T> newItems = [];
+    // List<T> newItems = [];
+    for (final item in restoredItems) {
+      final localItem = _box.get(getItemId(item));
+      if (localItem != null) {
+        if ((item is Task && item.equals(localItem as Task, checkIdEquality: true)) ||
+            (item is Note && item.equals(localItem as Note, checkIdEquality: true)) ||
+            (item is Folder && item.equals(localItem as Folder, checkIdEquality: true)) ||
+            (item is CategoryModel &&
+                item.equals(localItem as CategoryModel, checkIdEquality: true))) {
+          continue;
+        } else {
+          setItemId(item, 0);
+        }
+      } else {
+        final duplicateExistsWithDifferentId = _box.getAll().any((e) {
+          if (e is Task) {
+            return e.equals(item as Task);
+          } else if (e is Note) {
+            return e.equals(item as Note);
+          } else if (e is Folder) {
+            return e.equals(item as Folder);
+          } else if (e is CategoryModel) {
+            return e.equals(item as CategoryModel);
+          }
+          return false;
+        });
+        if(duplicateExistsWithDifferentId){
+          continue;
+        }
+      }
+      _box.put(item);
+      initializeItemsWithRebuilding();
+    }
 
     //Assign 0 to item id if database is empty or item is not in the database, so that objectbox doesn't throw id not valid error
-    for (final item in manyItems) {
-      final id = getItemId(item);
-      if (!isEmptyDatabase) {
-        if (_box.contains(id)) {
-          if (item is CategoryModel) {
-            g.catVm.putItem(item, edit: true, scrollToBottom: false);
-          } else {
-            putItem(item, edit: true);
-          }
-        } else {
-          debugPrint('');
-          setItemId(item, 0);
-          if (item is CategoryModel) {
-            g.catVm.putItem(item, edit: false, scrollToBottom: false);
-          } else {
-            putItem(item, edit: false);
-          }
-        }
-      }else{
-        setItemId(item, 0);
-        putItem(item, edit: false);
-      }
-    }
     // for (final item in manyItems) {
+    //   final id = getItemId(item);
+    //   if (!isEmptyDatabase) {
+    //     if (_box.contains(id)) {
+    //       if (item is CategoryModel) {
+    //         g.catVm.putItem(item, edit: true, scrollToBottom: false);
+    //       } else {
+    //         putItem(item, edit: true);
+    //       }
+    //     } else {
+    //       debugPrint('');
+    //       setItemId(item, 0);
+    //       if (item is CategoryModel) {
+    //         g.catVm.putItem(item, edit: false, scrollToBottom: false);
+    //       } else {
+    //         putItem(item, edit: false);
+    //       }
+    //     }
+    //   } else {
+    //     setItemId(item, 0);
+    //     putItem(item, edit: false);
+    //   }
+    // }
+    // for (final item in restoredItems) {
     //   if (item is Task && (!_box.contains(item.id) || isEmptyDatabase)) item.id = 0;
     //   if (item is Note && (!_box.contains(item.id) || isEmptyDatabase)) item.id = 0;
     //   if (item is Folder && (!_box.contains(item.id) || isEmptyDatabase)) item.id = 0;
     //   if (item is CategoryModel && (!_box.contains(item.id) || isEmptyDatabase)) item.id = 0;
     // }
-    // newItems = List.from(manyItems);
+    // newItems = List.from(restoredItems);
     //
     // final ids = _box.putMany(newItems);
     //
-    // _items.addAll(newItems);
+    // initializeItemsWithRebuilding();
 
     // MiniLogger.d('Items added/updated with ids: $ids');
-    notifyListeners();
+    // notifyListeners();
   }
 
   String _getPrimaryLabel(T item) {

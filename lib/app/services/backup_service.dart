@@ -77,46 +77,6 @@ class BackupService {
     }
   }
 
-  Map<String, dynamic> _mergeData(Map<String, dynamic> oldData, Map<String, dynamic> newData) {
-    final merged = Map<String, dynamic>.from(oldData);
-
-    newData.forEach((key, newList) {
-      if (merged.containsKey(key)) {
-        final oldList = List<Map<String, dynamic>>.from(merged[key]);
-        final newItems = List<Map<String, dynamic>>.from(newList);
-
-        // Create a map for quick lookup of existing items by ID
-        final existingItems = <String, Map<String, dynamic>>{};
-        for (var item in oldList) {
-          if (item['id'] != null) {
-            existingItems[item['id'].toString()] = item;
-          }
-        }
-
-        // Update existing items or add new ones
-        for (var newItem in newItems) {
-          if (newItem['id'] != null) {
-            final id = newItem['id'].toString();
-            if (existingItems.containsKey(id)) {
-              // Update existing item
-              existingItems[id]!.addAll(newItem);
-            } else {
-              // Add new item
-              oldList.add(newItem);
-            }
-          }
-        }
-
-        merged[key] = oldList;
-      } else {
-        // Key doesn't exist in old data, add entire list
-        merged[key] = newList;
-      }
-    });
-
-    return merged;
-  }
-
   /// Takes json file as input, compresses it using [_compressJsonFile] and uploads it to google drive.
   Future<void> uploadFileToGoogleDrive(dart.File jsonFile) async {
     try {
@@ -241,7 +201,6 @@ class BackupService {
     try {
       final jsonString = await jsonFile.readAsString();
 
-      MiniLogger.d('Json string backup: $jsonString');
 
       final jsonMap = jsonDecode(jsonString);
 
