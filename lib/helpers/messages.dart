@@ -45,4 +45,11 @@ class Messages {
 
   static final mNotifAlarmDifference =
       'To ensure timely alarms and reminders, please consider disabling battery optimization for this app. While notifications may be delayed by 1–5 minutes due to power-saving features, alarms remain accurate. You can adjust battery optimization settings in your device preferences. Note: this may slightly impact battery life.';
+
+  static final mNoTasksYet = 'No tasks for this date';
+
+  static final mNoOneTimeTasksYet  = 'You one-time tasks for this date';
+
+  static final mNoRepeatingTasksYet = 'No repeating tasks for this date';
+
 }

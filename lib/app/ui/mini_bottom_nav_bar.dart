@@ -52,10 +52,10 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
     final primary = Theme.of(context).colorScheme.primary;
     final onSurface = Theme.of(context).colorScheme.onSurface;
 
-    return ListenableBuilder(
-      listenable: g.navMan,
-      builder: (context, child) {
-        final isSelected = widget.i == g.navMan.currentDestination;
+    return ValueListenableBuilder(
+      valueListenable: g.navMan.currentDestination,
+      builder: (context,value, child) {
+        final isSelected = widget.i == value;
 
         return InkWell(
           splashColor: primary.withAlpha(26),
