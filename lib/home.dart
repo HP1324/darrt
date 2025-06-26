@@ -20,21 +20,21 @@ class Home extends StatelessWidget {
       child: Scaffold(
         appBar: MiniAppBar(),
         drawer: const AppDrawer(),
-        body: ListenableBuilder(
-            listenable: g.navMan,
-            builder: (context, child) {
+        body: ValueListenableBuilder(
+            valueListenable: g.navMan.currentDestination,
+            builder: (context,value, child) {
               return IndexedStack(
-                index: g.navMan.currentDestination,
+                index: value,
                 children: [
                   const TasksPage(),
                   const CategoriesPage(),
                 ],
               );
             }),
-        floatingActionButton: ListenableBuilder(
-          listenable: g.navMan,
-          builder: (context, child) {
-            if (g.navMan.currentDestination == 0) {
+        floatingActionButton: ValueListenableBuilder(
+          valueListenable: g.navMan.currentDestination,
+          builder: (context, value ,child) {
+            if (value == 0) {
               return const _FloatingActionButtonWidget();
             }
             return const SizedBox.shrink(); // Return an invisible widget instead of null
@@ -50,9 +50,9 @@ class _BottomNavBarWidget extends StatelessWidget {
   const _BottomNavBarWidget();
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: g.navMan,
-      builder: (context, child) {
+    return ValueListenableBuilder(
+      valueListenable: g.navMan.currentDestination,
+      builder: (context, value,child) {
         return Container(
           decoration: BoxDecoration(
             border: Border.all(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/app/ui/empty_tasks_indicator.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
@@ -56,6 +57,15 @@ class _TasksPageState extends State<TasksPage> {
                     ],
                   ),
                 ),
+              ),
+              ListenableBuilder(
+                listenable: g.taskVm,
+                builder: (context, child) {
+                  if (g.taskVm.selectedTaskIds.isNotEmpty) {
+                    return TasksSelectedActions();
+                  }
+                  return const SliverToBoxAdapter(child: SizedBox.shrink());
+                },
               ),
             ],
             body: TabBarView(
@@ -179,21 +189,21 @@ class TaskList extends StatefulWidget {
 class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
-  Widget getEmptyIndicator() {
+  Widget _getEmptyIndicator() {
     if (widget.isRepeating == true) {
-      return const EmptyTasksIndicator(
+      return EmptyTasksIndicator(
         icon: Icons.repeat_on_outlined,
-        message: 'No repeating tasks found.\nSet one up for daily routines!',
+        message: Messages.mNoRepeatingTasksYet,
       );
     } else if (widget.isRepeating == false) {
-      return const EmptyTasksIndicator(
+      return EmptyTasksIndicator(
         icon: Icons.task_alt_outlined,
-        message: 'You have no one-time tasks.\nCreate one to get started!',
+        message: Messages.mNoOneTimeTasksYet,
       );
     } else {
-      return const EmptyTasksIndicator(
+      return EmptyTasksIndicator(
         icon: Icons.inbox_outlined,
-        message: 'No tasks yet.\nStart by adding your first one!',
+        message: Messages.mNoTasksYet,
       );
     }
   }
@@ -204,74 +214,88 @@ class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin 
     final list = widget.isRepeating == null
         ? widget.tasks
         : widget.tasks.where((t) => t.isRepeating == widget.isRepeating).toList();
-    return Column(
-      children: [
-        ListenableBuilder(
-          listenable: g.taskVm,
-          builder: (context, child) {
-            if (g.taskVm.selectedTaskIds.isNotEmpty) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  if (g.taskVm.selectedTaskIds.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0),
-                      child: Text('${g.taskVm.selectedTaskIds.length}'),
-                    ),
-                  Spacer(),
-                  IconButton(
-                    onPressed: () {
-                      g.taskVm.clearSelection();
-                    },
-                    icon: CloseButtonIcon(),
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      final message = await showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('Delete Tasks'),
-                            content: const Text('Are you sure you want to delete these tasks?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  final message = g.taskVm.deleteMultipleItems();
-                                  Navigator.pop(context, message);
-                                  if (context.mounted) {
-                                    showToast(context, type: ToastificationType.success, description: message);
-                                  }
-                                },
-                                child: const Text('Delete'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    icon: Icon(Icons.delete),
-                  ),
-                ],
-              );
-            }
-            return const SizedBox.shrink();
+
+    if (list.isEmpty) {
+      return _getEmptyIndicator();
+    }
+    return CustomScrollView(
+      slivers: [
+        SliverList.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            return TaskItem(task: list[index]);
           },
         ),
-        Expanded(
-          child: list.isEmpty
-              ? getEmptyIndicator()
-              : ListView.builder(
-                  itemCount: list.length,
-                  itemBuilder: (context, index) {
-                    return TaskItem(task: list[index]);
-                  },
-                ),
+      ],
+    );
+  }
+}
+
+class TasksSelectedActions extends StatelessWidget {
+  const TasksSelectedActions({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPersistentHeader(
+      pinned: true,
+      delegate: _TasksSelectedActionsDelegate(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            if (g.taskVm.selectedTaskIds.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0),
+                child: Text('${g.taskVm.selectedTaskIds.length}'),
+              ),
+            Spacer(),
+            IconButton(
+              onPressed: () => g.taskVm.clearSelection(),
+              icon: CloseButtonIcon(),
+            ),
+            IconButton(
+              onPressed: () async => await _showTaskDeleteConfirmationDialog(context),
+              icon: Icon(Icons.delete),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showTaskDeleteConfirmationDialog(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return _TaskDeleteAlertDialog();
+      },
+    );
+  }
+}
+
+class _TaskDeleteAlertDialog extends StatelessWidget {
+  const _TaskDeleteAlertDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Delete Tasks'),
+      content: const Text('Are you sure you want to delete these tasks?'),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            final message = g.taskVm.deleteMultipleItems();
+            Navigator.pop(context);
+            if (context.mounted) {
+              showToast(context, type: ToastificationType.success, description: message);
+            }
+          },
+          child: const Text('Delete'),
         ),
       ],
     );
@@ -318,6 +342,27 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(_TabBarDelegate oldDelegate) {
     //This function was previously returning false, but that was creating an issue, where the tab bar was not updating when the theme changed.
+    return true;
+  }
+}
+
+class _TasksSelectedActionsDelegate extends SliverPersistentHeaderDelegate {
+  final Widget _child;
+  _TasksSelectedActionsDelegate(this._child);
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(color: Theme.of(context).scaffoldBackgroundColor,height: kToolbarHeight, child: _child);
+  }
+
+  @override
+  double get maxExtent => kToolbarHeight;
+
+  @override
+  double get minExtent => kToolbarHeight;
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
     return true;
   }
 }

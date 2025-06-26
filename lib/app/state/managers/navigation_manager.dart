@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
-class NavigationManager extends ChangeNotifier {
+class NavigationManager  {
   List<bool> selected = [true,false,false,false,false];
-  int currentDestination = 0;
+  final ValueNotifier<int> currentDestination = ValueNotifier(0);
   void onDestinationChanged(int selectedDest){
-    currentDestination = selectedDest;
+    currentDestination.value = selectedDest;
     selected =  List.generate(selected.length, (index)=> index == selectedDest);
-    notifyListeners();
   }
 }
