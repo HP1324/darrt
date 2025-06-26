@@ -110,4 +110,34 @@ class TaskViewModel extends ViewModel<Task> {
   void setItemId(Task item, int id) {
     item.id = id;
   }
+
+  void selectAllTasks(bool value, int index) {
+    selectedTaskIds.clear();
+
+    if (value) {
+      if (index == 0) {
+        // Select all tasks
+        for (var element in tasks) {
+          selectedTaskIds.add(element.id);
+        }
+      } else if (index == 1) {
+        // Select only single tasks (isRepeating == false)
+        for (var element in tasks) {
+          if (element.isRepeating == false) {
+            selectedTaskIds.add(element.id);
+          }
+        }
+      } else if (index == 2) {
+        // Select only repeating tasks (isRepeating == true)
+        for (var element in tasks) {
+          if (element.isRepeating == true) {
+            selectedTaskIds.add(element.id);
+          }
+        }
+      }
+    }
+    // If value is false, _selectedItemIds remains empty (cleared above)
+
+    notifyListeners(); // Don't forget to notify listeners
+  }
 }

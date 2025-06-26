@@ -49,7 +49,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.edit ? widget.task!.title.replaceAll('\n', ' ') : 'Add New Task')),
+      appBar: AppBar(
+        title: Text(widget.edit ? widget.task!.title.replaceAll('\n', ' ') : 'Add New Task'),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 13.0),
         child: SingleChildScrollView(
@@ -149,8 +151,11 @@ class TitleTextField extends StatelessWidget {
 
   Future<void> _handleSpeechToText(BuildContext context) async {
     showPermissionDeniedToast() {
-      showToast(context,
-          type: ToastificationType.error, description: 'Microphone permission denied');
+      showToast(
+        context,
+        type: ToastificationType.error,
+        description: 'Microphone permission denied',
+      );
     }
 
     // Check permission status first using permission_handler
@@ -198,8 +203,11 @@ class TitleTextField extends StatelessWidget {
           if (initResult) {
             g.sttController.startListening();
           } else {
-            showToast(context,
-                type: ToastificationType.error, description: 'Microphone permission denied');
+            showToast(
+              context,
+              type: ToastificationType.error,
+              description: 'Microphone permission denied',
+            );
           }
         } else {
           MiniLogger.d('Some permissions denied on first request');
@@ -260,7 +268,8 @@ class TitleTextField extends StatelessWidget {
                 Text('• Microphone: Required to capture your voice input'),
                 SizedBox(height: 8),
                 Text(
-                    '• Nearby devices (Android 12+): Required when using Bluetooth headsets or external microphones'),
+                  '• Nearby devices (Android 12+): Required when using Bluetooth headsets or external microphones',
+                ),
                 SizedBox(height: 12),
                 Text(
                   'Go to Settings > Permissions and enable both Microphone and Nearby devices permissions.',
@@ -298,7 +307,8 @@ class AddRemindersWidget extends StatelessWidget {
         g.taskSc.textFieldNode.unfocus();
         final allowed = await AwesomeNotifications().isNotificationAllowed();
         if (context.mounted) {
-          if ((allowed || await NotificationService.showNotificationRationale(context)) && context.mounted) {
+          if ((allowed || await NotificationService.showNotificationRationale(context)) &&
+              context.mounted) {
             _showRemindersBottomSheet(context);
           }
         }
@@ -341,7 +351,9 @@ class AddRemindersWidget extends StatelessWidget {
                   actions: [
                     FilledButton(
                       onPressed: () async {
-                        await AppSettings.openAppSettings(type:AppSettingsType.batteryOptimization);
+                        await AppSettings.openAppSettings(
+                          type: AppSettingsType.batteryOptimization,
+                        );
                         // await SettingsService.openBatterySettings();
                       },
                       child: Text('Go to settings'),
@@ -406,7 +418,8 @@ class AddRemindersWidget extends StatelessWidget {
                             itemCount: reminders.length,
                             itemBuilder: (context, index) {
                               debugPrint(
-                                  'Reminder ${index + 1} time in list: ${reminders[index].time.hour}:${reminders[index].time.minute}');
+                                'Reminder ${index + 1} time in list: ${reminders[index].time.hour}:${reminders[index].time.minute}',
+                              );
                               return ReminderItem(
                                 reminder: reminders[index],
                                 onTap: () {
@@ -459,7 +472,9 @@ class DuedateSelector extends StatelessWidget {
           onTap: () async {
             final date = await showDatePicker(
               context: context,
-              firstDate: DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate)),
+              firstDate: DateTime.fromMillisecondsSinceEpoch(
+                MiniBox.read(mFirstInstallDate),
+              ).subtract(const Duration(days: 365)),
               lastDate: DateTime.now().add(Duration(days: maxExtentDateDays)),
             );
             if (date != null) {
@@ -520,8 +535,9 @@ class WeekdaySelector extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color:
-                                isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                            color: isSelected
+                                ? colorScheme.onPrimary
+                                : colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -611,10 +627,9 @@ class RepeatTypeSelector extends StatelessWidget {
                 label,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                      color:
-                          isSelected ? theme.colorScheme.primary : theme.textTheme.bodyLarge?.color,
-                    ),
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? theme.colorScheme.primary : theme.textTheme.bodyLarge?.color,
+                ),
               ),
             ),
           ),
@@ -643,7 +658,9 @@ class DateRangeSelector extends StatelessWidget {
                 g.taskSc.textFieldNode.unfocus();
                 final date = await showDatePicker(
                   context: context,
-                  firstDate: DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate)),
+                  firstDate: DateTime.fromMillisecondsSinceEpoch(
+                    MiniBox.read(mFirstInstallDate),
+                  ).subtract(const Duration(days: 365)),
                   lastDate: DateTime.now().add(Duration(days: maxExtentDateDays)),
                 );
                 if (date != null) {
@@ -704,7 +721,7 @@ class _ReminderDialogState extends State<ReminderDialog> {
   void initState() {
     super.initState();
     // Initialize from existing reminder if editing, else defaults
-    _selectedType = widget.edit ? widget.reminder!.type :MiniBox.read(mDefaultReminderType);
+    _selectedType = widget.edit ? widget.reminder!.type : MiniBox.read(mDefaultReminderType);
     _selectedTime = widget.edit ? widget.reminder!.time : TimeOfDay.now();
   }
 
@@ -724,9 +741,9 @@ class _ReminderDialogState extends State<ReminderDialog> {
       title: Text(
         widget.edit ? 'Edit reminder' : 'Add a reminder',
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -740,15 +757,16 @@ class _ReminderDialogState extends State<ReminderDialog> {
           Text(
             'Reminder type',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 8),
           SegmentedButton(
             showSelectedIcon: false,
             style: SegmentedButton.styleFrom(
-              backgroundColor:
-                  Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+              backgroundColor: Theme.of(
+                context,
+              ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
               padding: const EdgeInsets.symmetric(vertical: 15),
             ),
             segments: [
@@ -794,8 +812,8 @@ class _ReminderDialogState extends State<ReminderDialog> {
           Text(
             'Time',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 8),
           Material(
@@ -815,8 +833,8 @@ class _ReminderDialogState extends State<ReminderDialog> {
                     Text(
                       _selectedTime.format(context),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                     Icon(
                       Icons.access_time_rounded,
@@ -973,8 +991,10 @@ class CategorySelector extends StatelessWidget {
             const SizedBox(height: 8),
             ListTile(
               onTap: () => MiniRouter.to(context, AddCategoryPage(edit: false)),
-              title:
-                  const Text('Create New Category', style: TextStyle(fontWeight: FontWeight.w500)),
+              title: const Text(
+                'Create New Category',
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
@@ -996,8 +1016,10 @@ class CategorySelector extends StatelessWidget {
                       final map = g.taskSc.categorySelection;
                       return CheckboxListTile(
                         value: map[cat] ?? false,
-                        title:
-                            Text(cat.name, style: const TextStyle(overflow: TextOverflow.ellipsis)),
+                        title: Text(
+                          cat.name,
+                          style: const TextStyle(overflow: TextOverflow.ellipsis),
+                        ),
                         onChanged: (selected) {
                           if (selected != null) {
                             g.taskSc.setCategory(cat, selected);
@@ -1032,15 +1054,19 @@ class PrioritySelector extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               border: Border(
-                  bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0)),
+                bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Priority',
-                    style: TextStyle(
-                        fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                        fontWeight: FontWeight.w500)),
+                Text(
+                  'Priority',
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
@@ -1178,9 +1204,9 @@ class ReminderItem extends StatelessWidget {
               Text(
                 reminder.time.format(context),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(width: 16),
               Row(
@@ -1195,8 +1221,8 @@ class ReminderItem extends StatelessWidget {
                   Text(
                     reminder.type == 'alarm' ? 'Alarm' : 'Notification',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -1406,8 +1432,12 @@ class RepeatTypeHelpButton extends StatelessWidget {
 }
 
 class StructuredRow extends StatelessWidget {
-  const StructuredRow(
-      {super.key, required this.leadingIcon, required this.expanded, this.trailing});
+  const StructuredRow({
+    super.key,
+    required this.leadingIcon,
+    required this.expanded,
+    this.trailing,
+  });
   final IconData leadingIcon;
   final Widget expanded;
   final Widget? trailing;

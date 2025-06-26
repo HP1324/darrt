@@ -100,7 +100,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
           }
           return false;
         });
-        if(duplicateExistsWithDifferentId){
+        if (duplicateExistsWithDifferentId) {
           continue;
         }
       }
@@ -173,6 +173,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
     _selectedItemIds.clear();
     return getDeleteSuccessMessage(length);
   }
+
 
   void toggleSelection(int id) {
     if (selectedItemIds.contains(id)) {
