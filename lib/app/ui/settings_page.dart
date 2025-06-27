@@ -13,6 +13,7 @@ import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:toastification/toastification.dart';
+import 'package:workmanager/workmanager.dart';
 import '../../helpers/consts.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -91,20 +92,32 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
           ),
           ListenableBuilder(
             listenable: Listenable.merge([g.settingsSc.autoBackUp, g.settingsSc.lastBackupDate]),
-            builder: (context,  child) {
+            builder: (context, child) {
               final autoBackup = g.settingsSc.autoBackUp.value;
               final lastBackupDate = g.settingsSc.lastBackupDate.value;
               return CheckboxListTile(
                 contentPadding: EdgeInsets.zero,
                 visualDensity: VisualDensity.compact,
                 value: autoBackup,
-                onChanged: (value) {
-                  if(value != null) g.settingsSc.updateAutoBackup(value);
+                onChanged: (value) async{
+                  if (value != null) {
+                    g.settingsSc.updateAutoBackup(value);
+                    if (value) {
+                      // await Workmanager().registerPeriodicTask('auto_backup', 'auto_backup', frequency: Duration(minutes: 15));
+                      await Workmanager().registerOneOffTask('auto_backup', 'auto_backup', initialDelay: Duration(seconds: 5));
+                    }else{
+                      await Workmanager().cancelByUniqueName('auto_backup');
+                    }
+                  }
                 },
                 title: Text('Auto backup'),
-                subtitle: Text(lastBackupDate != null ? 'Last backup: ${formatDate(lastBackupDate, 'dd/MM/yyyy')}' : 'Backup has not been done yet'),
+                subtitle: Text(
+                  lastBackupDate != null
+                      ? 'Last backup: ${formatDate(lastBackupDate, 'dd/MM/yyyy')}'
+                      : 'Backup has not been done yet',
+                ),
               );
-            }
+            },
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -152,7 +165,7 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
                                 //   description: 'Restore completed successfully',
                                 // );
                               }
-                            } on BackupFileNotFoundError catch(e){
+                            } on BackupFileNotFoundError catch (e) {
                               if (context.mounted) {
                                 showToast(
                                   context,

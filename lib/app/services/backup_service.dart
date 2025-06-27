@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io' as dart;
 import 'package:archive/archive_io.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/scheduler.dart';
 import 'dart:developer' as dev;
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:minimaltodo/app/exceptions.dart';
@@ -8,6 +10,7 @@ import 'package:minimaltodo/app/services/content_comparator.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
@@ -17,6 +20,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../note/models/folder.dart';
 import '../../note/models/note.dart';
 import '../../task/models/task.dart';
+import 'package:workmanager/workmanager.dart';
 
 const String backupFileJsonName = 'minitodo_backup.json';
 const String backupFileZipName = 'minitodo_backup.zip';
@@ -78,29 +82,30 @@ class BackupService {
   }
 
   /// Takes json file as input, compresses it using [_compressJsonFile] and uploads it to google drive.
-  Future<void> uploadFileToGoogleDrive(dart.File jsonFile) async {
+  Future<bool> uploadFileToGoogleDrive(dart.File jsonFile) async {
     try {
-      //Retrieve authenticated client to work with drive API
+      // Retrieve authenticated client to work with Drive API
       final client = await GoogleSignInService().getAuthenticatedClient();
 
       if (client == null) {
         throw GoogleClientNotAuthenticatedError();
       }
+
       final driveApi = drive.DriveApi(client);
 
-      //Check if file already exists
+      // Check if file already exists
       final existingFiles = await driveApi.files.list(
         q: "name='$backupFileZipName' and trashed=false",
-        spaces: 'appDataFolder'
+        spaces: 'appDataFolder',
       );
 
       if (existingFiles.files != null && existingFiles.files!.isNotEmpty) {
         await driveApi.files.delete(existingFiles.files!.first.id!);
       }
 
-      // 2. Upload the new file
+      // Compress JSON file
       final zipFile = _compressJsonFile(jsonFile);
-      //Uploading to appDataFolder to make it hidden from the user's drive interface
+
       final driveFile = drive.File()
         ..name = backupFileZipName
         ..parents = ['appDataFolder'];
@@ -110,18 +115,22 @@ class BackupService {
         await zipFile.length(),
         contentType: 'application/zip',
       );
-      MiniLogger.d('File size: ${driveFile.size}');
+
       final uploaded = await driveApi.files.create(driveFile, uploadMedia: media);
+
+      client.close();
 
       if (uploaded.id != null) {
         MiniLogger.d('Backup file uploaded to Google Drive (fileId: ${uploaded.id})');
+        return true;
       } else {
-        throw Exception('Failed to upload file');
+        MiniLogger.e('Upload returned null id');
+        return false;
       }
-      client.close();
     } catch (e, t) {
-      MiniLogger.e('Error uploading file to Google Drive ${e.toString()}, type: ${t.runtimeType}');
-      MiniLogger.t('Stacktrace: ${t.toString()}');
+      MiniLogger.e('Error uploading file to Google Drive: $e');
+      MiniLogger.t('Stacktrace: $t');
+      return false;
     }
   }
 
@@ -200,7 +209,6 @@ class BackupService {
   Future<Map<String, dynamic>> parseBackupJsonFileAsMap(dart.File jsonFile) async {
     try {
       final jsonString = await jsonFile.readAsString();
-
 
       final jsonMap = jsonDecode(jsonString);
 
@@ -324,11 +332,34 @@ class BackupMergeService {
   }
 }
 
-class BackgroundAutoBackupService{
-
-  @pragma('vm:entry-point')
-  static void callBackDispatcher(){
-
-  }
-
+@pragma('vm:entry-point')
+void callBackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    switch (task) {
+      case 'auto_backup':
+        print('printing something in another isolate');
+        WidgetsFlutterBinding.ensureInitialized();
+        await GoogleSignInService().restoreGoogleAccount();
+        // try {
+        // if (!ObjectBox.store.isClosed()) {
+        // ObjectBox.store.close();
+        // }
+        // } catch(e, t) {
+        final appState = SchedulerBinding.instance.lifecycleState;
+        print('state: $appState');
+        if (appState == AppLifecycleState.detached) {
+          // await ObjectBox.init();
+        }
+        // }
+        await MiniBox.initStorage();
+        final jsonFile = await BackupService().generateBackupJsonFile();
+        final backupSuccessful = await BackupService().uploadFileToGoogleDrive(jsonFile);
+        if (backupSuccessful) {
+          g.settingsSc.updateLastBackupDate(DateTime.now());
+          print('backup successful');
+        }
+        break;
+    }
+    return Future.value(true);
+  });
 }
