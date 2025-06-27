@@ -1,72 +1,78 @@
 // Content comparison utilities
 class ContentComparator {
-  static bool areTasksEqual(Map<String, dynamic> task1, Map<String, dynamic> task2) {
-    return task1['title'] == task2['title'] &&
-        task1['priority'] == task2['priority'] &&
-        task1['isDone'] == task2['isDone'] &&
-        task1['isRepeating'] == task2['isRepeating'] &&
-        task1['reminders'] == task2['reminders'] &&
-        task1['repeatConfig'] == task2['repeatConfig'] &&
-        _areDateTimesEqual(task1['createdAt'], task2['createdAt']) &&
-        _areDateTimesEqual(task1['endDate'], task2['endDate']) &&
-        _areDateTimesEqual(task1['dueDate'], task2['dueDate']) &&
-        _areDateTimesEqual(task1['startDate'], task2['startDate']);
+  static String taskContentHash(Map<String, dynamic> json) {
+    final basicFields = '${json['title']}|${json['priority']}|${json['isDone']}|${json['isRepeating']}';
+
+    final dateFields =
+        '${_ms(json['createdAt'])}|${_ms(json['dueDate'])}|${_ms(json['startDate'])}|${_ms(json['endDate'])}';
+
+    final reminders = json['reminders'] ?? 'null';
+    final repeatConfig = json['repeatConfig'] ?? 'null';
+    final stringFields = '$reminders|$repeatConfig';
+
+    final categories = (json['categories'] ?? []) as List;
+    final sortedCatNames = categories.map((e) => e['name']).toList()..sort();
+    final categoriesStr = sortedCatNames.join(',');
+
+    final completions = (json['completions'] ?? []) as List;
+    final sortedCompletions = completions
+        .map((e) => _ms(e['date']))
+        .toList()
+      ..sort();
+    final completionsStr = sortedCompletions.join(',');
+
+    return '$basicFields|$dateFields|$stringFields|$categoriesStr|$completionsStr';
   }
 
-  static bool areCategoriesEqual(Map<String, dynamic> cat1, Map<String, dynamic> cat2) {
-    return cat1['name'] == cat2['name'] &&
-        cat1['icon'] == cat2['icon'] &&
-        cat1['color'] == cat2['color'];
+  static String noteContentHash(Map<String, dynamic> json) {
+    final content = json['content'] ?? '';
+    final created = _ms(json['createdAt']);
+    final updated = _ms(json['updatedAt']);
+
+    final folders = (json['folders'] ?? []) as List;
+    final folderNames = folders.map((f) => f['name']).toList()..sort();
+    final foldersStr = folderNames.join(',');
+
+    return '$content|$created|$updated|$foldersStr';
   }
 
-  static bool areNotesEqual(Map<String, dynamic> note1, Map<String, dynamic> note2) {
-    return note1['content'] == note2['content'] &&
-        _areDateTimesEqual(note1['createdAt'], note2['createdAt']) &&
-        _areDateTimesEqual(note1['updatedAt'], note2['updatedAt']);
+  static String folderContentHash(Map<String, dynamic> json) {
+    return '${json['name']}';
   }
 
-  static bool areFoldersEqual(Map<String, dynamic> folder1, Map<String, dynamic> folder2) {
-    return folder1['name'] == folder2['name'];
+  static String categoryContentHash(Map<String, dynamic> json) {
+    return '${json['name']}|${json['icon']}|${json['color']}';
   }
 
-  static bool areCompletionsEqual(Map<String, dynamic> comp1, Map<String, dynamic> comp2) {
-    return _areDateTimesEqual(comp1['date'], comp2['date']) &&
-        comp1['isDone'] == comp2['isDone'];
+  static String completionContentHash(Map<String, dynamic> json) {
+    return '${_ms(json['date'])}|${json['isDone']}';
   }
 
-  static bool _areDateTimesEqual(dynamic date1, dynamic date2) {
-    if (date1 == null && date2 == null) return true;
-    if (date1 == null || date2 == null) return false;
-
-    // Handle both string and DateTime formats
-    if (date1 is String && date2 is String) {
-      return date1 == date2;
-    }
-
-    if (date1 is int && date2 is int) {
-      return date1 == date2; // millisecondsSinceEpoch
-    }
-
-    return date1.toString() == date2.toString();
+  static String _ms(dynamic dt) {
+    if (dt == null) return 'null';
+    if (dt is int) return dt.toString();
+    if (dt is String) return dt;
+    return dt.toString();
   }
 }
 
 // Entity type resolver
 class EntityTypeResolver {
-  static const Map<String, bool Function(Map<String, dynamic>, Map<String, dynamic>)> _comparators = {
-    'tasks': ContentComparator.areTasksEqual,
-    'categories': ContentComparator.areCategoriesEqual,
-    'notes': ContentComparator.areNotesEqual,
-    'folders': ContentComparator.areFoldersEqual,
-    'completions': ContentComparator.areCompletionsEqual,
+  static final _hashGenerators = <String, String Function(Map<String, dynamic>)>{
+    'tasks': ContentComparator.taskContentHash,
+    'notes': ContentComparator.noteContentHash,
+    'folders': ContentComparator.folderContentHash,
+    'categories': ContentComparator.categoryContentHash,
+    'completions': ContentComparator.completionContentHash,
   };
 
   static bool areItemsEqual(String entityType, Map<String, dynamic> item1, Map<String, dynamic> item2) {
-    final comparator = _comparators[entityType];
-    if (comparator == null) {
+    final hashFn = _hashGenerators[entityType];
+    if (hashFn == null) {
       throw ArgumentError('Unknown entity type: $entityType');
     }
-    return comparator(item1, item2);
+    return hashFn(item1) == hashFn(item2);
   }
 }
+
 

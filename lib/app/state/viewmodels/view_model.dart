@@ -20,7 +20,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
   set setItems(List<T> items) => _items = items;
 
   /// The ObjectBox store box for database operations
-  final _box = ObjectBox.store.box<T>();
+  final _box = ObjectBox.store!.box<T>();
 
   /// Getter or _box
   Box<T> get box => _box;
@@ -125,12 +125,12 @@ abstract class ViewModel<T> extends ChangeNotifier {
           (item is Folder && localItemById is Folder && item.equals(localItemById, checkIdEquality: true)) ||
           (item is CategoryModel && localItemById is CategoryModel && item.equals(localItemById, checkIdEquality: true));
 
+      debugPrint('isIdentical: $isIdentical');
       if (isIdentical) continue;
 
       // Case 2: Same content exists under different ID -> skip
       final contentDuplicateExists = allLocalItems.any((e) {
         if (e.runtimeType != item.runtimeType) return false;
-
         if (item is Task) return e is Task && item.equals(e, checkIdEquality: false);
         if (item is Note) return e is Note && item.equals(e, checkIdEquality: false);
         if (item is Folder) return e is Folder && item.equals(e, checkIdEquality: false);
@@ -143,10 +143,11 @@ abstract class ViewModel<T> extends ChangeNotifier {
         continue;
       }
 
-      // Case 3: Same ID but different content -> insert as new
-      if (localItemById != null) {
-        setItemId(item, 0);
-      }
+      // At this point, we know this should be inserted as new,
+      // so we must reset the ID before put()—this covers both:
+      //  • Case 3 (same ID, diff content) AND
+      //  • Case 4 (diff ID, diff content)
+      setItemId(item, 0);
 
       _box.put(item);
     }
