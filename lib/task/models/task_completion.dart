@@ -29,7 +29,8 @@ class TaskCompletion{
     return completion;
   }
 
-  bool equals(TaskCompletion other) {
+  bool equals(TaskCompletion other, {bool? checkIdEquality = false}) {
+    if(checkIdEquality! && id != other.id) return false;
     return contentHash() == other.contentHash();
     // Note: Not comparing task relation to avoid circular reference
   }

@@ -111,57 +111,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
   //   initializeItemsWithRebuilding();
   //
   // }
-  void putManyItems(List<T> restoredItems) {
-    MiniLogger.d('items length: ${restoredItems.length}');
-
-    final allLocalItems = _box.getAll();
-
-    for (final item in restoredItems) {
-      final localItemById = _box.get(getItemId(item));
-
-      // Case 1: Same ID, same content -> skip
-      final isIdentical = (item is Task && localItemById is Task && item.equals(localItemById, checkIdEquality: true)) ||
-          (item is Note && localItemById is Note && item.equals(localItemById, checkIdEquality: true)) ||
-          (item is Folder && localItemById is Folder && item.equals(localItemById, checkIdEquality: true)) ||
-          (item is CategoryModel && localItemById is CategoryModel && item.equals(localItemById, checkIdEquality: true));
-
-      debugPrint('isIdentical: $isIdentical');
-      if (isIdentical) continue;
-
-      // Case 2: Same content exists under different ID -> skip
-      final contentDuplicateExists = allLocalItems.any((e) {
-        if (e.runtimeType != item.runtimeType) return false;
-        if (item is Task) return e is Task && item.equals(e, checkIdEquality: false);
-        if (item is Note) return e is Note && item.equals(e, checkIdEquality: false);
-        if (item is Folder) return e is Folder && item.equals(e, checkIdEquality: false);
-        if (item is CategoryModel) return e is CategoryModel && item.equals(e, checkIdEquality: false);
-        return false;
-      });
-
-      if (contentDuplicateExists) {
-        MiniLogger.d('Skipping duplicate item (content matched but id different): ${getItemId(item)}');
-        continue;
-      }
-
-      // At this point, we know this should be inserted as new,
-      // so we must reset the ID before put()—this covers both:
-      //  • Case 3 (same ID, diff content) AND
-      //  • Case 4 (diff ID, diff content)
-      setItemId(item, 0);
-
-      _box.put(item);
-    }
-
-    initializeItemsWithRebuilding();
-  }
-
-  String _getPrimaryLabel(T item) {
-    if (item is Task) return item.title;
-    if (item is Note) return item.content;
-    if (item is Folder) return item.name;
-    if (item is CategoryModel) return item.name;
-    return '';
-  }
+  void putManyForRestore(List<T> restoredItems);
 
   /// Delete an item from the local ObjectBox database and the in-memory list.
   /// Child classes may override this method for implementing custom behavior
