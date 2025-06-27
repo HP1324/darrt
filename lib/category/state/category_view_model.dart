@@ -9,7 +9,7 @@ class CategoryViewModel extends ViewModel<CategoryModel> {
   @override
   String putItem(CategoryModel item,{required bool edit, bool scrollToBottom = true}) {
     final category = item;
-    if(items.indexWhere((c) => c.name == category.name) != -1) return Messages.mCategoryExists;
+    if(!edit && items.indexWhere((c) => c.name == category.name) != -1) return Messages.mCategoryExists;
     if (category.name.trim().isEmpty) return Messages.mCategoryEmpty;
     final message = super.putItem(category, edit: edit);
 

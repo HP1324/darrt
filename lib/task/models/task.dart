@@ -194,11 +194,11 @@ class Task {
   /// - And optionally, their `id` values match (when `checkIdEquality` is `true`).
   ///
   /// Returns `true` if all comparisons match, `false` otherwise.
-
   bool equals(Task other, {bool? checkIdEquality = false}) {
     if (checkIdEquality! && id != other.id) {
       return false;
     }
+    return contentHash() == other.contentHash();
     // Compare basic fields
     if (title != other.title ||
         priority != other.priority ||
@@ -247,7 +247,33 @@ class Task {
       }
     }
 
+    debugPrint('task ${title} exists in local database with id ${id}');
     return true;
+  }
+  String contentHash() {
+    // Basic fields
+    final basicFields = '$title|$priority|$isDone|$isRepeating';
+
+    // DateTime fields (handle nulls for createdAt and endDate, non-null for dueDate and startDate)
+    final dateFields = '${createdAt?.millisecondsSinceEpoch ?? 'null'}|'
+        '${dueDate.millisecondsSinceEpoch}|'
+        '${startDate.millisecondsSinceEpoch}|'
+        '${endDate?.millisecondsSinceEpoch ?? 'null'}';
+
+    // String fields (handle nulls)
+    final stringFields = '${reminders ?? 'null'}|${repeatConfig ?? 'null'}';
+
+    // Categories (sort by name for consistency)
+    final catNames = categories.map((c) => c.name).toList()..sort();
+    final categoriesStr = catNames.join(',');
+
+    // Completions (sort by date for consistency)
+    final completionDates = completions
+        .map((c) => c.date.millisecondsSinceEpoch)
+        .toList()..sort();
+    final completionsStr = completionDates.join(',');
+
+    return '$basicFields|$dateFields|$stringFields|$categoriesStr|$completionsStr';
   }
 }
 

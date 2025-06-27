@@ -62,8 +62,11 @@ class Folder {
     if (checkIdEquality! && id != other.id) {
       return false;
     }
-    return name == other.name;
+    return contentHash() == other.contentHash();
     // Note: Not comparing notes backlink to avoid circular reference
   }
 
+  String contentHash() {
+    return name;
+  }
 }

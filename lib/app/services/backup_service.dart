@@ -54,7 +54,7 @@ class BackupService {
         final oldData = await parseBackupJsonFileAsMap(oldDecompressedFile);
 
         // Merge the old and new data
-        BackupMergeService.mergeData(oldData, newData);
+        mergedData = BackupMergeService.mergeData(oldData, newData);
         // mergedData = _mergeData(oldData, newData);
       } catch (e, t) {
         MiniLogger.e('Error downloading old backup file ${e.toString()}, type: ${e.runtimeType}');
@@ -322,4 +322,13 @@ class BackupMergeService {
       return existingList.any((existingItem) => existingItem['id']?.toString() == newId);
     }
   }
+}
+
+class BackgroundAutoBackupService{
+
+  @pragma('vm:entry-point')
+  static void callBackDispatcher(){
+
+  }
+
 }

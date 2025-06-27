@@ -60,8 +60,10 @@ class CategoryModel {
     if (checkIdEquality! && id != other.id) {
       return false;
     }
-    return name == other.name &&
-        icon == other.icon &&
-        color == other.color;
+    return contentHash() == other.contentHash();
+  }
+
+  String contentHash() {
+    return '$name|$icon|$color';
   }
 }

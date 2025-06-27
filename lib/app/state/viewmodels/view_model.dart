@@ -69,83 +69,89 @@ abstract class ViewModel<T> extends ChangeNotifier {
     return edit ? getUpdateSuccessMessage() : getCreateSuccessMessage();
   }
 
+  // void putManyItems(List<T> restoredItems) {
+  //   MiniLogger.d('items length: ${restoredItems.length}');
+  //   bool isEmptyDatabase = _box.getAll().isEmpty;
+  //
+  //   //List to be put in database based on conditions
+  //   // List<T> newItems = [];
+  //   final allLocalItems = _box.getAll();
+  //   for (final item in restoredItems) {
+  //     final localItem = _box.get(getItemId(item));
+  //     if (localItem != null) {
+  //       if ((item is Task && item.equals(localItem as Task, checkIdEquality: true)) ||
+  //           (item is Note && item.equals(localItem as Note, checkIdEquality: true)) ||
+  //           (item is Folder && item.equals(localItem as Folder, checkIdEquality: true)) ||
+  //           (item is CategoryModel &&
+  //               item.equals(localItem as CategoryModel, checkIdEquality: true))) {
+  //         continue;
+  //       } else {
+  //         setItemId(item, 0);
+  //       }
+  //     } else {
+  //       final duplicateExistsWithDifferentId = allLocalItems.any((e) {
+  //         if (e is Task) {
+  //           debugPrint('Duplicate task ${e.title} exists with id ${e.id}');
+  //           return e.equals(item as Task);
+  //         } else if (e is Note) {
+  //           return e.equals(item as Note);
+  //         } else if (e is Folder) {
+  //           return e.equals(item as Folder);
+  //         } else if (e is CategoryModel) {
+  //           return e.equals(item as CategoryModel);
+  //         }
+  //         return false;
+  //       });
+  //       if (duplicateExistsWithDifferentId) {
+  //         continue;
+  //       }
+  //     }
+  //     _box.put(item);
+  //   }
+  //   initializeItemsWithRebuilding();
+  //
+  // }
   void putManyItems(List<T> restoredItems) {
     MiniLogger.d('items length: ${restoredItems.length}');
-    bool isEmptyDatabase = _box.getAll().isEmpty;
 
-    //List to be put in database based on conditions
-    // List<T> newItems = [];
+    final allLocalItems = _box.getAll();
+
     for (final item in restoredItems) {
-      final localItem = _box.get(getItemId(item));
-      if (localItem != null) {
-        if ((item is Task && item.equals(localItem as Task, checkIdEquality: true)) ||
-            (item is Note && item.equals(localItem as Note, checkIdEquality: true)) ||
-            (item is Folder && item.equals(localItem as Folder, checkIdEquality: true)) ||
-            (item is CategoryModel &&
-                item.equals(localItem as CategoryModel, checkIdEquality: true))) {
-          continue;
-        } else {
-          setItemId(item, 0);
-        }
-      } else {
-        final duplicateExistsWithDifferentId = _box.getAll().any((e) {
-          if (e is Task) {
-            return e.equals(item as Task);
-          } else if (e is Note) {
-            return e.equals(item as Note);
-          } else if (e is Folder) {
-            return e.equals(item as Folder);
-          } else if (e is CategoryModel) {
-            return e.equals(item as CategoryModel);
-          }
-          return false;
-        });
-        if (duplicateExistsWithDifferentId) {
-          continue;
-        }
+      final localItemById = _box.get(getItemId(item));
+
+      // Case 1: Same ID, same content -> skip
+      final isIdentical = (item is Task && localItemById is Task && item.equals(localItemById, checkIdEquality: true)) ||
+          (item is Note && localItemById is Note && item.equals(localItemById, checkIdEquality: true)) ||
+          (item is Folder && localItemById is Folder && item.equals(localItemById, checkIdEquality: true)) ||
+          (item is CategoryModel && localItemById is CategoryModel && item.equals(localItemById, checkIdEquality: true));
+
+      if (isIdentical) continue;
+
+      // Case 2: Same content exists under different ID -> skip
+      final contentDuplicateExists = allLocalItems.any((e) {
+        if (e.runtimeType != item.runtimeType) return false;
+
+        if (item is Task) return e is Task && item.equals(e, checkIdEquality: false);
+        if (item is Note) return e is Note && item.equals(e, checkIdEquality: false);
+        if (item is Folder) return e is Folder && item.equals(e, checkIdEquality: false);
+        if (item is CategoryModel) return e is CategoryModel && item.equals(e, checkIdEquality: false);
+        return false;
+      });
+
+      if (contentDuplicateExists) {
+        MiniLogger.d('Skipping duplicate item (content matched but id different): ${getItemId(item)}');
+        continue;
       }
+
+      // Case 3: Same ID but different content -> insert as new
+      if (localItemById != null) {
+        setItemId(item, 0);
+      }
+
       _box.put(item);
-      initializeItemsWithRebuilding();
     }
 
-    //Assign 0 to item id if database is empty or item is not in the database, so that objectbox doesn't throw id not valid error
-    // for (final item in manyItems) {
-    //   final id = getItemId(item);
-    //   if (!isEmptyDatabase) {
-    //     if (_box.contains(id)) {
-    //       if (item is CategoryModel) {
-    //         g.catVm.putItem(item, edit: true, scrollToBottom: false);
-    //       } else {
-    //         putItem(item, edit: true);
-    //       }
-    //     } else {
-    //       debugPrint('');
-    //       setItemId(item, 0);
-    //       if (item is CategoryModel) {
-    //         g.catVm.putItem(item, edit: false, scrollToBottom: false);
-    //       } else {
-    //         putItem(item, edit: false);
-    //       }
-    //     }
-    //   } else {
-    //     setItemId(item, 0);
-    //     putItem(item, edit: false);
-    //   }
-    // }
-    // for (final item in restoredItems) {
-    //   if (item is Task && (!_box.contains(item.id) || isEmptyDatabase)) item.id = 0;
-    //   if (item is Note && (!_box.contains(item.id) || isEmptyDatabase)) item.id = 0;
-    //   if (item is Folder && (!_box.contains(item.id) || isEmptyDatabase)) item.id = 0;
-    //   if (item is CategoryModel && (!_box.contains(item.id) || isEmptyDatabase)) item.id = 0;
-    // }
-    // newItems = List.from(restoredItems);
-    //
-    // final ids = _box.putMany(newItems);
-    //
-    // initializeItemsWithRebuilding();
-
-    // MiniLogger.d('Items added/updated with ids: $ids');
-    // notifyListeners();
+    initializeItemsWithRebuilding();
   }
 
   String _getPrimaryLabel(T item) {
@@ -173,7 +179,6 @@ abstract class ViewModel<T> extends ChangeNotifier {
     _selectedItemIds.clear();
     return getDeleteSuccessMessage(length);
   }
-
 
   void toggleSelection(int id) {
     if (selectedItemIds.contains(id)) {
