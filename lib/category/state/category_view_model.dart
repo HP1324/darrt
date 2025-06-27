@@ -43,4 +43,10 @@ class CategoryViewModel extends ViewModel<CategoryModel> {
   void setItemId(CategoryModel item, int id) {
     item.id =id;
   }
+
+  @override
+  void putManyForRestore(List<CategoryModel> restoredItems) {
+    box.putMany(restoredItems);
+    initializeItemsWithRebuilding();
+  }
 }

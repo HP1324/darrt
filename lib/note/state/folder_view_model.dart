@@ -33,4 +33,10 @@ class FolderViewModel extends ViewModel<Folder> {
   void setItemId(Folder item, int id) {
     item.id = id;
   }
+
+  @override
+  void putManyForRestore(List<Folder> folders) {
+    box.putMany(folders);
+    initializeItemsWithRebuilding();
+  }
 }

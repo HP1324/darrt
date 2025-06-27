@@ -33,4 +33,9 @@ class NoteViewModel extends ViewModel<Note>{
     item.id = id;
   }
 
+  @override
+  void putManyForRestore(List<Note> restoredItems) {
+      box.putMany(restoredItems);
+      initializeItemsWithRebuilding();
+  }
 }

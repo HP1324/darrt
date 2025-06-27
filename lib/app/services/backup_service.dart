@@ -30,23 +30,27 @@ class BackupService {
   factory BackupService() => _instance;
   BackupService._internal();
 
+  Map<String, dynamic> getLocalData() {
+    final tasks = ObjectBox.taskBox.getAll();
+    final categories = ObjectBox.categoryBox.getAll();
+    final notes = ObjectBox.noteBox.getAll();
+    final folders = ObjectBox.folderBox.getAll();
+    final completions = ObjectBox.completionBox.getAll();
+
+    return {
+      'tasks': tasks.map((task) => task.toJson()).toList(),
+      'categories': categories.map((category) => category.toJson()).toList(),
+      'notes': notes.map((note) => note.toJson()).toList(),
+      'folders': folders.map((folder) => folder.toJson()).toList(),
+      'completions': completions.map((completion) => completion.toJson()).toList(),
+    };
+  }
+
   Future<dart.File> generateBackupJsonFile() async {
     try {
-      final tasks = ObjectBox.taskBox.getAll();
-      final categories = ObjectBox.categoryBox.getAll();
-      final notes = ObjectBox.noteBox.getAll();
-      final folders = ObjectBox.folderBox.getAll();
-      final completions = ObjectBox.completionBox.getAll();
+      final localData = getLocalData();
 
-      final newData = {
-        'tasks': tasks.map((task) => task.toJson()).toList(),
-        'categories': categories.map((category) => category.toJson()).toList(),
-        'notes': notes.map((note) => note.toJson()).toList(),
-        'folders': folders.map((folder) => folder.toJson()).toList(),
-        'completions': completions.map((completion) => completion.toJson()).toList(),
-      };
-
-      Map<String, dynamic> mergedData = Map.from(newData);
+      Map<String, dynamic> mergedData = Map.from(localData);
       try {
         // Download the Old zip file which already exists in google drive
         final oldCompressedFile = await downloadCompressedFileFromGoogleDrive();
@@ -55,10 +59,15 @@ class BackupService {
         final oldDecompressedFile = _decompressToJsonFile(oldCompressedFile);
 
         // Parse the old json file as map
-        final oldData = await parseBackupJsonFileAsMap(oldDecompressedFile);
+        final driveData = await parseBackupJsonFileAsMap(oldDecompressedFile);
 
         // Merge the old and new data
-        mergedData = BackupMergeService.mergeData(oldData, newData);
+        mergedData = BackupMergeService.mergeData(
+          driveData,
+          localData,
+          mergeType: MergeType.backup,
+        );
+        dev.log('backed up data: $mergedData');
         // mergedData = _mergeData(oldData, newData);
       } catch (e, t) {
         MiniLogger.e('Error downloading old backup file ${e.toString()}, type: ${e.runtimeType}');
@@ -182,27 +191,31 @@ class BackupService {
     final jsonBackupFile = _decompressToJsonFile(backupFile);
 
     //Parse the json file as map to work on it
-    Map<String, dynamic> backupMap = await parseBackupJsonFileAsMap(jsonBackupFile);
+    Map<String, dynamic> driveData = await parseBackupJsonFileAsMap(jsonBackupFile);
+    Map<String, dynamic> localData = getLocalData();
+    Map<String, dynamic> mergedData = BackupMergeService.mergeData(
+      localData,
+      driveData,
+      mergeType: MergeType.restore,
+    );
 
-    final categories = (backupMap['categories'] as List)
+    final categories = (mergedData['categories'] as List)
         .map((e) => CategoryModel.fromJson(e))
         .toList();
-    g.catVm.putManyItems(categories);
+    g.catVm.putManyForRestore(categories);
 
-    final tasks = (backupMap['tasks'] as List).map((e) => Task.fromJson(e)).toList();
-    g.taskVm.putManyItems(tasks);
-
-    final folders = (backupMap['folders'] as List).map((e) => Folder.fromJson(e)).toList();
-    g.folderVm.putManyItems(folders);
-
-    final notes = (backupMap['notes'] as List).map((e) => Note.fromJson(e)).toList();
-    g.noteVm.putManyItems(notes);
-
-    final completions = (backupMap['completions'] as List)
+    final completions = (mergedData['completions'] as List)
         .map((e) => TaskCompletion.fromJson(e))
         .toList();
-    TaskCompletion.putManyCompletions(completions);
-    // ObjectBox.completionBox.putMany(completions);
+
+    final tasks = (mergedData['tasks'] as List).map((e) => Task.fromJson(e)).toList();
+    g.taskVm.putManyForRestore(tasks, completions: completions);
+
+    final folders = (mergedData['folders'] as List).map((e) => Folder.fromJson(e)).toList();
+    g.folderVm.putManyForRestore(folders);
+
+    final notes = (mergedData['notes'] as List).map((e) => Note.fromJson(e)).toList();
+    g.noteVm.putManyForRestore(notes);
 
     MiniLogger.d('Data restored from google drive');
   }
@@ -288,48 +301,116 @@ class BackupService {
 class BackupMergeService {
   static Map<String, dynamic> mergeData(
     Map<String, dynamic> oldData,
-    Map<String, dynamic> newData,
-  ) {
+    Map<String, dynamic> newData, {
+    required MergeType mergeType,
+  }) {
     final merged = Map<String, dynamic>.from(oldData);
+    final oldObjects = convertJsonDataToObjects(oldData);
+    final newObjects = convertJsonDataToObjects(newData);
 
-    newData.forEach((key, newList) {
-      if (merged.containsKey(key)) {
-        final oldList = List<Map<String, dynamic>>.from(merged[key]);
-        final newItems = List<Map<String, dynamic>>.from(newList);
+    for (var key in newData.keys) {
+      final oldList = oldData[key] as List<dynamic>? ?? [];
+      final newList = newData[key] as List<dynamic>? ?? [];
 
-        // Add items from newData that don't exist in oldData (content-wise)
-        for (var newItem in newItems) {
-          if (!_itemExistsInList(key, newItem, oldList)) {
-            oldList.add(newItem);
+      List mergedList = List.from(oldList);
+
+      for (var item in newList) {
+        final oldItem = mergedList.firstWhere((e) => e.id == item.id, orElse: () => null);
+        if (oldItem != null) {
+          //Same id
+          if (oldItem.equals(item)) {
+            // Case 1. Same id, same content. Do nothing, skip the iteration
+            continue;
+          } else {
+            // Case 2. Same id, different content. Update existing item with new item's value. id will be same
+            final index = mergedList.indexWhere((e) => e.id == item.id);
+            mergedList[index] = item;
+          }
+        } else {
+          // Case 3. Different id, same content. Update existing item with new item's value. Id will be the same, so objectbox will update the exiting item with new value
+          final itemWithSameContent = mergedList.firstWhere(
+            (e) => e.equals(item),
+            orElse: () => null,
+          );
+          if (itemWithSameContent != null) {
+            final index = mergedList.indexWhere((e) => e.equals(item));
+            mergedList[index] = item;
+          } else {
+            // Case 4. Different id, different content. Set item id to zero if restoring, so objectbox can consider it a new item
+            if (mergeType == MergeType.restore) item.id = 0;
+            mergedList.add(item);
           }
         }
-
-        merged[key] = oldList;
-      } else {
-        // Key doesn't exist in old data, add entire list
-        merged[key] = List<Map<String, dynamic>>.from(newList);
       }
-    });
+      merged[key] = mergedList;
+    }
 
     return merged;
   }
 
-  static bool _itemExistsInList(
-    String entityType,
-    Map<String, dynamic> newItem,
-    List<Map<String, dynamic>> existingList,
-  ) {
-    try {
-      return existingList.any(
-        (existingItem) => EntityTypeResolver.areItemsEqual(entityType, newItem, existingItem),
-      );
-    } catch (e) {
-      // Fallback to ID comparison if entity type is unknown
-      final newId = newItem['id']?.toString();
-      if (newId == null) return false;
+  static Map<String, List<dynamic>> convertJsonDataToObjects(Map<String, dynamic> jsonData) {
+    final convertedData = <String, List<dynamic>>{};
 
-      return existingList.any((existingItem) => existingItem['id']?.toString() == newId);
+    for (var key in jsonData.keys) {
+      final jsonList = jsonData[key] as List<dynamic>? ?? [];
+      List<dynamic> objectList = [];
+
+      switch (key) {
+        case 'tasks':
+          objectList = jsonList.map((json) => Task.fromJson(json)).toList();
+          break;
+        case 'categories':
+          objectList = jsonList.map((json) => CategoryModel.fromJson(json)).toList();
+          break;
+        case 'completions':
+          objectList = jsonList.map((json) => TaskCompletion.fromJson(json)).toList();
+          break;
+        case 'notes':
+          objectList = jsonList.map((json) => Note.fromJson(json)).toList();
+          break;
+        case 'folders':
+          objectList = jsonList.map((json) => Folder.fromJson(json)).toList();
+          break;
+        default:
+          objectList = jsonList; // Keep as is for unknown keys
+      }
+
+      convertedData[key] = objectList;
     }
+
+    return convertedData;
+  }
+  static Map<String, dynamic> convertObjectsToJsonData(Map<String, List<dynamic>> objectData) {
+    final convertedData = <String, dynamic>{};
+
+    for (var key in objectData.keys) {
+      final objectList = objectData[key] ?? [];
+      List<dynamic> jsonList = [];
+
+      switch (key) {
+        case 'tasks':
+          jsonList = objectList.map((obj) => (obj as Task).toJson()).toList();
+          break;
+        case 'categories':
+          jsonList = objectList.map((obj) => (obj as CategoryModel).toJson()).toList();
+          break;
+        case 'completions':
+          jsonList = objectList.map((obj) => (obj as TaskCompletion).toJson()).toList();
+          break;
+        case 'notes':
+          jsonList = objectList.map((obj) => (obj as Note).toJson()).toList();
+          break;
+        case 'folders':
+          jsonList = objectList.map((obj) => (obj as Folder).toJson()).toList();
+          break;
+        default:
+          jsonList = objectList; // Keep as is for unknown keys
+      }
+
+      convertedData[key] = jsonList;
+    }
+
+    return convertedData;
   }
 }
 
@@ -363,4 +444,9 @@ void callBackDispatcher() {
     }
     return Future.value(true);
   });
+}
+
+enum MergeType {
+  backup,
+  restore,
 }
