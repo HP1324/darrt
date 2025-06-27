@@ -1,16 +1,19 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:minimaltodo/app/notification/notification_action_controller.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
+import 'package:minimaltodo/app/services/backup_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/home.dart';
+import 'package:workmanager/workmanager.dart';
 
 
 /// Initializes app services and state
@@ -26,6 +29,7 @@ Future<void> initApp() async {
     // Initialize notifications
     await NotificationService.init();
 
+    Workmanager().initialize(callBackDispatcher,isInDebugMode: kDebugMode);
   } catch (e) {
     MiniLogger.e('Failed to initialize app: ${e.toString()}, Error type: ${e.runtimeType}');
   }
