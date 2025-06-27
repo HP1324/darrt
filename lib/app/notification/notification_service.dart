@@ -15,36 +15,21 @@ class NotificationService {
 
   static Future<void> init() async {
     try {
+      await initNotifChannels();
       bool permissionGranted = await _notif.isNotificationAllowed();
-
       if (!permissionGranted && (MiniBox.read(mFirstTimeNotifPermission) ?? true)) {
         permissionGranted = await _notif.requestPermissionToSendNotifications();
         await MiniBox.write(mFirstTimeNotifPermission, false);
-        await MiniBox.write(mNotificationsEnabled, permissionGranted);
         MiniLogger.d('First time permission request: $permissionGranted');
       }
 
-      if (permissionGranted) {
-        await initNotifChannels();
-        MiniLogger.d('Notification service initialized successfully');
-      } else {
-        await MiniBox.write(mNotificationsEnabled, false);
-        MiniLogger.d('Notifications disabled - continuing without notification support');
-      }
+      MiniLogger.d('Notification service initialized successfully');
     } catch (e) {
       MiniLogger.e('Failed to initialize notification service: ${e.toString()}');
-      await MiniBox.write(mNotificationsEnabled, false);
     }
   }
 
-  static Future<bool> isNotificationsEnabled() async {
-    try {
-      return MiniBox.read(mNotificationsEnabled) ?? false;
-    } catch (e) {
-      MiniLogger.e('Error checking notification status: ${e.toString()}');
-      return false;
-    }
-  }
+
 
   static Future<void> initNotifChannels() async {
     try {
@@ -86,10 +71,6 @@ class NotificationService {
 
   static Future<void> createTaskNotification(Task task) async {
     if (task.reminders == null || task.reminderObjects.isEmpty) {
-      return;
-    }
-    if (!await isNotificationsEnabled()) {
-      MiniLogger.d('Skipping notification creation - notifications are disabled');
       return;
     }
     MiniLogger.d('Creating one-off task notification');
@@ -143,10 +124,6 @@ class NotificationService {
 
   static Future<void> createRepeatingTaskNotifications(Task task) async {
     if (task.reminders == null || task.reminderObjects.isEmpty) {
-      return;
-    }
-    if (!await isNotificationsEnabled()) {
-      MiniLogger.i('Notifications disabled; skipping repeating notifications.');
       return;
     }
     if (task.endDate != null && task.endDate!.difference(task.startDate) > Duration(days: 365)) {
@@ -275,8 +252,13 @@ class NotificationService {
     try {
       // Calculate the next notification date
       final now = DateTime.now();
-      DateTime nextNotificationDate =
-          DateTime(now.year, now.month, baseDateTime.day, reminder.time.hour, reminder.time.minute);
+      DateTime nextNotificationDate = DateTime(
+        now.year,
+        now.month,
+        baseDateTime.day,
+        reminder.time.hour,
+        reminder.time.minute,
+      );
 
       // If the day has already passed this month, move to next month
       if (nextNotificationDate.isBefore(now)) {
@@ -339,7 +321,12 @@ class NotificationService {
       // Calculate the next notification date
       final now = DateTime.now();
       DateTime nextNotificationDate = DateTime(
-          now.year, baseDateTime.month, baseDateTime.day, reminder.time.hour, reminder.time.minute);
+        now.year,
+        baseDateTime.month,
+        baseDateTime.day,
+        reminder.time.hour,
+        reminder.time.minute,
+      );
 
       // If date has passed this year, move to next year
       if (nextNotificationDate.isBefore(now)) {
@@ -403,7 +390,8 @@ class NotificationService {
       }
     } catch (e, stacktrace) {
       MiniLogger.e(
-          'Error removing notification: ${e.toString()}\n$stacktrace\nError type: ${e.runtimeType}');
+        'Error removing notification: ${e.toString()}\n$stacktrace\nError type: ${e.runtimeType}',
+      );
     }
   }
 
@@ -429,8 +417,7 @@ class NotificationService {
   }
 
   static Future<bool> showNotificationRationale(BuildContext context) async {
-    bool userAllowed = false;
-    await showAdaptiveDialog(
+    return await showAdaptiveDialog(
       context: context,
       builder: (_) {
         return AlertDialog(
@@ -442,19 +429,15 @@ class NotificationService {
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Text(
-                "Allow the application to send notifications, otherwise we won't be able to remind you about your tasks."),
+              "Allow the application to send notifications, otherwise we won't be able to remind you about your tasks.",
+            ),
           ),
           actions: [
             InkWell(
               onTap: () async {
                 final navigator = Navigator.of(context);
                 final allowed = await AwesomeNotifications().requestPermissionToSendNotifications();
-                if (allowed && context.mounted) {
-                  await MiniBox.write(mNotificationsEnabled, allowed);
-                  await NotificationService.initNotifChannels();
-                }
-                userAllowed = allowed;
-                navigator.pop();
+                navigator.pop(allowed);
               },
               child: Container(
                 padding: const EdgeInsets.all(8),
@@ -471,7 +454,6 @@ class NotificationService {
         );
       },
     );
-    return userAllowed;
   }
 
   static void scheduleQuickReminder(String title, int minutes) async {

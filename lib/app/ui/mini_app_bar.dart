@@ -112,8 +112,8 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               _MiniAppBarAction(
                 onTap: () async {
-                  showQuickReminderDialog() {
-                    showDialog(
+                  showQuickReminderDialog() async{
+                    await showDialog(
                       context: context,
                       builder: (context) {
                         return QuickReminderDialog();
@@ -121,17 +121,16 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                     );
                   }
 
-                  showNotificationRationale() async {
-                    return await NotificationService.showNotificationRationale(context);
-                  }
-
                   bool allowed = true;
                   if (!await AwesomeNotifications().isNotificationAllowed()) {
-                    allowed = await showNotificationRationale();
+                    if (!context.mounted) return; // Check before using context
+                    allowed = await NotificationService.showNotificationRationale(context);
                   }
+                  if (!context.mounted) return; // Check again after async call
+
                   if (allowed) {
-                    showQuickReminderDialog();
-                  } else if (context.mounted) {
+                    await showQuickReminderDialog();
+                  } else {
                     showToast(
                       context,
                       type: ToastificationType.error,

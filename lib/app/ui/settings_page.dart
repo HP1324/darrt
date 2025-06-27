@@ -5,7 +5,8 @@ import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:minimaltodo/app/exceptions.dart';
 import 'package:minimaltodo/app/services/backup_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
-import 'package:minimaltodo/app/state/value_notifiers.dart';
+import 'package:minimaltodo/app/state/controllers/settings_state_controller.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
@@ -88,13 +89,22 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
             ),
             trailing: _BackupButton(),
           ),
-          CheckboxListTile(
-            contentPadding: EdgeInsets.zero,
-            visualDensity: VisualDensity.compact,
-            value: true,
-            onChanged: (value) {},
-            title: Text('Auto backup'),
-            subtitle: Text('Last backup: 12 Feb 2025, 12:32 PM'),
+          ListenableBuilder(
+            listenable: Listenable.merge([g.settingsSc.autoBackUp, g.settingsSc.lastBackupDate]),
+            builder: (context,  child) {
+              final autoBackup = g.settingsSc.autoBackUp.value;
+              final lastBackupDate = g.settingsSc.lastBackupDate.value;
+              return CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                visualDensity: VisualDensity.compact,
+                value: autoBackup,
+                onChanged: (value) {
+                  if(value != null) g.settingsSc.updateAutoBackup(value);
+                },
+                title: Text('Auto backup'),
+                subtitle: Text(lastBackupDate != null ? 'Last backup: ${formatDate(lastBackupDate, 'dd/MM/yyyy')}' : 'Backup has not been done yet'),
+              );
+            }
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -282,7 +292,7 @@ class SnoozeSection extends StatelessWidget {
           runSpacing: 4,
           children: [1, 5, 10, 15, 20, 25, 30, 45, 50, 60].map((minutes) {
             return ValueListenableBuilder(
-              valueListenable: snoozeMinutes,
+              valueListenable: g.settingsSc.snoozeMinutes,
               builder: (context, value, child) {
                 return ChoiceChip(
                   showCheckmark: false,
@@ -291,7 +301,7 @@ class SnoozeSection extends StatelessWidget {
                   selected: value == minutes,
                   onSelected: (selected) {
                     if (selected) {
-                      updateSnoozeMinutes(minutes);
+                      g.settingsSc.updateSnoozeMinutes(minutes);
                     }
                   },
                 );
@@ -316,7 +326,7 @@ class DefaultReminderTypeSection extends StatelessWidget {
       children: [
         Text('Default reminder type', style: theme.textTheme.titleMedium),
         ValueListenableBuilder(
-          valueListenable: defaultReminderType,
+          valueListenable: g.settingsSc.defaultReminderType,
           builder: (context, value, child) {
             return SegmentedButton<String>(
               segments: const [
@@ -333,7 +343,7 @@ class DefaultReminderTypeSection extends StatelessWidget {
               ],
               selected: {value},
               onSelectionChanged: (Set<String> selection) {
-                updateDefaultReminder(selection.first);
+                g.settingsSc.updateDefaultReminder(selection.first);
               },
             );
           },
@@ -381,6 +391,7 @@ class _BackupButtonState extends State<_BackupButton> {
                           description: 'Backup successful',
                         );
                       }
+                      g.settingsSc.updateLastBackupDate(DateTime.now());
                     } catch (e) {
                       if (context.mounted) {
                         showToast(

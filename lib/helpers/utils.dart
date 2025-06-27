@@ -47,7 +47,7 @@ String formatTime(TimeOfDay time) {
   return DateFormat.jm().format(dt); // "5:30 PM" format
 }
 
-String formatDate(DateTime date, String format) => DateFormat(format).format(date);
+String formatDate(DateTime date, String format) => DateFormat(format).add_jm().format(date);
 
 String formatDateAndTime(DateTime dateTime, String format) {
   return DateFormat(format).add_jm().format(dateTime);

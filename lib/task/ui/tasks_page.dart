@@ -26,11 +26,7 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
       g.navMan.currentTab.value = _tabController.index;
     });
   }
-  @override
-  void dispose() {
-    debugPrint('Tasks page dispose called');
-    super.dispose();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +57,7 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
                   ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w500),
                   tabs: const [
                     Tab(text: 'All'),
-                    Tab(text: 'Single'),
+                    Tab(text: 'One-time'),
                     Tab(text: 'Repeating'),
                   ],
                 ),
