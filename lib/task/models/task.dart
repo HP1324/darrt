@@ -93,6 +93,7 @@ class Task {
     'reminders': reminders,
     'priority': priority,
     'categoryIds': categories.map((c) => c.id).toList(),
+    // 'completionIds': completions.map((c) => c.id).toList(),
   };
 
   // Create a Task from JSON
@@ -136,6 +137,7 @@ class Task {
       }
 
       task.categories.addAll(validCategories);
+
 
       return task;
     } catch (e) {
@@ -199,56 +201,6 @@ class Task {
       return false;
     }
     return contentHash() == other.contentHash();
-    // Compare basic fields
-    if (title != other.title ||
-        priority != other.priority ||
-        isDone != other.isDone ||
-        isRepeating != other.isRepeating ||
-        reminders != other.reminders ||
-        repeatConfig != other.repeatConfig) {
-      return false;
-    }
-
-    // Compare DateTime fields (handling null values)
-    if (createdAt?.millisecondsSinceEpoch != other.createdAt?.millisecondsSinceEpoch ||
-        endDate?.millisecondsSinceEpoch != other.endDate?.millisecondsSinceEpoch ||
-        dueDate.millisecondsSinceEpoch != other.dueDate.millisecondsSinceEpoch ||
-        startDate.millisecondsSinceEpoch != other.startDate.millisecondsSinceEpoch) {
-      return false;
-    }
-
-    // Compare categories (ToMany relation)
-    if (categories.length != other.categories.length) {
-      return false;
-    }
-
-    final thisCategoriesSorted = categories.toList()..sort((a, b) => a.name.compareTo(b.name));
-    final otherCategoriesSorted = other.categories.toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
-
-    for (int i = 0; i < thisCategoriesSorted.length; i++) {
-      if (!thisCategoriesSorted[i].equals(otherCategoriesSorted[i])) {
-        return false;
-      }
-    }
-
-    // Compare completions (ToMany relation)
-    if (completions.length != other.completions.length) {
-      return false;
-    }
-
-    final thisCompletionsSorted = completions.toList()..sort((a, b) => a.date.compareTo(b.date));
-    final otherCompletionsSorted = other.completions.toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
-
-    for (int i = 0; i < thisCompletionsSorted.length; i++) {
-      if (!thisCompletionsSorted[i].equals(otherCompletionsSorted[i])) {
-        return false;
-      }
-    }
-
-    debugPrint('task ${title} exists in local database with id ${id}');
-    return true;
   }
   String contentHash() {
     // Basic fields

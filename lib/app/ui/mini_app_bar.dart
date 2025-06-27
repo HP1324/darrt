@@ -53,7 +53,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                       final isBefore = selectedDate.isBefore(g.calMan.previousSelectedDate);
                       final title = DateUtils.isSameDay(selectedDate, DateTime.now())
                           ? 'Today'
-                          : formatDate(selectedDate, 'EEE, d MMM, yyyy');
+                          : formatDateNoJm(selectedDate, 'EEE, d MMM, yyyy');
                       return AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
                         transitionBuilder: (child, animation) {

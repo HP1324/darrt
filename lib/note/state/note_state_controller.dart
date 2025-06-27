@@ -45,7 +45,7 @@ class NoteStateController extends StateController<NoteState, Note> {
 
   @override
   void initState(bool edit, [Note? model]) {
-    final folders = ObjectBox.store.box<Folder>().getAll();
+    final folders = ObjectBox.store!.box<Folder>().getAll();
 
     state = NoteState(
       color: 'green',

@@ -201,7 +201,8 @@ class BackupService {
     final completions = (backupMap['completions'] as List)
         .map((e) => TaskCompletion.fromJson(e))
         .toList();
-    ObjectBox.completionBox.putMany(completions);
+    TaskCompletion.putManyCompletions(completions);
+    // ObjectBox.completionBox.putMany(completions);
 
     MiniLogger.d('Data restored from google drive');
   }
@@ -341,9 +342,9 @@ void callBackDispatcher() {
         WidgetsFlutterBinding.ensureInitialized();
         await GoogleSignInService().restoreGoogleAccount();
         // try {
-        // if (!ObjectBox.store.isClosed()) {
-        // ObjectBox.store.close();
-        // }
+        if (ObjectBox.store != null) {
+          await ObjectBox.init();
+        }
         // } catch(e, t) {
         final appState = SchedulerBinding.instance.lifecycleState;
         print('state: $appState');
