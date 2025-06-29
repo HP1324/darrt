@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
+import 'package:minimaltodo/app/services/backup_service.dart';
 import 'package:minimaltodo/helpers/messages.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/objectbox.g.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
@@ -62,6 +64,16 @@ class TaskViewModel extends ViewModel<Task> {
     for (int id in selectedTaskIds) {
       NotificationService.removeAllTaskNotifications(tasks.firstWhere((t) => t.id == id));
     }
+
+    // Delete ALL completions for each task
+    for (var id in selectedTaskIds) {
+      final removed = _completionBox.query(TaskCompletion_.task.equals(id)).build()
+        ..remove()
+        ..close(); // Remove will delete all the matching objects
+      MiniLogger.d('Removed $removed completions for task $id');
+      recurringTaskCompletions[id]?.clear();
+    }
+
     final message = super.deleteMultipleItems();
     return message;
   }
@@ -75,14 +87,14 @@ class TaskViewModel extends ViewModel<Task> {
         _completionBox.put(completion);
         recurringTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
       } else {
-        final completion = _completionBox
-            .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
-            .build()
-            .findFirst();
-        if (completion != null) {
-          _completionBox.remove(completion.id);
-          recurringTaskCompletions[task.id]?.remove(date);
-        }
+        final removed =
+            _completionBox
+                .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
+                .build()
+              ..remove()
+              ..close();
+        MiniLogger.d('removed $removed completions for task ${task.id}');
+        recurringTaskCompletions[task.id]?.remove(date);
       }
     } else {
       task.isDone = value;
@@ -113,10 +125,28 @@ class TaskViewModel extends ViewModel<Task> {
 
   @override
   void putManyForRestore(List<Task> restoredItems, {List<TaskCompletion>? completions}) {
-    box.putMany(restoredItems);
+    final taskIds = box.putMany(restoredItems);
+    final List? oldTasks = BackupMergeService.oldCacheObjects['tasks'];
+    final allTasks = box.getMany(taskIds);
+    if (oldTasks!.isNotEmpty) {
+      for (var oldTask in oldTasks) {
+        // final query = _completionBox.query(TaskCompletion_.task.equals(task.id)).build().find();
+        for (var completion in completions!) {
+          if (completion.task.targetId == oldTask.id) {
+            debugPrint('here came it');
+            final newTask = allTasks.firstWhere((t) => t!.equals(oldTask));
+            completion.task.target = newTask;
+          }
+        }
+      }
+    }
     if (completions != null) {
       _completionBox.putMany(completions);
     }
-    initializeItemsWithRebuilding();
+    initializeItems();
+    notifyListeners();
   }
+
+  @override
+  void mergeItems(List<Task> oldItems, List<Task> newItems) {}
 }

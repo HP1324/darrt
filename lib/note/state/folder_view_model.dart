@@ -39,4 +39,9 @@ class FolderViewModel extends ViewModel<Folder> {
     box.putMany(folders);
     initializeItemsWithRebuilding();
   }
+
+  @override
+  void mergeItems(List<Folder> oldItems, List<Folder> newItems){
+
+  }
 }

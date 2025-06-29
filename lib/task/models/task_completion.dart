@@ -3,14 +3,14 @@ import 'package:minimaltodo/task/models/task.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
-class TaskCompletion{
+class TaskCompletion {
   @Id()
-  int id = 0;
+  int id;
   DateTime date;
   bool isDone;
   final task = ToOne<Task>();
 
-  TaskCompletion({required this.date, required this.isDone});
+  TaskCompletion({this.id = 0, required this.date, required this.isDone});
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -30,13 +30,12 @@ class TaskCompletion{
   }
 
   bool equals(TaskCompletion other, {bool? checkIdEquality = false}) {
-    if(checkIdEquality! && id != other.id) return false;
+    if (checkIdEquality! && id != other.id) return false;
     return contentHash() == other.contentHash();
     // Note: Not comparing task relation to avoid circular reference
   }
 
-  String contentHash() =>
-      '${date.millisecondsSinceEpoch}|${isDone ? 1 : 0}';
+  String contentHash() => '${date.millisecondsSinceEpoch}|${isDone ? 1 : 0}';
 
   static void putManyCompletions(List<TaskCompletion> restored) {
     final box = ObjectBox.completionBox;

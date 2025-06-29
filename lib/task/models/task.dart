@@ -93,7 +93,6 @@ class Task {
     'reminders': reminders,
     'priority': priority,
     'categoryIds': categories.map((c) => c.id).toList(),
-    // 'completionIds': completions.map((c) => c.id).toList(),
   };
 
   // Create a Task from JSON

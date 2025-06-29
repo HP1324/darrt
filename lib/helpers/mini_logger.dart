@@ -2,7 +2,7 @@ import 'package:logger/logger.dart';
 
 class MiniLogger {
   static final _logger = Logger(
-    printer: PrettyPrinter(methodCount: 5, dateTimeFormat: DateTimeFormat.dateAndTime),
+    printer: PrettyPrinter(methodCount: null, dateTimeFormat: DateTimeFormat.dateAndTime),
   );
   static void e(String message) {
     _logger.e(message);

@@ -102,7 +102,7 @@ class TaskStateController extends StateController<TaskState, Task> {
     task.categories.clear();
     if (categories.isEmpty) {
       //Add general category if user unchecked all the category checkboxes
-      task.categories.add(ObjectBox.categoryBox.get(1));
+      task.categories.add(ObjectBox.categoryBox.get(1) ?? CategoryModel(id: 1, name: 'General'));
     } else {
       task.categories.addAll(categories);
     }

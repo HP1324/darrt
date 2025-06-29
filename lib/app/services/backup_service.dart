@@ -21,6 +21,7 @@ import '../../note/models/folder.dart';
 import '../../note/models/note.dart';
 import '../../task/models/task.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:collection/collection.dart';
 
 const String backupFileJsonName = 'minitodo_backup.json';
 const String backupFileZipName = 'minitodo_backup.zip';
@@ -31,11 +32,11 @@ class BackupService {
   BackupService._internal();
 
   Map<String, dynamic> getLocalData() {
-    final tasks = ObjectBox.taskBox.getAll();
-    final categories = ObjectBox.categoryBox.getAll();
-    final notes = ObjectBox.noteBox.getAll();
-    final folders = ObjectBox.folderBox.getAll();
-    final completions = ObjectBox.completionBox.getAll();
+    final List<Task> tasks = ObjectBox.taskBox.getAll();
+    final List<CategoryModel> categories = ObjectBox.categoryBox.getAll();
+    final List<Note> notes = ObjectBox.noteBox.getAll();
+    final List<Folder> folders = ObjectBox.folderBox.getAll();
+    final List<TaskCompletion> completions = ObjectBox.completionBox.getAll();
 
     return {
       'tasks': tasks.map((task) => task.toJson()).toList(),
@@ -67,8 +68,9 @@ class BackupService {
           localData,
           mergeType: MergeType.backup,
         );
-        dev.log('backed up data: $mergedData');
         // mergedData = _mergeData(oldData, newData);
+      } on BackupFileNotFoundError catch (e) {
+        MiniLogger.e(e.toString());
       } catch (e, t) {
         MiniLogger.e('Error downloading old backup file ${e.toString()}, type: ${e.runtimeType}');
         MiniLogger.t(t.toString());
@@ -227,7 +229,6 @@ class BackupService {
       final jsonMap = jsonDecode(jsonString);
 
       if (jsonMap is Map<String, dynamic>) {
-        dev.log('JSON Map: $jsonMap');
         return jsonMap;
       } else {
         throw FormatException('Invalid JSON structure: not a Map');
@@ -299,23 +300,28 @@ class BackupService {
 }
 
 class BackupMergeService {
+  static Map<String, List<dynamic>> oldCacheObjects = {};
+
   static Map<String, dynamic> mergeData(
     Map<String, dynamic> oldData,
     Map<String, dynamic> newData, {
     required MergeType mergeType,
   }) {
-    final merged = Map<String, dynamic>.from(oldData);
     final oldObjects = convertJsonDataToObjects(oldData);
     final newObjects = convertJsonDataToObjects(newData);
 
-    for (var key in newData.keys) {
-      final oldList = oldData[key] as List<dynamic>? ?? [];
-      final newList = newData[key] as List<dynamic>? ?? [];
+    final merged = Map<String, List<dynamic>>.from(oldObjects);
+
+    for (var key in newObjects.keys) {
+      final oldList = oldObjects[key] ?? [];
+      final newList = newObjects[key] ?? [];
 
       List mergedList = List.from(oldList);
 
       for (var item in newList) {
-        final oldItem = mergedList.firstWhere((e) => e.id == item.id, orElse: () => null);
+        final oldItem = oldList.firstWhereOrNull(
+          (e) => e.id == item.id,
+        );
         if (oldItem != null) {
           //Same id
           if (oldItem.equals(item)) {
@@ -327,16 +333,18 @@ class BackupMergeService {
             mergedList[index] = item;
           }
         } else {
-          // Case 3. Different id, same content. Update existing item with new item's value. Id will be the same, so objectbox will update the exiting item with new value
-          final itemWithSameContent = mergedList.firstWhere(
-            (e) => e.equals(item),
-            orElse: () => null,
-          );
-          if (itemWithSameContent != null) {
-            final index = mergedList.indexWhere((e) => e.equals(item));
-            mergedList[index] = item;
+          // Case 3. Different id, same content. Update existing item with new item's value in backup and do nothing if restoring. Id will be the same, so objectbox will update the exiting item with new value
+          if (mergeType == MergeType.backup) {
+            final itemWithSameContent = mergedList.firstWhereOrNull((e) => e.equals(item));
+            if (itemWithSameContent != null) {
+              final index = mergedList.indexWhere((e) => e.equals(item));
+              mergedList[index] = item;
+            }
           } else {
-            // Case 4. Different id, different content. Set item id to zero if restoring, so objectbox can consider it a new item
+            // Case 4. Different id, different content.which means item does not exist at all. Set item id to zero if restoring, so objectbox can consider it a new item
+            debugPrint('case 4 hit');
+            if (item is Task) print('id: ${item.id},title: ${item.title}');
+            oldCacheObjects.putIfAbsent(key, () => []).add(item);
             if (mergeType == MergeType.restore) item.id = 0;
             mergedList.add(item);
           }
@@ -344,8 +352,13 @@ class BackupMergeService {
       }
       merged[key] = mergedList;
     }
-
-    return merged;
+    final mergedJsonData = convertObjectsToJsonData(merged);
+    if (mergeType == MergeType.restore) {
+      dev.log('merged data during restore: $mergedJsonData');
+    } else {
+      dev.log('merged data during backup: $mergedJsonData');
+    }
+    return mergedJsonData;
   }
 
   static Map<String, List<dynamic>> convertJsonDataToObjects(Map<String, dynamic> jsonData) {
@@ -380,6 +393,7 @@ class BackupMergeService {
 
     return convertedData;
   }
+
   static Map<String, dynamic> convertObjectsToJsonData(Map<String, List<dynamic>> objectData) {
     final convertedData = <String, dynamic>{};
 
@@ -412,6 +426,26 @@ class BackupMergeService {
 
     return convertedData;
   }
+
+  static Task getTaskOrElseObject() {
+    return Task(id: -1, title: '');
+  }
+
+  static CategoryModel getCategoryModelOrElseObject() {
+    return CategoryModel(id: -1, name: '');
+  }
+
+  static TaskCompletion getTaskCompletionOrElseObject() {
+    return TaskCompletion(id: -1, date: DateTime.now(), isDone: false);
+  }
+
+  static Note getNoteOrElseObject() {
+    return Note(id: -1, content: '');
+  }
+
+  static Folder getFolderOrElseObject() {
+    return Folder(id: -1, name: '');
+  }
 }
 
 @pragma('vm:entry-point')
@@ -423,7 +457,7 @@ void callBackDispatcher() {
         WidgetsFlutterBinding.ensureInitialized();
         await GoogleSignInService().restoreGoogleAccount();
         // try {
-        if (ObjectBox.store != null) {
+        if (ObjectBox.store == null) {
           await ObjectBox.init();
         }
         // } catch(e, t) {
