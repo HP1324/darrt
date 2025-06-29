@@ -1,5 +1,7 @@
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:minimaltodo/helpers/messages.dart';
+import 'package:minimaltodo/helpers/typedefs.dart';
+import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/note/models/folder.dart';
 
 class FolderViewModel extends ViewModel<Folder> {
@@ -41,7 +43,8 @@ class FolderViewModel extends ViewModel<Folder> {
   }
 
   @override
-  void mergeItems(List<Folder> oldItems, List<Folder> newItems){
+  void mergeItems(EntityObjectListMap<Folder> oldItems, EntityObjectListMap<Folder> newItems){
 
   }
+
 }

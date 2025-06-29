@@ -1,5 +1,7 @@
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:minimaltodo/helpers/messages.dart';
+import 'package:minimaltodo/helpers/typedefs.dart';
+import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/note/models/note.dart';
 
 class NoteViewModel extends ViewModel<Note>{
@@ -40,7 +42,8 @@ class NoteViewModel extends ViewModel<Note>{
   }
 
   @override
-  void mergeItems(List<Note> oldItems, List<Note> newItems){
+  void mergeItems(EntityObjectListMap<Note> oldItems, EntityObjectListMap<Note> newItems){
 
   }
+
 }

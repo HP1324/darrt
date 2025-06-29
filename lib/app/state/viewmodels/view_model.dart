@@ -3,6 +3,7 @@ import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/note/models/folder.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/objectbox.g.dart' show Box;
@@ -69,48 +70,6 @@ abstract class ViewModel<T> extends ChangeNotifier {
     return edit ? getUpdateSuccessMessage() : getCreateSuccessMessage();
   }
 
-  // void putManyItems(List<T> restoredItems) {
-  //   MiniLogger.d('items length: ${restoredItems.length}');
-  //   bool isEmptyDatabase = _box.getAll().isEmpty;
-  //
-  //   //List to be put in database based on conditions
-  //   // List<T> newItems = [];
-  //   final allLocalItems = _box.getAll();
-  //   for (final item in restoredItems) {
-  //     final localItem = _box.get(getItemId(item));
-  //     if (localItem != null) {
-  //       if ((item is Task && item.equals(localItem as Task, checkIdEquality: true)) ||
-  //           (item is Note && item.equals(localItem as Note, checkIdEquality: true)) ||
-  //           (item is Folder && item.equals(localItem as Folder, checkIdEquality: true)) ||
-  //           (item is CategoryModel &&
-  //               item.equals(localItem as CategoryModel, checkIdEquality: true))) {
-  //         continue;
-  //       } else {
-  //         setItemId(item, 0);
-  //       }
-  //     } else {
-  //       final duplicateExistsWithDifferentId = allLocalItems.any((e) {
-  //         if (e is Task) {
-  //           debugPrint('Duplicate task ${e.title} exists with id ${e.id}');
-  //           return e.equals(item as Task);
-  //         } else if (e is Note) {
-  //           return e.equals(item as Note);
-  //         } else if (e is Folder) {
-  //           return e.equals(item as Folder);
-  //         } else if (e is CategoryModel) {
-  //           return e.equals(item as CategoryModel);
-  //         }
-  //         return false;
-  //       });
-  //       if (duplicateExistsWithDifferentId) {
-  //         continue;
-  //       }
-  //     }
-  //     _box.put(item);
-  //   }
-  //   initializeItemsWithRebuilding();
-  //
-  // }
   void putManyForRestore(List<T> restoredItems);
 
   /// Delete an item from the local ObjectBox database and the in-memory list.
@@ -161,7 +120,37 @@ abstract class ViewModel<T> extends ChangeNotifier {
   void setItemId(T item, int id);
 
   /// All child classes are responsible for merging logic
-  void mergeItems(List<T> oldItems, List<T> newItems){
+  void mergeItems(EntityObjectListMap<T> oldItems, EntityObjectListMap<T> newItems) {}
 
+  /// Convert [EntityJsonListMap] to [EntityObjectListMap]
+  EntityObjectListMap<T> convertJsonDataToObjects(
+    EntityJsonListMap jsonData,
+    JsonFactory<T> fromJson,
+  ) {
+    final EntityObjectListMap<T> convertedData = {};
+
+    for (var key in jsonData.keys) {
+      final jsonList = jsonData[key] as List<dynamic>? ?? [];
+      List<T> objectList = jsonList.map((json) => fromJson(json)).toList();
+      convertedData[key] = objectList;
+    }
+    return convertedData;
+  }
+
+  /// Convert [EntityObjectListMap] to [EntityJsonListMap]
+  EntityJsonListMap convertObjectsToJsonData(
+    EntityObjectListMap<T> objectData,
+    JsonConverter<T> toJson,
+  ) {
+    final EntityJsonListMap convertedData = {};
+
+    for (var key in objectData.keys) {
+      final objectList = objectData[key] ?? [];
+      List<Map<String, dynamic>> jsonList = objectList.map((obj) => toJson(obj)).toList();
+
+      convertedData[key] = jsonList;
+    }
+
+    return convertedData;
   }
 }

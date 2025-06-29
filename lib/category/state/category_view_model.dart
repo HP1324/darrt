@@ -2,6 +2,8 @@ import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/helpers/typedefs.dart';
+import 'package:minimaltodo/helpers/typedefs.dart';
 class CategoryViewModel extends ViewModel<CategoryModel> {
   final ScrollController scrollController = ScrollController();
 
@@ -51,7 +53,8 @@ class CategoryViewModel extends ViewModel<CategoryModel> {
   }
 
   @override
-  void mergeItems(List<CategoryModel> oldItems, List<CategoryModel> newItems){
+  void mergeItems(EntityObjectListMap<CategoryModel> oldItems, EntityObjectListMap<CategoryModel> newItems){
 
   }
+
 }

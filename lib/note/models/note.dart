@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart' show TextSelection;
 import 'package:flutter_quill/flutter_quill.dart' show Document, QuillController;
 import 'package:flutter_quill/quill_delta.dart' show Delta;
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/note/models/folder.dart';
@@ -15,18 +16,21 @@ class Note {
     required this.content,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? uuid,
   })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+        updatedAt = updatedAt ?? DateTime.now(),
+        uuid = g.uuid.v4();
   @Id()
   int id;
   String content;
   DateTime? createdAt, updatedAt;
+  final String uuid;
   final folders = ToMany<Folder>();
 
-  factory Note.fromQuillController(QuillController controller) {
+  factory Note.fromQuillController(QuillController controller,{String? uuid}) {
     final deltaJson = jsonEncode(controller.document.toDelta().toJson());
     final now = DateTime.now();
-    return Note(content: deltaJson, createdAt: now, updatedAt: now);
+    return Note(content: deltaJson, createdAt: now, updatedAt: now,uuid: uuid ?? g.uuid.v4());
   }
 
   QuillController toQuillController() {
@@ -41,6 +45,7 @@ class Note {
     'createdAt': createdAt?.millisecondsSinceEpoch,
     'updatedAt': updatedAt?.millisecondsSinceEpoch,
     'folderIds': folders.where((f) => f.id > 0).map((f) => f.id).toList(),
+    'uuid': uuid,
   };
 
   factory Note.fromJson(Map<String, dynamic> json) {
@@ -54,6 +59,7 @@ class Note {
         updatedAt: json['updatedAt'] != null
             ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'])
             : DateTime.now(),
+        uuid: json['uuid'],
       );
 
       final folderIds = (json['folderIds'] as List?)?.cast<int>() ?? [];

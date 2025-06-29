@@ -29,7 +29,7 @@ class NoteStateController extends StateController<NoteState, Note> {
 
   @override
   Note buildModel({required bool edit, Note? model}) {
-    var note = Note.fromQuillController(controller);
+    var note = Note.fromQuillController(controller, uuid: edit ? model!.uuid : null);
     note.id = edit ? model!.id : 0;
     final folders = g.folderVm.folders.where((f) =>g.noteSc.folderSelection[f] == true).toList();
     note.folders.clear();
