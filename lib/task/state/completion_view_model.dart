@@ -1,4 +1,6 @@
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
+import 'package:minimaltodo/helpers/typedefs.dart';
+import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
 
 /// Making this class abstract because it does not directly belong to ViewModel family.
@@ -12,7 +14,7 @@ class CompletionViewModel extends ViewModel<TaskCompletion> {
   int getItemId(TaskCompletion item) => item.id;
 
   @override
-  void mergeItems(List<TaskCompletion> oldItems, List<TaskCompletion> newItems){
+  void mergeItems(EntityObjectListMap<TaskCompletion> oldItems, EntityObjectListMap<TaskCompletion> newItems){
 
   }
 
@@ -29,4 +31,6 @@ class CompletionViewModel extends ViewModel<TaskCompletion> {
   void putManyForRestore(List<TaskCompletion> restoredItems) {
     // TODO: implement putManyForRestore
   }
+
+
 }

@@ -4,6 +4,8 @@ import 'package:minimaltodo/app/services/backup_service.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/helpers/typedefs.dart';
+import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/objectbox.g.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:minimaltodo/task/models/task.dart';
@@ -148,5 +150,7 @@ class TaskViewModel extends ViewModel<Task> {
   }
 
   @override
-  void mergeItems(List<Task> oldItems, List<Task> newItems) {}
+  void mergeItems(EntityObjectListMap<Task> oldItems, EntityObjectListMap<Task> newItems) {}
+
+
 }

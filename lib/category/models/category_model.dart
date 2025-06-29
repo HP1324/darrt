@@ -1,15 +1,22 @@
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
 class CategoryModel {
-  CategoryModel({this.id = 0, required this.name, this.icon = 'folder', this.color = 'primary'});
+  CategoryModel({
+    this.id = 0,
+    required this.name,
+    this.icon = 'folder',
+    this.color = 'primary',
+    String? uuid,
+  }) : uuid = g.uuid.v4();
   @Id()
   int id;
   String name;
   String icon;
   String color;
-
+  final String uuid;
   @Backlink('categories')
   final tasks = ToMany<Task>();
 
@@ -26,20 +33,21 @@ class CategoryModel {
   @override
   int get hashCode => Object.hash(id, name, icon, color);
 
-
   factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
-        id: json["id"],
-        name: json["name"],
-        icon: json["icon_code"] ?? 'folder',
-        color: json["color"],
-      );
+    id: json["id"],
+    name: json["name"],
+    icon: json["icon_code"] ?? 'folder',
+    color: json["color"],
+    uuid: json['uuid'],
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "icon_code": icon,
-        "color": color,
-      };
+    "id": id,
+    "name": name,
+    "icon_code": icon,
+    "color": color,
+    'uuid': uuid,
+  };
 
   /// Compares this [CategoryModel] with another to determine equality.
   ///

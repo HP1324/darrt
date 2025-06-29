@@ -6,7 +6,6 @@ import 'package:flutter/scheduler.dart';
 import 'dart:developer' as dev;
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:minimaltodo/app/exceptions.dart';
-import 'package:minimaltodo/app/services/content_comparator.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
@@ -16,10 +15,9 @@ import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-
-import '../../note/models/folder.dart';
-import '../../note/models/note.dart';
-import '../../task/models/task.dart';
+import 'package:minimaltodo/note/models/folder.dart';
+import 'package:minimaltodo/note/models/note.dart';
+import 'package:minimaltodo/task/models/task.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:collection/collection.dart';
 

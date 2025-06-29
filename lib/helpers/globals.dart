@@ -13,6 +13,7 @@ import 'package:minimaltodo/task/state/completion_view_model.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart' show TaskStateController;
 import 'package:minimaltodo/task/state/task_view_model.dart' show TaskViewModel;
 import 'package:minimaltodo/task/ui/add_task_page.dart';
+import 'package:uuid/uuid.dart';
 
 
 
@@ -42,6 +43,7 @@ final sttController = SpeechToTextController();
 
 final settingsSc = SettingsStateController();
 
+final Uuid uuid = Uuid();
 
 
 

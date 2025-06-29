@@ -25,6 +25,7 @@ class FolderStateController extends StateController<FolderState, Folder> {
     return Folder(
       name: textController.text,
       id: edit ? folder!.id : 0,
+      uuid: edit ? folder!.uuid : null,
     );
   }
 }

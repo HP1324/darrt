@@ -41,6 +41,7 @@ class CategoryStateController extends StateController<CategoryState, CategoryMod
       icon: icon,
       color: color,
       id: edit ? category!.id : 0,
+      uuid: edit? category!.uuid : null,
     );
   }
 

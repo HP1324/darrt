@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:objectbox/objectbox.dart';
@@ -8,10 +9,12 @@ class Folder {
   Folder({
     this.id = 0,
     required this.name,
-  });
+    String? uuid,
+  }) : uuid = g.uuid.v4();
   @Id()
   int id;
   String name;
+  final String uuid;
   @Backlink('folders')
   final notes = ToMany<Note>();
 
@@ -29,12 +32,14 @@ class Folder {
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
+    'uuid': uuid,
   };
   factory Folder.fromJson(Map<String, dynamic> json) {
     try {
       return Folder(
         id: json['id'] ?? 0,
         name: json['name'],
+        uuid: json['uuid'],
       );
     } catch (e, t) {
       MiniLogger.e('Failed to parse Folder from JSON: $e');

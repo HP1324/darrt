@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/objectbox.g.dart';
@@ -24,8 +24,10 @@ class Task {
     this.priority = 'Low',
     this.repeatConfig,
     this.reminders,
+    String? uuid,
   }) : dueDate = dueDate ?? DateTime.now(),
-       startDate = startDate ?? DateTime.now();
+       startDate = startDate ?? DateTime.now(),
+       uuid = g.uuid.v4();
   @Id()
   int id;
   String title, priority;
@@ -33,7 +35,7 @@ class Task {
   DateTime dueDate, startDate;
   bool isDone, isRepeating;
   String? reminders, repeatConfig;
-
+  final String uuid;
   final categories = ToMany<CategoryModel>();
   @Backlink()
   final completions = ToMany<TaskCompletion>();
@@ -93,6 +95,7 @@ class Task {
     'reminders': reminders,
     'priority': priority,
     'categoryIds': categories.map((c) => c.id).toList(),
+    'uuid': uuid,
   };
 
   // Create a Task from JSON
@@ -111,6 +114,7 @@ class Task {
             : null,
         repeatConfig: json['repeatConfig'],
         reminders: json['reminders'],
+        uuid: json['uuid'],
       );
       // Restore category relations
 
@@ -136,7 +140,6 @@ class Task {
       }
 
       task.categories.addAll(validCategories);
-
 
       return task;
     } catch (e) {
@@ -201,12 +204,14 @@ class Task {
     }
     return contentHash() == other.contentHash();
   }
+
   String contentHash() {
     // Basic fields
     final basicFields = '$title|$priority|$isDone|$isRepeating';
 
     // DateTime fields (handle nulls for createdAt and endDate, non-null for dueDate and startDate)
-    final dateFields = '${createdAt?.millisecondsSinceEpoch ?? 'null'}|'
+    final dateFields =
+        '${createdAt?.millisecondsSinceEpoch ?? 'null'}|'
         '${dueDate.millisecondsSinceEpoch}|'
         '${startDate.millisecondsSinceEpoch}|'
         '${endDate?.millisecondsSinceEpoch ?? 'null'}';
@@ -219,9 +224,7 @@ class Task {
     final categoriesStr = catNames.join(',');
 
     // Completions (sort by date for consistency)
-    final completionDates = completions
-        .map((c) => c.date.millisecondsSinceEpoch)
-        .toList()..sort();
+    final completionDates = completions.map((c) => c.date.millisecondsSinceEpoch).toList()..sort();
     final completionsStr = completionDates.join(',');
 
     return '$basicFields|$dateFields|$stringFields|$categoriesStr|$completionsStr';
