@@ -159,4 +159,9 @@ abstract class ViewModel<T> extends ChangeNotifier {
 
   /// Set the ID of an item
   void setItemId(T item, int id);
+
+  /// All child classes are responsible for merging logic
+  void mergeItems(List<T> oldItems, List<T> newItems){
+
+  }
 }

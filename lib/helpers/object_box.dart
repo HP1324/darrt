@@ -11,7 +11,7 @@ import 'package:minimaltodo/task/models/task_completion.dart';
 late final Admin admin;
 
 class ObjectBox {
-  static late Store? _store;
+  static Store? _store;
   static bool _initialized = false;
   static Future<void> init() async {
     if (_initialized) return;
@@ -27,15 +27,15 @@ class ObjectBox {
 
   static Store? get store => _store;
 
-  static Box get taskBox => _store!.box<Task>();
+  static Box<Task> get taskBox => _store!.box<Task>();
 
-  static Box get categoryBox => _store!.box<CategoryModel>();
+  static Box<CategoryModel> get categoryBox => _store!.box<CategoryModel>();
 
-  static Box get completionBox => _store!.box<TaskCompletion>();
+  static Box<TaskCompletion> get completionBox => _store!.box<TaskCompletion>();
 
-  static Box get folderBox => _store!.box<Folder>();
+  static Box<Folder> get folderBox => _store!.box<Folder>();
 
-  static Box get noteBox => _store!.box<Note>();
+  static Box<Note> get noteBox => _store!.box<Note>();
   static void close() {
     _store!.close();
   }

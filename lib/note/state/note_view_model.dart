@@ -38,4 +38,9 @@ class NoteViewModel extends ViewModel<Note>{
       box.putMany(restoredItems);
       initializeItemsWithRebuilding();
   }
+
+  @override
+  void mergeItems(List<Note> oldItems, List<Note> newItems){
+
+  }
 }

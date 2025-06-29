@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
+import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:toastification/toastification.dart';
@@ -108,6 +109,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                       final user = GoogleSignInService().currentUser;
                       debugPrint(user?.email ?? 'null is there in user');
                     }
+                    ObjectBox.completionBox.removeAll();
                   },
                 ),
               _MiniAppBarAction(

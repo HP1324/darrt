@@ -49,4 +49,9 @@ class CategoryViewModel extends ViewModel<CategoryModel> {
     box.putMany(restoredItems);
     initializeItemsWithRebuilding();
   }
+
+  @override
+  void mergeItems(List<CategoryModel> oldItems, List<CategoryModel> newItems){
+
+  }
 }
