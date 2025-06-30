@@ -1,7 +1,6 @@
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/typedefs.dart';
-import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/note/models/folder.dart';
 
 class FolderViewModel extends ViewModel<Folder> {
@@ -43,8 +42,16 @@ class FolderViewModel extends ViewModel<Folder> {
   }
 
   @override
-  void mergeItems(EntityObjectListMap<Folder> oldItems, EntityObjectListMap<Folder> newItems){
+  String getItemUuid(Folder item)=>item.uuid;
 
+  @override
+  EntityObjectList<Folder> convertJsonListToObjectList(EntityJsonList jsonList) {
+    return jsonList.map(Folder.fromJson).toList();
+  }
+
+  @override
+  EntityJsonList convertObjectsListToJsonList(EntityObjectList<Folder> objectList) {
+    return objectList.map((folder) => folder.toJson()).toList();
   }
 
 }
