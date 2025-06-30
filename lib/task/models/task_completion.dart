@@ -1,4 +1,3 @@
-import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:objectbox/objectbox.dart';
@@ -9,24 +8,24 @@ class TaskCompletion {
   int id;
   DateTime date;
   bool isDone;
-  final String uuid;
+  String? uuid;
   final task = ToOne<Task>();
 
-  TaskCompletion({this.id = 0, required this.date, required this.isDone, String? uuid}) : uuid = g.uuid.v4();
+  TaskCompletion({this.id = 0, required this.date, required this.isDone, String? uuid}) : uuid = uuid ?? '';
 
   Map<String, dynamic> toJson() => {
     'id': id,
     'date': date.millisecondsSinceEpoch,
     'isDone': isDone ? 1 : 0,
     'taskId': task.targetId,
-    'uuid': uuid,
+    'uuid': uuid!,
   };
 
   factory TaskCompletion.fromJson(Map<String, dynamic> json) {
     final completion = TaskCompletion(
       date: DateTime.fromMillisecondsSinceEpoch(json['date']),
       isDone: json['isDone'] == 1,
-      uuid: json['uuid'],
+      uuid: json['uuid']!,
     );
     completion.id = json['id'];
     completion.task.targetId = json['taskId']; // Relink later

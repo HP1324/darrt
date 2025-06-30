@@ -1,13 +1,12 @@
+import 'dart:developer' as dev;
+
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:minimaltodo/category/models/category_model.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:minimaltodo/app/services/backup_service.dart' show MergeType;
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/typedefs.dart';
-import 'package:minimaltodo/note/models/folder.dart';
-import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/objectbox.g.dart' show Box;
-import 'package:minimaltodo/task/models/task.dart';
 
 /// Generic abstract class for view models that manage collections of model objects
 /// T is the model type (e.g., CategoryModel, Task)
@@ -119,38 +118,68 @@ abstract class ViewModel<T> extends ChangeNotifier {
   /// Set the ID of an item
   void setItemId(T item, int id);
 
-  /// All child classes are responsible for merging logic
-  void mergeItems(EntityObjectListMap<T> oldItems, EntityObjectListMap<T> newItems) {}
-
-  /// Convert [EntityJsonListMap] to [EntityObjectListMap]
-  EntityObjectListMap<T> convertJsonDataToObjects(
-    EntityJsonListMap jsonData,
-    JsonFactory<T> fromJson,
-  ) {
-    final EntityObjectListMap<T> convertedData = {};
-
-    for (var key in jsonData.keys) {
-      final jsonList = jsonData[key] as List<dynamic>? ?? [];
-      List<T> objectList = jsonList.map((json) => fromJson(json)).toList();
-      convertedData[key] = objectList;
+  EntityObjectListMap<T> mergeItems(
+    EntityObjectListMap<T> oldItems,
+    EntityObjectListMap<T> newItems, {
+    required MergeType mergeType,
+  }) {
+    // If any item with same 'uuid' field exists in oldItems, then if mergeType is MergeType.backup, just update it with the item with same uuid in newItems. and if mergeType is MergeType.restore, skip the item and keep the item in oldItems as it is. and if an item with same uuid does not exist in oldItems, just add it in both mode. also in restore mode, set the item.id field to zero before merging it
+    EntityObjectListMap<T> mergedItems = EntityObjectListMap.from(oldItems);
+    for (var key in newItems.keys) {
+      final oldList = mergedItems[key] ?? [];
+      final newList = newItems[key] ?? [];
+      List<T> mergedList = List.from(oldList);
+      for (var item in newList) {
+        final oldItemWithSameUuid = oldList.firstWhereOrNull(
+          (e) => getItemUuid(e) == getItemUuid(item),
+        );
+        if (oldItemWithSameUuid != null) {
+          if (mergeType == MergeType.backup) {
+            final index = mergedList.indexOf(oldItemWithSameUuid);
+            if (index != -1) mergedList[index] = item;
+          }
+        } else {
+          if (mergeType == MergeType.restore) setItemId(item, 0);
+          mergedList.add(item);
+        }
+      }
+      mergedItems[key] = mergedList;
     }
-    return convertedData;
+    return mergedItems;
   }
 
-  /// Convert [EntityObjectListMap] to [EntityJsonListMap]
-  EntityJsonListMap convertObjectsToJsonData(
-    EntityObjectListMap<T> objectData,
-    JsonConverter<T> toJson,
-  ) {
-    final EntityJsonListMap convertedData = {};
+    EntityObjectList<T> mergeItemLists(
+      EntityObjectList<T> oldList,
+      EntityObjectList<T> newList, {
+      required MergeType mergeType,
+    }) {
+      // If any item with same 'uuid' field exists in oldItems, then if mergeType is MergeType.backup, just update it with the item with same uuid in newItems. and if mergeType is MergeType.restore, skip the item and keep the item in oldItems as it is. and if an item with same uuid does not exist in oldItems, just add it in both mode. also in restore mode, set the item.id field to zero before merging it
+      dev.log('Old list ids: ${oldList.map((e) {getItemId(e); print('item type: ${e.runtimeType}');})}');
+      dev.log('New list ids: ${oldList.map((e) {getItemId(e); print('item type: ${e.runtimeType}');})}');
+      EntityObjectList<T> mergedList = EntityObjectList.from(oldList);
+      for (var item in newList) {
+        final oldItemWithSameUuid = mergedList.firstWhereOrNull(
+          (e) => getItemUuid(e) == getItemUuid(item),
+        );
+        if (oldItemWithSameUuid != null) {
+          if (mergeType == MergeType.backup) {
+            final index = mergedList.indexOf(oldItemWithSameUuid);
+            if (index != -1) mergedList[index] = item;
+          }
+        } else {
+          if (mergeType == MergeType.restore) setItemId(item, 0);
+          mergedList.add(item);
+        }
+      }
 
-    for (var key in objectData.keys) {
-      final objectList = objectData[key] ?? [];
-      List<Map<String, dynamic>> jsonList = objectList.map((obj) => toJson(obj)).toList();
-
-      convertedData[key] = jsonList;
+      return mergedList;
     }
 
-    return convertedData;
-  }
+  /// Convert [EntityJsonList] to [EntityObjectList]
+  EntityObjectList<T> convertJsonListToObjectList(EntityJsonList jsonList);
+
+  /// Convert [EntityObjectList] to [EntityJsonList]
+  EntityJsonList convertObjectsListToJsonList(EntityObjectList<T> objectList);
+
+  String getItemUuid(T item);
 }

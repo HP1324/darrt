@@ -5,7 +5,6 @@ import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/typedefs.dart';
-import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/objectbox.g.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:minimaltodo/task/models/task.dart';
@@ -14,23 +13,25 @@ import 'package:minimaltodo/task/models/task_completion.dart';
 class TaskViewModel extends ViewModel<Task> {
   TaskViewModel() {
     super.initializeItems();
-    singleTaskCompletions.clear();
+    onetimeTaskCompletions.clear();
     for (var task in tasks.where((t) => !t.isRepeating).toList()) {
-      singleTaskCompletions[task.id] = task.isDone;
+      onetimeTaskCompletions[task.id] = task.isDone;
     }
-    recurringTaskCompletions.clear();
+    repeatingTaskCompletions.clear();
     for (var completion in _completionBox.getAll()) {
       int id = completion.task.targetId;
       int date = completion.date.millisecondsSinceEpoch;
-      recurringTaskCompletions.putIfAbsent(id, () => {}).add(date);
+      repeatingTaskCompletions.putIfAbsent(id, () => {}).add(date);
     }
   }
 
   final _completionBox = ObjectBox.completionBox;
   Set<int> get selectedTaskIds => selectedItemIds;
-  final Map<int, bool> singleTaskCompletions = {};
-  final Map<int, Set<int>> recurringTaskCompletions = {};
+  final Map<int, bool> onetimeTaskCompletions = {};
+  final Map<int, Set<int>> repeatingTaskCompletions = {};
 
+  final OneTimeCompletions oneTimeCompletions = ValueNotifier({});
+  final RepeatingCompletions repeatingCompletions = ValueNotifier({});
   List<Task> get tasks => items;
   @override
   String putItem(Task item, {required bool edit}) {
@@ -73,7 +74,7 @@ class TaskViewModel extends ViewModel<Task> {
         ..remove()
         ..close(); // Remove will delete all the matching objects
       MiniLogger.d('Removed $removed completions for task $id');
-      recurringTaskCompletions[id]?.clear();
+      repeatingTaskCompletions[id]?.clear();
     }
 
     final message = super.deleteMultipleItems();
@@ -86,8 +87,9 @@ class TaskViewModel extends ViewModel<Task> {
       if (value) {
         final completion = TaskCompletion(date: DateUtils.dateOnly(d), isDone: value);
         completion.task.target = task;
+        completion.uuid = completion.task.target!.uuid;
         _completionBox.put(completion);
-        recurringTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
+        repeatingTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
       } else {
         final removed =
             _completionBox
@@ -96,12 +98,12 @@ class TaskViewModel extends ViewModel<Task> {
               ..remove()
               ..close();
         MiniLogger.d('removed $removed completions for task ${task.id}');
-        recurringTaskCompletions[task.id]?.remove(date);
+        repeatingTaskCompletions[task.id]?.remove(date);
       }
     } else {
       task.isDone = value;
       box.put(task);
-      singleTaskCompletions[task.id] = value;
+      onetimeTaskCompletions[task.id] = value;
     }
 
     notifyListeners();
@@ -130,7 +132,7 @@ class TaskViewModel extends ViewModel<Task> {
     final taskIds = box.putMany(restoredItems);
     final List? oldTasks = BackupMergeService.oldCacheObjects['tasks'];
     final allTasks = box.getMany(taskIds);
-    if (oldTasks!.isNotEmpty) {
+    if (oldTasks != null && oldTasks.isNotEmpty) {
       for (var oldTask in oldTasks) {
         // final query = _completionBox.query(TaskCompletion_.task.equals(task.id)).build().find();
         for (var completion in completions!) {
@@ -150,7 +152,18 @@ class TaskViewModel extends ViewModel<Task> {
   }
 
   @override
-  void mergeItems(EntityObjectListMap<Task> oldItems, EntityObjectListMap<Task> newItems) {}
+  String getItemUuid(Task item) => item.uuid;
 
+  // @override
+  // void mergeItems(EntityObjectListMap<Task> oldItems, EntityObjectListMap<Task> newItems) {}
 
+  @override
+  EntityObjectList<Task> convertJsonListToObjectList(EntityJsonList jsonList) {
+    return jsonList.map(Task.fromJson).toList();
+  }
+
+  @override
+  EntityJsonList convertObjectsListToJsonList(EntityObjectList<Task> objectList) {
+    return objectList.map((task) => task.toJson()).toList();
+  }
 }
