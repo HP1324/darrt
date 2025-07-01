@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:minimaltodo/app/exceptions.dart';
 import 'package:minimaltodo/app/services/backup_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
-import 'package:minimaltodo/app/state/controllers/settings_state_controller.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:restart_app/restart_app.dart';
 import 'package:toastification/toastification.dart';
 import 'package:workmanager/workmanager.dart';
 import '../../helpers/consts.dart';
+import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -58,7 +56,9 @@ class BackupRestoreSection extends StatefulWidget {
 class _BackupRestoreSectionState extends State<BackupRestoreSection> {
   final GoogleSignInService _googleService = GoogleSignInService();
 
-  final ValueNotifier<String> currentEmail = ValueNotifier(MiniBox.read(mGoogleEmail) ?? tapHereToSignIn);
+  final ValueNotifier<String> currentEmail = ValueNotifier(
+    MiniBox.read(mGoogleEmail) ?? tapHereToSignIn,
+  );
 
   final ValueNotifier<bool> isBackingUp = ValueNotifier(false);
 
@@ -71,6 +71,7 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
     isRestoring.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -184,7 +185,7 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
                                   description: e.userMessage!,
                                 );
                               }
-                            }on GoogleClientNotAuthenticatedError catch (e) {
+                            } on GoogleClientNotAuthenticatedError catch (e) {
                               if (context.mounted) {
                                 showToast(
                                   context,
@@ -192,14 +193,12 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
                                   description: e.userMessage!,
                                 );
                               }
-                            }  catch (e, t) {
-                              MiniLogger.e('Error restoring data: ${e.toString()}');
-                              MiniLogger.t('Stacktrace: $t');
+                            } on InternetOffError catch (e) {
                               if (context.mounted) {
                                 showToast(
                                   context,
                                   type: ToastificationType.error,
-                                  description: 'Restore failed',
+                                  description: e.userMessage!,
                                 );
                               }
                             } finally {
@@ -272,14 +271,13 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
         }
       }
 
-      final account = await _googleService.signIn();
+      final GoogleSignInAccount? account = await _googleService.signIn();
+
       if (account != null) {
         final email = account.email;
         currentEmail.value = email;
+        showSignInToast(context, ToastificationType.success, 'Signed in to $email');
         await MiniBox.write(mGoogleEmail, email);
-        if (context.mounted) {
-          showSignInToast(context, ToastificationType.success, 'Signed in to $email');
-        }
       }
     } catch (e, t) {
       MiniLogger.e('Sign in error: ${e.toString()}');
@@ -406,6 +404,14 @@ class _BackupButtonState extends State<_BackupButton> {
           onPressed: backingUp
               ? null // optional: disable button while backing up
               : () async {
+                  if (!await InternetConnection().hasInternetAccess && context.mounted) {
+                    showToast(
+                      context,
+                      type: ToastificationType.error,
+                      description: 'No internet connection',
+                    );
+                    return;
+                  }
                   final backupService = BackupService();
                   if (await GoogleSignInService().isSignedIn()) {
                     isBackingUp.value = true;
@@ -420,7 +426,7 @@ class _BackupButtonState extends State<_BackupButton> {
                         );
                       }
                       g.settingsSc.updateLastBackupDate(DateTime.now());
-                    }on GoogleClientNotAuthenticatedError catch (e) {
+                    } on GoogleClientNotAuthenticatedError catch (e) {
                       if (context.mounted) {
                         showToast(
                           context,
@@ -428,12 +434,12 @@ class _BackupButtonState extends State<_BackupButton> {
                           description: e.userMessage!,
                         );
                       }
-                    }  catch (e) {
+                    } on InternetOffError catch (e) {
                       if (context.mounted) {
                         showToast(
                           context,
                           type: ToastificationType.error,
-                          description: 'Backup failed',
+                          description: e.userMessage!,
                         );
                       }
                     } finally {
@@ -521,6 +527,14 @@ class _DeleteBackupSectionState extends State<_DeleteBackupSection> {
                               );
                             }
                           } on GoogleClientNotAuthenticatedError catch (e) {
+                            if (context.mounted) {
+                              showToast(
+                                context,
+                                type: ToastificationType.error,
+                                description: e.userMessage!,
+                              );
+                            }
+                          } on InternetOffError catch (e) {
                             if (context.mounted) {
                               showToast(
                                 context,

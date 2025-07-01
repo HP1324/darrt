@@ -10,8 +10,9 @@ class BackupFileNotFoundError implements Exception {
 }
 
 class InternetOffError implements Exception {
-  final String message;
-  InternetOffError(this.message);
+  String? message;
+  String? userMessage;
+  InternetOffError([this.message = 'No internet connection', this.userMessage = 'No internet connection']);
 }
 
 class GoogleClientNotAuthenticatedError implements Exception {

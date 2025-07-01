@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'dart:developer' as dev;
 import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:minimaltodo/app/exceptions.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
@@ -12,7 +13,6 @@ import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
-import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -20,7 +20,6 @@ import 'package:minimaltodo/note/models/folder.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:collection/collection.dart';
 
 const String backupFileJsonName = 'minitodo_backup.json';
 const String backupFileZipName = 'minitodo_backup.zip';
@@ -48,6 +47,9 @@ class BackupService {
 
   Future<dart.File> generateBackupJsonFile() async {
     try {
+      if(!await InternetConnection().hasInternetAccess){
+        throw InternetOffError();
+      }
       final localData = getLocalData();
 
       Map<String, dynamic> mergedData = Map.from(localData);
@@ -149,6 +151,9 @@ class BackupService {
 
   ///Downloads the compressed backup file(not json) from google drive,stores it in the platform's temporary directory and returns it as a dart [File] object. The temporary directory is retrieved using [getTemporaryDirectory] method from the path_provider package.
   Future<dart.File> downloadCompressedFileFromGoogleDrive() async {
+    if(!await InternetConnection().hasInternetAccess){
+      throw InternetOffError();
+    }
     final client = await GoogleSignInService().getAuthenticatedClient();
 
     if (client == null) {
@@ -280,6 +285,10 @@ class BackupService {
   }
 
   Future<void> deleteBackupFromGoogleDrive() async {
+    if(!await InternetConnection().hasInternetAccess){
+      throw InternetOffError();
+    }
+
     final client = await GoogleSignInService().getAuthenticatedClient();
 
     if (client == null) {
