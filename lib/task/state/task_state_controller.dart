@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/app/state/controllers/state_controller.dart';
 import 'package:minimaltodo/task/models/reminder.dart';
@@ -101,11 +102,14 @@ class TaskStateController extends StateController<TaskState, Task> {
     final categories = g.catVm.categories.where((c) => g.taskSc.categorySelection[c] == true).toList();
     task.categories.clear();
     if (categories.isEmpty) {
-      //Add general category if user unchecked all the category checkboxes
-      task.categories.add(ObjectBox.categoryBox.get(1) ?? CategoryModel(id: 1, name: 'General'));
+      final generalCategory = ObjectBox.categoryBox.get(1) ?? CategoryModel(id: 1, name: 'General');
+      task.categories.add(generalCategory);
+      task.categoryUuids = [generalCategory.uuid];
     } else {
       task.categories.addAll(categories);
+      task.categoryUuids = categories.map((c) => c.uuid).toList();
     }
+
     return task;
   }
 
@@ -246,15 +250,15 @@ class TaskStateController extends StateController<TaskState, Task> {
   String putReminder({bool edit = false, required Reminder reminder, Reminder? oldReminder}) {
     List<Reminder> updatedReminders = List.from(reminders);
     if (kDebugMode) {
-      debugPrint('All Reminders');
+      MiniLogger.dp('All Reminders');
       for (var reminder in updatedReminders) {
-        debugPrint('Reminder: ${reminder.time.hour}:${reminder.time.minute}');
+        MiniLogger.dp('Reminder: ${reminder.time.hour}:${reminder.time.minute}');
       }
-      debugPrint('All reminders');
+      MiniLogger.dp('All reminders');
     }
     if (edit) {
       final index = updatedReminders.indexWhere((r) => r.time == oldReminder!.time);
-      debugPrint('this is index: $index');
+      MiniLogger.dp('this is index: $index');
       if (index != -1) {
         updatedReminders[index] = reminder;
       }

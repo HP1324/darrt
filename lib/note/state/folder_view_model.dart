@@ -1,7 +1,10 @@
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:minimaltodo/helpers/messages.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/note/models/folder.dart';
+
+import '../models/note.dart';
 
 class FolderViewModel extends ViewModel<Folder> {
   List<Folder> get folders => items;
@@ -36,21 +39,46 @@ class FolderViewModel extends ViewModel<Folder> {
   }
 
   @override
-  void putManyForRestore(List<Folder> folders) {
+  void putManyForRestore(List<Folder> folders, {List<Note>? notes}) {
     box.putMany(folders);
-    initializeItemsWithRebuilding();
+    restoreFolderRelations(folders, notes: notes!);
+    initializeItems();
+    notifyListeners();
+  }
+  void restoreFolderRelations(
+      List<Folder> restoredFolders, {
+        required List<Note> notes,
+      }) {
+    // Build a UUID → Folder map for fast access
+    final folderByUuid = {
+      for (final folder in restoredFolders) folder.uuid: folder,
+    };
+
+    for (final note in notes) {
+      note.folders.clear();
+
+      final uuids = note.folderUuids; // Assuming you restored this from backup
+      for (final uuid in uuids) {
+        final folder = folderByUuid[uuid];
+        if (folder != null) {
+          note.folders.add(folder);
+        } else {
+          MiniLogger.dp('Folder with UUID $uuid not found for note "${note.content}"');
+        }
+      }
+    }
   }
 
   @override
   String getItemUuid(Folder item)=>item.uuid;
 
   @override
-  EntityObjectList<Folder> convertJsonListToObjectList(EntityJsonList jsonList) {
+  List<Folder> convertJsonListToObjectList(List<Map<String,dynamic>> jsonList) {
     return jsonList.map(Folder.fromJson).toList();
   }
 
   @override
-  EntityJsonList convertObjectsListToJsonList(EntityObjectList<Folder> objectList) {
+  List<Map<String,dynamic>> convertObjectsListToJsonList(List<Folder> objectList) {
     return objectList.map((folder) => folder.toJson()).toList();
   }
 

@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
@@ -12,7 +12,7 @@ class CompletionViewModel extends ViewModel<TaskCompletion> {
   int getItemId(TaskCompletion item) => item.id;
 
   // @override
-  // void mergeItems(EntityObjectListMap<TaskCompletion> oldItems, EntityObjectListMap<TaskCompletion> newItems){
+  // void mergeItems(Map<String,dynamic><TaskCompletion> oldItems, Map<String,dynamic><TaskCompletion> newItems){
   //
   // }
 
@@ -23,13 +23,13 @@ class CompletionViewModel extends ViewModel<TaskCompletion> {
 
 
   @override
-  EntityObjectList<TaskCompletion> convertJsonListToObjectList(EntityJsonList jsonList) {
+  List<TaskCompletion> convertJsonListToObjectList(List<Map<String,dynamic>> jsonList) {
     return jsonList.map(TaskCompletion.fromJson).toList();
   }
 
   @override
-  EntityJsonList convertObjectsListToJsonList(EntityObjectList<TaskCompletion> objectList) {
-    debugPrint('no error until now');
+  List<Map<String,dynamic>> convertObjectsListToJsonList(List<TaskCompletion> objectList) {
+    MiniLogger.dp('no error until now');
     return objectList.map((completion) => completion.toJson()).toList();
   }
 

@@ -37,19 +37,20 @@ class NoteViewModel extends ViewModel<Note>{
   @override
   void putManyForRestore(List<Note> restoredItems) {
       box.putMany(restoredItems);
-      initializeItemsWithRebuilding();
+      initializeItems();
+      notifyListeners();
   }
 
   @override
   String getItemUuid(Note item) =>item.uuid;
 
   @override
-  EntityObjectList<Note> convertJsonListToObjectList(EntityJsonList jsonList) {
+  List<Note> convertJsonListToObjectList(List<Map<String,dynamic>> jsonList) {
     return jsonList.map(Note.fromJson).toList();
   }
 
   @override
-  EntityJsonList convertObjectsListToJsonList(EntityObjectList<Note> objectList) {
+  List<Map<String,dynamic>> convertObjectsListToJsonList(List<Note> objectList) {
     return objectList.map((note) => note.toJson()).toList();
   }
 

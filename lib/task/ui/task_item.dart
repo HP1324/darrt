@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
@@ -17,7 +18,7 @@ class TaskItem extends StatefulWidget {
 class _TaskItemState extends State<TaskItem> {
   @override
   Widget build(BuildContext context) {
-  debugPrint('Task: title: ${widget.task.title}, id: ${widget.task.id}');
+  MiniLogger.dp('Task: title: ${widget.task.title}, id: ${widget.task.id}');
     final scheme = Theme.of(context).colorScheme;
     return ListenableBuilder(
       listenable: g.taskVm,
@@ -210,7 +211,7 @@ class TaskCategoriesSection extends StatelessWidget {
               var categories = g.catVm.categories;
               widget.task.categories.removeWhere((c) => !categories.contains(c));
               if (widget.task.categories.isEmpty) {
-                debugPrint('This condition called');
+                MiniLogger.dp('This condition called');
                 widget.task.categories.add(CategoryModel(id: 1, name: 'General'));
                 widget.task.categories.applyToDb();
               }

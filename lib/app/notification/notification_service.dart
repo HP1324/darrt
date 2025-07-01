@@ -81,7 +81,7 @@ class NotificationService {
         final time = reminder.time;
         final isAlarm = reminder.type.toLowerCase() == 'alarm';
         if (kDebugMode) {
-          debugPrint('Reminder: ${reminder.time.hour}:${reminder.time.minute}');
+          MiniLogger.dp('Reminder: ${reminder.time.hour}:${reminder.time.minute}');
         }
         await _notif.createNotification(
           content: NotificationContent(
@@ -200,9 +200,9 @@ class NotificationService {
       }
       final id = notificationId;
       if (kDebugMode) {
-        debugPrint('Weekday: $weekday');
-        debugPrint('Reminder: $id ${reminder.time.hour}:${reminder.time.minute}');
-        debugPrint('Base date: ${formatDate(baseDateTime, 'dd/MMM/yyyy')}');
+        MiniLogger.dp('Weekday: $weekday');
+        MiniLogger.dp('Reminder: $id ${reminder.time.hour}:${reminder.time.minute}');
+        MiniLogger.dp('Base date: ${formatDate(baseDateTime, 'dd/MMM/yyyy')}');
       }
       if (task.endDate != null && notifyDate.isAfter(task.endDate!)) {
         return;
