@@ -31,11 +31,11 @@ class NoteStateController extends StateController<NoteState, Note> {
     note.id = edit ? model!.id : 0;
     final folders = g.folderVm.folders.where((f) => g.noteSc.folderSelection[f] == true).toList();
     note.folders.clear();
-    if(folders.isEmpty){
+    if (folders.isEmpty) {
       final generalFolder = ObjectBox.folderBox.get(1) ?? Folder(id: 1, name: 'General');
       note.folders.add(generalFolder);
       note.folderUuids = [generalFolder.uuid];
-    }else{
+    } else {
       note.folders.addAll(folders);
       note.folderUuids = folders.map((f) => f.uuid).toList();
     }
@@ -49,16 +49,14 @@ class NoteStateController extends StateController<NoteState, Note> {
   }
 
   @override
-  void initState(bool edit, [Note? model]) {
+  void initState(bool edit, [Note? model, Folder? initialFolder]) {
     final folders = g.folderVm.folders;
     state = NoteState(
-      folderSelection: edit
+      folderSelection: initialFolder == null ?  edit
           ? {for (var folder in folders) folder: model!.folders.contains(folder)}
-          : {folders[0]: true},
+          : {folders[0]: true} : {initialFolder: true},
       createdAt: edit ? model!.createdAt! : DateTime.now(),
       updatedAt: edit ? model!.updatedAt! : DateTime.now(),
-
-
     );
     controller = edit ? model!.toQuillController() : QuillController.basic();
     controller.moveCursorToEnd();
@@ -68,7 +66,6 @@ class NoteStateController extends StateController<NoteState, Note> {
     state = state.copyWith(folderSelection: {...state.folderSelection, folder: value});
     notifyListeners();
   }
-
 }
 
 extension AccessState on NoteStateController {

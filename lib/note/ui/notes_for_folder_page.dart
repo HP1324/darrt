@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/note/models/folder.dart';
+import 'package:minimaltodo/note/ui/add_note_page.dart';
 import 'package:minimaltodo/note/ui/note_item.dart';
 import 'package:toastification/toastification.dart' show ToastificationType;
 
@@ -21,9 +23,9 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
         g.noteVm.clearSelection();
       },
       child: Scaffold(
-          body: CustomScrollView(
-        slivers: [
-          ListenableBuilder(
+        body: CustomScrollView(
+          slivers: [
+            ListenableBuilder(
               listenable: g.noteVm,
               builder: (context, child) {
                 final ids = g.noteVm.selectedItemIds;
@@ -47,7 +49,8 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
                             builder: (context) => AlertDialog(
                               title: const Text('Delete Notes'),
                               content: Text(
-                                  'Delete ${ids.length > 1 ? '${ids.length} notes' : '1 note'}?'),
+                                'Delete ${ids.length > 1 ? '${ids.length} notes' : '1 note'}?',
+                              ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
@@ -56,8 +59,11 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
                                 TextButton(
                                   onPressed: () {
                                     message = g.noteVm.deleteMultipleItems();
-                                    showToast(context,
-                                        type: ToastificationType.success, description: message);
+                                    showToast(
+                                      context,
+                                      type: ToastificationType.success,
+                                      description: message,
+                                    );
                                     Navigator.pop(context);
                                   },
                                   child: const Text('Delete'),
@@ -71,29 +77,37 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
                     ],
                   ],
                 );
-              }),
-          ListenableBuilder(
-            listenable: g.noteVm,
+              },
+            ),
+            ListenableBuilder(
+              listenable: g.noteVm,
 
-            builder: (context, child) {
-              final notes = g.noteVm.notes.where((n) => n.folders.contains(widget.folder)).toList();
-              return SliverPadding(
-                padding: const EdgeInsets.all(12),
-                sliver: SliverMasonryGrid.count(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  childCount: notes.length,
-                  itemBuilder: (context, index) {
-                    final note = notes[index];
-                    return NoteItem(note: note);
-                  },
-                ),
-              );
-            },
-          ),
-        ],
-      )),
+              builder: (context, child) {
+                final notes = g.noteVm.notes
+                    .where((n) => n.folders.contains(widget.folder))
+                    .toList();
+                return SliverPadding(
+                  padding: const EdgeInsets.all(12),
+                  sliver: SliverMasonryGrid.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    childCount: notes.length,
+                    itemBuilder: (context, index) {
+                      final note = notes[index];
+                      return NoteItem(note: note);
+                    },
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => MiniRouter.to(context, AddNotePage(edit: false, folder: widget.folder)),
+          child: Icon(Icons.add),
+        ),
+      ),
     );
   }
 }

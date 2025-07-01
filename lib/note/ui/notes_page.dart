@@ -22,6 +22,31 @@ class _NotesPageState extends State<NotesPage> {
     g.noteVm.selectedItemIds.clear();
   }
 
+  // Group notes by date
+  Map<String, List<dynamic>> _groupNotesByDate(List<dynamic> notes) {
+    Map<String, List<dynamic>> groupedNotes = {};
+
+    for (var note in notes) {
+      // Assuming note has a createdAt property of type DateTime
+      final dateKey = formatDateNoJm(note.createdAt, 'EEE, dd, MMM, yyyy');
+
+      if (groupedNotes[dateKey] == null) {
+        groupedNotes[dateKey] = [];
+      }
+      groupedNotes[dateKey]!.add(note);
+    }
+
+    // Sort the map by date (most recent first)
+    var sortedEntries = groupedNotes.entries.toList()
+      ..sort((a, b) {
+        // You might need to parse the date string back to DateTime for proper sorting
+        // Or modify this based on how your formatDateNoJm function works
+        return b.key.compareTo(a.key);
+      });
+
+    return Map.fromEntries(sortedEntries);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,6 +55,8 @@ class _NotesPageState extends State<NotesPage> {
         builder: (context, child) {
           final ids = g.noteVm.selectedItemIds;
           final notes = g.noteVm.notes;
+          final groupedNotes = _groupNotesByDate(notes);
+
           return CustomScrollView(
             slivers: [
               SliverAppBar(
@@ -85,18 +112,47 @@ class _NotesPageState extends State<NotesPage> {
                   ),
                 ],
               ),
-              SliverPadding(
-                padding: const EdgeInsets.all(12),
-                sliver: SliverMasonryGrid.count(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  childCount: notes.length,
-                  itemBuilder: (context, index) {
-                    final note = notes[index];
-                    return NoteItem(note: note);
-                  },
-                ),
+              // Build grouped sections
+              ...groupedNotes.entries.map((entry) {
+                final dateLabel = entry.key;
+                final notesForDate = entry.value;
+
+                return SliverMainAxisGroup(
+                  slivers: [
+                    // Date header
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        child: Text(
+                          dateLabel,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Notes grid for this date
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      sliver: SliverMasonryGrid.count(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        childCount: notesForDate.length,
+                        itemBuilder: (context, index) {
+                          final note = notesForDate[index];
+                          return NoteItem(note: note);
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
+
+              // Add some bottom padding
+              SliverToBoxAdapter(
+                child: SizedBox(height: 100), // Space for FAB
               ),
             ],
           );
