@@ -38,28 +38,33 @@ class _AddFolderPageState extends State<AddFolderPage> {
       builder: (context, child) {
         final folderColor = IconColorStorage.colors[g.folderSc.color] ?? scheme.primary;
         return Scaffold(
-          appBar: AppBar(title: Text(widget.edit ? widget.folder!.name : 'Add Folder'),backgroundColor: folderColor.withValues(alpha: 0.1)),
+          appBar: AppBar(
+            title: Text(widget.edit ? widget.folder!.name : 'Add Folder'),
+            backgroundColor: folderColor.withValues(alpha: 0.1),
+          ),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                TextField(
-                  textCapitalization: TextCapitalization.sentences,
-                  controller: g.folderSc.textController,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    hintText: 'Enter Folder Name Here',
-                    filled: true,
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: folderColor),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: folderColor, width: 2),
-                    ),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: folderColor),
+                Theme(
+                  data: Theme.of(context).copyWith(
+                    textSelectionTheme: TextSelectionThemeData(selectionHandleColor: folderColor),
+                  ),
+                  child: TextField(
+                    textCapitalization: TextCapitalization.sentences,
+                    controller: g.folderSc.textController,
+                    autofocus: true,
+                    cursorColor: folderColor,
+                    decoration: InputDecoration(
+                      hintText: 'Enter Folder Name Here',
+                      filled: true,
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: folderColor)),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: folderColor, width: 2),
+                      ),
+                      border: OutlineInputBorder(borderSide: BorderSide(color: folderColor)),
                     ),
                   ),
                 ),
