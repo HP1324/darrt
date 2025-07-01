@@ -1,12 +1,5 @@
-typedef EntityObjectListMap<T> = Map<String, List<T>>;
+import 'package:flutter/material.dart';
 
-typedef EntityJsonListMap = Map<String, List<Map<String, dynamic>>>;
+typedef OneTimeCompletions = ValueNotifier<Map<int, bool>>;
 
-/// [JsonFactory] can also be called [fromJson]
-typedef JsonFactory<T> = T Function(Map<String, dynamic> json);
-
-/// [JsonConverter] can also be called [toJson]
-typedef JsonConverter<T> = Map<String, dynamic> Function(T object);
-
-
-
+typedef RepeatingCompletions = ValueNotifier<Map<int, Set<int>>>;

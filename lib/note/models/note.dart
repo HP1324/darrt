@@ -17,14 +17,17 @@ class Note {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? uuid,
+    List<String>? folderUuids
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now(),
-        uuid = g.uuid.v4();
+        uuid = uuid ?? g.uuid.v4(),
+        folderUuids = folderUuids ?? [];
   @Id()
   int id;
   String content;
   DateTime? createdAt, updatedAt;
   final String uuid;
+  List<String> folderUuids;
   final folders = ToMany<Folder>();
 
   factory Note.fromQuillController(QuillController controller,{String? uuid}) {
@@ -46,6 +49,7 @@ class Note {
     'updatedAt': updatedAt?.millisecondsSinceEpoch,
     'folderIds': folders.where((f) => f.id > 0).map((f) => f.id).toList(),
     'uuid': uuid,
+    'folderUuids':folders.where((f) => f.id > 0).map((f) => f.uuid).toList(),
   };
 
   factory Note.fromJson(Map<String, dynamic> json) {
@@ -60,6 +64,7 @@ class Note {
             ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'])
             : DateTime.now(),
         uuid: json['uuid'],
+        folderUuids: List<String>.from(json['folderUuids']),
       );
 
       final folderIds = (json['folderIds'] as List?)?.cast<int>() ?? [];

@@ -43,6 +43,8 @@ final sttController = SpeechToTextController();
 
 final settingsSc = SettingsStateController();
 
+final completionVm = CompletionViewModel();
+
 final Uuid uuid = Uuid();
 
 
