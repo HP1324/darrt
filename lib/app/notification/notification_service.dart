@@ -456,20 +456,21 @@ class NotificationService {
     );
   }
 
-  static Future<void> scheduleQuickReminder(String title, int minutes) async {
+  static Future<void> scheduleQuickReminder(String? title, int minutes) async {
     final now = DateTime.now();
     final reminderType = MiniBox.read(mDefaultReminderType);
     final channelKey = reminderType == alarmReminderType ? alarmChannelKey : notifChannelKey;
     final category = reminderType == alarmReminderType
         ? NotificationCategory.Alarm
         : NotificationCategory.Reminder;
-
+    
+    final nextTime = TimeOfDay.fromDateTime(now.add(Duration(minutes: minutes)));
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: now.millisecondsSinceEpoch.remainder(1000000),
         channelKey: channelKey,
-        title: 'Quick Reminder',
-        body: title.isNotEmpty ? title : 'No title was set',
+        title: title != null ? 'Task due at ${formatTime(nextTime)}' :'Quick Reminder',
+        body: title ?? 'No title was set',
         category: category,
       ),
       schedule: NotificationInterval(
