@@ -304,10 +304,9 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
           child: Text('Cancel'),
         ),
         FilledButton(
-          onPressed: () {
+          onPressed: () async{
             final title = _titleController.text;
             final minutes = int.parse(_minutesController.text);
-            NotificationService.scheduleQuickReminder(title, minutes);
             showToast(
               context,
               type: ToastificationType.success,
@@ -315,6 +314,7 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
                   'Reminder set after ${minutes > 1 ? '$minutes minutes' : '$minutes minute'}',
             );
             Navigator.pop(context);
+            await NotificationService.scheduleQuickReminder(title, minutes);
             MiniLogger.dp('title: $title, minutes: $minutes, type: ${minutes.runtimeType}');
           },
           child: Text('Set Reminder'),

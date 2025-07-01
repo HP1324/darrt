@@ -54,6 +54,8 @@ const mLastBackupDate = 'last_backup_date';
 
 const mAutoBackup = 'auto_backup';
 
+const tapHereToSignIn = 'Tap here to sign in to google account';
+
 const googleClientId = "569574442549-543mjpqcfhsivrn5atcoblifvbkvg0vp.apps.googleusercontent.com";
 
 Uint8List noteEmptyErrorBytes = Uint8List(0);

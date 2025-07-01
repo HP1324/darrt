@@ -9,6 +9,7 @@ import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/consts.dart';
+import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -24,7 +25,8 @@ import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:speech_to_text/speech_to_text.dart';
 
 class AddTaskPage extends StatefulWidget {
-  const AddTaskPage({super.key, required this.edit, this.task, this.category}) : assert(!edit || task != null);
+  const AddTaskPage({super.key, required this.edit, this.task, this.category})
+    : assert(!edit || task != null);
 
   ///Flag to indicate whether a task is being edited or a new task is being created
   final bool edit;
@@ -44,7 +46,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   @override
   void dispose() {
     g.taskSc.clearState();
-    g.sttController.clearSttState();
+    g.taskSttController.clearSttState();
     super.dispose();
   }
 
@@ -170,19 +172,19 @@ class TitleTextField extends StatelessWidget {
       MiniLogger.d('All required permissions are granted');
 
       // Check if speech is initialized
-      if (!g.sttController.speech.isAvailable) {
+      if (!g.taskSttController.speech.isAvailable) {
         MiniLogger.d('Speech not initialized, initializing...');
-        final initResult = await g.sttController.initSpeech();
+        final initResult = await g.taskSttController.initSpeech();
         if (initResult) {
           MiniLogger.d('Speech initialized successfully');
-          g.sttController.startListening();
+          g.taskSttController.startListening();
         } else {
           MiniLogger.d('Speech initialization failed');
           showPermissionDeniedToast();
         }
       } else {
         MiniLogger.d('Speech already initialized, starting listening');
-        g.sttController.startListening();
+        g.taskSttController.startListening();
       }
     } else {
       MiniLogger.d('Some permissions are missing');
@@ -201,9 +203,9 @@ class TitleTextField extends StatelessWidget {
 
         if (permissionsGranted) {
           MiniLogger.d('Permissions granted on first request');
-          final initResult = await g.sttController.initSpeech();
+          final initResult = await g.taskSttController.initSpeech();
           if (initResult) {
-            g.sttController.startListening();
+            g.taskSttController.startListening();
           } else {
             showToast(
               context,
@@ -230,9 +232,9 @@ class TitleTextField extends StatelessWidget {
           if (permissionsGranted) {
             MiniLogger.d('Permissions granted on second request');
             // Force reinitialize speech since permission state changed
-            final initResult = await g.sttController.initSpeech();
+            final initResult = await g.taskSttController.initSpeech();
             if (initResult) {
-              g.sttController.startListening();
+              g.taskSttController.startListening();
             } else {
               showPermissionDeniedToast();
             }
@@ -244,58 +246,11 @@ class TitleTextField extends StatelessWidget {
         } else {
           MiniLogger.d('Permissions denied multiple times, showing settings dialog');
           if (context.mounted) {
-            _showSettingsDialog(context);
+            showSettingsDialog(context);
           }
         }
       }
     }
-  }
-
-  void _showSettingsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Permissions Required'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'To use speech-to-text functionality, please allow the following permissions:',
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
-                SizedBox(height: 12),
-                Text('• Microphone: Required to capture your voice input'),
-                SizedBox(height: 8),
-                Text(
-                  '• Nearby devices (Android 12+): Required when using Bluetooth headsets or external microphones',
-                ),
-                SizedBox(height: 12),
-                Text(
-                  'Go to Settings > Permissions and enable both Microphone and Nearby devices permissions.',
-                  style: TextStyle(fontSize: 13),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await openAppSettings();
-              },
-              child: Text('Settings'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }
 
@@ -940,7 +895,6 @@ class CategorySelector extends StatelessWidget {
                     'Categories',
                     style: TextStyle(fontSize: textTheme.labelLarge!.fontSize),
                   ),
-                  // Icon(Icons.arrow_drop_down, size: 20)
                 ],
               ),
             ],
@@ -1016,17 +970,26 @@ class CategorySelector extends StatelessWidget {
                     itemBuilder: (_, index) {
                       final cat = g.catVm.categories[index];
                       final map = g.taskSc.categorySelection;
-                      return CheckboxListTile(
-                        value: map[cat] ?? false,
+                      return ListTile(
+                        selected: map[cat] ?? false,
+                        selectedColor: IconColorStorage.colors[cat.color],
+                        leading: Icon(IconColorStorage.flattenedIcons[cat.icon]),
+                        trailing: Checkbox(
+                          fillColor: WidgetStateProperty.resolveWith((states){
+                            if(states.contains(WidgetState.selected)) return IconColorStorage.colors[cat.color];
+                            return null;
+                          }),
+                          value: map[cat] ?? false,
+                          onChanged: (selected) {
+                            if (selected != null) {
+                              g.taskSc.setCategory(cat, selected);
+                            }
+                          },
+                        ),
                         title: Text(
                           cat.name,
                           style: const TextStyle(overflow: TextOverflow.ellipsis),
                         ),
-                        onChanged: (selected) {
-                          if (selected != null) {
-                            g.taskSc.setCategory(cat, selected);
-                          }
-                        },
                       );
                     },
                   ),
@@ -1456,7 +1419,7 @@ class StructuredRow extends StatelessWidget {
   }
 }
 
-class SpeechToTextController extends ChangeNotifier {
+class TaskSttController extends ChangeNotifier {
   final SpeechToText speech = SpeechToText();
   String hintText = "What's on your mind? ";
   Future<bool> initSpeech() async {

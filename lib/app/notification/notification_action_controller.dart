@@ -19,48 +19,28 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     if (appState == AppLifecycleState.detached) {
       await ObjectBox.init();
     }
-    late Task task;
-    if(receivedAction.payload != null) {
+    Task? task;
+    if (receivedAction.payload != null) {
       task = ObjectBox.taskBox.get(int.parse(receivedAction.payload!['id']!))!;
     }
 
     switch (receivedAction.buttonKeyPressed) {
       case finishedActionKey:
-        g.taskVm.toggleStatus(task, true, DateTime.now());
+        g.taskVm.toggleStatus(task!, true, DateTime.now());
         break;
       case snoozeActionKey:
-        final now = DateTime.now();
         final minutes = MiniBox.read(mSnoozeMinutes);
-        final nextTime = TimeOfDay.fromDateTime(now.add(Duration(minutes: minutes)));
-        AwesomeNotifications().createNotification(
-          content: NotificationContent(
-            id: now.millisecondsSinceEpoch.remainder(1000000),
-            title: 'Task due at ${formatTime(nextTime)}',
-            body: task.title,
-            actionType: ActionType.Default,
-            channelKey: receivedAction.channelKey!,
-            payload: receivedAction.payload,
-            category: receivedAction.category,
-            notificationLayout: NotificationLayout.Default,
-          ),
-          schedule: NotificationInterval(
-            interval: Duration(minutes: minutes),
-            repeats: false,
-            allowWhileIdle: true,
-          ),
-          actionButtons: [
-            finishedActionButton,
-            snoozeActionButton,
-          ],
-        );
+        await NotificationService.scheduleQuickReminder(receivedAction.body ?? '', minutes);
         break;
       case quickSnoozeActionKey:
         final minutes = MiniBox.read(mSnoozeMinutes);
-        NotificationService.scheduleQuickReminder(receivedAction.body ?? '', minutes);
+        await NotificationService.scheduleQuickReminder(receivedAction.body ?? '', minutes);
       default:
-        MiniTodo.navigatorKey.currentState?.push(
-          MaterialPageRoute(builder: (_) => AddTaskPage(edit: true, task: task)),
-        );
+        if (task != null) {
+          MiniTodo.navigatorKey.currentState?.push(
+            MaterialPageRoute(builder: (_) => AddTaskPage(edit: true, task: task)),
+          );
+        }
         break;
     }
   } catch (e, t) {
@@ -89,8 +69,3 @@ final snoozeActionButton = NotificationActionButton(
   actionType: ActionType.SilentAction,
 );
 
-final quickSnoozeActionButton = NotificationActionButton(
-    key: quickSnoozeActionKey,
-    label: snoozeActionLabel,
-    actionType: ActionType.SilentAction,
-);

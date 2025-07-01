@@ -30,7 +30,7 @@ class BackupService {
   factory BackupService() => _instance;
   BackupService._internal();
 
-  Map<String,dynamic> getLocalData() {
+  Map<String, dynamic> getLocalData() {
     final List<Task> tasks = ObjectBox.taskBox.getAll();
     final List<CategoryModel> categories = ObjectBox.categoryBox.getAll();
     final List<Note> notes = ObjectBox.noteBox.getAll();
@@ -68,8 +68,10 @@ class BackupService {
           mergeType: MergeType.backup,
         );
         // mergedData = _mergeData(oldData, newData);
-      } on BackupFileNotFoundError catch (e) {
-        MiniLogger.e(e.toString());
+      } on BackupFileNotFoundError {
+        rethrow;
+      } on GoogleClientNotAuthenticatedError {
+        rethrow;
       } catch (e, t) {
         MiniLogger.e('Error downloading old backup file ${e.toString()}, type: ${e.runtimeType}');
         MiniLogger.t(t.toString());
@@ -193,8 +195,8 @@ class BackupService {
     final jsonBackupFile = _decompressToJsonFile(backupFile);
 
     //Parse the json file as map to work on it
-    Map<String,dynamic> driveData = await parseBackupJsonFileAsMap(jsonBackupFile);
-    Map<String,dynamic> localData = getLocalData();
+    Map<String, dynamic> driveData = await parseBackupJsonFileAsMap(jsonBackupFile);
+    Map<String, dynamic> localData = getLocalData();
     MiniLogger.dp('error was not above');
     Map<String, dynamic> mergedData = BackupMergeService.mergeData(
       localData,
@@ -224,12 +226,12 @@ class BackupService {
     MiniLogger.d('Data restored from google drive');
   }
 
-  Future<Map<String,dynamic>> parseBackupJsonFileAsMap(dart.File jsonFile) async {
+  Future<Map<String, dynamic>> parseBackupJsonFileAsMap(dart.File jsonFile) async {
     try {
       final jsonString = await jsonFile.readAsString();
       final jsonMap = jsonDecode(jsonString);
 
-      if (jsonMap is Map<String,dynamic>) {
+      if (jsonMap is Map<String, dynamic>) {
         return jsonMap;
       } else {
         throw FormatException('Invalid JSON structure: not a Map');
@@ -303,11 +305,11 @@ class BackupService {
 class BackupMergeService {
   static Map<String, List<dynamic>> oldCacheObjects = {};
 
-  static Map<String,dynamic> mergeData(
-      Map<String,dynamic> oldData,
-      Map<String,dynamic> newData, {
-        required MergeType mergeType,
-      }) {
+  static Map<String, dynamic> mergeData(
+    Map<String, dynamic> oldData,
+    Map<String, dynamic> newData, {
+    required MergeType mergeType,
+  }) {
     // Convert JSON data to objects once
     final oldObjects = convertJsonDataToObjects(oldData);
     final newObjects = convertJsonDataToObjects(newData);
@@ -315,7 +317,7 @@ class BackupMergeService {
     final mergedData = <String, List<dynamic>>{};
 
     // Get all unique keys from both datasets
-    final allKeys = {...oldObjects.keys, ...newObjects.keys} ;
+    final allKeys = {...oldObjects.keys, ...newObjects.keys};
 
     for (var key in allKeys) {
       final oldList = oldObjects[key] ?? [];
@@ -327,45 +329,45 @@ class BackupMergeService {
         case 'categories':
           dev.log('Old categories: ${oldData[key]}, New categories: ${newData[key]}');
           mergedList = g.catVm.mergeItemLists(
-              oldList.cast<CategoryModel>(),
-              newList.cast<CategoryModel>(),
-              mergeType: mergeType
+            oldList.cast<CategoryModel>(),
+            newList.cast<CategoryModel>(),
+            mergeType: mergeType,
           );
           mergedData[key] = g.catVm.convertObjectsListToJsonList(mergedList.cast<CategoryModel>());
           break;
 
         case 'folders':
           mergedList = g.folderVm.mergeItemLists(
-              oldList.cast<Folder>(),
-              newList.cast<Folder>(),
-              mergeType: mergeType
+            oldList.cast<Folder>(),
+            newList.cast<Folder>(),
+            mergeType: mergeType,
           );
           mergedData[key] = g.folderVm.convertObjectsListToJsonList(mergedList.cast<Folder>());
           break;
 
         case 'tasks':
           mergedList = g.taskVm.mergeItemLists(
-              oldList.cast<Task>(),
-              newList.cast<Task>(),
-              mergeType: mergeType
+            oldList.cast<Task>(),
+            newList.cast<Task>(),
+            mergeType: mergeType,
           );
           mergedData[key] = g.taskVm.convertObjectsListToJsonList(mergedList.cast<Task>());
           break;
 
         case 'notes':
           mergedList = g.noteVm.mergeItemLists(
-              oldList.cast<Note>(),
-              newList.cast<Note>(),
-              mergeType: mergeType
+            oldList.cast<Note>(),
+            newList.cast<Note>(),
+            mergeType: mergeType,
           );
           mergedData[key] = g.noteVm.convertObjectsListToJsonList(mergedList.cast<Note>());
           break;
 
         case 'completions':
           mergedList = g.completionVm.mergeItemLists(
-              oldList.cast<TaskCompletion>(),
-              newList.cast<TaskCompletion>(),
-              mergeType: mergeType
+            oldList.cast<TaskCompletion>(),
+            newList.cast<TaskCompletion>(),
+            mergeType: mergeType,
           );
           mergedData[key] = g.completionVm.convertObjectsListToJsonList(
             mergedList.cast<TaskCompletion>(),
@@ -373,7 +375,7 @@ class BackupMergeService {
           break;
 
         default:
-        // For unknown keys, just use the new list
+          // For unknown keys, just use the new list
           mergedList = newList;
           mergedData[key] = mergedList;
       }
@@ -383,7 +385,7 @@ class BackupMergeService {
     return mergedData;
   }
 
-  static Map<String,dynamic> convertJsonDataToObjects(Map<String,dynamic> jsonData) {
+  static Map<String, dynamic> convertJsonDataToObjects(Map<String, dynamic> jsonData) {
     final convertedData = <String, List<dynamic>>{};
 
     for (var key in jsonData.keys) {
@@ -416,8 +418,8 @@ class BackupMergeService {
     return convertedData;
   }
 
-  static Map<String, dynamic> convertObjectsToJsonData(Map<String,dynamic> objectData) {
-    final Map<String,dynamic> convertedData = {};
+  static Map<String, dynamic> convertObjectsToJsonData(Map<String, dynamic> objectData) {
+    final Map<String, dynamic> convertedData = {};
 
     for (var key in objectData.keys) {
       final objectList = objectData[key] ?? [];
