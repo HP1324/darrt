@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
-import 'package:minimaltodo/app/services/backup_service.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
-import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/objectbox.g.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
@@ -12,25 +10,29 @@ import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
 
 class TaskViewModel extends ViewModel<Task> {
-  TaskViewModel() {
+
+  @override
+  void initializeItems() {
     super.initializeItems();
-    singleTaskCompletions.clear();
+    onetimeTaskCompletions.clear();
     for (var task in tasks.where((t) => !t.isRepeating).toList()) {
-      singleTaskCompletions[task.id] = task.isDone;
+      onetimeTaskCompletions[task.id] = task.isDone;
     }
-    recurringTaskCompletions.clear();
+    repeatingTaskCompletions.clear();
     for (var completion in _completionBox.getAll()) {
       int id = completion.task.targetId;
       int date = completion.date.millisecondsSinceEpoch;
-      recurringTaskCompletions.putIfAbsent(id, () => {}).add(date);
+      repeatingTaskCompletions.putIfAbsent(id, () => {}).add(date);
     }
   }
 
   final _completionBox = ObjectBox.completionBox;
   Set<int> get selectedTaskIds => selectedItemIds;
-  final Map<int, bool> singleTaskCompletions = {};
-  final Map<int, Set<int>> recurringTaskCompletions = {};
+  final Map<int, bool> onetimeTaskCompletions = {};
+  final Map<int, Set<int>> repeatingTaskCompletions = {};
 
+  final OneTimeCompletions oneTimeCompletions = ValueNotifier({});
+  final RepeatingCompletions repeatingCompletions = ValueNotifier({});
   List<Task> get tasks => items;
   @override
   String putItem(Task item, {required bool edit}) {
@@ -69,11 +71,11 @@ class TaskViewModel extends ViewModel<Task> {
 
     // Delete ALL completions for each task
     for (var id in selectedTaskIds) {
-      final removed = _completionBox.query(TaskCompletion_.task.equals(id)).build()
-        ..remove()
-        ..close(); // Remove will delete all the matching objects
+      final query = _completionBox.query(TaskCompletion_.task.equals(id)).build();
+      final removed = query.remove();
+      query.close();
       MiniLogger.d('Removed $removed completions for task $id');
-      recurringTaskCompletions[id]?.clear();
+      repeatingTaskCompletions[id]?.clear();
     }
 
     final message = super.deleteMultipleItems();
@@ -86,8 +88,11 @@ class TaskViewModel extends ViewModel<Task> {
       if (value) {
         final completion = TaskCompletion(date: DateUtils.dateOnly(d), isDone: value);
         completion.task.target = task;
+        completion.taskUuid = completion.task.target!.uuid;
+        MiniLogger.dp('Completion uuid: ${completion.uuid!}');
+        MiniLogger.dp('Completion task uuid: ${completion.taskUuid!}');
         _completionBox.put(completion);
-        recurringTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
+        repeatingTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
       } else {
         final removed =
             _completionBox
@@ -96,12 +101,12 @@ class TaskViewModel extends ViewModel<Task> {
               ..remove()
               ..close();
         MiniLogger.d('removed $removed completions for task ${task.id}');
-        recurringTaskCompletions[task.id]?.remove(date);
+        repeatingTaskCompletions[task.id]?.remove(date);
       }
     } else {
       task.isDone = value;
       box.put(task);
-      singleTaskCompletions[task.id] = value;
+      onetimeTaskCompletions[task.id] = value;
     }
 
     notifyListeners();
@@ -127,30 +132,44 @@ class TaskViewModel extends ViewModel<Task> {
 
   @override
   void putManyForRestore(List<Task> restoredItems, {List<TaskCompletion>? completions}) {
-    final taskIds = box.putMany(restoredItems);
-    final List? oldTasks = BackupMergeService.oldCacheObjects['tasks'];
-    final allTasks = box.getMany(taskIds);
-    if (oldTasks!.isNotEmpty) {
-      for (var oldTask in oldTasks) {
-        // final query = _completionBox.query(TaskCompletion_.task.equals(task.id)).build().find();
-        for (var completion in completions!) {
-          if (completion.task.targetId == oldTask.id) {
-            debugPrint('here came it');
-            final newTask = allTasks.firstWhere((t) => t!.equals(oldTask));
-            completion.task.target = newTask;
-          }
-        }
-      }
-    }
-    if (completions != null) {
-      _completionBox.putMany(completions);
-    }
+    box.putMany(restoredItems);
+    reassignTaskRelations(tasks: restoredItems, completions: completions!);
+
+    _completionBox.putMany(completions);
     initializeItems();
     notifyListeners();
   }
 
+  void reassignTaskRelations({
+    required List<Task> tasks,
+    required List<TaskCompletion> completions,
+  }) {
+    // Build UUID → Task map
+    final taskByUuid = {for (var task in tasks) task.uuid: task};
+
+    for (var completion in completions) {
+      final matchingTask = taskByUuid[completion.taskUuid];
+      if (matchingTask != null) {
+        completion.task.target = matchingTask;
+      } else {
+        MiniLogger.dp('No matching task found for completion UUID: ${completion.taskUuid}');
+      }
+    }
+  }
+
   @override
-  void mergeItems(EntityObjectListMap<Task> oldItems, EntityObjectListMap<Task> newItems) {}
+  String getItemUuid(Task item) => item.uuid;
 
+  // @override
+  // void mergeItems(Map<String,dynamic><Task> oldItems, Map<String,dynamic><Task> newItems) {}
 
+  @override
+  List<Task> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
+    return jsonList.map(Task.fromJson).toList();
+  }
+
+  @override
+  List<Map<String, dynamic>> convertObjectsListToJsonList(List<Task> objectList) {
+    return objectList.map((task) => task.toJson()).toList();
+  }
 }

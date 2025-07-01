@@ -25,9 +25,11 @@ class Task {
     this.repeatConfig,
     this.reminders,
     String? uuid,
+    List<String>? categoryUuids,
   }) : dueDate = dueDate ?? DateTime.now(),
        startDate = startDate ?? DateTime.now(),
-       uuid = g.uuid.v4();
+       uuid = uuid ?? g.uuid.v4(),
+       categoryUuids = categoryUuids ?? [];
   @Id()
   int id;
   String title, priority;
@@ -36,6 +38,7 @@ class Task {
   bool isDone, isRepeating;
   String? reminders, repeatConfig;
   final String uuid;
+  List<String> categoryUuids;
   final categories = ToMany<CategoryModel>();
   @Backlink()
   final completions = ToMany<TaskCompletion>();
@@ -95,6 +98,7 @@ class Task {
     'reminders': reminders,
     'priority': priority,
     'categoryIds': categories.map((c) => c.id).toList(),
+    'categoryUuids': categories.map((c) => c.uuid).toList(),
     'uuid': uuid,
   };
 
@@ -115,6 +119,7 @@ class Task {
         repeatConfig: json['repeatConfig'],
         reminders: json['reminders'],
         uuid: json['uuid'],
+        categoryUuids: List<String>.from(json['categoryUuids'] ?? []),
       );
       // Restore category relations
 

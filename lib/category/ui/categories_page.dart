@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/category_item.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:minimaltodo/helpers/mini_logger.dart' show MiniLogger;
 
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
@@ -18,7 +19,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   @override
   void dispose() {
-    debugPrint('Categories page dispose called');
+    MiniLogger.dp('Categories page dispose called');
     _searchController.dispose();
     _focusNode.dispose();
     super.dispose();

@@ -27,6 +27,7 @@ class _AddNotePageState extends State<AddNotePage> {
 
   @override
   void dispose() {
+    g.noteSc.clearState();
     super.dispose();
   }
 
@@ -49,19 +50,19 @@ class _AddNotePageState extends State<AddNotePage> {
               multiRowsDisplay: false,
               toolbarIconAlignment: WrapAlignment.start,
               buttonOptions: QuillSimpleToolbarButtonOptions(
-                  selectHeaderStyleDropdownButton:
-                  QuillToolbarSelectHeaderStyleDropdownButtonOptions(
-                    attributes: [
-                      Attribute.h1,
-                      Attribute.h2,
-                      Attribute.h3,
-                      Attribute.h4,
-                      Attribute.h5,
-                      Attribute.h6,
-                    ],
-                  ),
-                  fontFamily: QuillToolbarFontFamilyButtonOptions(attribute: Attribute.font),
-                  fontSize: QuillToolbarFontSizeButtonOptions(attribute: Attribute.size)),
+                selectHeaderStyleDropdownButton: QuillToolbarSelectHeaderStyleDropdownButtonOptions(
+                  attributes: [
+                    Attribute.h1,
+                    Attribute.h2,
+                    Attribute.h3,
+                    Attribute.h4,
+                    Attribute.h5,
+                    Attribute.h6,
+                  ],
+                ),
+                fontFamily: QuillToolbarFontFamilyButtonOptions(attribute: Attribute.font),
+                fontSize: QuillToolbarFontSizeButtonOptions(attribute: Attribute.size),
+              ),
             ),
           ),
           Expanded(
@@ -84,7 +85,6 @@ class _AddNotePageState extends State<AddNotePage> {
     );
   }
 }
-
 
 class SaveNotePdfButton extends StatelessWidget {
   const SaveNotePdfButton({super.key});
@@ -116,27 +116,29 @@ class SaveNoteButton extends StatelessWidget {
       onPressed: () {
         var message = '';
         if (!g.noteSc.controller.document.isEmpty()) {
-          final note =
-          g.noteSc.buildModel(edit: widget.edit, model: widget.edit ? widget.note : null);
+          final note = g.noteSc.buildModel(
+            edit: widget.edit,
+            model: widget.edit ? widget.note : null,
+          );
           message = g.noteVm.putItem(note, edit: widget.edit);
           Navigator.pop(context);
         } else {
           message = Messages.mNoteEmpty;
         }
-        showToast(context,
-            type: message == Messages.mNoteEmpty
-                ? ToastificationType.error
-                : ToastificationType.success,
-            description: message);
+        showToast(
+          context,
+          type: message == Messages.mNoteEmpty
+              ? ToastificationType.error
+              : ToastificationType.success,
+          description: message,
+        );
       },
     );
   }
 }
 
 class FolderSelector extends StatelessWidget {
-  const FolderSelector({
-    super.key,
-  });
+  const FolderSelector({super.key});
 
   @override
   Widget build(BuildContext context) {

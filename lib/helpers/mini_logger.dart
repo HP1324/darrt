@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
 class MiniLogger {
@@ -21,5 +22,12 @@ class MiniLogger {
   }
   static void w(String message){
     _logger.w(message);
+  }
+
+  /// Just [debugPrint] guarded with [kDebugMode]
+  static void dp(String message){
+    if(kDebugMode){
+      debugPrint(message);
+    }
   }
 }
