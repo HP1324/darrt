@@ -26,7 +26,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 4083594686780447909),
     name: 'CategoryModel',
-    lastPropertyId: const obx_int.IdUid(4, 4526307758566994091),
+    lastPropertyId: const obx_int.IdUid(5, 3587722825949265965),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -53,6 +53,12 @@ final _entities = <obx_int.ModelEntity>[
         type: 9,
         flags: 0,
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 3587722825949265965),
+        name: 'uuid',
+        type: 9,
+        flags: 0,
+      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[
@@ -66,7 +72,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 8058497308889952526),
     name: 'Task',
-    lastPropertyId: const obx_int.IdUid(11, 6578782677401607101),
+    lastPropertyId: const obx_int.IdUid(12, 985918659402229626),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -135,6 +141,12 @@ final _entities = <obx_int.ModelEntity>[
         type: 9,
         flags: 0,
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(12, 985918659402229626),
+        name: 'uuid',
+        type: 9,
+        flags: 0,
+      ),
     ],
     relations: <obx_int.ModelRelation>[
       obx_int.ModelRelation(
@@ -154,7 +166,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(3, 2058329802195215529),
     name: 'TaskCompletion',
-    lastPropertyId: const obx_int.IdUid(4, 4698986600626205175),
+    lastPropertyId: const obx_int.IdUid(5, 3829692608195470719),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -183,6 +195,12 @@ final _entities = <obx_int.ModelEntity>[
         indexId: const obx_int.IdUid(1, 7157772403585420880),
         relationTarget: 'Task',
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 3829692608195470719),
+        name: 'uuid',
+        type: 9,
+        flags: 0,
+      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
@@ -190,7 +208,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(4, 8867042065594792655),
     name: 'Folder',
-    lastPropertyId: const obx_int.IdUid(2, 258328508912231986),
+    lastPropertyId: const obx_int.IdUid(3, 6554606030194318613),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -202,6 +220,12 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(2, 258328508912231986),
         name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 6554606030194318613),
+        name: 'uuid',
         type: 9,
         flags: 0,
       ),
@@ -218,7 +242,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(5, 1091526975409140722),
     name: 'Note',
-    lastPropertyId: const obx_int.IdUid(4, 3896664754239967175),
+    lastPropertyId: const obx_int.IdUid(5, 9104315675524435353),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -243,6 +267,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(4, 3896664754239967175),
         name: 'updatedAt',
         type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 9104315675524435353),
+        name: 'uuid',
+        type: 9,
         flags: 0,
       ),
     ],
@@ -323,11 +353,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final nameOffset = fbb.writeString(object.name);
         final iconOffset = fbb.writeString(object.icon);
         final colorOffset = fbb.writeString(object.color);
-        fbb.startTable(5);
+        final uuidOffset = fbb.writeString(object.uuid);
+        fbb.startTable(6);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
         fbb.addOffset(2, iconOffset);
         fbb.addOffset(3, colorOffset);
+        fbb.addOffset(4, uuidOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -349,11 +381,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final colorParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 10, '');
+        final uuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 12, '');
         final object = CategoryModel(
           id: idParam,
           name: nameParam,
           icon: iconParam,
           color: colorParam,
+          uuid: uuidParam,
         );
         obx_int.InternalToManyAccess.setRelInfo<CategoryModel>(
           object.tasks,
@@ -387,7 +423,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final repeatConfigOffset = object.repeatConfig == null
             ? null
             : fbb.writeString(object.repeatConfig!);
-        fbb.startTable(12);
+        final uuidOffset = fbb.writeString(object.uuid);
+        fbb.startTable(13);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, titleOffset);
         fbb.addInt64(2, object.createdAt?.millisecondsSinceEpoch);
@@ -399,6 +436,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(8, object.endDate?.millisecondsSinceEpoch);
         fbb.addOffset(9, remindersOffset);
         fbb.addOffset(10, repeatConfigOffset);
+        fbb.addOffset(11, uuidOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -457,6 +495,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final remindersParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 22);
+        final uuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 26, '');
         final object = Task(
           id: idParam,
           title: titleParam,
@@ -469,6 +510,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           priority: priorityParam,
           repeatConfig: repeatConfigParam,
           reminders: remindersParam,
+          uuid: uuidParam,
         );
         obx_int.InternalToManyAccess.setRelInfo<Task>(
           object.categories,
@@ -496,17 +538,25 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.id = id;
       },
       objectToFB: (TaskCompletion object, fb.Builder fbb) {
-        fbb.startTable(5);
+        final uuidOffset = fbb.writeString(object.uuid);
+        fbb.startTable(6);
         fbb.addInt64(0, object.id);
         fbb.addInt64(1, object.date.millisecondsSinceEpoch);
         fbb.addBool(2, object.isDone);
         fbb.addInt64(3, object.task.targetId);
+        fbb.addOffset(4, uuidOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
       objectFromFB: (obx.Store store, ByteData fbData) {
         final buffer = fb.BufferContext(fbData);
         final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
         final dateParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0),
         );
@@ -516,8 +566,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
           8,
           false,
         );
-        final object = TaskCompletion(date: dateParam, isDone: isDoneParam)
-          ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+        final uuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 12, '');
+        final object = TaskCompletion(
+          id: idParam,
+          date: dateParam,
+          isDone: isDoneParam,
+          uuid: uuidParam,
+        );
         object.task.targetId = const fb.Int64Reader().vTableGet(
           buffer,
           rootOffset,
@@ -540,9 +597,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
       },
       objectToFB: (Folder object, fb.Builder fbb) {
         final nameOffset = fbb.writeString(object.name);
-        fbb.startTable(3);
+        final uuidOffset = fbb.writeString(object.uuid);
+        fbb.startTable(4);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
+        fbb.addOffset(2, uuidOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -558,7 +617,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final nameParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 6, '');
-        final object = Folder(id: idParam, name: nameParam);
+        final uuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final object = Folder(id: idParam, name: nameParam, uuid: uuidParam);
         obx_int.InternalToManyAccess.setRelInfo<Folder>(
           object.notes,
           store,
@@ -579,11 +641,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
       },
       objectToFB: (Note object, fb.Builder fbb) {
         final contentOffset = fbb.writeString(object.content);
-        fbb.startTable(5);
+        final uuidOffset = fbb.writeString(object.uuid);
+        fbb.startTable(6);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, contentOffset);
         fbb.addInt64(2, object.createdAt?.millisecondsSinceEpoch);
         fbb.addInt64(3, object.updatedAt?.millisecondsSinceEpoch);
+        fbb.addOffset(4, uuidOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -615,11 +679,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final updatedAtParam = updatedAtValue == null
             ? null
             : DateTime.fromMillisecondsSinceEpoch(updatedAtValue);
+        final uuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 12, '');
         final object = Note(
           id: idParam,
           content: contentParam,
           createdAt: createdAtParam,
           updatedAt: updatedAtParam,
+          uuid: uuidParam,
         );
         obx_int.InternalToManyAccess.setRelInfo<Note>(
           object.folders,
@@ -654,6 +722,11 @@ class CategoryModel_ {
   /// See [CategoryModel.color].
   static final color = obx.QueryStringProperty<CategoryModel>(
     _entities[0].properties[3],
+  );
+
+  /// See [CategoryModel.uuid].
+  static final uuid = obx.QueryStringProperty<CategoryModel>(
+    _entities[0].properties[4],
   );
 }
 
@@ -712,6 +785,11 @@ class Task_ {
     _entities[1].properties[10],
   );
 
+  /// See [Task.uuid].
+  static final uuid = obx.QueryStringProperty<Task>(
+    _entities[1].properties[11],
+  );
+
   /// see [Task.categories]
   static final categories = obx.QueryRelationToMany<Task, CategoryModel>(
     _entities[1].relations[0],
@@ -744,6 +822,11 @@ class TaskCompletion_ {
   static final task = obx.QueryRelationToOne<TaskCompletion, Task>(
     _entities[2].properties[3],
   );
+
+  /// See [TaskCompletion.uuid].
+  static final uuid = obx.QueryStringProperty<TaskCompletion>(
+    _entities[2].properties[4],
+  );
 }
 
 /// [Folder] entity fields to define ObjectBox queries.
@@ -756,6 +839,11 @@ class Folder_ {
   /// See [Folder.name].
   static final name = obx.QueryStringProperty<Folder>(
     _entities[3].properties[1],
+  );
+
+  /// See [Folder.uuid].
+  static final uuid = obx.QueryStringProperty<Folder>(
+    _entities[3].properties[2],
   );
 }
 
@@ -778,6 +866,9 @@ class Note_ {
   static final updatedAt = obx.QueryDateProperty<Note>(
     _entities[4].properties[3],
   );
+
+  /// See [Note.uuid].
+  static final uuid = obx.QueryStringProperty<Note>(_entities[4].properties[4]);
 
   /// see [Note.folders]
   static final folders = obx.QueryRelationToMany<Note, Folder>(
