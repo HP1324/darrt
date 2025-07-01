@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
@@ -107,7 +108,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   onTap: () async {
                     if (kDebugMode) {
                       final user = GoogleSignInService().currentUser;
-                      debugPrint(user?.email ?? 'null is there in user');
+                      MiniLogger.dp(user?.email ?? 'null is there in user');
                     }
                     ObjectBox.completionBox.removeAll();
                   },
@@ -314,7 +315,7 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
                   'Reminder set after ${minutes > 1 ? '$minutes minutes' : '$minutes minute'}',
             );
             Navigator.pop(context);
-            debugPrint('title: $title, minutes: $minutes, type: ${minutes.runtimeType}');
+            MiniLogger.dp('title: $title, minutes: $minutes, type: ${minutes.runtimeType}');
           },
           child: Text('Set Reminder'),
         ),

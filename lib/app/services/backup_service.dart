@@ -12,6 +12,7 @@ import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -29,7 +30,7 @@ class BackupService {
   factory BackupService() => _instance;
   BackupService._internal();
 
-  Map<String, dynamic> getLocalData() {
+  Map<String,dynamic> getLocalData() {
     final List<Task> tasks = ObjectBox.taskBox.getAll();
     final List<CategoryModel> categories = ObjectBox.categoryBox.getAll();
     final List<Note> notes = ObjectBox.noteBox.getAll();
@@ -76,6 +77,7 @@ class BackupService {
 
       final jsonString = jsonEncode(mergedData);
 
+      dev.log('This is the merged data: $jsonString');
       final dir = await getApplicationDocumentsDirectory();
 
       final file = dart.File(path.join(dir.path, backupFileJsonName));
@@ -191,42 +193,43 @@ class BackupService {
     final jsonBackupFile = _decompressToJsonFile(backupFile);
 
     //Parse the json file as map to work on it
-    Map<String, dynamic> driveData = await parseBackupJsonFileAsMap(jsonBackupFile);
-    Map<String, dynamic> localData = getLocalData();
+    Map<String,dynamic> driveData = await parseBackupJsonFileAsMap(jsonBackupFile);
+    Map<String,dynamic> localData = getLocalData();
+    MiniLogger.dp('error was not above');
     Map<String, dynamic> mergedData = BackupMergeService.mergeData(
       localData,
       driveData,
       mergeType: MergeType.restore,
     );
 
+    final tasks = (mergedData['tasks'] as List).map((e) => Task.fromJson(e)).toList();
+
     final categories = (mergedData['categories'] as List)
         .map((e) => CategoryModel.fromJson(e))
         .toList();
-    g.catVm.putManyForRestore(categories);
+    g.catVm.putManyForRestore(categories, tasks: tasks);
 
     final completions = (mergedData['completions'] as List)
         .map((e) => TaskCompletion.fromJson(e))
         .toList();
 
-    final tasks = (mergedData['tasks'] as List).map((e) => Task.fromJson(e)).toList();
     g.taskVm.putManyForRestore(tasks, completions: completions);
 
-    final folders = (mergedData['folders'] as List).map((e) => Folder.fromJson(e)).toList();
-    g.folderVm.putManyForRestore(folders);
-
     final notes = (mergedData['notes'] as List).map((e) => Note.fromJson(e)).toList();
+    final folders = (mergedData['folders'] as List).map((e) => Folder.fromJson(e)).toList();
+    g.folderVm.putManyForRestore(folders, notes: notes);
+
     g.noteVm.putManyForRestore(notes);
 
     MiniLogger.d('Data restored from google drive');
   }
 
-  Future<Map<String, dynamic>> parseBackupJsonFileAsMap(dart.File jsonFile) async {
+  Future<Map<String,dynamic>> parseBackupJsonFileAsMap(dart.File jsonFile) async {
     try {
       final jsonString = await jsonFile.readAsString();
-
       final jsonMap = jsonDecode(jsonString);
 
-      if (jsonMap is Map<String, dynamic>) {
+      if (jsonMap is Map<String,dynamic>) {
         return jsonMap;
       } else {
         throw FormatException('Invalid JSON structure: not a Map');
@@ -300,66 +303,87 @@ class BackupService {
 class BackupMergeService {
   static Map<String, List<dynamic>> oldCacheObjects = {};
 
-  static Map<String, dynamic> mergeData(
-    Map<String, dynamic> oldData,
-    Map<String, dynamic> newData, {
-    required MergeType mergeType,
-  }) {
+  static Map<String,dynamic> mergeData(
+      Map<String,dynamic> oldData,
+      Map<String,dynamic> newData, {
+        required MergeType mergeType,
+      }) {
+    // Convert JSON data to objects once
     final oldObjects = convertJsonDataToObjects(oldData);
     final newObjects = convertJsonDataToObjects(newData);
 
-    final merged = Map<String, List<dynamic>>.from(oldObjects);
+    final mergedData = <String, List<dynamic>>{};
 
-    for (var key in newObjects.keys) {
+    // Get all unique keys from both datasets
+    final allKeys = {...oldObjects.keys, ...newObjects.keys} ;
+
+    for (var key in allKeys) {
       final oldList = oldObjects[key] ?? [];
       final newList = newObjects[key] ?? [];
 
       List mergedList = List.from(oldList);
 
-      for (var item in newList) {
-        final oldItem = oldList.firstWhereOrNull(
-          (e) => e.id == item.id,
-        );
-        if (oldItem != null) {
-          //Same id
-          if (oldItem.equals(item)) {
-            // Case 1. Same id, same content. Do nothing, skip the iteration
-            continue;
-          } else {
-            // Case 2. Same id, different content. Update existing item with new item's value. id will be same
-            final index = mergedList.indexWhere((e) => e.id == item.id);
-            mergedList[index] = item;
-          }
-        } else {
-          // Case 3. Different id, same content. Update existing item with new item's value in backup and do nothing if restoring. Id will be the same, so objectbox will update the exiting item with new value
-          if (mergeType == MergeType.backup) {
-            final itemWithSameContent = mergedList.firstWhereOrNull((e) => e.equals(item));
-            if (itemWithSameContent != null) {
-              final index = mergedList.indexWhere((e) => e.equals(item));
-              mergedList[index] = item;
-            }
-          } else {
-            // Case 4. Different id, different content.which means item does not exist at all. Set item id to zero if restoring, so objectbox can consider it a new item
-            debugPrint('case 4 hit');
-            if (item is Task) print('id: ${item.id},title: ${item.title}');
-            oldCacheObjects.putIfAbsent(key, () => []).add(item);
-            if (mergeType == MergeType.restore) item.id = 0;
-            mergedList.add(item);
-          }
-        }
+      switch (key) {
+        case 'categories':
+          dev.log('Old categories: ${oldData[key]}, New categories: ${newData[key]}');
+          mergedList = g.catVm.mergeItemLists(
+              oldList.cast<CategoryModel>(),
+              newList.cast<CategoryModel>(),
+              mergeType: mergeType
+          );
+          mergedData[key] = g.catVm.convertObjectsListToJsonList(mergedList.cast<CategoryModel>());
+          break;
+
+        case 'folders':
+          mergedList = g.folderVm.mergeItemLists(
+              oldList.cast<Folder>(),
+              newList.cast<Folder>(),
+              mergeType: mergeType
+          );
+          mergedData[key] = g.folderVm.convertObjectsListToJsonList(mergedList.cast<Folder>());
+          break;
+
+        case 'tasks':
+          mergedList = g.taskVm.mergeItemLists(
+              oldList.cast<Task>(),
+              newList.cast<Task>(),
+              mergeType: mergeType
+          );
+          mergedData[key] = g.taskVm.convertObjectsListToJsonList(mergedList.cast<Task>());
+          break;
+
+        case 'notes':
+          mergedList = g.noteVm.mergeItemLists(
+              oldList.cast<Note>(),
+              newList.cast<Note>(),
+              mergeType: mergeType
+          );
+          mergedData[key] = g.noteVm.convertObjectsListToJsonList(mergedList.cast<Note>());
+          break;
+
+        case 'completions':
+          mergedList = g.completionVm.mergeItemLists(
+              oldList.cast<TaskCompletion>(),
+              newList.cast<TaskCompletion>(),
+              mergeType: mergeType
+          );
+          mergedData[key] = g.completionVm.convertObjectsListToJsonList(
+            mergedList.cast<TaskCompletion>(),
+          );
+          break;
+
+        default:
+        // For unknown keys, just use the new list
+          mergedList = newList;
+          mergedData[key] = mergedList;
       }
-      merged[key] = mergedList;
     }
-    final mergedJsonData = convertObjectsToJsonData(merged);
-    if (mergeType == MergeType.restore) {
-      dev.log('merged data during restore: $mergedJsonData');
-    } else {
-      dev.log('merged data during backup: $mergedJsonData');
-    }
-    return mergedJsonData;
+
+    dev.log('This is merged json data: $mergedData');
+    return mergedData;
   }
 
-  static Map<String, List<dynamic>> convertJsonDataToObjects(Map<String, dynamic> jsonData) {
+  static Map<String,dynamic> convertJsonDataToObjects(Map<String,dynamic> jsonData) {
     final convertedData = <String, List<dynamic>>{};
 
     for (var key in jsonData.keys) {
@@ -392,8 +416,8 @@ class BackupMergeService {
     return convertedData;
   }
 
-  static Map<String, dynamic> convertObjectsToJsonData(Map<String, List<dynamic>> objectData) {
-    final convertedData = <String, dynamic>{};
+  static Map<String, dynamic> convertObjectsToJsonData(Map<String,dynamic> objectData) {
+    final Map<String,dynamic> convertedData = {};
 
     for (var key in objectData.keys) {
       final objectList = objectData[key] ?? [];
@@ -423,26 +447,6 @@ class BackupMergeService {
     }
 
     return convertedData;
-  }
-
-  static Task getTaskOrElseObject() {
-    return Task(id: -1, title: '');
-  }
-
-  static CategoryModel getCategoryModelOrElseObject() {
-    return CategoryModel(id: -1, name: '');
-  }
-
-  static TaskCompletion getTaskCompletionOrElseObject() {
-    return TaskCompletion(id: -1, date: DateTime.now(), isDone: false);
-  }
-
-  static Note getNoteOrElseObject() {
-    return Note(id: -1, content: '');
-  }
-
-  static Folder getFolderOrElseObject() {
-    return Folder(id: -1, name: '');
   }
 }
 

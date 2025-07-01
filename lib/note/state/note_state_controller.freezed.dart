@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$NoteState {
 
- String get color; DateTime get createdAt; DateTime get updatedAt; Map<Folder, bool> get folderSelection;
+ DateTime get createdAt; DateTime get updatedAt; Map<Folder, bool> get folderSelection;
 /// Create a copy of NoteState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $NoteStateCopyWith<NoteState> get copyWith => _$NoteStateCopyWithImpl<NoteState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is NoteState&&(identical(other.color, color) || other.color == color)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&const DeepCollectionEquality().equals(other.folderSelection, folderSelection));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is NoteState&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&const DeepCollectionEquality().equals(other.folderSelection, folderSelection));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,color,createdAt,updatedAt,const DeepCollectionEquality().hash(folderSelection));
+int get hashCode => Object.hash(runtimeType,createdAt,updatedAt,const DeepCollectionEquality().hash(folderSelection));
 
 @override
 String toString() {
-  return 'NoteState(color: $color, createdAt: $createdAt, updatedAt: $updatedAt, folderSelection: $folderSelection)';
+  return 'NoteState(createdAt: $createdAt, updatedAt: $updatedAt, folderSelection: $folderSelection)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $NoteStateCopyWith<$Res>  {
   factory $NoteStateCopyWith(NoteState value, $Res Function(NoteState) _then) = _$NoteStateCopyWithImpl;
 @useResult
 $Res call({
- String color, DateTime createdAt, DateTime updatedAt, Map<Folder, bool> folderSelection
+ DateTime createdAt, DateTime updatedAt, Map<Folder, bool> folderSelection
 });
 
 
@@ -63,10 +63,9 @@ class _$NoteStateCopyWithImpl<$Res>
 
 /// Create a copy of NoteState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? color = null,Object? createdAt = null,Object? updatedAt = null,Object? folderSelection = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? createdAt = null,Object? updatedAt = null,Object? folderSelection = null,}) {
   return _then(_self.copyWith(
-color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
-as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,folderSelection: null == folderSelection ? _self.folderSelection : folderSelection // ignore: cast_nullable_to_non_nullable
 as Map<Folder, bool>,
@@ -80,10 +79,9 @@ as Map<Folder, bool>,
 
 
 class _NoteState extends NoteState {
-  const _NoteState({required this.color, required this.createdAt, required this.updatedAt, required final  Map<Folder, bool> folderSelection}): _folderSelection = folderSelection,super._();
+  const _NoteState({required this.createdAt, required this.updatedAt, required final  Map<Folder, bool> folderSelection}): _folderSelection = folderSelection,super._();
   
 
-@override final  String color;
 @override final  DateTime createdAt;
 @override final  DateTime updatedAt;
  final  Map<Folder, bool> _folderSelection;
@@ -104,16 +102,16 @@ _$NoteStateCopyWith<_NoteState> get copyWith => __$NoteStateCopyWithImpl<_NoteSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NoteState&&(identical(other.color, color) || other.color == color)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&const DeepCollectionEquality().equals(other._folderSelection, _folderSelection));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NoteState&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&const DeepCollectionEquality().equals(other._folderSelection, _folderSelection));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,color,createdAt,updatedAt,const DeepCollectionEquality().hash(_folderSelection));
+int get hashCode => Object.hash(runtimeType,createdAt,updatedAt,const DeepCollectionEquality().hash(_folderSelection));
 
 @override
 String toString() {
-  return 'NoteState(color: $color, createdAt: $createdAt, updatedAt: $updatedAt, folderSelection: $folderSelection)';
+  return 'NoteState(createdAt: $createdAt, updatedAt: $updatedAt, folderSelection: $folderSelection)';
 }
 
 
@@ -124,7 +122,7 @@ abstract mixin class _$NoteStateCopyWith<$Res> implements $NoteStateCopyWith<$Re
   factory _$NoteStateCopyWith(_NoteState value, $Res Function(_NoteState) _then) = __$NoteStateCopyWithImpl;
 @override @useResult
 $Res call({
- String color, DateTime createdAt, DateTime updatedAt, Map<Folder, bool> folderSelection
+ DateTime createdAt, DateTime updatedAt, Map<Folder, bool> folderSelection
 });
 
 
@@ -141,10 +139,9 @@ class __$NoteStateCopyWithImpl<$Res>
 
 /// Create a copy of NoteState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? color = null,Object? createdAt = null,Object? updatedAt = null,Object? folderSelection = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? createdAt = null,Object? updatedAt = null,Object? folderSelection = null,}) {
   return _then(_NoteState(
-color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
-as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,folderSelection: null == folderSelection ? _self._folderSelection : folderSelection // ignore: cast_nullable_to_non_nullable
 as Map<Folder, bool>,

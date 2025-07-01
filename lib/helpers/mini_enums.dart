@@ -12,7 +12,24 @@ enum ThemeColors {
   celadon,
   rust,
   lilac,
+  whatsappGreen,
+  // New colors optimized for both light and dark modes
+  indigo,
+  forestGreen,
+  burgundy,
+  steel,
+  coral,
+  sage,
+  plum,
+  amber,
+  navy,
+  crimson,
+  jade,
+  bronze,
+  ochre,
+  sienna,
 }
+
 extension ThemeColorsExtension on ThemeColors {
   Color get color {
     switch (this) {
@@ -35,7 +52,37 @@ extension ThemeColorsExtension on ThemeColors {
       case ThemeColors.rust:
         return const Color(0xFFB7410E);      // Warm earthy red
       case ThemeColors.lilac:
-        return const Color(0xFFC8A2C8);      // Muted purple
+        return const Color(0xFFC8A2C8);
+      case ThemeColors.whatsappGreen:
+        return const Color(0xFF29b370);
+      case ThemeColors.indigo:
+        return const Color(0xFF4F46E5);      // Rich indigo, versatile across themes
+      case ThemeColors.forestGreen:
+        return const Color(0xFF065F46);      // Deep forest green
+      case ThemeColors.burgundy:
+        return const Color(0xFF8B1538);      // Deep wine red
+      case ThemeColors.steel:
+        return const Color(0xFF64748B);      // Modern steel blue-gray
+      case ThemeColors.coral:
+        return const Color(0xFFFF6B6B);      // Vibrant yet balanced coral
+      case ThemeColors.sage:
+        return const Color(0xFF87A96B);      // Muted sage green
+      case ThemeColors.plum:
+        return const Color(0xFF8B5A83);      // Sophisticated plum
+      case ThemeColors.amber:
+        return const Color(0xFFD97706);      // Warm amber orange
+      case ThemeColors.navy:
+        return const Color(0xFF1E3A8A);      // Classic navy blue
+      case ThemeColors.crimson:
+        return const Color(0xFFDC2626);      // Bold crimson red
+      case ThemeColors.jade:
+        return const Color(0xFF059669);      // Fresh jade green
+      case ThemeColors.bronze:
+        return const Color(0xFF92400E);      // Rich bronze brown
+      case ThemeColors.ochre:
+        return const Color(0xFFCC8E35);      // Golden ochre yellow
+      case ThemeColors.sienna:
+        return const Color(0xFFA0522D);      // Warm sienna brown
     }
   }
 }

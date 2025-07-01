@@ -414,7 +414,9 @@ class _BackupButtonState extends State<_BackupButton> {
                         );
                       }
                     } finally {
-                      isBackingUp.value = false;
+                      if(context.mounted) {
+                        isBackingUp.value = false;
+                      }
                     }
                   }
                 },
