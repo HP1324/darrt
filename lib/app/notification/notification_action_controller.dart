@@ -30,11 +30,11 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
         break;
       case snoozeActionKey:
         final minutes = MiniBox.read(mSnoozeMinutes);
-        await NotificationService.scheduleQuickReminder(receivedAction.body ?? '', minutes);
+        await NotificationService.scheduleQuickReminder(receivedAction.body, minutes);
         break;
       case quickSnoozeActionKey:
         final minutes = MiniBox.read(mSnoozeMinutes);
-        await NotificationService.scheduleQuickReminder(receivedAction.body ?? '', minutes);
+        await NotificationService.scheduleQuickReminder(receivedAction.body, minutes);
       default:
         if (task != null) {
           MiniTodo.navigatorKey.currentState?.push(
@@ -68,4 +68,3 @@ final snoozeActionButton = NotificationActionButton(
   label: snoozeActionLabel,
   actionType: ActionType.SilentAction,
 );
-
