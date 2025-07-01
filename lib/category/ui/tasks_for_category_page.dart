@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
+import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/task/ui/add_task_page.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 
@@ -24,7 +26,8 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
       listenable: g.taskVm,
       builder: (context, child) {
         final tasks = g.taskVm.tasks.where((t) => t.categories.contains(widget.category)).toList();
-        final color = IconColorStorage.colors[widget.category.color] ?? Theme.of(context).colorScheme.primary;
+        final color =
+            IconColorStorage.colors[widget.category.color] ?? Theme.of(context).colorScheme.primary;
         final icon = IconColorStorage.flattenedIcons[widget.category.icon];
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return Scaffold(
@@ -82,6 +85,10 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
                 ],
               );
             },
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => MiniRouter.to(context, AddTaskPage(edit: false, category: widget.category)),
+            child: Icon(Icons.add),
           ),
         );
       },
