@@ -86,9 +86,12 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
               );
             },
           ),
-          floatingActionButton: FloatingActionButton(
+          floatingActionButton: FloatingActionButton.extended(
             onPressed: () => MiniRouter.to(context, AddTaskPage(edit: false, category: widget.category)),
-            child: Icon(Icons.add),
+            backgroundColor: IconColorStorage.colors[widget.category.color],
+            tooltip: 'Add task to this category',
+            label: Text('Add task'),
+            icon: Icon(Icons.add),
           ),
         );
       },
