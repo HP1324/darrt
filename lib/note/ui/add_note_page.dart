@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:minimaltodo/helpers/messages.dart' show Messages;
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart' show generateNotePdf, savePdfToDownloads, showToast;
+import 'package:minimaltodo/note/models/folder.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/note/state/note_state_controller.dart';
 import 'package:minimaltodo/note/ui/add_folder_page.dart';
@@ -11,9 +12,10 @@ import 'package:toastification/toastification.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 
 class AddNotePage extends StatefulWidget {
-  const AddNotePage({super.key, required this.edit, this.note}) : assert(!edit || note != null);
+  const AddNotePage({super.key, required this.edit, this.note, this.folder}) : assert(!edit || note != null);
   final bool edit;
   final Note? note;
+  final Folder? folder;
   @override
   State<AddNotePage> createState() => _AddNotePageState();
 }
@@ -22,7 +24,7 @@ class _AddNotePageState extends State<AddNotePage> {
   @override
   void initState() {
     super.initState();
-    g.noteSc.initState(widget.edit, widget.edit ? widget.note : null);
+    g.noteSc.initState(widget.edit, widget.edit ? widget.note : null, widget.folder);
   }
 
   @override
