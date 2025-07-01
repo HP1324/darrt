@@ -9,6 +9,7 @@ import 'package:minimaltodo/note/state/folder_state_controller.dart' show Folder
 import 'package:minimaltodo/note/state/folder_view_model.dart' show FolderViewModel;
 import 'package:minimaltodo/note/state/note_state_controller.dart';
 import 'package:minimaltodo/note/state/note_view_model.dart' show NoteViewModel;
+import 'package:minimaltodo/note/ui/add_note_page.dart';
 import 'package:minimaltodo/task/state/completion_view_model.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart' show TaskStateController;
 import 'package:minimaltodo/task/state/task_view_model.dart' show TaskViewModel;
@@ -39,7 +40,9 @@ final calMan = CalendarManager();
 
 final navMan = NavigationManager();
 
-final sttController = SpeechToTextController();
+final taskSttController = TaskSttController();
+
+final noteSttController = NoteSttController();
 
 final settingsSc = SettingsStateController();
 

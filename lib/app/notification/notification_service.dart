@@ -456,7 +456,7 @@ class NotificationService {
     );
   }
 
-  static void scheduleQuickReminder(String title, int minutes) async {
+  static Future<void> scheduleQuickReminder(String title, int minutes) async {
     final now = DateTime.now();
     final reminderType = MiniBox.read(mDefaultReminderType);
     final channelKey = reminderType == alarmReminderType ? alarmChannelKey : notifChannelKey;
@@ -479,7 +479,7 @@ class NotificationService {
         timeZone: await AwesomeNotifications().getLocalTimeZoneIdentifier(),
       ),
       actionButtons: [
-        quickSnoozeActionButton,
+        snoozeActionButton,
       ],
     );
   }

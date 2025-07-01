@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:minimaltodo/app/ui/icon_color_picker.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:toastification/toastification.dart';
 import 'consts.dart';
 
@@ -105,5 +106,52 @@ void showColorPicker(BuildContext context, {required Function(String) onColorSel
   showDialog(
     context: context,
     builder: (context) => ColorPickerDialog(onColorSelected: onColorSelected),
+  );
+}
+
+void showSettingsDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text('Permissions Required'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'To use speech-to-text functionality, please allow the following permissions:',
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              SizedBox(height: 12),
+              Text('• Microphone: Required to capture your voice input'),
+              SizedBox(height: 8),
+              Text(
+                '• Nearby devices (Android 12+): Required when using Bluetooth headsets or external microphones',
+              ),
+              SizedBox(height: 12),
+              Text(
+                'Go to Settings > Permissions and enable both Microphone and Nearby devices permissions.',
+                style: TextStyle(fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await openAppSettings();
+            },
+            child: Text('Settings'),
+          ),
+        ],
+      );
+    },
   );
 }

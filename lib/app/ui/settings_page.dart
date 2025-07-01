@@ -39,7 +39,7 @@ class _SettingsPageState extends State<SettingsPage> {
               Divider(),
               SnoozeSection(),
               Divider(),
-              DriveBackupSection(),
+              BackupRestoreSection(),
             ],
           ),
         ),
@@ -48,22 +48,29 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
-class DriveBackupSection extends StatefulWidget {
-  const DriveBackupSection({super.key});
+class BackupRestoreSection extends StatefulWidget {
+  const BackupRestoreSection({super.key});
 
   @override
-  State<DriveBackupSection> createState() => _DriveBackupSectionState();
+  State<BackupRestoreSection> createState() => _BackupRestoreSectionState();
 }
 
-class _DriveBackupSectionState extends State<DriveBackupSection> {
+class _BackupRestoreSectionState extends State<BackupRestoreSection> {
   final GoogleSignInService _googleService = GoogleSignInService();
 
-  final ValueNotifier<String> currentEmail = ValueNotifier(MiniBox.read(mGoogleEmail) ?? 'Sign in');
+  final ValueNotifier<String> currentEmail = ValueNotifier(MiniBox.read(mGoogleEmail) ?? tapHereToSignIn);
 
   final ValueNotifier<bool> isBackingUp = ValueNotifier(false);
 
   final ValueNotifier<bool> isRestoring = ValueNotifier(false);
 
+  @override
+  void dispose() {
+    currentEmail.dispose();
+    isBackingUp.dispose();
+    isRestoring.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -99,13 +106,17 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
                 contentPadding: EdgeInsets.zero,
                 visualDensity: VisualDensity.compact,
                 value: autoBackup,
-                onChanged: (value) async{
+                onChanged: (value) async {
                   if (value != null) {
                     g.settingsSc.updateAutoBackup(value);
                     if (value) {
                       // await Workmanager().registerPeriodicTask('auto_backup', 'auto_backup', frequency: Duration(minutes: 15));
-                      await Workmanager().registerOneOffTask('auto_backup', 'auto_backup', initialDelay: Duration(seconds: 5));
-                    }else{
+                      await Workmanager().registerOneOffTask(
+                        'auto_backup',
+                        'auto_backup',
+                        initialDelay: Duration(seconds: 5),
+                      );
+                    } else {
                       await Workmanager().cancelByUniqueName('auto_backup');
                     }
                   }
@@ -173,7 +184,15 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
                                   description: e.userMessage!,
                                 );
                               }
-                            } catch (e, t) {
+                            }on GoogleClientNotAuthenticatedError catch (e) {
+                              if (context.mounted) {
+                                showToast(
+                                  context,
+                                  type: ToastificationType.error,
+                                  description: e.userMessage!,
+                                );
+                              }
+                            }  catch (e, t) {
                               MiniLogger.e('Error restoring data: ${e.toString()}');
                               MiniLogger.t('Stacktrace: $t');
                               if (context.mounted) {
@@ -201,7 +220,7 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
               OutlinedButton.icon(
                 onPressed: () async {
                   await _googleService.signOut();
-                  currentEmail.value = 'Sign in';
+                  currentEmail.value = tapHereToSignIn;
                   MiniBox.remove(mGoogleEmail);
                   if (context.mounted) {
                     showSignInToast(
@@ -244,9 +263,11 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
           if (shouldContinue != true) return;
 
           await _googleService.signOut();
-          currentEmail.value = 'Sign in';
+          currentEmail.value = tapHereToSignIn;
           MiniBox.remove(mGoogleEmail);
-          showSignInToast(context, ToastificationType.warning, 'Signed out');
+          if (context.mounted) {
+            showSignInToast(context, ToastificationType.warning, 'Signed out');
+          }
           await Future.delayed(Duration(milliseconds: 900));
         }
       }
@@ -258,12 +279,6 @@ class _DriveBackupSectionState extends State<DriveBackupSection> {
         await MiniBox.write(mGoogleEmail, email);
         if (context.mounted) {
           showSignInToast(context, ToastificationType.success, 'Signed in to $email');
-        }
-
-        final client = await _googleService.getAuthenticatedClient();
-        if (client != null) {
-          final userDrive = drive.DriveApi(client);
-          // Use userDrive for backup operations
         }
       }
     } catch (e, t) {
@@ -367,7 +382,7 @@ class DefaultReminderTypeSection extends StatelessWidget {
 }
 
 class _BackupButton extends StatefulWidget {
-  const _BackupButton({super.key});
+  const _BackupButton();
 
   @override
   State<_BackupButton> createState() => _BackupButtonState();
@@ -405,7 +420,15 @@ class _BackupButtonState extends State<_BackupButton> {
                         );
                       }
                       g.settingsSc.updateLastBackupDate(DateTime.now());
-                    } catch (e) {
+                    }on GoogleClientNotAuthenticatedError catch (e) {
+                      if (context.mounted) {
+                        showToast(
+                          context,
+                          type: ToastificationType.error,
+                          description: e.userMessage!,
+                        );
+                      }
+                    }  catch (e) {
                       if (context.mounted) {
                         showToast(
                           context,
@@ -414,7 +437,7 @@ class _BackupButtonState extends State<_BackupButton> {
                         );
                       }
                     } finally {
-                      if(context.mounted) {
+                      if (context.mounted) {
                         isBackingUp.value = false;
                       }
                     }
@@ -435,7 +458,7 @@ class _BackupButtonState extends State<_BackupButton> {
 }
 
 class _DeleteBackupSection extends StatefulWidget {
-  const _DeleteBackupSection({super.key});
+  const _DeleteBackupSection();
 
   @override
   State<_DeleteBackupSection> createState() => _DeleteBackupSectionState();
@@ -495,6 +518,14 @@ class _DeleteBackupSectionState extends State<_DeleteBackupSection> {
                                 context,
                                 type: ToastificationType.error,
                                 description: e.message!,
+                              );
+                            }
+                          } on GoogleClientNotAuthenticatedError catch (e) {
+                            if (context.mounted) {
+                              showToast(
+                                context,
+                                type: ToastificationType.error,
+                                description: e.userMessage!,
                               );
                             }
                           } finally {
