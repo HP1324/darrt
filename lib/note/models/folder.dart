@@ -9,11 +9,15 @@ class Folder {
   Folder({
     this.id = 0,
     required this.name,
+    this.icon = 'folder',
+    this.color = 'primary',
     String? uuid,
-  }) : uuid = g.uuid.v4();
+  }) : uuid = uuid ?? g.uuid.v4();
   @Id()
   int id;
   String name;
+  String icon;
+  String color;
   final String uuid;
   @Backlink('folders')
   final notes = ToMany<Note>();
@@ -32,6 +36,8 @@ class Folder {
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
+    'color': color,
+    'icon' :icon,
     'uuid': uuid,
   };
   factory Folder.fromJson(Map<String, dynamic> json) {
@@ -39,6 +45,8 @@ class Folder {
       return Folder(
         id: json['id'] ?? 0,
         name: json['name'],
+        color: json['color'],
+        icon: json['icon'],
         uuid: json['uuid'],
       );
     } catch (e, t) {

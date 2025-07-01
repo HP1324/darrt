@@ -14,7 +14,6 @@ part 'note_state_controller.freezed.dart';
 @freezed
 abstract class NoteState with _$NoteState {
   const factory NoteState({
-    required String color,
     required DateTime createdAt,
     required DateTime updatedAt,
     required Map<Folder, bool> folderSelection,
@@ -23,7 +22,6 @@ abstract class NoteState with _$NoteState {
 }
 
 class NoteStateController extends StateController<NoteState, Note> {
-
   QuillController controller = QuillController.basic();
   ScrollController scrollController = ScrollController();
 
@@ -31,9 +29,16 @@ class NoteStateController extends StateController<NoteState, Note> {
   Note buildModel({required bool edit, Note? model}) {
     var note = Note.fromQuillController(controller, uuid: edit ? model!.uuid : null);
     note.id = edit ? model!.id : 0;
-    final folders = g.folderVm.folders.where((f) =>g.noteSc.folderSelection[f] == true).toList();
+    final folders = g.folderVm.folders.where((f) => g.noteSc.folderSelection[f] == true).toList();
     note.folders.clear();
-    note.folders.addAll(folders);
+    if(folders.isEmpty){
+      final generalFolder = ObjectBox.folderBox.get(1) ?? Folder(id: 1, name: 'General');
+      note.folders.add(generalFolder);
+      note.folderUuids = [generalFolder.uuid];
+    }else{
+      note.folders.addAll(folders);
+      note.folderUuids = folders.map((f) => f.uuid).toList();
+    }
     return note;
   }
 
@@ -45,15 +50,15 @@ class NoteStateController extends StateController<NoteState, Note> {
 
   @override
   void initState(bool edit, [Note? model]) {
-    final folders = ObjectBox.store!.box<Folder>().getAll();
-
+    final folders = g.folderVm.folders;
     state = NoteState(
-      color: 'green',
-      createdAt: edit ? model!.createdAt! : DateTime.now(),
-      updatedAt: edit ? model!.updatedAt! : DateTime.now(),
       folderSelection: edit
           ? {for (var folder in folders) folder: model!.folders.contains(folder)}
           : {folders[0]: true},
+      createdAt: edit ? model!.createdAt! : DateTime.now(),
+      updatedAt: edit ? model!.updatedAt! : DateTime.now(),
+
+
     );
     controller = edit ? model!.toQuillController() : QuillController.basic();
     controller.moveCursorToEnd();
@@ -63,15 +68,11 @@ class NoteStateController extends StateController<NoteState, Note> {
     state = state.copyWith(folderSelection: {...state.folderSelection, folder: value});
     notifyListeners();
   }
-  void setColor(String newColor) {
-    state = state.copyWith(color: newColor);
-    notifyListeners();
-  }
+
 }
 
 extension AccessState on NoteStateController {
   FocusNode get focusNode => textFieldNode;
-  Color get color => IconColorStorage.colors[state.color] ?? Colors.white;
   DateTime get createdAt => state.createdAt;
   DateTime get updatedAt => state.updatedAt;
   Map<Folder, bool> get folderSelection => state.folderSelection;
