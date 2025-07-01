@@ -2,34 +2,41 @@ import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/helpers/typedefs.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:minimaltodo/task/models/task.dart';
+
 class CategoryViewModel extends ViewModel<CategoryModel> {
   final ScrollController scrollController = ScrollController();
 
   List<CategoryModel> get categories => items;
   @override
-  String putItem(CategoryModel item,{required bool edit, bool scrollToBottom = true}) {
+  String putItem(CategoryModel item, {required bool edit, bool scrollToBottom = true}) {
     final category = item;
-    if(!edit && items.indexWhere((c) => c.name == category.name) != -1) return Messages.mCategoryExists;
+    if (!edit && items.indexWhere((c) => c.name == category.name) != -1) {
+      return Messages.mCategoryExists;
+    }
     if (category.name.trim().isEmpty) return Messages.mCategoryEmpty;
     final message = super.putItem(category, edit: edit);
 
-    if(scrollToBottom) {
+    if (scrollToBottom && !edit) {
       scrollController.animateTo(
-          scrollController.position.maxScrollExtent, duration: Duration(milliseconds: 300),
-          curve: Curves.easeIn);
+        scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
     }
 
     return message;
   }
-@override
-  String deleteItem(int id) {
 
+  @override
+  String deleteItem(int id) {
     final message = super.deleteItem(id);
     return message;
   }
+
   @override
-  int getItemId(CategoryModel item) =>item.id;
+  int getItemId(CategoryModel item) => item.id;
 
   @override
   String getCreateSuccessMessage() => Messages.mCategoryAdded;
@@ -38,29 +45,53 @@ class CategoryViewModel extends ViewModel<CategoryModel> {
   String getUpdateSuccessMessage() => Messages.mCategoryEdited;
 
   @override
-  String getDeleteSuccessMessage(int length) => length == 1 ? '1 ${Messages.mCategoryDeleted}' : '$length ${Messages.mCategoriesDeleted}';
+  String getDeleteSuccessMessage(int length) =>
+      length == 1 ? '1 ${Messages.mCategoryDeleted}' : '$length ${Messages.mCategoriesDeleted}';
 
   @override
   void setItemId(CategoryModel item, int id) {
-    item.id =id;
+    item.id = id;
   }
 
   @override
-  void putManyForRestore(List<CategoryModel> restoredItems) {
+  void putManyForRestore(List<CategoryModel> restoredItems, {List<Task>? tasks}) {
     box.putMany(restoredItems);
-    initializeItemsWithRebuilding();
+    reassignTaskCategories(restoredItems, tasks: tasks!);
+    initializeItems();
+    notifyListeners();
+  }
+
+  void reassignTaskCategories(List<CategoryModel> restoredCategories, {required List<Task> tasks}) {
+
+    final categoryByUuid = {for (final cat in restoredCategories) cat.uuid: cat};
+
+    for (final task in tasks) {
+      // Optional: depends on your restore design
+      final List<String> categoryUuids = task.categoryUuids;
+
+      task.categories.clear();
+
+      for (final uuid in categoryUuids) {
+        final category = categoryByUuid[uuid];
+        if (category != null) {
+          task.categories.add(category);
+        } else {
+          MiniLogger.dp('Category with UUID $uuid not found for task ${task.title}');
+        }
+      }
+    }
   }
 
   @override
-  String getItemUuid(CategoryModel item) =>item.uuid;
+  String getItemUuid(CategoryModel item) => item.uuid;
 
   @override
-  EntityObjectList<CategoryModel> convertJsonListToObjectList(EntityJsonList jsonList) {
+  List<CategoryModel> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
     return jsonList.map(CategoryModel.fromJson).toList();
   }
 
   @override
-  EntityJsonList convertObjectsListToJsonList(EntityObjectList<CategoryModel> objectList) {
+  List<Map<String, dynamic>> convertObjectsListToJsonList(List<CategoryModel> objectList) {
     return objectList.map((category) => category.toJson()).toList();
   }
 }

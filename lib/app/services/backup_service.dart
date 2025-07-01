@@ -30,7 +30,7 @@ class BackupService {
   factory BackupService() => _instance;
   BackupService._internal();
 
-  EntityJsonListMap getLocalData() {
+  Map<String,dynamic> getLocalData() {
     final List<Task> tasks = ObjectBox.taskBox.getAll();
     final List<CategoryModel> categories = ObjectBox.categoryBox.getAll();
     final List<Note> notes = ObjectBox.noteBox.getAll();
@@ -77,6 +77,7 @@ class BackupService {
 
       final jsonString = jsonEncode(mergedData);
 
+      dev.log('This is the merged data: $jsonString');
       final dir = await getApplicationDocumentsDirectory();
 
       final file = dart.File(path.join(dir.path, backupFileJsonName));
@@ -192,42 +193,43 @@ class BackupService {
     final jsonBackupFile = _decompressToJsonFile(backupFile);
 
     //Parse the json file as map to work on it
-    EntityJsonListMap driveData = await parseBackupJsonFileAsMap(jsonBackupFile);
-    EntityJsonListMap localData = getLocalData();
-    debugPrint('error was not above');
+    Map<String,dynamic> driveData = await parseBackupJsonFileAsMap(jsonBackupFile);
+    Map<String,dynamic> localData = getLocalData();
+    MiniLogger.dp('error was not above');
     Map<String, dynamic> mergedData = BackupMergeService.mergeData(
       localData,
       driveData,
       mergeType: MergeType.restore,
     );
 
+    final tasks = (mergedData['tasks'] as List).map((e) => Task.fromJson(e)).toList();
+
     final categories = (mergedData['categories'] as List)
         .map((e) => CategoryModel.fromJson(e))
         .toList();
-    g.catVm.putManyForRestore(categories);
+    g.catVm.putManyForRestore(categories, tasks: tasks);
 
     final completions = (mergedData['completions'] as List)
         .map((e) => TaskCompletion.fromJson(e))
         .toList();
 
-    final tasks = (mergedData['tasks'] as List).map((e) => Task.fromJson(e)).toList();
     g.taskVm.putManyForRestore(tasks, completions: completions);
 
-    final folders = (mergedData['folders'] as List).map((e) => Folder.fromJson(e)).toList();
-    g.folderVm.putManyForRestore(folders);
-
     final notes = (mergedData['notes'] as List).map((e) => Note.fromJson(e)).toList();
+    final folders = (mergedData['folders'] as List).map((e) => Folder.fromJson(e)).toList();
+    g.folderVm.putManyForRestore(folders, notes: notes);
+
     g.noteVm.putManyForRestore(notes);
 
     MiniLogger.d('Data restored from google drive');
   }
 
-  Future<EntityJsonListMap> parseBackupJsonFileAsMap(dart.File jsonFile) async {
+  Future<Map<String,dynamic>> parseBackupJsonFileAsMap(dart.File jsonFile) async {
     try {
       final jsonString = await jsonFile.readAsString();
       final jsonMap = jsonDecode(jsonString);
 
-      if (jsonMap is dynamic) {
+      if (jsonMap is Map<String,dynamic>) {
         return jsonMap;
       } else {
         throw FormatException('Invalid JSON structure: not a Map');
@@ -301,9 +303,9 @@ class BackupService {
 class BackupMergeService {
   static Map<String, List<dynamic>> oldCacheObjects = {};
 
-  static EntityJsonListMap mergeData(
-      EntityJsonListMap oldData,
-      EntityJsonListMap newData, {
+  static Map<String,dynamic> mergeData(
+      Map<String,dynamic> oldData,
+      Map<String,dynamic> newData, {
         required MergeType mergeType,
       }) {
     // Convert JSON data to objects once
@@ -313,16 +315,17 @@ class BackupMergeService {
     final mergedData = <String, List<dynamic>>{};
 
     // Get all unique keys from both datasets
-    final allKeys = {...oldObjects.keys, ...newObjects.keys};
+    final allKeys = {...oldObjects.keys, ...newObjects.keys} ;
 
     for (var key in allKeys) {
       final oldList = oldObjects[key] ?? [];
       final newList = newObjects[key] ?? [];
 
-      EntityObjectList mergedList;
+      List mergedList = List.from(oldList);
 
       switch (key) {
         case 'categories':
+          dev.log('Old categories: ${oldData[key]}, New categories: ${newData[key]}');
           mergedList = g.catVm.mergeItemLists(
               oldList.cast<CategoryModel>(),
               newList.cast<CategoryModel>(),
@@ -380,7 +383,7 @@ class BackupMergeService {
     return mergedData;
   }
 
-  static EntityObjectListMap convertJsonDataToObjects(EntityJsonListMap jsonData) {
+  static Map<String,dynamic> convertJsonDataToObjects(Map<String,dynamic> jsonData) {
     final convertedData = <String, List<dynamic>>{};
 
     for (var key in jsonData.keys) {
@@ -413,8 +416,8 @@ class BackupMergeService {
     return convertedData;
   }
 
-  static Map<String, dynamic> convertObjectsToJsonData(EntityObjectListMap objectData) {
-    final EntityObjectListMap convertedData = {};
+  static Map<String, dynamic> convertObjectsToJsonData(Map<String,dynamic> objectData) {
+    final Map<String,dynamic> convertedData = {};
 
     for (var key in objectData.keys) {
       final objectList = objectData[key] ?? [];

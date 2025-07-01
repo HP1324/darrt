@@ -10,7 +10,7 @@ class CategoryModel {
     this.icon = 'folder',
     this.color = 'primary',
     String? uuid,
-  }) : uuid = g.uuid.v4();
+  }) : uuid = uuid ?? g.uuid.v4();
   @Id()
   int id;
   String name;

@@ -39,7 +39,7 @@
     },
     {
       "id": "2:8058497308889952526",
-      "lastPropertyId": "12:6880389326173513004",
+      "lastPropertyId": "13:6432319850255234333",
       "name": "Task",
       "properties": [
         {
@@ -102,6 +102,11 @@
           "id": "12:6880389326173513004",
           "name": "uuid",
           "type": 9
+        },
+        {
+          "id": "13:6432319850255234333",
+          "name": "categoryUuids",
+          "type": 30
         }
       ],
       "relations": [
@@ -114,7 +119,7 @@
     },
     {
       "id": "3:2058329802195215529",
-      "lastPropertyId": "5:628461710127996342",
+      "lastPropertyId": "6:1722549919444422731",
       "name": "TaskCompletion",
       "properties": [
         {
@@ -145,13 +150,18 @@
           "id": "5:628461710127996342",
           "name": "uuid",
           "type": 9
+        },
+        {
+          "id": "6:1722549919444422731",
+          "name": "taskUuid",
+          "type": 9
         }
       ],
       "relations": []
     },
     {
       "id": "4:8867042065594792655",
-      "lastPropertyId": "3:1747983063713572951",
+      "lastPropertyId": "5:2665913149026616990",
       "name": "Folder",
       "properties": [
         {
@@ -169,13 +179,23 @@
           "id": "3:1747983063713572951",
           "name": "uuid",
           "type": 9
+        },
+        {
+          "id": "4:3878403398080161662",
+          "name": "icon",
+          "type": 9
+        },
+        {
+          "id": "5:2665913149026616990",
+          "name": "color",
+          "type": 9
         }
       ],
       "relations": []
     },
     {
       "id": "5:1091526975409140722",
-      "lastPropertyId": "5:293678561892324517",
+      "lastPropertyId": "6:4403227657671098767",
       "name": "Note",
       "properties": [
         {
@@ -203,6 +223,11 @@
           "id": "5:293678561892324517",
           "name": "uuid",
           "type": 9
+        },
+        {
+          "id": "6:4403227657671098767",
+          "name": "folderUuids",
+          "type": 30
         }
       ],
       "relations": [

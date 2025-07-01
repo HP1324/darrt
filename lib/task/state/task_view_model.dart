@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
-import 'package:minimaltodo/app/services/backup_service.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
@@ -11,7 +10,9 @@ import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
 
 class TaskViewModel extends ViewModel<Task> {
-  TaskViewModel() {
+
+  @override
+  void initializeItems() {
     super.initializeItems();
     onetimeTaskCompletions.clear();
     for (var task in tasks.where((t) => !t.isRepeating).toList()) {
@@ -70,9 +71,9 @@ class TaskViewModel extends ViewModel<Task> {
 
     // Delete ALL completions for each task
     for (var id in selectedTaskIds) {
-      final removed = _completionBox.query(TaskCompletion_.task.equals(id)).build()
-        ..remove()
-        ..close(); // Remove will delete all the matching objects
+      final query = _completionBox.query(TaskCompletion_.task.equals(id)).build();
+      final removed = query.remove();
+      query.close();
       MiniLogger.d('Removed $removed completions for task $id');
       repeatingTaskCompletions[id]?.clear();
     }
@@ -87,7 +88,9 @@ class TaskViewModel extends ViewModel<Task> {
       if (value) {
         final completion = TaskCompletion(date: DateUtils.dateOnly(d), isDone: value);
         completion.task.target = task;
-        completion.uuid = completion.task.target!.uuid;
+        completion.taskUuid = completion.task.target!.uuid;
+        MiniLogger.dp('Completion uuid: ${completion.uuid!}');
+        MiniLogger.dp('Completion task uuid: ${completion.taskUuid!}');
         _completionBox.put(completion);
         repeatingTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
       } else {
@@ -129,41 +132,44 @@ class TaskViewModel extends ViewModel<Task> {
 
   @override
   void putManyForRestore(List<Task> restoredItems, {List<TaskCompletion>? completions}) {
-    final taskIds = box.putMany(restoredItems);
-    final List? oldTasks = BackupMergeService.oldCacheObjects['tasks'];
-    final allTasks = box.getMany(taskIds);
-    if (oldTasks != null && oldTasks.isNotEmpty) {
-      for (var oldTask in oldTasks) {
-        // final query = _completionBox.query(TaskCompletion_.task.equals(task.id)).build().find();
-        for (var completion in completions!) {
-          if (completion.task.targetId == oldTask.id) {
-            debugPrint('here came it');
-            final newTask = allTasks.firstWhere((t) => t!.equals(oldTask));
-            completion.task.target = newTask;
-          }
-        }
-      }
-    }
-    if (completions != null) {
-      _completionBox.putMany(completions);
-    }
+    box.putMany(restoredItems);
+    reassignTaskRelations(tasks: restoredItems, completions: completions!);
+
+    _completionBox.putMany(completions);
     initializeItems();
     notifyListeners();
+  }
+
+  void reassignTaskRelations({
+    required List<Task> tasks,
+    required List<TaskCompletion> completions,
+  }) {
+    // Build UUID → Task map
+    final taskByUuid = {for (var task in tasks) task.uuid: task};
+
+    for (var completion in completions) {
+      final matchingTask = taskByUuid[completion.taskUuid];
+      if (matchingTask != null) {
+        completion.task.target = matchingTask;
+      } else {
+        MiniLogger.dp('No matching task found for completion UUID: ${completion.taskUuid}');
+      }
+    }
   }
 
   @override
   String getItemUuid(Task item) => item.uuid;
 
   // @override
-  // void mergeItems(EntityObjectListMap<Task> oldItems, EntityObjectListMap<Task> newItems) {}
+  // void mergeItems(Map<String,dynamic><Task> oldItems, Map<String,dynamic><Task> newItems) {}
 
   @override
-  EntityObjectList<Task> convertJsonListToObjectList(EntityJsonList jsonList) {
+  List<Task> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
     return jsonList.map(Task.fromJson).toList();
   }
 
   @override
-  EntityJsonList convertObjectsListToJsonList(EntityObjectList<Task> objectList) {
+  List<Map<String, dynamic>> convertObjectsListToJsonList(List<Task> objectList) {
     return objectList.map((task) => task.toJson()).toList();
   }
 }

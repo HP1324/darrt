@@ -1,23 +1,29 @@
-import 'dart:io' show  Platform;
+import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' show QuillController;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 import 'package:intl/intl.dart';
+import 'package:minimaltodo/app/ui/icon_color_picker.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:toastification/toastification.dart';
 import 'consts.dart';
 
-
-void showToast(BuildContext context,
-    {required ToastificationType type, required String description, Duration? duration, Alignment? alignment}) {
+void showToast(
+  BuildContext context, {
+  required ToastificationType type,
+  required String description,
+  Duration? duration,
+  Alignment? alignment,
+}) {
   toastification.show(
     context: context,
     description: Text(description),
     type: type,
     autoCloseDuration: duration ?? const Duration(milliseconds: 1500),
-    alignment: alignment?? Alignment.bottomCenter,
+    alignment: alignment ?? Alignment.bottomCenter,
   );
 }
 
@@ -49,14 +55,15 @@ String formatTime(TimeOfDay time) {
 
 String formatDate(DateTime date, String format) => DateFormat(format).add_jm().format(date);
 
-String formatDateNoJm(DateTime date,String format) => DateFormat(format).format(date);
+String formatDateNoJm(DateTime date, String format) => DateFormat(format).format(date);
 String formatDateAndTime(DateTime dateTime, String format) {
   return DateFormat(format).add_jm().format(dateTime);
 }
 
 DateTime getFirstDate() {
-  return DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate))
-      .subtract(const Duration(days: 365));
+  return DateTime.fromMillisecondsSinceEpoch(
+    MiniBox.read(mFirstInstallDate),
+  ).subtract(const Duration(days: 365));
 }
 
 DateTime getMaxDate() {
@@ -85,3 +92,16 @@ Future<void> savePdfToDownloads(Uint8List pdfBytes, String fileName) async {
   }
 }
 
+void showIconPicker(BuildContext context, {required Function(String) onIconSelected}) {
+  showDialog(
+    context: context,
+    builder: (context) => IconPickerDialog(onIconSelected: onIconSelected),
+  );
+}
+
+void showColorPicker(BuildContext context, {required Function(String) onColorSelected}) {
+  showDialog(
+    context: context,
+    builder: (context) => ColorPickerDialog(onColorSelected: onColorSelected),
+  );
+}

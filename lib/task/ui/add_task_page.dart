@@ -417,7 +417,7 @@ class AddRemindersWidget extends StatelessWidget {
                         : ListView.builder(
                             itemCount: reminders.length,
                             itemBuilder: (context, index) {
-                              debugPrint(
+                              MiniLogger.dp(
                                 'Reminder ${index + 1} time in list: ${reminders[index].time.hour}:${reminders[index].time.minute}',
                               );
                               return ReminderItem(
@@ -878,7 +878,7 @@ class _ReminderDialogState extends State<ReminderDialog> {
 }
 
 void showReminderDialog(BuildContext context, {bool edit = false, Reminder? reminder}) {
-  debugPrint('Reminder time: ${reminder?.time.hour}:${reminder?.time.minute}');
+  MiniLogger.dp('Reminder time: ${reminder?.time.hour}:${reminder?.time.minute}');
   showAdaptiveDialog(
     context: context,
     builder: (context) => ReminderDialog(

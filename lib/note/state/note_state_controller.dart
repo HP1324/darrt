@@ -14,7 +14,6 @@ part 'note_state_controller.freezed.dart';
 @freezed
 abstract class NoteState with _$NoteState {
   const factory NoteState({
-    required String color,
     required DateTime createdAt,
     required DateTime updatedAt,
     required Map<Folder, bool> folderSelection,
@@ -32,7 +31,14 @@ class NoteStateController extends StateController<NoteState, Note> {
     note.id = edit ? model!.id : 0;
     final folders = g.folderVm.folders.where((f) => g.noteSc.folderSelection[f] == true).toList();
     note.folders.clear();
-    note.folders.addAll(folders);
+    if(folders.isEmpty){
+      final generalFolder = ObjectBox.folderBox.get(1) ?? Folder(id: 1, name: 'General');
+      note.folders.add(generalFolder);
+      note.folderUuids = [generalFolder.uuid];
+    }else{
+      note.folders.addAll(folders);
+      note.folderUuids = folders.map((f) => f.uuid).toList();
+    }
     return note;
   }
 
@@ -45,14 +51,14 @@ class NoteStateController extends StateController<NoteState, Note> {
   @override
   void initState(bool edit, [Note? model]) {
     final folders = g.folderVm.folders;
-
     state = NoteState(
       folderSelection: edit
           ? {for (var folder in folders) folder: model!.folders.contains(folder)}
           : {folders[0]: true},
-      color: 'green',
       createdAt: edit ? model!.createdAt! : DateTime.now(),
       updatedAt: edit ? model!.updatedAt! : DateTime.now(),
+
+
     );
     controller = edit ? model!.toQuillController() : QuillController.basic();
     controller.moveCursorToEnd();
@@ -63,15 +69,10 @@ class NoteStateController extends StateController<NoteState, Note> {
     notifyListeners();
   }
 
-  void setColor(String newColor) {
-    state = state.copyWith(color: newColor);
-    notifyListeners();
-  }
 }
 
 extension AccessState on NoteStateController {
   FocusNode get focusNode => textFieldNode;
-  Color get color => IconColorStorage.colors[state.color] ?? Colors.white;
   DateTime get createdAt => state.createdAt;
   DateTime get updatedAt => state.updatedAt;
   Map<Folder, bool> get folderSelection => state.folderSelection;
