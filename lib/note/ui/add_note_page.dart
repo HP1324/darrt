@@ -11,6 +11,8 @@ import 'package:minimaltodo/note/ui/add_folder_page.dart';
 import 'package:toastification/toastification.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 
+import '../../helpers/consts.dart';
+
 class AddNotePage extends StatefulWidget {
   const AddNotePage({super.key, required this.edit, this.note, this.folder}) : assert(!edit || note != null);
   final bool edit;
@@ -96,9 +98,13 @@ class SaveNotePdfButton extends StatelessWidget {
     return IconButton(
       onPressed: () async {
         final file = await generateNotePdf(g.noteSc.controller);
+        if(identical(file, noteEmptyErrorBytes) && context.mounted){
+          showToast(context, type: ToastificationType.error, description: Messages.mNoteEmpty);
+          return;
+        }
         await savePdfToDownloads(file, 'note${DateTime.now().millisecondsSinceEpoch}.pdf');
         if (context.mounted) {
-          showToast(context, type: ToastificationType.success, description: 'PDF saved');
+          showToast(context, type: ToastificationType.success, description: 'PDF saved to device');
         }
       },
       icon: const Icon(FontAwesomeIcons.filePdf),

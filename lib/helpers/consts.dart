@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 const mFirstInstallDate = 'first_install_date';
 
 const mFirstTimeInstall = 'first_time_install';
@@ -53,4 +55,6 @@ const mLastBackupDate = 'last_backup_date';
 const mAutoBackup = 'auto_backup';
 
 const googleClientId = "569574442549-543mjpqcfhsivrn5atcoblifvbkvg0vp.apps.googleusercontent.com";
+
+Uint8List noteEmptyErrorBytes = Uint8List(0);
 

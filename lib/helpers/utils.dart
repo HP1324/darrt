@@ -71,6 +71,8 @@ DateTime getMaxDate() {
 }
 
 Future<Uint8List> generateNotePdf(QuillController controller) async {
+  if (controller.document.isEmpty()) return noteEmptyErrorBytes;
+
   final pdfPageFormat = PDFPageFormat.a4;
   final pdfConverter = PDFConverter(
     document: controller.document.toDelta(),
