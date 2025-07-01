@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/note/models/folder.dart';
@@ -103,9 +104,12 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: FloatingActionButton.extended(
           onPressed: () => MiniRouter.to(context, AddNotePage(edit: false, folder: widget.folder)),
-          child: Icon(Icons.add),
+          backgroundColor: IconColorStorage.colors[widget.folder.color],
+          tooltip: 'Add new note to this folder',
+          label: Text('Add note'),
+          icon: Icon(Icons.add),
         ),
       ),
     );

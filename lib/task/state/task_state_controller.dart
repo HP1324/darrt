@@ -31,14 +31,14 @@ abstract class TaskState with _$TaskState {
 ///Controls the temporary state of the task add page when task is being added or updated
 class TaskStateController extends StateController<TaskState, Task> {
   @override
-  void initState(bool edit, [Task? task]) {
+  void initState(bool edit, [Task? task, CategoryModel? category]) {
 
     textController.text = edit ? task!.title : '';
     final categories = g.catVm.categories;
     state = TaskState(
-      categorySelection: edit
+      categorySelection:category == null? edit
           ? {for (var cat in categories) cat: task!.categories.contains(cat)}
-          : {CategoryModel(id: 1, name: 'General'): true},
+          : {CategoryModel(id: 1, name: 'General'): true} : {category: true},
       priority: edit ? task!.priority : priorities[3],
       dueDate: edit ? task!.dueDate : g.calMan.selectedDate,
       isRepeating: edit ? task!.isRepeating : g.navMan.currentTab.value == 2 ? true : false,

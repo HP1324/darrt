@@ -5,6 +5,7 @@ import 'package:awesome_notifications/awesome_notifications.dart' show AwesomeNo
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
+import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/consts.dart';
@@ -23,11 +24,12 @@ import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:speech_to_text/speech_to_text.dart';
 
 class AddTaskPage extends StatefulWidget {
-  const AddTaskPage({super.key, required this.edit, this.task}) : assert(!edit || task != null);
+  const AddTaskPage({super.key, required this.edit, this.task, this.category}) : assert(!edit || task != null);
 
   ///Flag to indicate whether a task is being edited or a new task is being created
   final bool edit;
   final Task? task;
+  final CategoryModel? category;
   @override
   State<AddTaskPage> createState() => _AddTaskPageState();
 }
@@ -36,7 +38,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   @override
   void initState() {
     super.initState();
-    g.taskSc.initState(widget.edit, widget.edit ? widget.task : null);
+    g.taskSc.initState(widget.edit, widget.edit ? widget.task : null, widget.category);
   }
 
   @override
