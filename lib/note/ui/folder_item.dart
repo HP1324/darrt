@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
@@ -54,33 +55,7 @@ class _FolderItemState extends State<FolderItem> {
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (context) => AlertDialog(
-                          content: const Text('Are you sure you want to delete the category?'),
-                          actions: [
-                            FilledButton(
-                              onPressed: () async {
-                                final message = g.folderVm.deleteItem(widget.folder.id);
-                                showToast(
-                                  context,
-                                  type: ToastificationType.success,
-                                  description: message,
-                                );
-                                Navigator.pop(context);
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStatePropertyAll(
-                                  Theme.of(context).colorScheme.error,
-                                ),
-                              ),
-                              child: const Text('Delete'),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: const Text('Cancel'),
-                            ),
-                          ],
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        ),
+                        builder: (context) => _DeleteFolderDialog(folderId: widget.folder.id),
                       );
                     },
                     child: Row(
@@ -95,6 +70,71 @@ class _FolderItemState extends State<FolderItem> {
               )
             : null,
       ),
+    );
+  }
+}
+
+class _DeleteFolderDialog extends StatefulWidget {
+  const _DeleteFolderDialog({required this.folderId});
+  final int folderId;
+  @override
+  State<_DeleteFolderDialog> createState() => _DeleteFolderDialogState();
+}
+
+class _DeleteFolderDialogState extends State<_DeleteFolderDialog> {
+  bool deleteNotes = false;
+
+  @override
+  void dispose(){
+    deleteNotes = false;
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Are you sure you want to delete the category?'),
+          CheckboxListTile(
+            contentPadding: EdgeInsets.zero,
+            value: deleteNotes,
+            subtitle: Text('Delete notes in this folder ?'),
+            onChanged: (newValue) {
+              setState(() {
+                deleteNotes = newValue ?? false;
+              });
+            },
+          ),
+        ],
+      ),
+      actions: [
+        FilledButton(
+          onPressed: () async {
+            final message = g.folderVm.deleteItem(
+              widget.folderId,
+              deleteTasks: deleteNotes,
+            );
+            showToast(
+              context,
+              type: ToastificationType.success,
+              description: message,
+            );
+            Navigator.pop(context);
+          },
+          style: ButtonStyle(
+            backgroundColor: WidgetStatePropertyAll(
+              Theme.of(context).colorScheme.error,
+            ),
+          ),
+          child: const Text('Delete'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+      ],
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:flutter/material.dart';
@@ -30,9 +31,9 @@ class CategoryViewModel extends ViewModel<CategoryModel> {
   }
 
   @override
-  String deleteItem(int id) {
-    final message = super.deleteItem(id);
-    return message;
+  String deleteItem(int id, {bool? deleteTasks}) {
+    if (deleteTasks!) g.taskVm.deleteTasksByCategory(id);
+    return super.deleteItem(id);
   }
 
   @override

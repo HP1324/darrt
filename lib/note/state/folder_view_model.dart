@@ -1,7 +1,8 @@
+import 'package:http/http.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/note/models/folder.dart';
 
 import '../models/note.dart';
@@ -28,6 +29,13 @@ class FolderViewModel extends ViewModel<Folder> {
   String getDeleteSuccessMessage(int length) => Messages.mFolderDeleted;
 
   @override
+  String deleteItem(int id, {bool? deleteTasks}) {
+    if (deleteTasks!) g.noteVm.deleteNotesByFolder(id);
+
+    return super.deleteItem(id);
+  }
+
+  @override
   int getItemId(Folder item) => item.id;
 
   @override
@@ -45,10 +53,11 @@ class FolderViewModel extends ViewModel<Folder> {
     initializeItems();
     notifyListeners();
   }
+
   void restoreFolderRelations(
-      List<Folder> restoredFolders, {
-        required List<Note> notes,
-      }) {
+    List<Folder> restoredFolders, {
+    required List<Note> notes,
+  }) {
     // Build a UUID → Folder map for fast access
     final folderByUuid = {
       for (final folder in restoredFolders) folder.uuid: folder,
@@ -70,16 +79,15 @@ class FolderViewModel extends ViewModel<Folder> {
   }
 
   @override
-  String getItemUuid(Folder item)=>item.uuid;
+  String getItemUuid(Folder item) => item.uuid;
 
   @override
-  List<Folder> convertJsonListToObjectList(List<Map<String,dynamic>> jsonList) {
+  List<Folder> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
     return jsonList.map(Folder.fromJson).toList();
   }
 
   @override
-  List<Map<String,dynamic>> convertObjectsListToJsonList(List<Folder> objectList) {
+  List<Map<String, dynamic>> convertObjectsListToJsonList(List<Folder> objectList) {
     return objectList.map((folder) => folder.toJson()).toList();
   }
-
 }
