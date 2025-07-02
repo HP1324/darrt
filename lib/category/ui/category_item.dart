@@ -36,7 +36,9 @@ class _CategoryItemState extends State<CategoryItem> {
         },
         tileColor: scheme.surfaceContainer.withValues(alpha: 0.3),
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16), side: BorderSide(color: color.withAlpha(50))),
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: color.withAlpha(50)),
+        ),
         leading: CategoryIcon(color: color, icon: icon),
         title: CategoryNameLabel(category: widget.category, textTheme: textTheme),
         subtitle: TaskCountLabel(category: widget.category, textTheme: textTheme),
@@ -161,26 +163,7 @@ class CategoryPopupMenuButton extends StatelessWidget {
           onTap: () {
             showDialog(
               context: context,
-              builder: (context) => AlertDialog(
-                content: const Text('Are you sure you want to delete the category?'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancel'),
-                  ),
-                  FilledButton(
-                    onPressed: () async {
-                      final message = g.catVm.deleteItem(category.id);
-                      showToast(context, type: ToastificationType.success, description: message);
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Delete'),
-                  ),
-                ],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+              builder: (context) => _DeleteCategoryDialog(categoryId: category.id),
             );
           },
           child: Row(
@@ -192,6 +175,62 @@ class CategoryPopupMenuButton extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _DeleteCategoryDialog extends StatefulWidget {
+  const _DeleteCategoryDialog({required this.categoryId});
+
+  final int categoryId;
+
+  @override
+  State<_DeleteCategoryDialog> createState() => _DeleteCategoryDialogState();
+}
+
+class _DeleteCategoryDialogState extends State<_DeleteCategoryDialog> {
+  bool deleteTasks = false;
+  @override
+  void dispose() {
+    deleteTasks = false;
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Are you sure you want to delete the category?'),
+          CheckboxListTile(
+            contentPadding: EdgeInsets.zero,
+            value: deleteTasks,
+            title: FittedBox(child: Text('Delete tasks in this category?')),
+            onChanged: (newValue) {
+              setState(() {
+                deleteTasks = newValue ?? false;
+              });
+            },
+          ),
+        ],
+      ),
+      actions: [
+        FilledButton(
+          onPressed: () async {
+            final message = g.catVm.deleteItem(widget.categoryId, deleteTasks: deleteTasks);
+            showToast(context, type: ToastificationType.success, description: message);
+            Navigator.pop(context);
+          },
+          child: const Text('Delete'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+      ],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
     );
   }
 }

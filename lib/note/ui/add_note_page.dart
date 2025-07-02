@@ -160,7 +160,7 @@ class _AddNotePageState extends State<AddNotePage> {
             showToast(
               context,
               type: ToastificationType.error,
-              description: 'Microphone permission denied',
+              description: 'All requested permissions are necessary for speech recognition',
             );
           }
         } else {

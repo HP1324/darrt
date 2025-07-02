@@ -81,7 +81,12 @@ class TaskViewModel extends ViewModel<Task> {
     final message = super.deleteMultipleItems();
     return message;
   }
-
+  void deleteTasksByCategory(int categoryId) {
+    final toDelete = items.where((t) => t.categories.any((c) => c.id == categoryId)).toList();
+    box.removeMany(toDelete.map((t) => t.id).toList());
+    items.removeWhere((t) => t.categories.any((c) => c.id == categoryId));
+    notifyListeners();
+  }
   void toggleStatus(Task task, bool value, DateTime d) async {
     if (task.isRepeating) {
       final date = DateUtils.dateOnly(d).millisecondsSinceEpoch;

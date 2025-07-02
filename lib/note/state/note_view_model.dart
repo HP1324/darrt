@@ -2,9 +2,10 @@ import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/note/models/note.dart';
+import 'package:minimaltodo/objectbox.g.dart';
 
-class NoteViewModel extends ViewModel<Note>{
-  NoteViewModel(){
+class NoteViewModel extends ViewModel<Note> {
+  NoteViewModel() {
     super.initializeItems();
   }
 
@@ -24,7 +25,8 @@ class NoteViewModel extends ViewModel<Note>{
   String getCreateSuccessMessage() => Messages.mNoteAdded;
 
   @override
-  String getDeleteSuccessMessage(int length)=> length == 1 ? '1 ${Messages.mNoteDeleted}' : '$length ${Messages.mNotesDeleted}';
+  String getDeleteSuccessMessage(int length) =>
+      length == 1 ? '1 ${Messages.mNoteDeleted}' : '$length ${Messages.mNotesDeleted}';
 
   @override
   String getUpdateSuccessMessage() => Messages.mNoteEdited;
@@ -36,22 +38,29 @@ class NoteViewModel extends ViewModel<Note>{
 
   @override
   void putManyForRestore(List<Note> restoredItems) {
-      box.putMany(restoredItems);
-      initializeItems();
-      notifyListeners();
+    box.putMany(restoredItems);
+    initializeItems();
+    notifyListeners();
   }
 
-  @override
-  String getItemUuid(Note item) =>item.uuid;
+  void deleteNotesByFolder(int folderId) {
+    final toDelete = items.where((n) => n.folders.any((f) => f.id == folderId)).toList();
+    box.removeMany(toDelete.map((n) => n.id).toList());
+    items.removeWhere((n) => n.folders.any((f) => f.id == folderId));
+    notifyListeners();
+  }
+
 
   @override
-  List<Note> convertJsonListToObjectList(List<Map<String,dynamic>> jsonList) {
+  String getItemUuid(Note item) => item.uuid;
+
+  @override
+  List<Note> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
     return jsonList.map(Note.fromJson).toList();
   }
 
   @override
-  List<Map<String,dynamic>> convertObjectsListToJsonList(List<Note> objectList) {
+  List<Map<String, dynamic>> convertObjectsListToJsonList(List<Note> objectList) {
     return objectList.map((note) => note.toJson()).toList();
   }
-
 }
