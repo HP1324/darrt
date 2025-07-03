@@ -34,22 +34,13 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Iconsax.notification),
-            title: const Text('Notifications'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
             leading: const Icon(Icons.color_lens_outlined),
-            title: const Text('Customize Theme'),
+            title: const Text('Theme'),
             onTap: () {
               Navigator.pop(context);
               MiniRouter.to(context, ThemeSettingsPage());
             },
           ),
-
-          const Divider(),
           ListTile(
             leading: const Icon(Iconsax.setting_2),
             title: const Text('Settings'),

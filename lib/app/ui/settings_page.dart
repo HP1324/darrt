@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/redis/v1.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:minimaltodo/app/exceptions.dart';
 import 'package:minimaltodo/app/services/backup_service.dart';
@@ -357,12 +358,12 @@ class DefaultReminderTypeSection extends StatelessWidget {
             return SegmentedButton<String>(
               segments: const [
                 ButtonSegment(
-                  value: 'notif',
+                  value: notifReminderType,
                   label: Text('Notification'),
                   icon: Icon(Icons.notifications),
                 ),
                 ButtonSegment(
-                  value: 'alarm',
+                  value: alarmReminderType,
                   label: Text('Alarm'),
                   icon: Icon(Icons.alarm),
                 ),
@@ -417,8 +418,8 @@ class _BackupButtonState extends State<_BackupButton> {
                     isBackingUp.value = true;
                     try {
                       final backupFile = await backupService.generateBackupJsonFile();
-                      await backupService.uploadFileToGoogleDrive(backupFile);
-                      if (context.mounted) {
+                      final backupSuccessful = await backupService.uploadFileToGoogleDrive(backupFile);
+                      if (context.mounted && backupSuccessful) {
                         showToast(
                           context,
                           type: ToastificationType.success,

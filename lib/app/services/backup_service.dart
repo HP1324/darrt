@@ -71,7 +71,8 @@ class BackupService {
         );
         // mergedData = _mergeData(oldData, newData);
       } on BackupFileNotFoundError {
-        rethrow;
+        //Can't rethrow this error as it will not allow to proceed with the backup when first time backup and no backup file is there in drive
+        MiniLogger.d('No previous backup file found in google drive');
       } on GoogleClientNotAuthenticatedError {
         rethrow;
       } catch (e, t) {

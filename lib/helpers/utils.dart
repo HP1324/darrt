@@ -61,11 +61,7 @@ String formatDateAndTime(DateTime dateTime, String format) {
   return DateFormat(format).add_jm().format(dateTime);
 }
 
-DateTime getFirstDate() {
-  return DateTime.fromMillisecondsSinceEpoch(
-    MiniBox.read(mFirstInstallDate),
-  ).subtract(const Duration(days: 365));
-}
+DateTime getFirstDate() =>mInitialDate;
 
 DateTime getMaxDate() {
   return DateTime.now().add(Duration(days: maxExtentDateDays));

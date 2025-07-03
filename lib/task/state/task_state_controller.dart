@@ -42,7 +42,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       priority: edit ? task!.priority : priorities[3],
       dueDate: edit ? task!.dueDate : g.calMan.selectedDate,
       isRepeating: edit ? task!.isRepeating : g.navMan.currentTab.value == 2 ? true : false,
-      startDate: edit ? task!.startDate : DateTime.now(),
+      startDate: edit ? task!.startDate : g.calMan.selectedDate,
       endDate: edit ? task!.endDate : null,
       repeatConfig: edit && task!.isRepeating
           ? RepeatConfig.fromJsonString(task.repeatConfig!)

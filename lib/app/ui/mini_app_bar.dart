@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
+import 'package:minimaltodo/helpers/consts.dart';
+import 'package:minimaltodo/helpers/messages.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
@@ -115,7 +118,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               _MiniAppBarAction(
                 onTap: () async {
-                  showQuickReminderDialog() async{
+                  showQuickReminderDialog() async {
                     await showDialog(
                       context: context,
                       builder: (context) {
@@ -188,6 +191,12 @@ class QuickReminderDialog extends StatefulWidget {
 class _QuickReminderDialogState extends State<QuickReminderDialog> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _minutesController = TextEditingController();
+  Set<String> reminderTypes = {notifReminderType, alarmReminderType};
+  late String reminderType = notifReminderType;
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -212,8 +221,7 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
           Tooltip(
             showDuration: Duration(milliseconds: 6000),
             triggerMode: TooltipTriggerMode.tap,
-            message:
-                'Note: This is a one-time quick reminder that will appear only as a notification. It won’t be added to your tasks list. Reminder type is set to the default reminder type in settings ',
+            message: Messages.mQuickReminderMessage,
             child: Icon(Icons.info_outline_rounded),
           ),
         ],
@@ -221,8 +229,25 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
       content: Column(
         spacing: 10,
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Reminder type selection segmented buttons string
+          SegmentedButton<String>(
+            showSelectedIcon: false,
+            segments: [
+              ButtonSegment(
+                value: notifReminderType,
+                label: FittedBox(child: Text('Notification')),
+              ),
+              ButtonSegment(value: alarmReminderType, label: Text('Alarm')),
+            ],
+            selected: {reminderType},
+            onSelectionChanged: (selected) {
+              setState(() {
+                reminderType = selected.first;
+              });
+            },
+          ),
           TextField(
             controller: _titleController,
             decoration: InputDecoration(
@@ -298,23 +323,20 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
           child: Text('Cancel'),
         ),
         FilledButton(
-          onPressed: () async{
+          onPressed: () async {
             final title = _titleController.text;
             final minutes = int.parse(_minutesController.text);
             showToast(
               context,
               type: ToastificationType.success,
-              description:
-                  'Reminder set after ${minutes > 1 ? '$minutes minutes' : '$minutes minute'}',
+              description:'Reminder set after ${minutes > 1 ? '$minutes minutes' : '$minutes minute'}',
             );
             Navigator.pop(context);
-            await NotificationService.scheduleQuickReminder(title, minutes);
+            await NotificationService.scheduleQuickReminder(title, minutes, type: reminderType);
             MiniLogger.dp('title: $title, minutes: $minutes, type: ${minutes.runtimeType}');
           },
           child: Text('Set Reminder'),

@@ -7,7 +7,6 @@ import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
-import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/main.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
@@ -30,11 +29,9 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
         break;
       case snoozeActionKey:
         final minutes = MiniBox.read(mSnoozeMinutes);
-        await NotificationService.scheduleQuickReminder(receivedAction.body, minutes);
+        final type = receivedAction.category == NotificationCategory.Alarm ? alarmReminderType : notifReminderType;
+        await NotificationService.scheduleQuickReminder(receivedAction.body, minutes,type: type);
         break;
-      case quickSnoozeActionKey:
-        final minutes = MiniBox.read(mSnoozeMinutes);
-        await NotificationService.scheduleQuickReminder(receivedAction.body, minutes);
       default:
         if (task != null) {
           MiniTodo.navigatorKey.currentState?.push(

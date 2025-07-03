@@ -6,8 +6,7 @@ class CalendarManager extends ChangeNotifier {
   DateTime selectedDate = DateTime.now();
   DateTime previousSelectedDate = DateTime.now();
   final maxDate = DateTime.now().add(Duration(days: maxExtentDateDays));
-  final initialDate = DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mFirstInstallDate))
-      .subtract(const Duration(days: 365));
+  final initialDate = mInitialDate;
   late List<DateTime> dates = List.generate(
     maxDate.difference(initialDate).inDays + 1,
         (index) => initialDate.add(Duration(days: index)),
