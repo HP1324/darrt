@@ -308,7 +308,7 @@ class SnoozeSection extends StatelessWidget {
         Row(
           children: [
             Text(
-              'Snooze for (in minutes)',
+              'Snooze reminder for (in minutes)',
               style: theme.textTheme.titleMedium,
             ),
           ],
@@ -418,7 +418,9 @@ class _BackupButtonState extends State<_BackupButton> {
                     isBackingUp.value = true;
                     try {
                       final backupFile = await backupService.generateBackupJsonFile();
-                      final backupSuccessful = await backupService.uploadFileToGoogleDrive(backupFile);
+                      final backupSuccessful = await backupService.uploadFileToGoogleDrive(
+                        backupFile,
+                      );
                       if (context.mounted && backupSuccessful) {
                         showToast(
                           context,
