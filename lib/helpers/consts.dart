@@ -53,6 +53,8 @@ const mLastBackupDate = 'last_backup_date';
 
 const mAutoBackup = 'auto_backup';
 
+const mCanPop = 'can_pop';
+
 const tapHereToSignIn = 'Tap here to sign in to google account';
 
 const googleClientId = "569574442549-543mjpqcfhsivrn5atcoblifvbkvg0vp.apps.googleusercontent.com";

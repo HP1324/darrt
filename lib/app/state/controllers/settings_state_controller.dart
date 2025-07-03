@@ -53,6 +53,13 @@ class SettingsStateController {
     lastBackupDate.value = value;
     await MiniBox.write(mLastBackupDate, value.millisecondsSinceEpoch);
   }
+
+  // final ValueNotifier<bool> canPop = ValueNotifier(MiniBox.read(mCanPop) ?? false);
+  //
+  // void updateCanPop(bool? value) async {
+  //   canPop.value = value ?? false;
+  //   await MiniBox.write(mCanPop, value);
+  // }
 }
 
 

@@ -23,11 +23,11 @@ class _NotesPageState extends State<NotesPage> {
   }
 
   // Group notes by date
+  // Group notes by date
   Map<String, List<dynamic>> _groupNotesByDate(List<dynamic> notes) {
     Map<String, List<dynamic>> groupedNotes = {};
 
     for (var note in notes) {
-      // Assuming note has a createdAt property of type DateTime
       final dateKey = formatDateNoJm(note.createdAt, 'EEE, dd, MMM, yyyy');
 
       if (groupedNotes[dateKey] == null) {
@@ -36,12 +36,15 @@ class _NotesPageState extends State<NotesPage> {
       groupedNotes[dateKey]!.add(note);
     }
 
-    // Sort the map by date (most recent first)
+    // Sort the map by actual date (most recent first)
     var sortedEntries = groupedNotes.entries.toList()
       ..sort((a, b) {
-        // You might need to parse the date string back to DateTime for proper sorting
-        // Or modify this based on how your formatDateNoJm function works
-        return b.key.compareTo(a.key);
+        // Get the first note from each group to compare their actual dates
+        final noteA = groupedNotes[a.key]!.first;
+        final noteB = groupedNotes[b.key]!.first;
+
+        // Compare actual DateTime objects (most recent first)
+        return noteB.createdAt.compareTo(noteA.createdAt);
       });
 
     return Map.fromEntries(sortedEntries);
@@ -66,9 +69,7 @@ class _NotesPageState extends State<NotesPage> {
                 actions: [
                   if (ids.isNotEmpty) ...[
                     IconButton(
-                      onPressed: () {
-                        g.noteVm.clearSelection();
-                      },
+                      onPressed: () => g.noteVm.clearSelection(),
                       icon: Icon(Icons.cancel),
                     ),
                     IconButton(
@@ -79,7 +80,8 @@ class _NotesPageState extends State<NotesPage> {
                           builder: (context) => AlertDialog(
                             title: const Text('Delete Notes'),
                             content: Text(
-                                'Delete ${ids.length > 1 ? '${ids.length} notes' : '1 note'}?'),
+                              'Delete ${ids.length > 1 ? '${ids.length} notes' : '1 note'}?',
+                            ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context),
@@ -96,8 +98,11 @@ class _NotesPageState extends State<NotesPage> {
                           ),
                         );
                         if (context.mounted) {
-                          showToast(context,
-                              type: ToastificationType.success, description: message);
+                          showToast(
+                            context,
+                            type: ToastificationType.success,
+                            description: message,
+                          );
                         }
                       },
                       icon: Icon(Icons.delete),

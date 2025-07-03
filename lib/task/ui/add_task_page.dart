@@ -52,34 +52,70 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.edit ? widget.task!.title.replaceAll('\n', ' ') : 'Add New Task'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 13.0),
-        child: SingleChildScrollView(
-          child: Column(
-            spacing: 20,
-            children: [
-              const TitleTextField(),
-              const CategorySelector(),
-              // const PrioritySelector(),
-              const TaskTypeSelector(),
-              const DueDateOrRepeatConfigSection(),
-              const AddRemindersWidget(),
-              const SizedBox(height: 100),
-            ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          final navigator = Navigator.of(context);
+          // Show confirmation dialog for user-initiated back attempts
+          final shouldPop = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Quit without saving?'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Are you sure you want to quit without saving?'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text('Yes'),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text('No'),
+                ),
+              ],
+            ),
+          );
+
+          // If user confirmed, actually pop the page
+          if (shouldPop == true) {
+            navigator.pop();
+          }
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.edit ? widget.task!.title.replaceAll('\n', ' ') : 'Add New Task'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 13.0),
+          child: SingleChildScrollView(
+            child: Column(
+              spacing: 20,
+              children: [
+                const TitleTextField(),
+                const CategorySelector(),
+                // const PrioritySelector(),
+                const TaskTypeSelector(),
+                const DueDateOrRepeatConfigSection(),
+                const AddRemindersWidget(),
+                const SizedBox(height: 100),
+              ],
+            ),
           ),
         ),
-      ),
-      floatingActionButton: Transform.scale(
-        scale: 0.9,
-        child: FloatingActionButton(
-          onPressed: () {
-            _putTask(context);
-          },
-          child: Icon(Icons.done),
+        floatingActionButton: Transform.scale(
+          scale: 0.9,
+          child: FloatingActionButton(
+            onPressed: () {
+              _putTask(context);
+            },
+            child: Icon(Icons.done),
+          ),
         ),
       ),
     );

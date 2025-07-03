@@ -11,6 +11,7 @@ import 'package:minimaltodo/note/models/folder.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/note/state/note_state_controller.dart';
 import 'package:minimaltodo/note/ui/add_folder_page.dart';
+import 'package:minimaltodo/note/ui/notes_page.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -45,61 +46,172 @@ class _AddNotePageState extends State<AddNotePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: const BackButton(),
-        actions: [
-          const SaveNotePdfButton(),
-          const FolderSelector(),
-          SaveNoteButton(widget: widget),
-        ],
-      ),
-      body: Column(
-        children: [
-          QuillSimpleToolbar(
-            controller: g.noteSc.controller,
-            config: QuillSimpleToolbarConfig(
-              multiRowsDisplay: false,
-              toolbarIconAlignment: WrapAlignment.start,
-              buttonOptions: QuillSimpleToolbarButtonOptions(
-                selectHeaderStyleDropdownButton: QuillToolbarSelectHeaderStyleDropdownButtonOptions(
-                  attributes: [
-                    Attribute.h1,
-                    Attribute.h2,
-                    Attribute.h3,
-                    Attribute.h4,
-                    Attribute.h5,
-                    Attribute.h6,
-                  ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          final navigator = Navigator.of(context);
+          // Show confirmation dialog for user-initiated back attempts
+          final shouldPop = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Quit without saving?'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Are you sure you want to quit without saving?'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text('Yes'),
                 ),
-                fontFamily: QuillToolbarFontFamilyButtonOptions(attribute: Attribute.font),
-                fontSize: QuillToolbarFontSizeButtonOptions(attribute: Attribute.size),
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text('No'),
+                ),
+              ],
+            ),
+          );
+
+          // If user confirmed, actually pop the page
+          if (shouldPop == true) {
+            navigator.pop();
+          }
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: const BackButton(),
+          actions: [
+            const SaveNotePdfButton(),
+            const FolderSelector(),
+          ],
+        ),
+        body: Column(
+          children: [
+            QuillSimpleToolbar(
+              controller: g.noteSc.controller,
+              config: QuillSimpleToolbarConfig(
+                multiRowsDisplay: false,
+                toolbarIconAlignment: WrapAlignment.start,
+                buttonOptions: QuillSimpleToolbarButtonOptions(
+                  selectHeaderStyleDropdownButton:
+                      QuillToolbarSelectHeaderStyleDropdownButtonOptions(
+                        attributes: [
+                          Attribute.h1,
+                          Attribute.h2,
+                          Attribute.h3,
+                          Attribute.h4,
+                          Attribute.h5,
+                          Attribute.h6,
+                        ],
+                      ),
+                  fontFamily: QuillToolbarFontFamilyButtonOptions(attribute: Attribute.font),
+                  fontSize: QuillToolbarFontSizeButtonOptions(attribute: Attribute.size),
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: QuillEditor(
-                scrollController: g.noteSc.scrollController,
-                controller: g.noteSc.controller,
-                focusNode: g.noteSc.focusNode,
-                config: QuillEditorConfig(
-                  placeholder: 'Enter your note here...',
-                  autoFocus: true,
-                  textCapitalization: TextCapitalization.sentences,
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: QuillEditor(
+                  scrollController: g.noteSc.scrollController,
+                  controller: g.noteSc.controller,
+                  focusNode: g.noteSc.focusNode,
+                  config: QuillEditorConfig(
+                    contextMenuBuilder: (context, editableTextState) {
+                      final TextSelectionToolbarAnchors anchors =
+                          editableTextState.contextMenuAnchors;
+
+                      return AdaptiveTextSelectionToolbar(
+                        // Position below text
+                        anchors: TextSelectionToolbarAnchors(
+                          primaryAnchor: anchors.primaryAnchor + const Offset(0, 80),
+                          secondaryAnchor: anchors.secondaryAnchor! + const Offset(0, 80),
+                        ),
+                        children: [
+                          // Your custom toolbar buttons
+                          TextSelectionToolbarTextButton(
+                            onPressed: () =>
+                                editableTextState.cutSelection(SelectionChangedCause.toolbar),
+                            padding: TextSelectionToolbarTextButton.getPadding(0, 4),
+                            child: const Text('Cut'),
+                          ),
+                          TextSelectionToolbarTextButton(
+                            onPressed: () =>
+                                editableTextState.copySelection(SelectionChangedCause.toolbar),
+                            padding: TextSelectionToolbarTextButton.getPadding(0, 4),
+                            child: const Text('Copy'),
+                          ),
+                          TextSelectionToolbarTextButton(
+                            onPressed: () =>
+                                editableTextState.pasteText(SelectionChangedCause.toolbar),
+                            padding: TextSelectionToolbarTextButton.getPadding(0, 4),
+                            child: const Text('Paste'),
+                          ),
+                          TextSelectionToolbarTextButton(
+                            onPressed: () =>
+                                editableTextState.selectAll(SelectionChangedCause.toolbar),
+                            padding: TextSelectionToolbarTextButton.getPadding(0, 4),
+                            child: const Text('Select All'),
+                          ),
+                        ],
+                      );
+                    },
+                    // textSelectionControls: ,
+                    placeholder: 'Enter your note here...',
+                    autoFocus: true,
+                    textCapitalization: TextCapitalization.sentences,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+        floatingActionButton: Column(
+          spacing: 7,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FloatingActionButton.small(
+              heroTag: null,
+              onPressed: () => _handleSpeechToText(context),
+              tooltip: 'Speak to write note',
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              foregroundColor: Theme.of(context).colorScheme.surface,
+              backgroundColor: Theme.of(context).colorScheme.onSurface,
+              child: Icon(Icons.mic),
+            ),
+            FloatingActionButton(
+              heroTag: null,
+              onPressed: () => _saveNote(context),
+              tooltip: 'Save note',
+              shape: StadiumBorder(),
+              child: const Icon(Icons.check),
+            ),
+          ],
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _handleSpeechToText(context),
-        tooltip: 'Speak to write note',
-        shape: StadiumBorder(),
-        child: Icon(Icons.mic),
-      ),
+    );
+  }
+
+  void _saveNote(BuildContext context) {
+    var message = '';
+    if (!g.noteSc.controller.document.isEmpty()) {
+      final note = g.noteSc.buildModel(
+        edit: widget.edit,
+        model: widget.edit ? widget.note : null,
+      );
+      message = g.noteVm.putItem(note, edit: widget.edit);
+      Navigator.pop(context);
+    } else {
+      message = Messages.mNoteEmpty;
+    }
+    showToast(
+      context,
+      type: message == Messages.mNoteEmpty ? ToastificationType.error : ToastificationType.success,
+      description: message,
     );
   }
 
@@ -317,6 +429,7 @@ class FolderSelector extends StatelessWidget {
     );
   }
 }
+
 class NoteSttController extends ChangeNotifier {
   final SpeechToText speech = SpeechToText();
   String hintText = "What's on your mind? ";
@@ -401,6 +514,7 @@ class NoteSttController extends ChangeNotifier {
       );
     }
   }
+
   // void onSpeechResult(SpeechRecognitionResult result) {
   //   final quillController = g.noteSc.controller;
   //   currentLiveSpeech = result.recognizedWords.trim();
