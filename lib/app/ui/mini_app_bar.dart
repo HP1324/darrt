@@ -6,13 +6,13 @@ import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/messages.dart';
-import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:toastification/toastification.dart';
-import 'package:minimaltodo/app/services/backup_service.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MiniAppBar({super.key});
@@ -113,7 +113,10 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                       final user = GoogleSignInService().currentUser;
                       MiniLogger.dp(user?.email ?? 'null is there in user');
                     }
-                    ObjectBox.completionBox.removeAll();
+                    final path = ObjectBox.store!.directoryPath;
+                    debugPrint('ObjectBox path: $path');
+                    final docsDir = await getApplicationDocumentsDirectory();
+                    debugPrint('App docs dir: ${docsDir.path}/objectbox');
                   },
                 ),
               _MiniAppBarAction(

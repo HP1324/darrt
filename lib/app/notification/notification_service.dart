@@ -2,7 +2,6 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/notification/notification_action_controller.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/task/models/reminder.dart';

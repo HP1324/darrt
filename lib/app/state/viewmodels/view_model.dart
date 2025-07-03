@@ -1,4 +1,3 @@
-import 'dart:developer' as dev;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
@@ -6,7 +5,6 @@ import 'package:minimaltodo/app/services/backup_service.dart' show MergeType, Ba
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
-import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/objectbox.g.dart' show Box;
 import 'package:minimaltodo/task/models/task_completion.dart';
 

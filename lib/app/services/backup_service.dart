@@ -3,6 +3,7 @@ import 'dart:io' as dart;
 import 'package:archive/archive_io.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:get_storage/get_storage.dart';
 import 'dart:developer' as dev;
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -13,6 +14,7 @@ import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/objectbox.g.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -91,7 +93,7 @@ class BackupService {
 
       return file;
     } catch (e, t) {
-      MiniLogger.e('Error generating backup file ${e.toString()}, type: ${t.runtimeType}');
+      MiniLogger.e('Error generating backup file ${e.toString()}, type: ${e.runtimeType}');
       MiniLogger.t('Stacktrace: ${t.toString()}');
       rethrow;
     }
@@ -467,26 +469,26 @@ void callBackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     switch (task) {
       case 'auto_backup':
-        print('printing something in another isolate');
-        WidgetsFlutterBinding.ensureInitialized();
-        await GoogleSignInService().restoreGoogleAccount();
-        // try {
-        if (ObjectBox.store == null) {
-          await ObjectBox.init();
-        }
-        // } catch(e, t) {
-        final appState = SchedulerBinding.instance.lifecycleState;
-        print('state: $appState');
-        if (appState == AppLifecycleState.detached) {
-          // await ObjectBox.init();
-        }
-        // }
-        await MiniBox.initStorage();
-        final jsonFile = await BackupService().generateBackupJsonFile();
-        final backupSuccessful = await BackupService().uploadFileToGoogleDrive(jsonFile);
-        if (backupSuccessful) {
-          g.settingsSc.updateLastBackupDate(DateTime.now());
-          print('backup successful');
+        try {
+          print('printing something in another isolate');
+          final signedIn = await GoogleSignInService().restoreGoogleAccount();
+          MiniLogger.dp('signed in: $signedIn');
+          await GetStorage.init();
+          final docsDir = await getApplicationDocumentsDirectory();
+          final objectBoxDirPath = path.join(docsDir.path, 'objectbox');
+          final Store store = Store.attach(getObjectBoxModel(), objectBoxDirPath);
+            ObjectBox.store = store;
+
+          final jsonFile = await BackupService().generateBackupJsonFile();
+          final backupSuccessful = await BackupService().uploadFileToGoogleDrive(jsonFile);
+          if (backupSuccessful) {
+            g.settingsSc.updateLastBackupDate(DateTime.now());
+            print('backup successful');
+          }
+          store.close();
+        }catch(e,t){
+          MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
+          MiniLogger.t(t.toString());
         }
         break;
     }

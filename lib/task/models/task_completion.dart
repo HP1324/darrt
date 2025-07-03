@@ -1,4 +1,3 @@
-import 'package:minimaltodo/helpers/globals.dart' as g show uuid;
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:objectbox/objectbox.dart';

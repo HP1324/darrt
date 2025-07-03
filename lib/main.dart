@@ -19,7 +19,7 @@ import 'package:workmanager/workmanager.dart';
 /// Initializes app services and state
 Future<void> initApp() async {
   try {
-    final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+    WidgetsFlutterBinding.ensureInitialized();
 
     // Initialize local storage & database
     await MiniBox.initStorage();
