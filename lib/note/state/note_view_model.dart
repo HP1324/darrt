@@ -1,8 +1,6 @@
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:minimaltodo/helpers/messages.dart';
-import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/note/models/note.dart';
-import 'package:minimaltodo/objectbox.g.dart';
 
 class NoteViewModel extends ViewModel<Note> {
   NoteViewModel() {

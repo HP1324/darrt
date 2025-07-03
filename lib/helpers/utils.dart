@@ -6,8 +6,6 @@ import 'package:flutter_quill/flutter_quill.dart' show QuillController;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/app/ui/icon_color_picker.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:toastification/toastification.dart';
 import 'consts.dart';

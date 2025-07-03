@@ -1,3 +1,4 @@
+
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/consts.dart';
@@ -13,6 +14,8 @@ late final Admin admin;
 class ObjectBox {
   static Store? _store;
   static bool _initialized = false;
+  static set store(Store? store) => _store;
+
   static Future<void> init() async {
     if (_initialized) return;
     _store = await openStore();
@@ -41,16 +44,14 @@ class ObjectBox {
   }
 
   static void _putInitialData() async {
-    if (MiniBox.read(mFirstTimeInstall) == null) {
-      if (categoryBox.isEmpty()) {
-        categoryBox.putMany(_getInitialCategories());
-      }
-
-      if (folderBox.isEmpty()) {
-        folderBox.putMany(_getInitialFolders());
-      }
-      await MiniBox.write(mFirstTimeInstall, false);
+    if (categoryBox.isEmpty()) {
+      categoryBox.putMany(_getInitialCategories());
     }
+
+    if (folderBox.isEmpty()) {
+      folderBox.putMany(_getInitialFolders());
+    }
+    await MiniBox.write(mFirstTimeInstall, false);
   }
 
   static List<CategoryModel> _getInitialCategories() {

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:googleapis/redis/v1.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:minimaltodo/app/exceptions.dart';
 import 'package:minimaltodo/app/services/backup_service.dart';
@@ -13,7 +11,6 @@ import 'package:minimaltodo/helpers/utils.dart';
 import 'package:toastification/toastification.dart';
 import 'package:workmanager/workmanager.dart';
 import '../../helpers/consts.dart';
-import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

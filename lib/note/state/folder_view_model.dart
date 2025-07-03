@@ -1,4 +1,3 @@
-import 'package:http/http.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/messages.dart';
