@@ -317,7 +317,6 @@ class FolderSelector extends StatelessWidget {
     );
   }
 }
-
 class NoteSttController extends ChangeNotifier {
   final SpeechToText speech = SpeechToText();
   String hintText = "What's on your mind? ";
@@ -328,13 +327,10 @@ class NoteSttController extends ChangeNotifier {
 
   void startListening() async {
     final quillController = g.noteSc.controller;
-
-    // Store the original document content
-    _originalDocumentLength =
-        quillController.document.length - 1; // -1 to exclude the trailing newline
-    _speechFinalized = '';
-    _currentLiveSpeech = '';
-
+    originalCursorPosition = quillController.selection.baseOffset; // Store cursor position
+    speechFinalized = '';
+    currentLiveSpeech = '';
+    previousSpeechLength = 0;
     await speech.listen(
       onResult: onSpeechResult,
       pauseFor: Duration(seconds: 10),
@@ -347,63 +343,111 @@ class NoteSttController extends ChangeNotifier {
 
   void clearSttState() async {
     await speech.stop();
-    _speechFinalized = '';
-    _currentLiveSpeech = '';
+    speechFinalized = '';
+    currentLiveSpeech = '';
   }
 
-  int _originalDocumentLength = 0;
-  String _speechFinalized = '';
-  String _currentLiveSpeech = '';
-
+  int originalCursorPosition = 0;
+  String speechFinalized = '';
+  String currentLiveSpeech = '';
+  int previousSpeechLength = 0;
   void onSpeechResult(SpeechRecognitionResult result) {
     final quillController = g.noteSc.controller;
-    _currentLiveSpeech = result.recognizedWords.trim();
+    currentLiveSpeech = result.recognizedWords.trim();
 
     if (result.finalResult) {
       // Append only once, when final
-      if (_currentLiveSpeech.isNotEmpty) {
-        _speechFinalized = ('$_speechFinalized $_currentLiveSpeech').trim();
+      if (currentLiveSpeech.isNotEmpty) {
+        speechFinalized = ('$speechFinalized $currentLiveSpeech').trim();
       }
-      _currentLiveSpeech = '';
+      currentLiveSpeech = '';
     }
 
     // Combine finalized + live speech
     final combinedSpeechText = [
-      _speechFinalized,
-      _currentLiveSpeech,
+      speechFinalized,
+      currentLiveSpeech,
     ].where((text) => text.isNotEmpty).join(' ');
 
     if (combinedSpeechText.isNotEmpty) {
-      // Calculate where to insert/replace the speech text
-      final currentDocLength = quillController.document.length - 1; // -1 for trailing newline
-      final speechStartPosition = _originalDocumentLength;
-
-      // If we have speech content that was previously added, replace it
-      if (currentDocLength > _originalDocumentLength) {
-        final speechLength = currentDocLength - _originalDocumentLength;
-        // Delete the previously added speech text
+      // Track the length of previously inserted speech text
+      // Instead of calculating from document length, track it directly
+      if (previousSpeechLength > 0) {
+        // Replace only the previously added speech text
         quillController.replaceText(
-          speechStartPosition,
-          speechLength,
+          originalCursorPosition,
+          previousSpeechLength,
           combinedSpeechText,
-          TextSelection.collapsed(offset: speechStartPosition + combinedSpeechText.length),
+          TextSelection.collapsed(offset: originalCursorPosition + combinedSpeechText.length),
         );
       } else {
-        // Insert the speech text at the end
+        // Insert the speech text at cursor position
         quillController.replaceText(
-          speechStartPosition,
+          originalCursorPosition,
           0,
           combinedSpeechText,
-          TextSelection.collapsed(offset: speechStartPosition + combinedSpeechText.length),
+          TextSelection.collapsed(offset: originalCursorPosition + combinedSpeechText.length),
         );
       }
 
+      // Update the tracked length for next iteration
+      previousSpeechLength = combinedSpeechText.length;
+
       // Set cursor at the end of the inserted text
-      final newCursorPosition = speechStartPosition + combinedSpeechText.length;
+      final newCursorPosition = originalCursorPosition + combinedSpeechText.length;
       quillController.updateSelection(
         TextSelection.collapsed(offset: newCursorPosition),
         ChangeSource.local,
       );
     }
   }
+  // void onSpeechResult(SpeechRecognitionResult result) {
+  //   final quillController = g.noteSc.controller;
+  //   currentLiveSpeech = result.recognizedWords.trim();
+  //
+  //   if (result.finalResult) {
+  //     // Append only once, when final
+  //     if (currentLiveSpeech.isNotEmpty) {
+  //       speechFinalized = ('$speechFinalized $currentLiveSpeech').trim();
+  //     }
+  //     currentLiveSpeech = '';
+  //   }
+  //
+  //   // Combine finalized + live speech
+  //   final combinedSpeechText = [
+  //     speechFinalized,
+  //     currentLiveSpeech,
+  //   ].where((text) => text.isNotEmpty).join(' ');
+  //
+  //   if (combinedSpeechText.isNotEmpty) {
+  //     // Calculate current speech length that was previously inserted
+  //     final currentDocLength = quillController.document.length - 1;
+  //     final previousSpeechLength = currentDocLength - originalCursorPosition;
+  //
+  //     if (previousSpeechLength > 0) {
+  //       // Replace the previously added speech text
+  //       quillController.replaceText(
+  //         originalCursorPosition,
+  //         previousSpeechLength,
+  //         combinedSpeechText,
+  //         TextSelection.collapsed(offset: originalCursorPosition + combinedSpeechText.length),
+  //       );
+  //     } else {
+  //       // Insert the speech text at cursor position
+  //       quillController.replaceText(
+  //         originalCursorPosition,
+  //         0,
+  //         combinedSpeechText,
+  //         TextSelection.collapsed(offset: originalCursorPosition + combinedSpeechText.length),
+  //       );
+  //     }
+  //
+  //     // Set cursor at the end of the inserted text
+  //     final newCursorPosition = originalCursorPosition + combinedSpeechText.length;
+  //     quillController.updateSelection(
+  //       TextSelection.collapsed(offset: newCursorPosition),
+  //       ChangeSource.local,
+  //     );
+  //   }
+  // }
 }

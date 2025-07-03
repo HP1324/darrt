@@ -2,6 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/notification/notification_action_controller.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/task/models/reminder.dart';
@@ -456,14 +457,13 @@ class NotificationService {
     );
   }
 
-  static Future<void> scheduleQuickReminder(String? title, int minutes) async {
+  static Future<void> scheduleQuickReminder(String? title, int minutes, {String? type}) async {
     final now = DateTime.now();
-    final reminderType = MiniBox.read(mDefaultReminderType);
-    final channelKey = reminderType == alarmReminderType ? alarmChannelKey : notifChannelKey;
-    final category = reminderType == alarmReminderType
+    final channelKey = type == alarmReminderType ? alarmChannelKey : notifChannelKey;
+    final category = type == alarmReminderType
         ? NotificationCategory.Alarm
         : NotificationCategory.Reminder;
-    
+
     final nextTime = TimeOfDay.fromDateTime(now.add(Duration(minutes: minutes)));
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
@@ -472,6 +472,7 @@ class NotificationService {
         title: title != null ? 'Task due at ${formatTime(nextTime)}' :'Quick Reminder',
         body: title ?? 'No title was set',
         category: category,
+        criticalAlert: true,
       ),
       schedule: NotificationInterval(
         interval: Duration(minutes: minutes),

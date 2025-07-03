@@ -302,7 +302,7 @@ class AddRemindersWidget extends StatelessWidget {
                 return AlertDialog(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
                   content: Text(
-                    Messages.mNotifAlarmDifference,
+                    Messages.mBatteryOptimizationMessage,
                     style: TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
                   ),
                   actions: [
@@ -429,10 +429,9 @@ class DuedateSelector extends StatelessWidget {
           onTap: () async {
             final date = await showDatePicker(
               context: context,
-              firstDate: DateTime.fromMillisecondsSinceEpoch(
-                MiniBox.read(mFirstInstallDate),
-              ).subtract(const Duration(days: 365)),
-              lastDate: DateTime.now().add(Duration(days: maxExtentDateDays)),
+              initialDate: g.taskSc.dueDate,
+              firstDate: getFirstDate(),
+              lastDate: getMaxDate(),
             );
             if (date != null) {
               g.taskSc.setDueDate(date);
@@ -615,10 +614,9 @@ class DateRangeSelector extends StatelessWidget {
                 g.taskSc.textFieldNode.unfocus();
                 final date = await showDatePicker(
                   context: context,
-                  firstDate: DateTime.fromMillisecondsSinceEpoch(
-                    MiniBox.read(mFirstInstallDate),
-                  ).subtract(const Duration(days: 365)),
-                  lastDate: DateTime.now().add(Duration(days: maxExtentDateDays)),
+                  initialDate: g.taskSc.startDate,
+                  firstDate: getFirstDate(),
+                  lastDate: getMaxDate(),
                 );
                 if (date != null) {
                   g.taskSc.setStartDate(date);
@@ -636,8 +634,9 @@ class DateRangeSelector extends StatelessWidget {
                 g.taskSc.textFieldNode.unfocus();
                 final date = await showDatePicker(
                   context: context,
+                  initialDate: g.taskSc.endDate,
                   firstDate: g.taskSc.startDate.add(Duration(days: 1)),
-                  lastDate: DateTime.now().add(Duration(days: maxExtentDateDays)),
+                  lastDate: getMaxDate(),
                 );
                 if (date != null) {
                   g.taskSc.setEndDate(date);
@@ -975,8 +974,9 @@ class CategorySelector extends StatelessWidget {
                         selectedColor: IconColorStorage.colors[cat.color],
                         leading: Icon(IconColorStorage.flattenedIcons[cat.icon]),
                         trailing: Checkbox(
-                          fillColor: WidgetStateProperty.resolveWith((states){
-                            if(states.contains(WidgetState.selected)) return IconColorStorage.colors[cat.color];
+                          fillColor: WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.selected))
+                              return IconColorStorage.colors[cat.color];
                             return null;
                           }),
                           value: map[cat] ?? false,
@@ -1422,12 +1422,18 @@ class StructuredRow extends StatelessWidget {
 class TaskSttController extends ChangeNotifier {
   final SpeechToText speech = SpeechToText();
   String hintText = "What's on your mind? ";
+  String? _originalTitleText;
+  String _speechFinalized = '';
+  String _currentLiveSpeech = '';
+  int previousSpeechLength = 0;
+  int originalCursorPosition = 0;
   Future<bool> initSpeech() async {
     return await speech.initialize();
   }
 
   void startListening() async {
-    _originalTitleText = g.taskSc.textController.text.trim(); // Store once
+    originalCursorPosition = g.taskSc.textController.selection.baseOffset;
+    previousSpeechLength = 0;
     _speechFinalized = '';
     _currentLiveSpeech = '';
     await speech.listen(
@@ -1446,9 +1452,6 @@ class TaskSttController extends ChangeNotifier {
     _currentLiveSpeech = '';
   }
 
-  String? _originalTitleText;
-  String _speechFinalized = '';
-  String _currentLiveSpeech = '';
   void onSpeechResult(SpeechRecognitionResult result) {
     final titleController = g.taskSc.textController;
     _currentLiveSpeech = result.recognizedWords.trim();
@@ -1461,16 +1464,33 @@ class TaskSttController extends ChangeNotifier {
       _currentLiveSpeech = '';
     }
 
-    // Combine the original + finalized + live
-    final combinedText = [
-      _originalTitleText,
+    // Combine finalized + live speech
+    final combinedSpeechText = [
       _speechFinalized,
       _currentLiveSpeech,
-    ].where((text) => text!.isNotEmpty).join(' ');
+    ].where((text) => text.isNotEmpty).join(' ');
 
-    titleController.text = combinedText;
-    titleController.selection = TextSelection.fromPosition(
-      TextPosition(offset: combinedText.length),
-    );
+    if (combinedSpeechText.isNotEmpty) {
+      // Get current text and cursor position
+      final currentText = titleController.text;
+      final cursorPosition = originalCursorPosition;
+
+      // Calculate text parts
+      final textBeforeCursor = currentText.substring(0, cursorPosition);
+      final textAfterSpeech = currentText.substring(cursorPosition + previousSpeechLength);
+
+      // Combine: text before cursor + new speech + text after previous speech
+      final newText = textBeforeCursor + combinedSpeechText + textAfterSpeech;
+
+      // Update controller
+      titleController.text = newText;
+
+      // Update tracked length for next iteration
+      previousSpeechLength = combinedSpeechText.length;
+
+      // Set cursor at the end of the inserted speech
+      final newCursorPosition = cursorPosition + combinedSpeechText.length;
+      titleController.selection = TextSelection.collapsed(offset: newCursorPosition);
+    }
   }
 }
