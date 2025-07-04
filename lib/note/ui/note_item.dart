@@ -24,7 +24,7 @@ class _NoteItemState extends State<NoteItem> {
   }
 
   String _extractInitialContent(Note note) {
-    final controller = note.toQuillController();
+    final controller = note.quillController;
     final text = controller.document.toPlainText();
     return text.length > 50 ? '${text.substring(0, 50)}...' : text;
   }

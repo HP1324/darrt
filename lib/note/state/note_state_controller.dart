@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_quill/flutter_quill.dart' show QuillController;
 import 'package:minimaltodo/app/state/controllers/state_controller.dart';
@@ -21,12 +23,25 @@ abstract class NoteState with _$NoteState {
 
 class NoteStateController extends StateController<NoteState, Note> {
   QuillController controller = QuillController.basic();
-  ScrollController scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
+  ScrollController get scrollController => _scrollController;
   @override
   Note buildModel({required bool edit, Note? model}) {
-    var note = Note.fromQuillController(controller, uuid: edit ? model!.uuid : null);
-    note.id = edit ? model!.id : 0;
+    Note note;
+    final content = jsonEncode(controller.document.toDelta().toJson());
+    if (edit) {
+      note = model!;
+      note.content = content;
+      note.updatedAt = DateTime.now();
+    } else {
+      note = Note(
+        id: 0,
+        content: content,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+    }
     final folders = g.folderVm.folders.where((f) => g.noteSc.folderSelection[f] == true).toList();
     note.folders.clear();
     if (folders.isEmpty) {
@@ -50,13 +65,15 @@ class NoteStateController extends StateController<NoteState, Note> {
   void initState(bool edit, [Note? model, Folder? initialFolder]) {
     final folders = g.folderVm.folders;
     state = NoteState(
-      folderSelection: initialFolder == null ?  edit
-          ? {for (var folder in folders) folder: model!.folders.contains(folder)}
-          : {folders[0]: true} : {initialFolder: true},
+      folderSelection: initialFolder == null
+          ? edit
+                ? {for (var folder in folders) folder: model!.folders.contains(folder)}
+                : {folders[0]: true}
+          : {initialFolder: true},
       createdAt: edit ? model!.createdAt! : DateTime.now(),
       updatedAt: edit ? model!.updatedAt! : DateTime.now(),
     );
-    controller = edit ? model!.toQuillController() : QuillController.basic();
+    controller = edit ? model!.quillController : QuillController.basic();
     controller.moveCursorToEnd();
   }
 

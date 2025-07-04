@@ -50,7 +50,6 @@ class _AddNotePageState extends State<AddNotePage> {
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
           final navigator = Navigator.of(context);
-          // Show confirmation dialog for user-initiated back attempts
           final shouldPop = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
@@ -84,7 +83,7 @@ class _AddNotePageState extends State<AddNotePage> {
         appBar: AppBar(
           leading: const BackButton(),
           actions: [
-            const SaveNotePdfButton(),
+            // const SaveNotePdfButton(),
             const FolderSelector(),
           ],
         ),
@@ -337,38 +336,7 @@ class SaveNotePdfButton extends StatelessWidget {
   }
 }
 
-class SaveNoteButton extends StatelessWidget {
-  const SaveNoteButton({super.key, required this.widget});
 
-  final AddNotePage widget;
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.check),
-      onPressed: () {
-        var message = '';
-        if (!g.noteSc.controller.document.isEmpty()) {
-          final note = g.noteSc.buildModel(
-            edit: widget.edit,
-            model: widget.edit ? widget.note : null,
-          );
-          message = g.noteVm.putItem(note, edit: widget.edit);
-          Navigator.pop(context);
-        } else {
-          message = Messages.mNoteEmpty;
-        }
-        showToast(
-          context,
-          type: message == Messages.mNoteEmpty
-              ? ToastificationType.error
-              : ToastificationType.success,
-          description: message,
-        );
-      },
-    );
-  }
-}
 
 class FolderSelector extends StatelessWidget {
   const FolderSelector({super.key});
@@ -376,7 +344,7 @@ class FolderSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.folder_open),
+      icon: const Icon(Icons.create_new_folder_outlined),
       onPressed: () {
         showModalBottomSheet(
           context: context,
