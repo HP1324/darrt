@@ -126,7 +126,7 @@ class Task {
       final ids = List<int>.from(json['categoryIds'] ?? []);
       //The following won't work and give a TypeError: type List<dynamic> is not a subtype of type List<int> in type cast, the above line works well and got this solution from [https://stackoverflow.com/a/68079173/28525347]
       // final ids = (json['categoryIds'] as List<int>?)?.cast<int>() ?? [];
-      final fetched = ObjectBox.categoryBox.getMany(ids);
+      final fetched = ObjectBox().categoryBox.getMany(ids);
 
       final validCategories = <CategoryModel>[];
       final missingIds = <int>[];

@@ -30,7 +30,7 @@ class NoteStateController extends StateController<NoteState, Note> {
     final folders = g.folderVm.folders.where((f) => g.noteSc.folderSelection[f] == true).toList();
     note.folders.clear();
     if (folders.isEmpty) {
-      final generalFolder = ObjectBox.folderBox.get(1) ?? Folder(id: 1, name: 'General');
+      final generalFolder = ObjectBox().folderBox.get(1) ?? Folder(id: 1, name: 'General');
       note.folders.add(generalFolder);
       note.folderUuids = [generalFolder.uuid];
     } else {

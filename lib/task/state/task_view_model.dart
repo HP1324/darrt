@@ -26,7 +26,7 @@ class TaskViewModel extends ViewModel<Task> {
     }
   }
 
-  final _completionBox = ObjectBox.completionBox;
+  final _completionBox = ObjectBox().completionBox;
   Set<int> get selectedTaskIds => selectedItemIds;
   final Map<int, bool> onetimeTaskCompletions = {};
   final Map<int, Set<int>> repeatingTaskCompletions = {};

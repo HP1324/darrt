@@ -55,8 +55,8 @@ class SearchStateController extends ChangeNotifier {
 
   // Load all data
   void _loadData() {
-    _allTasks = ObjectBox.store!.box<Task>().getAll();
-    _categories = ObjectBox.store!.box<CategoryModel>().getAll();
+    _allTasks = ObjectBox().store!.box<Task>().getAll();
+    _categories = ObjectBox().store!.box<CategoryModel>().getAll();
     notifyListeners();
   }
 

@@ -24,7 +24,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
   set setItems(List<T> items) => _items = items;
 
   /// The ObjectBox store box for database operations
-  final _box = ObjectBox.store!.box<T>();
+  final _box = ObjectBox().store!.box<T>();
 
   /// Getter or _box
   Box<T> get box => _box;

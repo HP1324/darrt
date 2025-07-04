@@ -44,7 +44,7 @@ class TaskCompletion {
   String contentHash() => '${date.millisecondsSinceEpoch}|${isDone ? 1 : 0}';
 
   static void putManyCompletions(List<TaskCompletion> restored) {
-    final box = ObjectBox.completionBox;
+    final box = ObjectBox().completionBox;
     final localAll = box.getAll();
 
     for (var item in restored) {

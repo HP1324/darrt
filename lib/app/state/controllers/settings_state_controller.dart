@@ -1,12 +1,12 @@
-
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 
 class SettingsStateController {
-
-//Default reminder type that user wants, i.e.,Alarm or Notification
-  final ValueNotifier<String> defaultReminderType = ValueNotifier(MiniBox.read(mDefaultReminderType));
+  //Default reminder type that user wants, i.e.,Alarm or Notification
+  final ValueNotifier<String> defaultReminderType = ValueNotifier(
+    MiniBox.read(mDefaultReminderType),
+  );
 
   void updateDefaultReminder(String value) async {
     await MiniBox.write(mDefaultReminderType, value);
@@ -21,7 +21,8 @@ class SettingsStateController {
   }
 
   final ValueNotifier<String> pickedAlarmSoundName = ValueNotifier(
-      MiniBox.read(mPickedAlarmSoundName) ?? 'System default sound');
+    MiniBox.read(mPickedAlarmSoundName) ?? 'System default sound',
+  );
 
   void updateAlarmSound({required String uri, required String name}) async {
     await MiniBox.write(mPickedAlarmSoundResourceUri, uri);
@@ -36,18 +37,11 @@ class SettingsStateController {
     notificationSound.value = value;
   }
 
-
-  final ValueNotifier<bool> autoBackUp = ValueNotifier(MiniBox.read(mAutoBackup) ?? false);
-
-  void updateAutoBackup(bool value) async {
-    autoBackUp.value = value;
-    await MiniBox.write(mAutoBackup, value);
-  }
-
   final ValueNotifier<DateTime?> lastBackupDate = ValueNotifier(
-    MiniBox.read(mLastBackupDate) != null ? DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mLastBackupDate)) : null,
+    MiniBox.read(mLastBackupDate) != null
+        ? DateTime.fromMillisecondsSinceEpoch(MiniBox.read(mLastBackupDate))
+        : null,
   );
-
 
   void updateLastBackupDate(DateTime value) async {
     lastBackupDate.value = value;
@@ -61,5 +55,3 @@ class SettingsStateController {
   //   await MiniBox.write(mCanPop, value);
   // }
 }
-
-

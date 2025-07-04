@@ -23,7 +23,7 @@ Future<void> initApp() async {
 
     // Initialize local storage & database
     await MiniBox.initStorage();
-    await ObjectBox.init();
+    await ObjectBox().init();
 
     await GoogleSignInService().restoreGoogleAccount();
     // Initialize notifications

@@ -16,11 +16,11 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
   try {
     final appState = SchedulerBinding.instance.lifecycleState;
     if (appState == AppLifecycleState.detached) {
-      await ObjectBox.init();
+      await ObjectBox().init();
     }
     Task? task;
     if (receivedAction.payload != null) {
-      task = ObjectBox.taskBox.get(int.parse(receivedAction.payload!['id']!))!;
+      task = ObjectBox().taskBox.get(int.parse(receivedAction.payload!['id']!))!;
     }
 
     switch (receivedAction.buttonKeyPressed) {
