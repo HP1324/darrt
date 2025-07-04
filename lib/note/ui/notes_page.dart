@@ -8,6 +8,8 @@ import 'package:minimaltodo/note/ui/folders_page.dart';
 import 'package:minimaltodo/note/ui/note_item.dart';
 import 'package:toastification/toastification.dart' show ToastificationType;
 
+import '../models/note.dart';
+
 class NotesPage extends StatefulWidget {
   const NotesPage({super.key});
 
@@ -22,14 +24,11 @@ class _NotesPageState extends State<NotesPage> {
     g.noteVm.selectedItemIds.clear();
   }
 
-  // Group notes by date
-  // Group notes by date
-  Map<String, List<dynamic>> _groupNotesByDate(List<dynamic> notes) {
-    Map<String, List<dynamic>> groupedNotes = {};
+  Map<String, List<Note>> _groupNotesByDate(List<Note> notes) {
+    Map<String, List<Note>> groupedNotes = {};
 
     for (var note in notes) {
-      final dateKey = formatDateNoJm(note.createdAt, 'EEE, dd, MMM, yyyy');
-
+      final dateKey = formatDateNoJm(note.createdAt!, 'EEE, dd MMM, yyyy');
       if (groupedNotes[dateKey] == null) {
         groupedNotes[dateKey] = [];
       }
@@ -44,7 +43,7 @@ class _NotesPageState extends State<NotesPage> {
         final noteB = groupedNotes[b.key]!.first;
 
         // Compare actual DateTime objects (most recent first)
-        return noteB.createdAt.compareTo(noteA.createdAt);
+        return noteB.createdAt?.compareTo(noteA.createdAt!) as int;
       });
 
     return Map.fromEntries(sortedEntries);

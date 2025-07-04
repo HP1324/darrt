@@ -36,7 +36,7 @@ class Note {
     return Note(content: deltaJson, createdAt: now, updatedAt: now,uuid: uuid ?? g.uuid.v4());
   }
 
-  QuillController toQuillController() {
+  QuillController get quillController {
     final delta = Delta.fromJson(jsonDecode(content));
     final doc =   Document.fromDelta(delta);
     return QuillController(document: doc, selection: const TextSelection.collapsed(offset: 0));
