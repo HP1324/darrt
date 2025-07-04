@@ -84,7 +84,7 @@ class _AddNotePageState extends State<AddNotePage> {
         appBar: AppBar(
           leading: const BackButton(),
           actions: [
-            const SaveNotePdfButton(),
+            // const SaveNotePdfButton(),
             const FolderSelector(),
           ],
         ),

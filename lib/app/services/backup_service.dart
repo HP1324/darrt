@@ -477,6 +477,7 @@ void callBackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     switch (task) {
       case mAutoBackup:
+
         try {
           if(!await InternetConnection().hasInternetAccess){
             throw InternetOffError();
