@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:minimaltodo/app/exceptions.dart';
@@ -62,6 +63,13 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
 
   final ValueNotifier<bool> isRestoring = ValueNotifier(false);
 
+  final ValueNotifier<bool> autoBackUp = ValueNotifier(MiniBox.read(mAutoBackup) ?? false);
+
+  void _updateAutoBackup(bool value) async {
+    autoBackUp.value = value;
+    await MiniBox.write(mAutoBackup, value);
+  }
+
   @override
   void dispose() {
     currentEmail.dispose();
@@ -97,26 +105,36 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
             trailing: _BackupButton(),
           ),
           ListenableBuilder(
-            listenable: Listenable.merge([g.settingsSc.autoBackUp, g.settingsSc.lastBackupDate]),
+            listenable: Listenable.merge([autoBackUp, g.settingsSc.lastBackupDate]),
             builder: (context, child) {
-              final autoBackup = g.settingsSc.autoBackUp.value;
+              final autoBackup = autoBackUp.value;
               final lastBackupDate = g.settingsSc.lastBackupDate.value;
               return CheckboxListTile(
                 contentPadding: EdgeInsets.zero,
                 visualDensity: VisualDensity.compact,
                 value: autoBackup,
                 onChanged: (value) async {
-                  if (value != null) {
-                    g.settingsSc.updateAutoBackup(value);
-                    if (value) {
-                      // await Workmanager().registerPeriodicTask('auto_backup', 'auto_backup', frequency: Duration(minutes: 15));
-                      await Workmanager().registerOneOffTask(
-                        'auto_backup',
-                        'auto_backup',
-                        initialDelay: Duration(seconds: 5),
+                  try {
+                    if (GoogleSignInService().currentUser == null) throw GoogleClientNotAuthenticatedError();
+                    if (value != null) {
+                      _updateAutoBackup(value);
+                      if (value) {
+                        await Workmanager().registerOneOffTask(
+                          mAutoBackup,
+                          mAutoBackup,
+                          initialDelay: Duration(seconds: 5),
+                        );
+                      } else {
+                        await Workmanager().cancelByUniqueName(mAutoBackup);
+                      }
+                    }
+                  } on GoogleClientNotAuthenticatedError {
+                    if (context.mounted) {
+                      showToast(
+                        context,
+                        type: ToastificationType.error,
+                        description: 'Sign in to continue',
                       );
-                    } else {
-                      await Workmanager().cancelByUniqueName('auto_backup');
                     }
                   }
                 },
@@ -129,6 +147,7 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
               );
             },
           ),
+          AutobackupFrequencySelector(autoBackup: autoBackUp),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -147,7 +166,7 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
 
                               if (context.mounted) {
                                 //Rationale dialog to restart the app using restart_app package
-                                showDialog(
+                                await showDialog(
                                   context: context,
                                   builder: (context) => AlertDialog(
                                     title: Text('Restart app'),
@@ -156,24 +175,13 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
                                     ),
                                     actions: [
                                       FilledButton.icon(
-                                        onPressed: () async {
-                                          // ObjectBox.store.close();
-                                          // if(ObjectBox.store.isClosed()) {
-                                          //   await Restart.restartApp();
-                                          // }
-                                          Navigator.pop(context);
-                                        },
+                                        onPressed: () => Navigator.pop(context),
                                         label: Text('Got it'),
                                         icon: Icon(Icons.restart_alt),
                                       ),
                                     ],
                                   ),
                                 );
-                                // showToast(
-                                //   context,
-                                //   type: ToastificationType.success,
-                                //   description: 'Restore completed successfully',
-                                // );
                               }
                             } on BackupFileNotFoundError catch (e) {
                               if (context.mounted) {
@@ -289,6 +297,100 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
       type: type,
       description: description,
       duration: Duration(milliseconds: 1700),
+    );
+  }
+}
+
+class AutobackupFrequencySelector extends StatefulWidget {
+  const AutobackupFrequencySelector({super.key, required this.autoBackup});
+
+  final ValueNotifier<bool> autoBackup;
+  @override
+  State<AutobackupFrequencySelector> createState() => _AutobackupFrequencySelectorState();
+}
+
+class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelector> {
+  String currentFrequency = 'daily';
+
+  void changeFrequency(String? newFrequency) {
+    if (newFrequency != null) {
+      currentFrequency = newFrequency;
+      setState(() {});
+    }
+  }
+
+  Widget buildRadioButton(String label) {
+    return Flexible(
+      child: InkWell(
+        onTap: () => changeFrequency(label.toLowerCase()),
+        borderRadius: BorderRadius.circular(6),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Radio<String>(
+                value: label.toLowerCase(),
+                onChanged: changeFrequency,
+                groupValue: currentFrequency,
+                visualDensity: VisualDensity.compact,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontSize: 13,
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: widget.autoBackup,
+      builder: (context, value, child) {
+        if (!value) return const SizedBox.shrink();
+
+        return Container(
+          margin: const EdgeInsets.all(5),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: IntrinsicHeight(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                buildRadioButton('Daily'),
+                Container(
+                  width: 1,
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                ),
+                buildRadioButton('Weekly'),
+                Container(
+                  width: 1,
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                ),
+                buildRadioButton('Monthly'),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

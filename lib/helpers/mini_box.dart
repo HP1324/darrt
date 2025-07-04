@@ -30,7 +30,7 @@ class MiniBox{
       writeIfNull(firstTimeMicTap, true),
       writeIfNull(micPermissionDeniedAgain, false),
       writeIfNull(mSnoozeMinutes, 5),
-      writeIfNull(mDefaultReminderType, 'notif'),
+      writeIfNull(mDefaultReminderType, notifReminderType),
       writeIfNull(mPickedAlarmSoundResourceUri, 'System alarm sound'),
       writeIfNull(mNotificationSound, 'System notification sound'),
     ]);

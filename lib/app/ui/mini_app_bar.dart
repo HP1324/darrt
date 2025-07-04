@@ -113,7 +113,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                       final user = GoogleSignInService().currentUser;
                       MiniLogger.dp(user?.email ?? 'null is there in user');
                     }
-                    final path = ObjectBox.store!.directoryPath;
+                    final path = ObjectBox().store!.directoryPath;
                     debugPrint('ObjectBox path: $path');
                     final docsDir = await getApplicationDocumentsDirectory();
                     debugPrint('App docs dir: ${docsDir.path}/objectbox');

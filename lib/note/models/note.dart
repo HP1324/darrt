@@ -68,7 +68,7 @@ class Note {
       );
 
       final folderIds = (json['folderIds'] as List?)?.cast<int>() ?? [];
-      final fetched = ObjectBox.folderBox.getMany(folderIds);
+      final fetched = ObjectBox().folderBox.getMany(folderIds);
 
       final validFolders = <Folder>[];
       final missingIds = <int>[];

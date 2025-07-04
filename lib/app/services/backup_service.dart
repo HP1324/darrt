@@ -10,6 +10,7 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:minimaltodo/app/exceptions.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -31,12 +32,19 @@ class BackupService {
   factory BackupService() => _instance;
   BackupService._internal();
 
+  ///Need this separate store for background backup purpose, since [ObjectBox().store], which is a static variable is not available in background isolate, they are different for each isolate, so even if we assign it the value, it will be null, they are not shared between isolates
+  Store? _store;
+  void setStore(Store store) => _store = store;
+
   Map<String, dynamic> getLocalData() {
-    final List<Task> tasks = ObjectBox.taskBox.getAll();
-    final List<CategoryModel> categories = ObjectBox.categoryBox.getAll();
-    final List<Note> notes = ObjectBox.noteBox.getAll();
-    final List<Folder> folders = ObjectBox.folderBox.getAll();
-    final List<TaskCompletion> completions = ObjectBox.completionBox.getAll();
+    final store = _store ?? ObjectBox().store;
+    if(store == null) throw Exception('Objectbox store not initialized');
+
+    final List<Task> tasks = store.box<Task>().getAll();
+    final List<CategoryModel> categories = store.box<CategoryModel>().getAll();
+    final List<Note> notes = store.box<Note>().getAll();
+    final List<Folder> folders = store.box<Folder>().getAll();
+    final List<TaskCompletion> completions =  store.box<TaskCompletion>().getAll();
 
     return {
       'tasks': tasks.map((task) => task.toJson()).toList(),
@@ -468,24 +476,25 @@ class BackupMergeService {
 void callBackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     switch (task) {
-      case 'auto_backup':
+      case mAutoBackup:
         try {
-          print('printing something in another isolate');
+          if(!await InternetConnection().hasInternetAccess){
+            throw InternetOffError();
+          }
           final signedIn = await GoogleSignInService().restoreGoogleAccount();
           MiniLogger.dp('signed in: $signedIn');
-          await GetStorage.init();
+          await MiniBox.initStorage();
           final docsDir = await getApplicationDocumentsDirectory();
           final objectBoxDirPath = path.join(docsDir.path, 'objectbox');
-          final Store store = Store.attach(getObjectBoxModel(), objectBoxDirPath);
-            ObjectBox.store = store;
-
+          // final Store store = Store.attach(getObjectBoxModel(), objectBoxDirPath);
+          // BackupService().setStore(store);
+          ObjectBox().initForAnotherIsolate(objectBoxDirPath);
           final jsonFile = await BackupService().generateBackupJsonFile();
           final backupSuccessful = await BackupService().uploadFileToGoogleDrive(jsonFile);
-          if (backupSuccessful) {
-            g.settingsSc.updateLastBackupDate(DateTime.now());
-            print('backup successful');
+          if(backupSuccessful) {
+            await MiniBox.write(mLastBackupDate, DateTime.now().millisecondsSinceEpoch);
           }
-          store.close();
+          ObjectBox().close();
         }catch(e,t){
           MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
           MiniLogger.t(t.toString());

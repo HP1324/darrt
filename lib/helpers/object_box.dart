@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:minimaltodo/category/models/category_model.dart';
 import 'package:minimaltodo/helpers/consts.dart';
@@ -12,38 +11,47 @@ import 'package:minimaltodo/task/models/task_completion.dart';
 late final Admin admin;
 
 class ObjectBox {
-  static Store? _store;
-  static bool _initialized = false;
-  static set store(Store? store) => _store;
+  static final ObjectBox _instance = ObjectBox._internal();
+  factory ObjectBox() => _instance;
+  ObjectBox._internal();
 
-  static Future<void> init() async {
+  Store? _store;
+  bool _initialized = false;
+
+  Future<void> init() async {
     if (_initialized) return;
     _store = await openStore();
     _initialized = true;
     _putInitialData();
     if (kDebugMode) {
       if (Admin.isAvailable()) {
-        admin = Admin(ObjectBox.store!);
+        admin = Admin(ObjectBox().store!);
       }
     }
   }
 
-  static Store? get store => _store;
+  void initForAnotherIsolate(String dbPath) async{
+    _store = Store.attach(getObjectBoxModel(), dbPath);
+    _initialized = true;
+    _putInitialData();
+  }
 
-  static Box<Task> get taskBox => _store!.box<Task>();
+  Store? get store => _store;
 
-  static Box<CategoryModel> get categoryBox => _store!.box<CategoryModel>();
+  Box<Task> get taskBox => _store!.box<Task>();
 
-  static Box<TaskCompletion> get completionBox => _store!.box<TaskCompletion>();
+  Box<CategoryModel> get categoryBox => _store!.box<CategoryModel>();
 
-  static Box<Folder> get folderBox => _store!.box<Folder>();
+  Box<TaskCompletion> get completionBox => _store!.box<TaskCompletion>();
 
-  static Box<Note> get noteBox => _store!.box<Note>();
-  static void close() {
+  Box<Folder> get folderBox => _store!.box<Folder>();
+
+  Box<Note> get noteBox => _store!.box<Note>();
+  void close() {
     _store!.close();
   }
 
-  static void _putInitialData() async {
+  void _putInitialData() async {
     if (categoryBox.isEmpty()) {
       categoryBox.putMany(_getInitialCategories());
     }
@@ -54,7 +62,7 @@ class ObjectBox {
     await MiniBox.write(mFirstTimeInstall, false);
   }
 
-  static List<CategoryModel> _getInitialCategories() {
+  List<CategoryModel> _getInitialCategories() {
     final Map<String, String> categories = {
       'General': 'folder',
       'Work': 'briefcase',
@@ -67,7 +75,7 @@ class ObjectBox {
     return categories.entries.map((e) => CategoryModel(name: e.key, icon: e.value)).toList();
   }
 
-  static List<Folder> _getInitialFolders() {
+  List<Folder> _getInitialFolders() {
     return [
       Folder(name: 'General'),
       Folder(name: 'Work'),
