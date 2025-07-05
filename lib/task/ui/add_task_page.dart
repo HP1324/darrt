@@ -102,6 +102,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 // const PrioritySelector(),
                 const TaskTypeSelector(),
                 const DueDateOrRepeatConfigSection(),
+                const TimeSelector(),
                 const AddRemindersSection(),
                 const SizedBox(height: 100),
               ],
@@ -131,6 +132,52 @@ class _AddTaskPageState extends State<AddTaskPage> {
       type = ToastificationType.error;
     }
     showToast(context, type: type, description: message);
+  }
+}
+
+class TimeSelector extends StatelessWidget {
+  const TimeSelector({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: g.taskSc,
+      builder: (context, child) {
+        final scheme = ColorScheme.of(context);
+        final textTheme = TextTheme.of(context);
+        final isRepeating = g.taskSc.isRepeating;
+        final time = TimeOfDay.fromDateTime(isRepeating ? g.taskSc.startDate : g.taskSc.dueDate);
+        return InkWell(
+          onTap: () async {
+            final selectedTime = await showTimePicker(context: context, initialTime: time);
+            if (selectedTime != null) {
+              final dateTime = DateTime(
+                g.taskSc.dueDate.year,
+                g.taskSc.dueDate.month,
+                g.taskSc.dueDate.day,
+                selectedTime.hour,
+                selectedTime.minute,
+              );
+              if (isRepeating) {
+                g.taskSc.setStartDate(dateTime);
+              } else {
+                g.taskSc.setDueDate(dateTime);
+              }
+            }
+          },
+          child: StructuredRow(
+            leadingIcon: Icons.timer,
+            expanded: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Time'),
+                Text(time.format(context),style: textTheme.labelMedium),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -367,9 +414,10 @@ class AddRemindersSection extends StatelessWidget {
     );
   }
 
-  void _showRemindersBottomSheet(BuildContext context) {
-    showModalBottomSheet(
+  void _showRemindersBottomSheet(BuildContext context) async {
+    await showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
@@ -420,7 +468,7 @@ class AddRemindersSection extends StatelessWidget {
                               );
                               return ReminderItem(
                                 reminder: reminders[index],
-                                onTap: () async{
+                                onTap: () async {
                                   await showReminderDialog(
                                     context,
                                     edit: true,
@@ -872,7 +920,11 @@ class _ReminderDialogState extends State<ReminderDialog> {
   }
 }
 
-Future<void> showReminderDialog(BuildContext context, {bool edit = false, Reminder? reminder}) async{
+Future<void> showReminderDialog(
+  BuildContext context, {
+  bool edit = false,
+  Reminder? reminder,
+}) async {
   MiniLogger.dp('Reminder time: ${reminder?.time.hour}:${reminder?.time.minute}');
   await showAdaptiveDialog(
     context: context,
@@ -880,8 +932,14 @@ Future<void> showReminderDialog(BuildContext context, {bool edit = false, Remind
       edit: edit,
       reminder: reminder,
       onSaved: (newReminder) {
-        final message = g.taskSc.putReminder(edit: edit, reminder: newReminder, oldReminder: reminder);
-        final type = message == Messages.mReminderAdded ? ToastificationType.success : ToastificationType.error;
+        final message = g.taskSc.putReminder(
+          edit: edit,
+          reminder: newReminder,
+          oldReminder: reminder,
+        );
+        final type = message == Messages.mReminderAdded
+            ? ToastificationType.success
+            : ToastificationType.error;
         showToast(context, type: type, description: message);
       },
     ),
@@ -1016,8 +1074,9 @@ class CategorySelector extends StatelessWidget {
                         leading: Icon(IconColorStorage.flattenedIcons[cat.icon]),
                         trailing: Checkbox(
                           fillColor: WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.selected))
+                            if (states.contains(WidgetState.selected)) {
                               return IconColorStorage.colors[cat.color];
+                            }
                             return null;
                           }),
                           value: map[cat] ?? false,
