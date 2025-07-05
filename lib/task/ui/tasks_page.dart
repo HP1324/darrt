@@ -226,10 +226,7 @@ class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin 
           return _getEmptyIndicator();
         }
 
-        // Sort tasks by time if in timeline view, otherwise keep original order
-        final sortedTasks = g.taskVm.isTimelineView
-            ? g.taskVm.getTasksSortedByTime(filteredTasks)
-            : filteredTasks;
+        final sortedTasks =  g.taskVm.getTasksSortedByTime(filteredTasks);
 
         return CustomScrollView(
           slivers: [

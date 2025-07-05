@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
@@ -169,6 +170,14 @@ class TaskTitleRow extends StatelessWidget {
       spacing: 8.0,
       children: [
         TaskTitle(task: task),
+        if (task.isRepeating) ...[
+          const SizedBox(width: 4),
+          Icon(
+            FontAwesomeIcons.repeat,
+            size: 13,
+            color: Theme.of(context).colorScheme.primary.withAlpha(200),
+          ),
+        ],
         // TaskPrioritySection(task: task, isUrgent: isUrgent, context: context),
       ],
     );
@@ -188,22 +197,39 @@ class TaskInfoRow extends StatelessWidget {
     return Row(
       children: [
         TaskCategoriesSection(task: task),
-        // if (!task.isRepeating) ...[
-        //   Text(
-        //     DateFormat('MMM d').format(task.dueDate),
-        //     style: Theme.of(context).textTheme.labelSmall,
-        //   ),
-        //   const SizedBox(width: 4),
-        // ],
-        if (task.isRepeating) ...[
-          const SizedBox(width: 4),
-          Icon(
-            FontAwesomeIcons.repeat,
-            size: 13,
-            color: Theme.of(context).colorScheme.primary.withAlpha(200),
-          ),
-        ],
+        TaskTime(task: task),
       ],
+    );
+  }
+}
+
+class TaskTime extends StatelessWidget {
+  const TaskTime({super.key, required this.task});
+
+  final Task task;
+
+  @override
+  Widget build(BuildContext context) {
+    if (task.time == null) return const SizedBox.shrink();
+
+    final timeFormat = DateFormat.jm(); // This will format based on locale (12/24 hour)
+    final timeString = timeFormat.format(task.time!);
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        timeString,
+        style: TextStyle(
+          fontSize: theme.textTheme.labelSmall!.fontSize,
+          fontWeight: FontWeight.w500,
+          color: theme.colorScheme.onPrimaryContainer,
+        ),
+      ),
     );
   }
 }
@@ -220,30 +246,29 @@ class TaskTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: ListenableBuilder(
-          listenable: Listenable.merge([g.calMan, g.taskVm]),
-          builder: (context, child) {
-            final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
-            final repeat = task.isRepeating;
-            final stc = g.taskVm.onetimeTaskCompletions, rtc = g.taskVm.repeatingTaskCompletions;
-            final isFinished = repeat
-                ? rtc[task.id]?.contains(date) ?? false
-                : stc[task.id] ?? false;
+        listenable: Listenable.merge([g.calMan, g.taskVm]),
+        builder: (context, child) {
+          final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
+          final repeat = task.isRepeating;
+          final stc = g.taskVm.onetimeTaskCompletions, rtc = g.taskVm.repeatingTaskCompletions;
+          final isFinished = repeat ? rtc[task.id]?.contains(date) ?? false : stc[task.id] ?? false;
 
-            return Text(
-              task.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-                fontWeight: FontWeight.w500,
-                decorationColor: Theme.of(context).colorScheme.outline,
-                decorationThickness: 2,
-                color: isFinished
-                    ? Theme.of(context).colorScheme.outline
-                    : Theme.of(context).colorScheme.onSurface,
-              ),
-            );
-          }),
+          return Text(
+            task.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
+              fontWeight: FontWeight.w500,
+              decorationColor: Theme.of(context).colorScheme.outline,
+              decorationThickness: 2,
+              color: isFinished
+                  ? Theme.of(context).colorScheme.outline
+                  : Theme.of(context).colorScheme.onSurface,
+            ),
+          );
+        },
+      ),
     );
   }
 }
