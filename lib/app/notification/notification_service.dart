@@ -480,7 +480,7 @@ class NotificationService {
         timeZone: await AwesomeNotifications().getLocalTimeZoneIdentifier(),
       ),
       actionButtons: [
-        snoozeActionButton,
+        quickSnoozeActionButton,
       ],
     );
   }
