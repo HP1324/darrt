@@ -420,8 +420,8 @@ class AddRemindersSection extends StatelessWidget {
                               );
                               return ReminderItem(
                                 reminder: reminders[index],
-                                onTap: () {
-                                  showReminderDialog(
+                                onTap: () async{
+                                  await showReminderDialog(
                                     context,
                                     edit: true,
                                     reminder: reminders[index],
@@ -438,9 +438,7 @@ class AddRemindersSection extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton.icon(
-                      onPressed: () async {
-                        showReminderDialog(context);
-                      },
+                      onPressed: () => showReminderDialog(context),
                       icon: const Icon(Icons.add),
                       label: const Text('Add Reminder'),
                     ),
@@ -874,15 +872,17 @@ class _ReminderDialogState extends State<ReminderDialog> {
   }
 }
 
-void showReminderDialog(BuildContext context, {bool edit = false, Reminder? reminder}) {
+Future<void> showReminderDialog(BuildContext context, {bool edit = false, Reminder? reminder}) async{
   MiniLogger.dp('Reminder time: ${reminder?.time.hour}:${reminder?.time.minute}');
-  showAdaptiveDialog(
+  await showAdaptiveDialog(
     context: context,
     builder: (context) => ReminderDialog(
       edit: edit,
       reminder: reminder,
       onSaved: (newReminder) {
-        g.taskSc.putReminder(edit: edit, reminder: newReminder, oldReminder: reminder);
+        final message = g.taskSc.putReminder(edit: edit, reminder: newReminder, oldReminder: reminder);
+        final type = message == Messages.mReminderAdded ? ToastificationType.success : ToastificationType.error;
+        showToast(context, type: type, description: message);
       },
     ),
   );
