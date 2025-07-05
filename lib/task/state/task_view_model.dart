@@ -177,4 +177,38 @@ class TaskViewModel extends ViewModel<Task> {
   List<Map<String, dynamic>> convertObjectsListToJsonList(List<Task> objectList) {
     return objectList.map((task) => task.toJson()).toList();
   }
+
+
+  bool _isTimelineView = false;
+  bool get isTimelineView => _isTimelineView;
+
+  // Toggle between timeline and normal view
+  void toggleViewMode() {
+    _isTimelineView = !_isTimelineView;
+    notifyListeners();
+  }
+
+  // Set view mode explicitly
+  void setViewMode(bool isTimeline) {
+    if (_isTimelineView != isTimeline) {
+      _isTimelineView = isTimeline;
+      notifyListeners();
+    }
+  }
+
+  // Get tasks sorted by time for timeline view
+  List<Task> getTasksSortedByTime(List<Task> tasks) {
+    final tasksWithTime = tasks.where((task) => task.time != null).toList();
+    final tasksWithoutTime = tasks.where((task) => task.time == null).toList();
+
+    // Sort tasks with time by their time
+    tasksWithTime.sort((a, b) {
+      final timeA = a.time!;
+      final timeB = b.time!;
+      return timeA.compareTo(timeB);
+    });
+
+    // Return tasks with time first, then tasks without time
+    return [...tasksWithTime, ...tasksWithoutTime];
+  }
 }
