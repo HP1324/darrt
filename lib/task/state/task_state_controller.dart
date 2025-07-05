@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/app/state/controllers/state_controller.dart';
@@ -15,7 +15,7 @@ part 'task_state_controller.freezed.dart';
 @freezed
 abstract class TaskState with _$TaskState {
   const factory TaskState({
-    required Map<CategoryModel, bool> categorySelection,
+    required Map<TaskCategory, bool> categorySelection,
     required DateTime dueDate,
     required bool isRepeating,
     required DateTime startDate,
@@ -31,14 +31,14 @@ abstract class TaskState with _$TaskState {
 ///Controls the temporary state of the task add page when task is being added or updated
 class TaskStateController extends StateController<TaskState, Task> {
   @override
-  void initState(bool edit, [Task? task, CategoryModel? category]) {
+  void initState(bool edit, [Task? task, TaskCategory? category]) {
 
     textController.text = edit ? task!.title : '';
     final categories = g.catVm.categories;
     state = TaskState(
       categorySelection:category == null? edit
           ? {for (var cat in categories) cat: task!.categories.contains(cat)}
-          : {CategoryModel(id: 1, name: 'General'): true} : {category: true},
+          : {TaskCategory(id: 1, name: 'General'): true} : {category: true},
       priority: edit ? task!.priority : priorities[3],
       dueDate: edit ? task!.dueDate : g.calMan.selectedDate,
       isRepeating: edit ? task!.isRepeating : g.navMan.currentTab.value == 2 ? true : false,
@@ -56,7 +56,7 @@ class TaskStateController extends StateController<TaskState, Task> {
   @override
   void clearState() {
     state = state.copyWith(
-      categorySelection: {CategoryModel(id: 1, name: 'General'): true},
+      categorySelection: {TaskCategory(id: 1, name: 'General'): true},
       dueDate: DateTime.now(),
       isRepeating: false,
       startDate: DateTime.now(),
@@ -102,7 +102,7 @@ class TaskStateController extends StateController<TaskState, Task> {
     final categories = g.catVm.categories.where((c) => g.taskSc.categorySelection[c] == true).toList();
     task.categories.clear();
     if (categories.isEmpty) {
-      final generalCategory = ObjectBox().categoryBox.get(1) ?? CategoryModel(id: 1, name: 'General');
+      final generalCategory = ObjectBox().categoryBox.get(1) ?? TaskCategory(id: 1, name: 'General');
       task.categories.add(generalCategory);
       task.categoryUuids = [generalCategory.uuid];
     } else {
@@ -113,7 +113,7 @@ class TaskStateController extends StateController<TaskState, Task> {
     return task;
   }
 
-  void setCategory(CategoryModel category, bool value) {
+  void setCategory(TaskCategory category, bool value) {
     state = state.copyWith(categorySelection: {...categorySelection, category: value});
     notifyListeners();
   }
@@ -289,5 +289,5 @@ extension AccessState on TaskStateController {
   List<Reminder> get reminders => state.reminders;
   String get priority => state.priority;
   int get currentPriority => state.currentPriority;
-  Map<CategoryModel, bool> get categorySelection => state.categorySelection;
+  Map<TaskCategory, bool> get categorySelection => state.categorySelection;
 }

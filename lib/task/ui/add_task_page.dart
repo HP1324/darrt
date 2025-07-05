@@ -5,7 +5,7 @@ import 'package:awesome_notifications/awesome_notifications.dart' show AwesomeNo
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
-import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/consts.dart';
@@ -31,7 +31,7 @@ class AddTaskPage extends StatefulWidget {
   ///Flag to indicate whether a task is being edited or a new task is being created
   final bool edit;
   final Task? task;
-  final CategoryModel? category;
+  final TaskCategory? category;
   @override
   State<AddTaskPage> createState() => _AddTaskPageState();
 }

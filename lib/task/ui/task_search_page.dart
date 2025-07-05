@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
@@ -10,11 +10,11 @@ final _controller = SearchStateController();
 // Controller class to handle all state and business logic
 class SearchStateController extends ChangeNotifier {
   String _searchQuery = '';
-  CategoryModel? _selectedCategory;
+  TaskCategory? _selectedCategory;
   String? _selectedPriority;
   bool _showFilters = false;
   List<Task> _allTasks = [];
-  List<CategoryModel> _categories = [];
+  List<TaskCategory> _categories = [];
   final List<String> priorities = ['Low', 'Medium', 'High', 'Urgent'];
 
   SearchStateController() {
@@ -23,10 +23,10 @@ class SearchStateController extends ChangeNotifier {
 
   // Getters
   String get searchQuery => _searchQuery;
-  CategoryModel? get selectedCategory => _selectedCategory;
+  TaskCategory? get selectedCategory => _selectedCategory;
   String? get selectedPriority => _selectedPriority;
   bool get showFilters => _showFilters;
-  List<CategoryModel> get categories => _categories;
+  List<TaskCategory> get categories => _categories;
 
   // Computed property for filtered tasks
   List<Task> get filteredTasks {
@@ -56,7 +56,7 @@ class SearchStateController extends ChangeNotifier {
   // Load all data
   void _loadData() {
     _allTasks = ObjectBox().store!.box<Task>().getAll();
-    _categories = ObjectBox().store!.box<CategoryModel>().getAll();
+    _categories = ObjectBox().store!.box<TaskCategory>().getAll();
     notifyListeners();
   }
 
@@ -73,7 +73,7 @@ class SearchStateController extends ChangeNotifier {
   }
 
   // Update category filter
-  void setCategory(CategoryModel? category) {
+  void setCategory(TaskCategory? category) {
     _selectedCategory = category;
     notifyListeners();
   }
@@ -226,7 +226,7 @@ class _CategoryFilters extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryChip(BuildContext context, CategoryModel? category, String label) {
+  Widget _buildCategoryChip(BuildContext context, TaskCategory? category, String label) {
     return ListenableBuilder(
       listenable: _controller,
       builder: (context, child) {

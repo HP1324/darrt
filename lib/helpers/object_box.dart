@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
-import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/note/models/folder.dart';
@@ -40,7 +40,7 @@ class ObjectBox {
 
   Box<Task> get taskBox => _store!.box<Task>();
 
-  Box<CategoryModel> get categoryBox => _store!.box<CategoryModel>();
+  Box<TaskCategory> get categoryBox => _store!.box<TaskCategory>();
 
   Box<TaskCompletion> get completionBox => _store!.box<TaskCompletion>();
 
@@ -62,7 +62,7 @@ class ObjectBox {
     await MiniBox.write(mFirstTimeInstall, false);
   }
 
-  List<CategoryModel> _getInitialCategories() {
+  List<TaskCategory> _getInitialCategories() {
     final Map<String, String> categories = {
       'General': 'folder',
       'Work': 'briefcase',
@@ -72,7 +72,7 @@ class ObjectBox {
       'Shopping': 'cart',
     };
 
-    return categories.entries.map((e) => CategoryModel(name: e.key, icon: e.value)).toList();
+    return categories.entries.map((e) => TaskCategory(name: e.key, icon: e.value)).toList();
   }
 
   List<Folder> _getInitialFolders() {
@@ -86,10 +86,11 @@ class ObjectBox {
 
   Map<String, dynamic> getLocalData() {
     late final List<Task> tasks;
-    late final List<CategoryModel> categories;
+    late final List<TaskCategory> categories;
     late final List<Note> notes;
     late final List<Folder> folders;
     late final List<TaskCompletion> completions;
+
     store!.runInTransaction(TxMode.read, () {
       tasks = taskBox.getAll();
       categories = categoryBox.getAll();

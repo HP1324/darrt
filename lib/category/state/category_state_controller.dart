@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/app/state/controllers/state_controller.dart';
 part 'category_state_controller.freezed.dart';
 
@@ -14,9 +14,9 @@ abstract class CategoryState with _$CategoryState {
 }
 
 ///Controls the temporary state of the category add page when category is being added or updated
-class CategoryStateController extends StateController<CategoryState, CategoryModel> {
+class CategoryStateController extends StateController<CategoryState, TaskCategory> {
   @override
-  void initState(bool edit, [CategoryModel? category]) {
+  void initState(bool edit, [TaskCategory? category]) {
     textController.text = edit ? category!.name : '';
     state = CategoryState(
       icon: edit ? category!.icon : 'folder',
@@ -34,9 +34,9 @@ class CategoryStateController extends StateController<CategoryState, CategoryMod
   }
 
   @override
-  CategoryModel buildModel({required bool edit, CategoryModel? model}) {
+  TaskCategory buildModel({required bool edit, TaskCategory? model}) {
     final category = model;
-    return CategoryModel(
+    return TaskCategory(
       name: textController.text,
       icon: icon,
       color: color,

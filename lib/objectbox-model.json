@@ -4,40 +4,6 @@
   "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
   "entities": [
     {
-      "id": "1:4083594686780447909",
-      "lastPropertyId": "5:882724735845963533",
-      "name": "CategoryModel",
-      "properties": [
-        {
-          "id": "1:1196596514986590602",
-          "name": "id",
-          "type": 6,
-          "flags": 1
-        },
-        {
-          "id": "2:6024314461305237015",
-          "name": "name",
-          "type": 9
-        },
-        {
-          "id": "3:7182844801193691355",
-          "name": "icon",
-          "type": 9
-        },
-        {
-          "id": "4:4526307758566994091",
-          "name": "color",
-          "type": 9
-        },
-        {
-          "id": "5:882724735845963533",
-          "name": "uuid",
-          "type": 9
-        }
-      ],
-      "relations": []
-    },
-    {
       "id": "2:8058497308889952526",
       "lastPropertyId": "13:6432319850255234333",
       "name": "Task",
@@ -113,7 +79,7 @@
         {
           "id": "1:5424052804524184019",
           "name": "categories",
-          "targetId": "1:4083594686780447909"
+          "targetId": "8:4829064955625959483"
         }
       ]
     },
@@ -237,17 +203,71 @@
           "targetId": "4:8867042065594792655"
         }
       ]
+    },
+    {
+      "id": "8:4829064955625959483",
+      "lastPropertyId": "5:1882302315608805349",
+      "name": "TaskCategory",
+      "properties": [
+        {
+          "id": "1:676214022164626525",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:901193005429752249",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:3520652600698507104",
+          "name": "icon",
+          "type": 9
+        },
+        {
+          "id": "4:5475214520042284200",
+          "name": "color",
+          "type": 9
+        },
+        {
+          "id": "5:1882302315608805349",
+          "name": "uuid",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "5:1091526975409140722",
+  "lastEntityId": "8:4829064955625959483",
   "lastIndexId": "1:7157772403585420880",
   "lastRelationId": "2:752695274466247110",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
-  "retiredEntityUids": [],
+  "retiredEntityUids": [
+    4083594686780447909,
+    2850945233524803595,
+    1485195572604595133
+  ],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    1196596514986590602,
+    6024314461305237015,
+    7182844801193691355,
+    4526307758566994091,
+    882724735845963533,
+    4631094889994363395,
+    5352492292411416707,
+    8334346387110220720,
+    9128676297472951657,
+    9184129150860060988,
+    8757146302406698459,
+    7167336752493011206,
+    4127554963078891830,
+    6805630063619366929,
+    1402961393425076424
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

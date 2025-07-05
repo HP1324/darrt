@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 class CategoryChip extends StatelessWidget {
   const CategoryChip({super.key, required this.category});
-  final CategoryModel category;
+  final TaskCategory category;
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;

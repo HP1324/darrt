@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/app/state/managers/theme_manager.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/mini_enums.dart';
 
 class ThemeSettingsPage extends StatelessWidget {
   const ThemeSettingsPage({super.key});

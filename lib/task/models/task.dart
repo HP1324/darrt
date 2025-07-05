@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
@@ -39,7 +39,7 @@ class Task {
   String? reminders, repeatConfig;
   final String uuid;
   List<String> categoryUuids;
-  final categories = ToMany<CategoryModel>();
+  final categories = ToMany<TaskCategory>();
   @Backlink()
   final completions = ToMany<TaskCompletion>();
 
@@ -128,7 +128,7 @@ class Task {
       // final ids = (json['categoryIds'] as List<int>?)?.cast<int>() ?? [];
       final fetched = ObjectBox().categoryBox.getMany(ids);
 
-      final validCategories = <CategoryModel>[];
+      final validCategories = <TaskCategory>[];
       final missingIds = <int>[];
 
       for (int i = 0; i < ids.length; i++) {

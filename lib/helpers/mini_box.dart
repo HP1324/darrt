@@ -4,7 +4,7 @@ import 'package:minimaltodo/helpers/consts.dart';
 
 class MiniBox{
   // final _prefs =
-  static final _box = GetStorage('prefs');
+  static final _box = GetStorage();
 
   static Future<void> write(String key, dynamic value)async{
     await _box.write(key, value);
@@ -24,7 +24,7 @@ class MiniBox{
   }
   ///Set global preferences and other settings like first time install date etc.
   static Future<void> initStorage()async {
-    await GetStorage.init('prefs');
+    await GetStorage.init();
     await Future.wait([
       writeIfNull(mDefaultTaskList, 0),
       writeIfNull(mFirstInstallDate, DateUtils.dateOnly(DateTime.now()).millisecondsSinceEpoch),

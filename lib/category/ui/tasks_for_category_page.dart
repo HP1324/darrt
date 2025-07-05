@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
@@ -8,7 +8,7 @@ import 'package:minimaltodo/helpers/globals.dart' as g;
 
 class TasksForCategoryPage extends StatefulWidget {
   const TasksForCategoryPage({super.key, required this.category});
-  final CategoryModel category;
+  final TaskCategory category;
   @override
   State<TasksForCategoryPage> createState() => _TasksForCategoryPageState();
 }
