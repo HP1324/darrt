@@ -241,8 +241,8 @@ class TaskStateController extends StateController<TaskState, Task> {
   final List<String> priorities = ["Urgent", "High", "Medium", "Low"];
   void navigatePriority(bool isNext) {
     final len = priorities.length;
-    final newP = (currentPriority + (isNext ? 1 : -1) + len) % len;
-    state = state.copyWith(currentPriority: newP, priority: priorities[newP]);
+    final newPriority = (currentPriority + (isNext ? 1 : -1) + len) % len;
+    state = state.copyWith(currentPriority: newPriority, priority: priorities[newPriority]);
     notifyListeners();
   }
 
