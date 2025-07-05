@@ -32,35 +32,14 @@ class BackupService {
   factory BackupService() => _instance;
   BackupService._internal();
 
-  ///Need this separate store for background backup purpose, since [ObjectBox().store], which is a static variable is not available in background isolate, they are different for each isolate, so even if we assign it the value, it will be null, they are not shared between isolates
-  Store? _store;
-  void setStore(Store store) => _store = store;
 
-  Map<String, dynamic> getLocalData() {
-    final store = _store ?? ObjectBox().store;
-    if(store == null) throw Exception('Objectbox store not initialized');
-
-    final List<Task> tasks = store.box<Task>().getAll();
-    final List<CategoryModel> categories = store.box<CategoryModel>().getAll();
-    final List<Note> notes = store.box<Note>().getAll();
-    final List<Folder> folders = store.box<Folder>().getAll();
-    final List<TaskCompletion> completions =  store.box<TaskCompletion>().getAll();
-
-    return {
-      'tasks': tasks.map((task) => task.toJson()).toList(),
-      'categories': categories.map((category) => category.toJson()).toList(),
-      'notes': notes.map((note) => note.toJson()).toList(),
-      'folders': folders.map((folder) => folder.toJson()).toList(),
-      'completions': completions.map((completion) => completion.toJson()).toList(),
-    };
-  }
 
   Future<dart.File> generateBackupJsonFile() async {
     try {
       if(!await InternetConnection().hasInternetAccess){
         throw InternetOffError();
       }
-      final localData = getLocalData();
+      final localData = ObjectBox().getLocalData();
 
       Map<String, dynamic> mergedData = Map.from(localData);
       try {
@@ -212,7 +191,7 @@ class BackupService {
 
     //Parse the json file as map to work on it
     Map<String, dynamic> driveData = await parseBackupJsonFileAsMap(jsonBackupFile);
-    Map<String, dynamic> localData = getLocalData();
+    Map<String, dynamic> localData = ObjectBox().getLocalData();
     MiniLogger.dp('error was not above');
     Map<String, dynamic> mergedData = BackupMergeService.mergeData(
       localData,
