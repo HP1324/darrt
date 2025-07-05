@@ -10,6 +10,7 @@ import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/main.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
+import 'package:minimaltodo/helpers/utils.dart';
 
 @pragma("vm:entry-point")
 Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
@@ -28,10 +29,34 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
         g.taskVm.toggleStatus(task!, true, DateTime.now());
         break;
       case snoozeActionKey:
+        final now = DateTime.now();
         final minutes = MiniBox.read(mSnoozeMinutes);
-        final type = receivedAction.category == NotificationCategory.Alarm ? alarmReminderType : notifReminderType;
-        await NotificationService.scheduleQuickReminder(receivedAction.body, minutes,type: type);
+        final nextTime = TimeOfDay.fromDateTime(now.add(Duration(minutes: minutes)));
+        AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: now.millisecondsSinceEpoch.remainder(1000000),
+            title: 'Task due at ${formatTime(nextTime)}',
+            body: task!.title,
+            actionType: ActionType.Default,
+            channelKey: receivedAction.channelKey!,
+            payload: receivedAction.payload,
+            category: receivedAction.category,
+            notificationLayout: NotificationLayout.Default,
+          ),
+          schedule: NotificationInterval(
+            interval: Duration(minutes: minutes),
+            repeats: false,
+            allowWhileIdle: true,
+          ),
+          actionButtons: [
+            finishedActionButton,
+            snoozeActionButton,
+          ],
+        );
         break;
+      case quickSnoozeActionKey:
+        final minutes = MiniBox.read(mSnoozeMinutes);
+        NotificationService.scheduleQuickReminder(receivedAction.body ?? '', minutes);
       default:
         if (task != null) {
           MiniTodo.navigatorKey.currentState?.push(
@@ -64,4 +89,11 @@ final snoozeActionButton = NotificationActionButton(
   key: snoozeActionKey,
   label: snoozeActionLabel,
   actionType: ActionType.SilentAction,
+);
+
+
+final quickSnoozeActionButton = NotificationActionButton(
+key: quickSnoozeActionKey,
+label: snoozeActionLabel,
+actionType: ActionType.SilentAction,
 );
