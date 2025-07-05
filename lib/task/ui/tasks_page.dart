@@ -15,18 +15,17 @@ class TasksPage extends StatefulWidget {
   State<TasksPage> createState() => _TasksPageState();
 }
 
-class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMixin{
+class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this,initialIndex: 0);
-    _tabController.addListener((){
+    _tabController = TabController(length: 3, vsync: this, initialIndex: 0);
+    _tabController.addListener(() {
       g.navMan.currentTab.value = _tabController.index;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -63,9 +62,8 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
                 ),
               ),
             ),
-            ListenableBuilder(
-              listenable: g.taskVm,
-              builder: (context, child) {
+            Builder(
+              builder: (context) {
                 if (g.taskVm.selectedTaskIds.isNotEmpty) {
                   return TasksSelectedActions();
                 }
@@ -101,7 +99,7 @@ class DateItem extends StatelessWidget {
         builder: (context, child) {
           final bool isSelected = g.calMan.selectedDate == date;
           final bool isToday = DateUtils.isSameDay(date, DateTime.now());
-          final ColorScheme scheme = Theme.of(context).colorScheme;
+          final scheme = Theme.of(context).colorScheme;
 
           // Determine text and background colors based on states
           Color dayTextColor;
@@ -123,9 +121,7 @@ class DateItem extends StatelessWidget {
           }
 
           return InkWell(
-            onTap: () {
-              g.calMan.updateSelectedDate(date);
-            },
+            onTap: () => g.calMan.updateSelectedDate(date),
             borderRadius: BorderRadius.circular(12),
             child: Container(
               decoration: BoxDecoration(
@@ -254,6 +250,7 @@ class TasksSelectedActions extends StatelessWidget {
               ),
             Spacer(),
             IconButton(
+              tooltip: 'Clear selection',
               onPressed: () => g.taskVm.clearSelection(),
               icon: CloseButtonIcon(),
             ),
@@ -282,17 +279,13 @@ class _TaskDeleteAlertDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       title: const Text('Delete Tasks'),
       content: const Text('Are you sure you want to delete these tasks?'),
       actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('Cancel'),
-        ),
-        TextButton(
+        FilledButton(
           onPressed: () {
             final message = g.taskVm.deleteMultipleItems();
             Navigator.pop(context);
@@ -300,7 +293,14 @@ class _TaskDeleteAlertDialog extends StatelessWidget {
               showToast(context, type: ToastificationType.success, description: message);
             }
           },
+          style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(theme.colorScheme.error)),
           child: const Text('Delete'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Cancel'),
         ),
       ],
     );
