@@ -118,6 +118,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                     debugPrint('App docs dir: ${docsDir.path}/objectbox');
                   },
                 ),
+              TimelineFilterButton(),
               _MiniAppBarAction(
                 onTap: () async {
                   showQuickReminderDialog() async {
@@ -183,6 +184,68 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
+class TimelineFilterButton extends StatelessWidget {
+  const TimelineFilterButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: g.taskVm,
+      builder: (context, child) {
+        return PopupMenuButton<bool>(
+          icon: Icon(
+            g.taskVm.isTimelineView ? Icons.timeline : Icons.view_agenda,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+          tooltip: 'View Mode',
+          onSelected: (value) {
+            g.taskVm.setViewMode(value);
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem<bool>(
+              value: false,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.view_agenda,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('List View'),
+                  const Spacer(),
+                  if (!g.taskVm.isTimelineView)
+                    Icon(
+                      Icons.check,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                ],
+              ),
+            ),
+            PopupMenuItem<bool>(
+              value: true,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.timeline,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('Timeline View'),
+                  const Spacer(),
+                  if (g.taskVm.isTimelineView)
+                    Icon(
+                      Icons.check,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
 class QuickReminderDialog extends StatefulWidget {
   const QuickReminderDialog({super.key});
 
