@@ -143,26 +143,16 @@ class TimeSelector extends StatelessWidget {
     return ListenableBuilder(
       listenable: g.taskSc,
       builder: (context, child) {
-        final scheme = ColorScheme.of(context);
         final textTheme = TextTheme.of(context);
-        final isRepeating = g.taskSc.isRepeating;
-        final time = TimeOfDay.fromDateTime(isRepeating ? g.taskSc.startDate : g.taskSc.dueDate);
+        final time = g.taskSc.time;
         return InkWell(
           onTap: () async {
-            final selectedTime = await showTimePicker(context: context, initialTime: time);
+            final selectedTime = await showTimePicker(
+              context: context,
+              initialTime: time != null ? TimeOfDay.fromDateTime(time) : TimeOfDay.now(),
+            );
             if (selectedTime != null) {
-              final dateTime = DateTime(
-                g.taskSc.dueDate.year,
-                g.taskSc.dueDate.month,
-                g.taskSc.dueDate.day,
-                selectedTime.hour,
-                selectedTime.minute,
-              );
-              if (isRepeating) {
-                g.taskSc.setStartDate(dateTime);
-              } else {
-                g.taskSc.setDueDate(dateTime);
-              }
+              g.taskSc.setTime(selectedTime);
             }
           },
           child: StructuredRow(
@@ -171,8 +161,26 @@ class TimeSelector extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Time'),
-                Text(time.format(context),style: textTheme.labelMedium),
+                Text(
+                  time != null ? TimeOfDay.fromDateTime(time).format(context) : 'No time set',
+                  style: textTheme.labelMedium,
+                ),
               ],
+            ),
+            trailing: Builder(
+              builder: (context) {
+                if (time != null) {
+                  return IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      size: 20,
+                      color: ColorScheme.of(context).error,
+                    ),
+                    onPressed: ()=> g.taskSc.resetTime(),
+                  );
+                }
+                return SizedBox.shrink();
+              },
             ),
           ),
         );

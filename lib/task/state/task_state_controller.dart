@@ -251,12 +251,15 @@ class TaskStateController extends StateController<TaskState, Task> {
     notifyListeners();
   }
 
-  void setTime(TimeOfDay mainTime){
-    final dateTime = DateTime( 1970, 1, 1, mainTime.hour,mainTime.minute);
+  void setTime(TimeOfDay selectedTime){
+    final dateTime = DateTime( 1970, 1, 1, selectedTime.hour,selectedTime.minute);
     state = state.copyWith(time: dateTime);
     notifyListeners();
   }
-
+  void resetTime() {
+    state = state.copyWith(time: null);
+    notifyListeners();
+  }
   ///Add or edit a reminder.
   ///[oldReminder] is necessary to provide when editing task to match if this reminder exists
   String putReminder({bool edit = false, required Reminder reminder, Reminder? oldReminder}) {
@@ -290,6 +293,8 @@ class TaskStateController extends StateController<TaskState, Task> {
     state = state.copyWith(reminders: updatedReminders);
     notifyListeners();
   }
+
+
 }
 
 extension AccessState on TaskStateController {
