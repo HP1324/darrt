@@ -6,6 +6,7 @@ import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
+import 'package:minimaltodo/task/ui/task_timeline_item.dart';
 import 'package:toastification/toastification.dart';
 
 class TasksPage extends StatefulWidget {
@@ -180,7 +181,6 @@ class DateItem extends StatelessWidget {
 class TaskList extends StatefulWidget {
   const TaskList({super.key, required this.tasks, this.isRepeating});
   final List<Task> tasks;
-
   final bool? isRepeating;
 
   @override
@@ -190,6 +190,7 @@ class TaskList extends StatefulWidget {
 class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+
   Widget _getEmptyIndicator() {
     if (widget.isRepeating == true) {
       return EmptyTasksIndicator(
@@ -212,22 +213,46 @@ class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final list = widget.isRepeating == null
-        ? widget.tasks
-        : widget.tasks.where((t) => t.isRepeating == widget.isRepeating).toList();
 
-    if (list.isEmpty) {
-      return _getEmptyIndicator();
-    }
-    return CustomScrollView(
-      slivers: [
-        SliverList.builder(
-          itemCount: list.length,
-          itemBuilder: (context, index) {
-            return TaskItem(task: list[index]);
-          },
-        ),
-      ],
+    return ListenableBuilder(
+      listenable: g.taskVm,
+      builder: (context, child) {
+        // Filter tasks based on repeating status
+        final filteredTasks = widget.isRepeating == null
+            ? widget.tasks
+            : widget.tasks.where((t) => t.isRepeating == widget.isRepeating).toList();
+
+        if (filteredTasks.isEmpty) {
+          return _getEmptyIndicator();
+        }
+
+        // Sort tasks by time if in timeline view, otherwise keep original order
+        final sortedTasks = g.taskVm.isTimelineView
+            ? g.taskVm.getTasksSortedByTime(filteredTasks)
+            : filteredTasks;
+
+        return CustomScrollView(
+          slivers: [
+            SliverList.builder(
+              itemCount: sortedTasks.length,
+              itemBuilder: (context, index) {
+                final task = sortedTasks[index];
+                final isLast = index == sortedTasks.length - 1;
+
+                // Use timeline item if timeline view is enabled, otherwise use regular item
+                if (g.taskVm.isTimelineView) {
+                  return TaskTimelineItem(
+                    task: task,
+                    isLast: isLast,
+                  );
+                } else {
+                  return TaskItem(task: task);
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
