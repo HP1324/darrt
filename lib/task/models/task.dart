@@ -19,6 +19,7 @@ class Task {
     DateTime? dueDate,
     DateTime? startDate,
     this.endDate,
+    this.time,
     this.isRepeating = false,
     this.isDone = false,
     this.priority = 'Low',
@@ -33,7 +34,7 @@ class Task {
   @Id()
   int id;
   String title, priority;
-  DateTime? createdAt, endDate;
+  DateTime? createdAt, endDate, time;
   DateTime dueDate, startDate;
   bool isDone, isRepeating;
   String? reminders, repeatConfig;
@@ -94,6 +95,7 @@ class Task {
     'isRepeating': isRepeating ? 1 : 0,
     'startDate': startDate.millisecondsSinceEpoch,
     'endDate': endDate?.millisecondsSinceEpoch,
+    'time' : time?.millisecondsSinceEpoch,
     'repeatConfig': repeatConfig,
     'reminders': reminders,
     'priority': priority,
@@ -115,6 +117,9 @@ class Task {
         startDate: DateTime.fromMillisecondsSinceEpoch(json['startDate']),
         endDate: json['endDate'] != null
             ? DateTime.fromMillisecondsSinceEpoch(json['endDate'])
+            : null,
+        time: json['time'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(json['time'])
             : null,
         repeatConfig: json['repeatConfig'],
         reminders: json['reminders'],
@@ -159,6 +164,7 @@ class Task {
     String? priority,
     DateTime? createdAt,
     DateTime? endDate,
+    DateTime? time,
     DateTime? dueDate,
     DateTime? startDate,
     bool? isDone,
@@ -172,6 +178,7 @@ class Task {
       priority: priority ?? this.priority,
       createdAt: createdAt ?? this.createdAt,
       endDate: endDate ?? this.endDate,
+      time: time ?? this.time,
       dueDate: dueDate ?? this.dueDate,
       startDate: startDate ?? this.startDate,
       isDone: isDone ?? this.isDone,

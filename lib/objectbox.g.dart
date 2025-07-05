@@ -26,7 +26,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 8058497308889952526),
     name: 'Task',
-    lastPropertyId: const obx_int.IdUid(13, 6432319850255234333),
+    lastPropertyId: const obx_int.IdUid(14, 9114797388521663395),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -105,6 +105,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(13, 6432319850255234333),
         name: 'categoryUuids',
         type: 30,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(14, 9114797388521663395),
+        name: 'time',
+        type: 10,
         flags: 0,
       ),
     ],
@@ -417,7 +423,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final categoryUuidsOffset = fbb.writeList(
           object.categoryUuids.map(fbb.writeString).toList(growable: false),
         );
-        fbb.startTable(14);
+        fbb.startTable(15);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, titleOffset);
         fbb.addInt64(2, object.createdAt?.millisecondsSinceEpoch);
@@ -431,6 +437,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(10, repeatConfigOffset);
         fbb.addOffset(11, uuidOffset);
         fbb.addOffset(12, categoryUuidsOffset);
+        fbb.addInt64(13, object.time?.millisecondsSinceEpoch);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -446,6 +453,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
           buffer,
           rootOffset,
           20,
+        );
+        final timeValue = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          30,
         );
         final idParam = const fb.Int64Reader().vTableGet(
           buffer,
@@ -468,6 +480,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final endDateParam = endDateValue == null
             ? null
             : DateTime.fromMillisecondsSinceEpoch(endDateValue);
+        final timeParam = timeValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(timeValue);
         final isRepeatingParam = const fb.BoolReader().vTableGet(
           buffer,
           rootOffset,
@@ -503,6 +518,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           dueDate: dueDateParam,
           startDate: startDateParam,
           endDate: endDateParam,
+          time: timeParam,
           isRepeating: isRepeatingParam,
           isDone: isDoneParam,
           priority: priorityParam,
@@ -860,6 +876,9 @@ class Task_ {
   static final categoryUuids = obx.QueryStringVectorProperty<Task>(
     _entities[0].properties[12],
   );
+
+  /// See [Task.time].
+  static final time = obx.QueryDateProperty<Task>(_entities[0].properties[13]);
 
   /// see [Task.categories]
   static final categories = obx.QueryRelationToMany<Task, TaskCategory>(
