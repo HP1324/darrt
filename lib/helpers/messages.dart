@@ -9,6 +9,10 @@ class Messages {
 
   static final mTaskEmpty = 'Enter a task first';
 
+  static final mReminderExists = 'Reminder already added';
+
+  static final mReminderAdded = 'Reminder added';
+
   static final mCategoryEmpty = 'Enter a category first';
 
   static final mCategoryAdded = 'Category Added';

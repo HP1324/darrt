@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:minimaltodo/category/models/task_category.dart';
+import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/app/state/controllers/state_controller.dart';
@@ -264,12 +265,12 @@ class TaskStateController extends StateController<TaskState, Task> {
       }
     } else {
       final exists = updatedReminders.any((r) => r.time.isAtSameTimeAs(reminder.time));
-      if (exists) return 'Time already added';
+      if (exists) return Messages.mReminderExists;
       updatedReminders.add(reminder);
     }
     state = state.copyWith(reminders: updatedReminders);
     notifyListeners();
-    return 'Reminder saved';
+    return Messages.mReminderAdded;
   }
 
   void removeReminder(Reminder reminder) {
