@@ -21,6 +21,7 @@ abstract class TaskState with _$TaskState {
     required bool isRepeating,
     required DateTime startDate,
     DateTime? endDate,
+    DateTime? time,
     required RepeatConfig repeatConfig,
     required List<Reminder> reminders,
     required String priority,
@@ -45,6 +46,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       isRepeating: edit ? task!.isRepeating : g.navMan.currentTab.value == 2 ? true : false,
       startDate: edit ? task!.startDate : g.calMan.selectedDate,
       endDate: edit ? task!.endDate : null,
+      time : edit ? task!.time : null,
       repeatConfig: edit && task!.isRepeating
           ? RepeatConfig.fromJsonString(task.repeatConfig!)
           : RepeatConfig(),
@@ -62,6 +64,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       isRepeating: false,
       startDate: DateTime.now(),
       endDate: null,
+      time : null,
       repeatConfig: RepeatConfig(),
       reminders: [],
       priority: priorities[3],
@@ -83,6 +86,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       task.priority = priority;
       task.startDate = startDate;
       task.endDate = endDate;
+      task.time = time;
       task.isRepeating = isRepeating;
       task.repeatConfig = isRepeating ? repeatConfig.toJsonString() : null;
       task.reminders = Reminder.remindersToJsonString(reminders);
@@ -95,6 +99,7 @@ class TaskStateController extends StateController<TaskState, Task> {
         priority: priority,
         startDate: startDate,
         endDate: endDate,
+        time: time,
         isRepeating: isRepeating,
         repeatConfig: isRepeating ? repeatConfig.toJsonString() : null,
         reminders: Reminder.remindersToJsonString(reminders),
@@ -246,6 +251,12 @@ class TaskStateController extends StateController<TaskState, Task> {
     notifyListeners();
   }
 
+  void setTime(TimeOfDay mainTime){
+    final dateTime = DateTime( 1970, 1, 1, mainTime.hour,mainTime.minute);
+    state = state.copyWith(time: dateTime);
+    notifyListeners();
+  }
+
   ///Add or edit a reminder.
   ///[oldReminder] is necessary to provide when editing task to match if this reminder exists
   String putReminder({bool edit = false, required Reminder reminder, Reminder? oldReminder}) {
@@ -286,6 +297,7 @@ extension AccessState on TaskStateController {
   DateTime get dueDate => state.dueDate;
   DateTime get startDate => state.startDate;
   DateTime? get endDate => state.endDate;
+  DateTime? get time => state.time;
   RepeatConfig get repeatConfig => state.repeatConfig;
   List<Reminder> get reminders => state.reminders;
   String get priority => state.priority;
