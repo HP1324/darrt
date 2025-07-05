@@ -3,8 +3,8 @@ import 'package:minimaltodo/task/models/task.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
-class CategoryModel {
-  CategoryModel({
+class TaskCategory {
+  TaskCategory({
     this.id = 0,
     required this.name,
     this.icon = 'folder',
@@ -23,7 +23,7 @@ class CategoryModel {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is CategoryModel &&
+    return other is TaskCategory &&
         other.id == id &&
         other.name == name &&
         icon == other.icon &&
@@ -33,7 +33,7 @@ class CategoryModel {
   @override
   int get hashCode => Object.hash(id, name, icon, color);
 
-  factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
+  factory TaskCategory.fromJson(Map<String, dynamic> json) => TaskCategory(
     id: json["id"],
     name: json["name"],
     icon: json["icon_code"] ?? 'folder',
@@ -49,9 +49,9 @@ class CategoryModel {
     'uuid': uuid,
   };
 
-  /// Compares this [CategoryModel] with another to determine equality.
+  /// Compares this [TaskCategory] with another to determine equality.
   ///
-  /// This method checks whether two [CategoryModel] instances have identical
+  /// This method checks whether two [TaskCategory] instances have identical
   /// values across their key fields: [name], [icon], and [color].
   ///
   /// The optional [checkIdEquality] flag controls whether the [id] field
@@ -64,7 +64,7 @@ class CategoryModel {
   ///
   /// Returns `true` if all relevant fields match; otherwise, returns `false`.
 
-  bool equals(CategoryModel other, {bool? checkIdEquality = false}) {
+  bool equals(TaskCategory other, {bool? checkIdEquality = false}) {
     if (checkIdEquality! && id != other.id) {
       return false;
     }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/tasks_for_category_page.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
@@ -11,7 +11,7 @@ import 'package:toastification/toastification.dart';
 class CategoryItem extends StatefulWidget {
   const CategoryItem({super.key, required this.category});
 
-  final CategoryModel category;
+  final TaskCategory category;
 
   @override
   State<CategoryItem> createState() => _CategoryItemState();
@@ -76,7 +76,7 @@ class CategoryNameLabel extends StatelessWidget {
     required this.textTheme,
   });
 
-  final CategoryModel category;
+  final TaskCategory category;
   final TextTheme textTheme;
 
   @override
@@ -97,7 +97,7 @@ class TaskCountLabel extends StatelessWidget {
     required this.textTheme,
   });
 
-  final CategoryModel category;
+  final TaskCategory category;
   final TextTheme textTheme;
 
   @override
@@ -127,7 +127,7 @@ class CategoryPopupMenuButton extends StatelessWidget {
   }) : _popupKey = popupKey;
 
   final GlobalKey<State<StatefulWidget>> _popupKey;
-  final CategoryModel category;
+  final TaskCategory category;
   final Color color;
 
   @override

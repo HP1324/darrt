@@ -61,6 +61,7 @@ class NoteStateController extends StateController<NoteState, Note> {
     controller.clear();
   }
 
+  ///[initialFolder] is for opening the note from a folder, so this folder will be selected by default, when adding note for a folder
   @override
   void initState(bool edit, [Note? model, Folder? initialFolder]) {
     final folders = g.folderVm.folders;

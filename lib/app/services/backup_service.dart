@@ -1,21 +1,17 @@
 import 'dart:convert';
 import 'dart:io' as dart;
 import 'package:archive/archive_io.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:get_storage/get_storage.dart';
 import 'dart:developer' as dev;
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:minimaltodo/app/exceptions.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
-import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
-import 'package:minimaltodo/objectbox.g.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -202,7 +198,7 @@ class BackupService {
     final tasks = (mergedData['tasks'] as List).map((e) => Task.fromJson(e)).toList();
 
     final categories = (mergedData['categories'] as List)
-        .map((e) => CategoryModel.fromJson(e))
+        .map((e) => TaskCategory.fromJson(e))
         .toList();
     g.catVm.putManyForRestore(categories, tasks: tasks);
 
@@ -328,11 +324,11 @@ class BackupMergeService {
         case 'categories':
           dev.log('Old categories: ${oldData[key]}, New categories: ${newData[key]}');
           mergedList = g.catVm.mergeItemLists(
-            oldList.cast<CategoryModel>(),
-            newList.cast<CategoryModel>(),
+            oldList.cast<TaskCategory>(),
+            newList.cast<TaskCategory>(),
             mergeType: mergeType,
           );
-          mergedData[key] = g.catVm.convertObjectsListToJsonList(mergedList.cast<CategoryModel>());
+          mergedData[key] = g.catVm.convertObjectsListToJsonList(mergedList.cast<TaskCategory>());
           break;
 
         case 'folders':
@@ -396,7 +392,7 @@ class BackupMergeService {
           objectList = jsonList.map((json) => Task.fromJson(json)).toList();
           break;
         case 'categories':
-          objectList = jsonList.map((json) => CategoryModel.fromJson(json)).toList();
+          objectList = jsonList.map((json) => TaskCategory.fromJson(json)).toList();
           break;
         case 'completions':
           objectList = jsonList.map((json) => TaskCompletion.fromJson(json)).toList();
@@ -429,7 +425,7 @@ class BackupMergeService {
           jsonList = objectList.map((obj) => (obj as Task).toJson()).toList();
           break;
         case 'categories':
-          jsonList = objectList.map((obj) => (obj as CategoryModel).toJson()).toList();
+          jsonList = objectList.map((obj) => (obj as TaskCategory).toJson()).toList();
           break;
         case 'completions':
           jsonList = objectList.map((obj) => (obj as TaskCompletion).toJson()).toList();

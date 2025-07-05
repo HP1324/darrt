@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/ui/icon_color_picker.dart';
-import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/category/state/category_state_controller.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/messages.dart';
@@ -12,7 +12,7 @@ class AddCategoryPage extends StatefulWidget {
   const AddCategoryPage({super.key, required this.edit, this.category})
     : assert(!edit || category != null);
   final bool edit;
-  final CategoryModel? category;
+  final TaskCategory? category;
   @override
   State<AddCategoryPage> createState() => _AddCategoryPageState();
 }

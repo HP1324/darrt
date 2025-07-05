@@ -1,4 +1,4 @@
-import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/task/models/task.dart';
 
-class CategoryViewModel extends ViewModel<CategoryModel> {
+class CategoryViewModel extends ViewModel<TaskCategory> {
   final ScrollController scrollController = ScrollController();
 
-  List<CategoryModel> get categories => items;
+  List<TaskCategory> get categories => items;
   @override
-  String putItem(CategoryModel item, {required bool edit, bool scrollToBottom = true}) {
+  String putItem(TaskCategory item, {required bool edit, bool scrollToBottom = true}) {
     final category = item;
     if (!edit && items.indexWhere((c) => c.name == category.name) != -1) {
       return Messages.mCategoryExists;
@@ -37,7 +37,7 @@ class CategoryViewModel extends ViewModel<CategoryModel> {
   }
 
   @override
-  int getItemId(CategoryModel item) => item.id;
+  int getItemId(TaskCategory item) => item.id;
 
   @override
   String getCreateSuccessMessage() => Messages.mCategoryAdded;
@@ -50,19 +50,19 @@ class CategoryViewModel extends ViewModel<CategoryModel> {
       length == 1 ? '1 ${Messages.mCategoryDeleted}' : '$length ${Messages.mCategoriesDeleted}';
 
   @override
-  void setItemId(CategoryModel item, int id) {
+  void setItemId(TaskCategory item, int id) {
     item.id = id;
   }
 
   @override
-  void putManyForRestore(List<CategoryModel> restoredItems, {List<Task>? tasks}) {
+  void putManyForRestore(List<TaskCategory> restoredItems, {List<Task>? tasks}) {
     box.putMany(restoredItems);
     reassignTaskCategories(restoredItems, tasks: tasks!);
     initializeItems();
     notifyListeners();
   }
 
-  void reassignTaskCategories(List<CategoryModel> restoredCategories, {required List<Task> tasks}) {
+  void reassignTaskCategories(List<TaskCategory> restoredCategories, {required List<Task> tasks}) {
 
     final categoryByUuid = {for (final cat in restoredCategories) cat.uuid: cat};
 
@@ -84,15 +84,15 @@ class CategoryViewModel extends ViewModel<CategoryModel> {
   }
 
   @override
-  String getItemUuid(CategoryModel item) => item.uuid;
+  String getItemUuid(TaskCategory item) => item.uuid;
 
   @override
-  List<CategoryModel> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
-    return jsonList.map(CategoryModel.fromJson).toList();
+  List<TaskCategory> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
+    return jsonList.map(TaskCategory.fromJson).toList();
   }
 
   @override
-  List<Map<String, dynamic>> convertObjectsListToJsonList(List<CategoryModel> objectList) {
+  List<Map<String, dynamic>> convertObjectsListToJsonList(List<TaskCategory> objectList) {
     return objectList.map((category) => category.toJson()).toList();
   }
 }

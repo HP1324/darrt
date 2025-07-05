@@ -2,7 +2,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/app/services/backup_service.dart' show MergeType, BackupMergeService;
-import 'package:minimaltodo/category/models/category_model.dart';
+import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/objectbox.g.dart' show Box;
@@ -179,7 +179,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
   }
 
   String getTypeKey(T item) {
-    if (item is CategoryModel) return 'categories';
+    if (item is TaskCategory) return 'categories';
     if (item is Task) return 'tasks';
     if (item is Note) return 'notes';
     if (item is Folder) return 'folders';

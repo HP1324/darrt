@@ -10,7 +10,6 @@ import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:toastification/toastification.dart';
 
