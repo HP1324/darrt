@@ -30,7 +30,7 @@ class ObjectBox {
     }
   }
 
-  void initForAnotherIsolate(String dbPath) async{
+  void initForAnotherIsolate(String dbPath) async {
     _store = Store.attach(getObjectBoxModel(), dbPath);
     _initialized = true;
     _putInitialData();
@@ -82,5 +82,28 @@ class ObjectBox {
       Folder(name: 'Study'),
       Folder(name: 'Journal'),
     ];
+  }
+
+  Map<String, dynamic> getLocalData() {
+    late final List<Task> tasks;
+    late final List<CategoryModel> categories;
+    late final List<Note> notes;
+    late final List<Folder> folders;
+    late final List<TaskCompletion> completions;
+    store!.runInTransaction(TxMode.read, () {
+      tasks = taskBox.getAll();
+      categories = categoryBox.getAll();
+      notes = noteBox.getAll();
+      folders = folderBox.getAll();
+      completions = completionBox.getAll();
+    });
+
+    return {
+      'tasks': tasks.map((task) => task.toJson()).toList(),
+      'categories': categories.map((category) => category.toJson()).toList(),
+      'notes': notes.map((note) => note.toJson()).toList(),
+      'folders': folders.map((folder) => folder.toJson()).toList(),
+      'completions': completions.map((completion) => completion.toJson()).toList(),
+    };
   }
 }
