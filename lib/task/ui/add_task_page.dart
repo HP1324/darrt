@@ -102,7 +102,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 // const PrioritySelector(),
                 const TaskTypeSelector(),
                 const DueDateOrRepeatConfigSection(),
-                const AddRemindersWidget(),
+                const AddRemindersSection(),
                 const SizedBox(height: 100),
               ],
             ),
@@ -290,11 +290,12 @@ class TitleTextField extends StatelessWidget {
   }
 }
 
-class AddRemindersWidget extends StatelessWidget {
-  const AddRemindersWidget({super.key});
+class AddRemindersSection extends StatelessWidget {
+  const AddRemindersSection({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return InkWell(
       onTap: () async {
         g.taskSc.textFieldNode.unfocus();
@@ -313,17 +314,17 @@ class AddRemindersWidget extends StatelessWidget {
           children: [
             Text(
               "Reminders",
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 14),
+              style: theme.textTheme.titleMedium?.copyWith(fontSize: 14),
             ),
             ListenableBuilder(
               listenable: g.taskSc,
-              builder: (context, widget) {
+              builder: (context, child) {
                 final reminders = g.taskSc.reminders;
                 return Text(
                   reminders.isEmpty
                       ? 'Click here to add reminders per day'
                       : reminders.map((r) => r.time.format(context)).join(', '),
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: theme.textTheme.bodySmall,
                 );
               },
             ),
@@ -332,33 +333,37 @@ class AddRemindersWidget extends StatelessWidget {
         trailing: IconButton(
           onPressed: () {
             g.taskSc.textFieldNode.unfocus();
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
-                  content: Text(
-                    Messages.mBatteryOptimizationMessage,
-                    style: TextStyle(fontSize: Theme.of(context).textTheme.bodyMedium!.fontSize),
-                  ),
-                  actions: [
-                    FilledButton(
-                      onPressed: () async {
-                        await AppSettings.openAppSettings(
-                          type: AppSettingsType.batteryOptimization,
-                        );
-                        // await SettingsService.openBatterySettings();
-                      },
-                      child: Text('Go to settings'),
-                    ),
-                  ],
-                );
-              },
-            );
+            _showBatteryOptimizationDialog(context, theme);
           },
           icon: Icon(Icons.info_outline),
         ),
       ),
+    );
+  }
+
+  void _showBatteryOptimizationDialog(BuildContext context, ThemeData theme) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+          content: Text(
+            Messages.mBatteryOptimizationMessage,
+            style: TextStyle(fontSize: theme.textTheme.bodyMedium!.fontSize),
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () async {
+                await AppSettings.openAppSettings(
+                  type: AppSettingsType.batteryOptimization,
+                );
+                // await SettingsService.openBatterySettings();
+              },
+              child: Text('Go to settings'),
+            ),
+          ],
+        );
+      },
     );
   }
 
