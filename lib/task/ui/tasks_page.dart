@@ -268,20 +268,20 @@ class TasksSelectedActions extends StatelessWidget {
     await showDialog(
       context: context,
       builder: (context) {
-        return _TaskDeleteAlertDialog();
+        return _TaskDeleteConfirmationDialog();
       },
     );
   }
 }
 
-class _TaskDeleteAlertDialog extends StatelessWidget {
-  const _TaskDeleteAlertDialog();
+class _TaskDeleteConfirmationDialog extends StatelessWidget {
+  const _TaskDeleteConfirmationDialog();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
       title: const Text('Delete Tasks'),
       content: const Text('Are you sure you want to delete these tasks?'),
       actions: [
@@ -299,6 +299,7 @@ class _TaskDeleteAlertDialog extends StatelessWidget {
         TextButton(
           onPressed: () {
             Navigator.pop(context);
+            g.taskVm.clearSelection();
           },
           child: const Text('Cancel'),
         ),
