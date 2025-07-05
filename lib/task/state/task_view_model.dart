@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/helpers/messages.dart';
+import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/typedefs.dart';
@@ -10,7 +11,6 @@ import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
 
 class TaskViewModel extends ViewModel<Task> {
-
   @override
   void initializeItems() {
     super.initializeItems();
@@ -81,12 +81,14 @@ class TaskViewModel extends ViewModel<Task> {
     final message = super.deleteMultipleItems();
     return message;
   }
+
   void deleteTasksByCategory(int categoryId) {
     final toDelete = items.where((t) => t.categories.any((c) => c.id == categoryId)).toList();
     box.removeMany(toDelete.map((t) => t.id).toList());
     items.removeWhere((t) => t.categories.any((c) => c.id == categoryId));
     notifyListeners();
   }
+
   void toggleStatus(Task task, bool value, DateTime d) async {
     if (task.isRepeating) {
       final date = DateUtils.dateOnly(d).millisecondsSinceEpoch;
@@ -178,21 +180,22 @@ class TaskViewModel extends ViewModel<Task> {
     return objectList.map((task) => task.toJson()).toList();
   }
 
-
-  bool _isTimelineView = false;
+  bool _isTimelineView = MiniBox.read('isTimeLine') ?? false;
   bool get isTimelineView => _isTimelineView;
 
   // Toggle between timeline and normal view
-  void toggleViewMode() {
+  void toggleViewMode() async {
     _isTimelineView = !_isTimelineView;
     notifyListeners();
+    await MiniBox.write('isTimeLine', _isTimelineView);
   }
 
   // Set view mode explicitly
-  void setViewMode(bool isTimeline) {
+  void setViewMode(bool isTimeline) async {
     if (_isTimelineView != isTimeline) {
       _isTimelineView = isTimeline;
       notifyListeners();
+      await MiniBox.write('isTimeLine', _isTimelineView);
     }
   }
 

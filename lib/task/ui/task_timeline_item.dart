@@ -79,18 +79,31 @@ class TimelineTaskContainer extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Timeline line and checkpoint
+            // TimelineTaskTime(task: task),
             SizedBox(
               width: 32,
               child: Column(
                 children: [
+                  Expanded(
+                    child: Container(
+                      width: 2,
+                      // margin: const EdgeInsets.only(top: 1),
+                      decoration: BoxDecoration(
+                        color: hasTime
+                            ? scheme.outline.withValues(alpha:0.3)
+                            : scheme.outline.withValues(alpha:0.1),
+                        borderRadius: BorderRadius.circular(1),
+                      ),
+                    ),
+                  ),
                   // Timeline checkpoint (checkbox)
                   TimelineCheckbox(task: task),
                   // Timeline line
-                  if (!isLast)
+                  // if (!isLast)
                     Expanded(
                       child: Container(
                         width: 2,
-                        margin: const EdgeInsets.only(top: 4),
+                        // margin: const EdgeInsets.only(top: 4),
                         decoration: BoxDecoration(
                           color: hasTime
                               ? scheme.outline.withValues(alpha:0.3)
@@ -104,25 +117,25 @@ class TimelineTaskContainer extends StatelessWidget {
             ),
             // Task content
             Expanded(
-              child: Container(
-                margin: const EdgeInsets.only(left: 12, top: 4),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? scheme.outline.withValues(alpha:0.1)
-                      : scheme.surface.withValues(alpha:0.05),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: scheme.outline.withValues(alpha:0.1),
-                    width: 0.5,
-                  ),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: onTap,
+                onLongPress: onLongPress,
+                child: Container(
+                  // margin: const EdgeInsets.only(left: 12, top: 4),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? scheme.outline.withValues(alpha:0.7)
+                        : scheme.surface.withValues(alpha:0.05),
                     borderRadius: BorderRadius.circular(12),
-                    onTap: onTap,
-                    onLongPress: onLongPress,
+                    border: Border.all(
+                      color: scheme.outline.withValues(alpha:0.1),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
                     child: TimelineTaskContent(task: task),
                   ),
                 ),
@@ -176,19 +189,33 @@ class TimelineTaskTitle extends StatelessWidget {
         final isFinished = repeat
             ? rtc[task.id]?.contains(date) ?? false
             : stc[task.id] ?? false;
-
-        return Text(
-          task.title,
-          style: TextStyle(
-            fontSize: Theme.of(context).textTheme.titleMedium!.fontSize,
-            fontWeight: FontWeight.w600,
-            decorationColor: Theme.of(context).colorScheme.outline,
-            decorationThickness: 2,
-            decoration: isFinished ? TextDecoration.lineThrough : null,
-            color: isFinished
-                ? Theme.of(context).colorScheme.outline
-                : Theme.of(context).colorScheme.onSurface,
-          ),
+        final theme = Theme.of(context);
+        return Row(
+          children: [
+            Expanded(
+              child: Text(
+                task.title,
+                style: TextStyle(
+                  fontSize: theme.textTheme.titleSmall!.fontSize,
+                  fontWeight: FontWeight.w600,
+                  decorationColor: theme.colorScheme.outline,
+                  decorationThickness: 2,
+                  decoration: isFinished ? TextDecoration.lineThrough : null,
+                  color: isFinished
+                      ? theme.colorScheme.outline
+                      : theme.colorScheme.onSurface,
+                ),
+              ),
+            ),
+            if (task.isRepeating) ...[
+              const SizedBox(width: 4),
+              Icon(
+                FontAwesomeIcons.repeat,
+                size: 13,
+                color: Theme.of(context).colorScheme.primary.withAlpha(200),
+              ),
+            ],
+          ],
         );
       },
     );
@@ -215,15 +242,6 @@ class TimelineTaskInfo extends StatelessWidget {
         if (task.time != null) ...[
           const SizedBox(width: 8),
           TimelineTaskTime(task: task),
-        ],
-        // Repeat indicator
-        if (task.isRepeating) ...[
-          const SizedBox(width: 8),
-          Icon(
-            FontAwesomeIcons.repeat,
-            size: 12,
-            color: Theme.of(context).colorScheme.primary.withValues(alpha:0.7),
-          ),
         ],
       ],
     );
@@ -282,19 +300,20 @@ class TimelineTaskTime extends StatelessWidget {
 
     final timeFormat = DateFormat.jm(); // This will format based on locale (12/24 hour)
     final timeString = timeFormat.format(task.time!);
+    final theme = Theme.of(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha:0.3),
+        color: theme.colorScheme.primaryContainer.withValues(alpha:0.8),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         timeString,
         style: TextStyle(
-          fontSize: 11,
+          fontSize:theme.textTheme.labelSmall!.fontSize,
           fontWeight: FontWeight.w500,
-          color: Theme.of(context).colorScheme.onPrimaryContainer,
+          color: theme.colorScheme.onPrimaryContainer,
         ),
       ),
     );
