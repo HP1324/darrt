@@ -24,7 +24,6 @@ class _TaskItemState extends State<TaskItem> {
       builder: (context, child) {
         final ids = g.taskVm.selectedTaskIds;
         final isSelected = ids.contains(widget.task.id);
-
         return TaskItemContainer(
           task: widget.task,
           isSelected: isSelected,
