@@ -93,8 +93,8 @@ class TimelineTaskContainer extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 4),
                         decoration: BoxDecoration(
                           color: hasTime
-                              ? scheme.outline.withOpacity(0.3)
-                              : scheme.outline.withOpacity(0.1),
+                              ? scheme.outline.withValues(alpha:0.3)
+                              : scheme.outline.withValues(alpha:0.1),
                           borderRadius: BorderRadius.circular(1),
                         ),
                       ),
@@ -109,11 +109,11 @@ class TimelineTaskContainer extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? scheme.outline.withOpacity(0.1)
-                      : scheme.surface.withOpacity(0.05),
+                      ? scheme.outline.withValues(alpha:0.1)
+                      : scheme.surface.withValues(alpha:0.05),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: scheme.outline.withOpacity(0.1),
+                    color: scheme.outline.withValues(alpha:0.1),
                     width: 0.5,
                   ),
                 ),
@@ -222,7 +222,7 @@ class TimelineTaskInfo extends StatelessWidget {
           Icon(
             FontAwesomeIcons.repeat,
             size: 12,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha:0.7),
           ),
         ],
       ],
@@ -286,7 +286,7 @@ class TimelineTaskTime extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha:0.3),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -354,7 +354,7 @@ class TimelineCheckbox extends StatelessWidget {
           );
         }
         return BorderSide(
-          color: hasTime ? colorScheme.primary.withOpacity(0.6) : colorScheme.outline.withOpacity(0.4),
+          color: hasTime ? colorScheme.primary.withValues(alpha:0.6) : colorScheme.outline.withValues(alpha:0.4),
           width: 2,
         );
       }),
@@ -372,7 +372,7 @@ class TimelineCheckbox extends StatelessWidget {
       }),
       overlayColor: WidgetStateProperty.resolveWith<Color>((states) {
         if (states.contains(WidgetState.pressed)) {
-          return (hasTime ? colorScheme.primary : colorScheme.outline).withOpacity(0.1);
+          return (hasTime ? colorScheme.primary : colorScheme.outline).withValues(alpha:0.1);
         }
         return Colors.transparent;
       }),
