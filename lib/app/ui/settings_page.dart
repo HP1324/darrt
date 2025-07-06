@@ -55,18 +55,18 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
   final GoogleSignInService _googleService = GoogleSignInService();
 
   final ValueNotifier<String> currentEmail = ValueNotifier(
-    MiniBox.read(mGoogleEmail) ?? tapHereToSignIn,
+    MiniBox().read(mGoogleEmail) ?? tapHereToSignIn,
   );
 
   final ValueNotifier<bool> isBackingUp = ValueNotifier(false);
 
   final ValueNotifier<bool> isRestoring = ValueNotifier(false);
 
-  final ValueNotifier<bool> autoBackUp = ValueNotifier(MiniBox.read(mAutoBackup) ?? false);
+  final ValueNotifier<bool> autoBackUp = ValueNotifier(MiniBox().read(mAutoBackup) ?? false);
 
   void _updateAutoBackup(bool value) async {
     autoBackUp.value = value;
-    await MiniBox.write(mAutoBackup, value);
+    await MiniBox().write(mAutoBackup, value);
   }
 
   @override
@@ -225,7 +225,7 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
                 onPressed: () async {
                   await _googleService.signOut();
                   currentEmail.value = tapHereToSignIn;
-                  MiniBox.remove(mGoogleEmail);
+                  MiniBox().remove(mGoogleEmail);
                   if (context.mounted) {
                     showSignInToast(
                       context,
@@ -268,7 +268,7 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
 
           await _googleService.signOut();
           currentEmail.value = tapHereToSignIn;
-          MiniBox.remove(mGoogleEmail);
+          MiniBox().remove(mGoogleEmail);
           if (context.mounted) {
             showSignInToast(context, ToastificationType.warning, 'Signed out');
           }
@@ -282,7 +282,7 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
         final email = account.email;
         currentEmail.value = email;
         showSignInToast(context, ToastificationType.success, 'Signed in to $email');
-        await MiniBox.write(mGoogleEmail, email);
+        await MiniBox().write(mGoogleEmail, email);
       }
     } catch (e, t) {
       MiniLogger.e('Sign in error: ${e.toString()}');

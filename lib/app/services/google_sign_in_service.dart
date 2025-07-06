@@ -41,11 +41,11 @@ class GoogleSignInService {
   Future<bool> restoreGoogleAccount() async {
     final account = await _googleSignIn.signInSilently();
     if (account != null) {
-      await MiniBox.write(mGoogleEmail, account.email);
+      await MiniBox().write(mGoogleEmail, account.email);
       MiniLogger.d("Restored user: ${account.email}");
       return true;
     } else {
-      await MiniBox.write(mGoogleEmail, null);
+      await MiniBox().write(mGoogleEmail, null);
       MiniLogger.d("No previous session found");
       return false;
     }

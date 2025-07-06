@@ -11,12 +11,12 @@ class ThemeManager extends ChangeNotifier {
   late ThemePreference _themePreference;
 
   ThemeManager() {
-    final storedColorIndex = MiniBox.read(mThemeColor);
+    final storedColorIndex = MiniBox().read(mThemeColor);
     _selectedColor = storedColorIndex != null
         ? ThemeColors.values[storedColorIndex]
         : ThemeColors.values[0];
 
-    final storedPreference = MiniBox.read(mThemePreference);
+    final storedPreference = MiniBox().read(mThemePreference);
     _themePreference = storedPreference != null
         ? ThemePreference.values[storedPreference]
         : ThemePreference.system;
@@ -62,7 +62,7 @@ class ThemeManager extends ChangeNotifier {
 
   Future<void> setThemePreference(ThemePreference preference) async {
     try {
-      await MiniBox.write(mThemePreference, preference.index);
+      await MiniBox().write(mThemePreference, preference.index);
       _themePreference = preference;
       notifyListeners();
     } catch (e) {
@@ -72,7 +72,7 @@ class ThemeManager extends ChangeNotifier {
 
   Future<void> setThemeColor(ThemeColors color) async {
     _selectedColor = color;
-    await MiniBox.write(mThemeColor, color.index);
+    await MiniBox().write(mThemeColor, color.index);
     notifyListeners();
   }
 }

@@ -59,7 +59,7 @@ class ObjectBox {
     if (folderBox.isEmpty()) {
       folderBox.putMany(_getInitialFolders());
     }
-    await MiniBox.write(mFirstTimeInstall, false);
+    await MiniBox().write(mFirstTimeInstall, false);
   }
 
   List<TaskCategory> _getInitialCategories() {

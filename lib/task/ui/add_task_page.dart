@@ -280,9 +280,9 @@ class TitleTextField extends StatelessWidget {
     } else {
       MiniLogger.d('Some permissions are missing');
 
-      if (MiniBox.read(firstTimeMicTap) ?? true) {
+      if (MiniBox().read(firstTimeMicTap) ?? true) {
         MiniLogger.d('First time requesting permissions');
-        await MiniBox.write(firstTimeMicTap, false);
+        await MiniBox().write(firstTimeMicTap, false);
 
         // Request microphone permission first
         final micResult = await Permission.microphone.request();
@@ -311,7 +311,7 @@ class TitleTextField extends StatelessWidget {
       } else {
         MiniLogger.d('Not first time, checking if denied again flag is set');
 
-        if (!(MiniBox.read(micPermissionDeniedAgain) ?? false)) {
+        if (!(MiniBox().read(micPermissionDeniedAgain) ?? false)) {
           MiniLogger.d('Requesting permissions second time');
 
           // Request both permissions again
@@ -331,7 +331,7 @@ class TitleTextField extends StatelessWidget {
             }
           } else {
             MiniLogger.d('Some permissions denied on second request');
-            await MiniBox.write(micPermissionDeniedAgain, true);
+            await MiniBox().write(micPermissionDeniedAgain, true);
             showPermissionDeniedToast();
           }
         } else {
@@ -772,7 +772,7 @@ class _ReminderDialogState extends State<ReminderDialog> {
   void initState() {
     super.initState();
     // Initialize from existing reminder if editing, else defaults
-    _selectedType = widget.edit ? widget.reminder!.type : MiniBox.read(mDefaultReminderType);
+    _selectedType = widget.edit ? widget.reminder!.type : MiniBox().read(mDefaultReminderType);
     _selectedTime = widget.edit ? widget.reminder!.time : TimeOfDay.now();
   }
 

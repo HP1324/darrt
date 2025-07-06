@@ -180,14 +180,14 @@ class TaskViewModel extends ViewModel<Task> {
     return objectList.map((task) => task.toJson()).toList();
   }
 
-  bool _isTimelineView = MiniBox.read('isTimeLine') ?? false;
+  bool _isTimelineView = MiniBox().read('isTimeLine') ?? false;
   bool get isTimelineView => _isTimelineView;
 
   // Toggle between timeline and normal view
   void toggleViewMode() async {
     _isTimelineView = !_isTimelineView;
     notifyListeners();
-    await MiniBox.write('isTimeLine', _isTimelineView);
+    await MiniBox().write('isTimeLine', _isTimelineView);
   }
 
   // Set view mode explicitly
@@ -195,7 +195,7 @@ class TaskViewModel extends ViewModel<Task> {
     if (_isTimelineView != isTimeline) {
       _isTimelineView = isTimeline;
       notifyListeners();
-      await MiniBox.write('isTimeLine', _isTimelineView);
+      await MiniBox().write('isTimeLine', _isTimelineView);
     }
   }
 
