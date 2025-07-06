@@ -17,6 +17,7 @@ import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 import 'category/models/task_category.dart';
 import 'note/models/folder.dart';
 import 'note/models/note.dart';
+import 'quickreminder/model/quick_reminder.dart';
 import 'task/models/task.dart';
 import 'task/models/task_completion.dart';
 
@@ -321,6 +322,40 @@ final _entities = <obx_int.ModelEntity>[
       ),
     ],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(9, 3517275010729598994),
+    name: 'QuickReminder',
+    lastPropertyId: const obx_int.IdUid(4, 7987538131712612453),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 246131569503549765),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 5177062319457027476),
+        name: 'title',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 9115729849534517293),
+        name: 'type',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 7987538131712612453),
+        name: 'durationMinutes',
+        type: 6,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -361,7 +396,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(8, 4829064955625959483),
+    lastEntityId: const obx_int.IdUid(9, 3517275010729598994),
     lastIndexId: const obx_int.IdUid(1, 7157772403585420880),
     lastRelationId: const obx_int.IdUid(2, 752695274466247110),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -807,6 +842,53 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    QuickReminder: obx_int.EntityDefinition<QuickReminder>(
+      model: _entities[5],
+      toOneRelations: (QuickReminder object) => [],
+      toManyRelations: (QuickReminder object) => {},
+      getId: (QuickReminder object) => object.id,
+      setId: (QuickReminder object, int id) {
+        object.id = id;
+      },
+      objectToFB: (QuickReminder object, fb.Builder fbb) {
+        final titleOffset = object.title == null
+            ? null
+            : fbb.writeString(object.title!);
+        final typeOffset = object.type == null
+            ? null
+            : fbb.writeString(object.type!);
+        fbb.startTable(5);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, titleOffset);
+        fbb.addOffset(2, typeOffset);
+        fbb.addInt64(3, object.durationMinutes);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final durationMinutesParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          10,
+          0,
+        );
+        final titleParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 6);
+        final typeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 8);
+        final object = QuickReminder(
+          durationMinutes: durationMinutesParam,
+          title: titleParam,
+          type: typeParam,
+        )..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -1011,5 +1093,28 @@ class TaskCategory_ {
   /// See [TaskCategory.uuid].
   static final uuid = obx.QueryStringProperty<TaskCategory>(
     _entities[4].properties[4],
+  );
+}
+
+/// [QuickReminder] entity fields to define ObjectBox queries.
+class QuickReminder_ {
+  /// See [QuickReminder.id].
+  static final id = obx.QueryIntegerProperty<QuickReminder>(
+    _entities[5].properties[0],
+  );
+
+  /// See [QuickReminder.title].
+  static final title = obx.QueryStringProperty<QuickReminder>(
+    _entities[5].properties[1],
+  );
+
+  /// See [QuickReminder.type].
+  static final type = obx.QueryStringProperty<QuickReminder>(
+    _entities[5].properties[2],
+  );
+
+  /// See [QuickReminder.durationMinutes].
+  static final durationMinutes = obx.QueryIntegerProperty<QuickReminder>(
+    _entities[5].properties[3],
   );
 }

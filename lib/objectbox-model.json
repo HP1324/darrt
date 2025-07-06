@@ -242,9 +242,38 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "9:3517275010729598994",
+      "lastPropertyId": "4:7987538131712612453",
+      "name": "QuickReminder",
+      "properties": [
+        {
+          "id": "1:246131569503549765",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5177062319457027476",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "3:9115729849534517293",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "4:7987538131712612453",
+          "name": "durationMinutes",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "8:4829064955625959483",
+  "lastEntityId": "9:3517275010729598994",
   "lastIndexId": "1:7157772403585420880",
   "lastRelationId": "2:752695274466247110",
   "lastSequenceId": "0:0",
