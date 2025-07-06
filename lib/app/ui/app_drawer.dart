@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:minimaltodo/app/ui/settings_page.dart';
 import 'package:minimaltodo/app/ui/theme_settings_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/quickreminder/ui/quick_reminders_page.dart';
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
@@ -46,6 +48,13 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Settings'),
             onTap: () {
                 MiniRouter.to(context, SettingsPage());
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.alarm),
+            title: const Text('Quick Reminders'),
+            onTap: () {
+                MiniRouter.to(context, QuickRemindersPage());
             },
           ),
           const Spacer(),
