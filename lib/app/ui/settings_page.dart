@@ -124,8 +124,7 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
                         await Workmanager().registerPeriodicTask(
                           mAutoBackup,
                           mAutoBackup,
-                          initialDelay: Duration(seconds: 5),
-                          frequency: duration,
+                          frequency: Duration(seconds: 10),
                         );
                       } else {
                         MiniLogger.dp('Cancelling background task');
@@ -326,7 +325,6 @@ class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelecto
       await Workmanager().registerPeriodicTask(
         mAutoBackup,
         mAutoBackup,
-        // initialDelay: Duration(seconds: 5),
         frequency: duration,
       );
       await MiniBox().write(mAutoBackupFrequency, newFrequency);
