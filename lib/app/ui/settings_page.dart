@@ -118,12 +118,17 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
                     if (value != null) {
                       _updateAutoBackup(value);
                       if (value) {
-                        await Workmanager().registerOneOffTask(
+                        final frequency = MiniBox().read(mAutoBackupFrequency) ?? 'daily';
+                        Duration duration = frequency == 'daily' ? Duration(days: 1) :frequency == 'weekly' ? Duration(days: 7) : Duration(days: 30);
+                        MiniLogger.dp('Registering background task: frequency: $frequency, duration: $duration');
+                        await Workmanager().registerPeriodicTask(
                           mAutoBackup,
                           mAutoBackup,
                           initialDelay: Duration(seconds: 5),
+                          frequency: duration,
                         );
                       } else {
+                        MiniLogger.dp('Cancelling background task');
                         await Workmanager().cancelByUniqueName(mAutoBackup);
                       }
                     }
@@ -309,14 +314,25 @@ class AutobackupFrequencySelector extends StatefulWidget {
 }
 
 class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelector> {
-  String currentFrequency = 'daily';
+  String currentFrequency = MiniBox().read(mAutoBackupFrequency) ?? 'daily';
 
-  void changeFrequency(String? newFrequency) {
+  void changeFrequency(String? newFrequency) async{
     if (newFrequency != null) {
       currentFrequency = newFrequency;
       setState(() {});
+
+      final duration = newFrequency == 'daily' ? Duration(days: 1) :newFrequency == 'weekly' ? Duration(days: 7) : Duration(days: 30);
+      await Workmanager().cancelByUniqueName(mAutoBackup);
+      await Workmanager().registerPeriodicTask(
+        mAutoBackup,
+        mAutoBackup,
+        // initialDelay: Duration(seconds: 5),
+        frequency: duration,
+      );
+      await MiniBox().write(mAutoBackupFrequency, newFrequency);
     }
   }
+
 
   Widget buildRadioButton(String label) {
     return Flexible(
@@ -324,7 +340,7 @@ class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelecto
         onTap: () => changeFrequency(label.toLowerCase()),
         borderRadius: BorderRadius.circular(6),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          // padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -336,7 +352,7 @@ class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelecto
                 visualDensity: VisualDensity.compact,
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              const SizedBox(width: 4),
+              // const SizedBox(width: 4),
               Flexible(
                 child: Text(
                   label,
