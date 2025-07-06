@@ -360,12 +360,12 @@ class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelecto
       valueListenable: widget.autoBackup,
       builder: (context, value, child) {
         if (!value) return const SizedBox.shrink();
-
+        final theme = Theme.of(context);
         return Container(
           margin: const EdgeInsets.all(5),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: theme.colorScheme.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(8),
           ),
           child: IntrinsicHeight(
@@ -375,13 +375,13 @@ class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelecto
                 buildRadioButton('Daily'),
                 Container(
                   width: 1,
-                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  color: theme.colorScheme.outline.withValues(alpha:0.2),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                 ),
                 buildRadioButton('Weekly'),
                 Container(
                   width: 1,
-                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  color: theme.colorScheme.outline.withValues(alpha:0.2),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                 ),
                 buildRadioButton('Monthly'),
