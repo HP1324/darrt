@@ -7,9 +7,7 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:minimaltodo/app/exceptions.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/category/models/task_category.dart';
-import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
@@ -18,7 +16,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:minimaltodo/note/models/folder.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/task/models/task.dart';
-import 'package:workmanager/workmanager.dart';
 
 const String backupFileJsonName = 'minitodo_backup.json';
 const String backupFileZipName = 'minitodo_backup.zip';
@@ -28,11 +25,9 @@ class BackupService {
   factory BackupService() => _instance;
   BackupService._internal();
 
-
-
   Future<dart.File> generateBackupJsonFile() async {
     try {
-      if(!await InternetConnection().hasInternetAccess){
+      if (!await InternetConnection().hasInternetAccess) {
         throw InternetOffError();
       }
       final localData = ObjectBox().getLocalData();
@@ -137,7 +132,7 @@ class BackupService {
 
   ///Downloads the compressed backup file(not json) from google drive,stores it in the platform's temporary directory and returns it as a dart [File] object. The temporary directory is retrieved using [getTemporaryDirectory] method from the path_provider package.
   Future<dart.File> downloadCompressedFileFromGoogleDrive() async {
-    if(!await InternetConnection().hasInternetAccess){
+    if (!await InternetConnection().hasInternetAccess) {
       throw InternetOffError();
     }
     final client = await GoogleSignInService().getAuthenticatedClient();
@@ -271,7 +266,7 @@ class BackupService {
   }
 
   Future<void> deleteBackupFromGoogleDrive() async {
-    if(!await InternetConnection().hasInternetAccess){
+    if (!await InternetConnection().hasInternetAccess) {
       throw InternetOffError();
     }
 
@@ -447,39 +442,7 @@ class BackupMergeService {
   }
 }
 
-@pragma('vm:entry-point')
-void callBackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    switch (task) {
-      case mAutoBackup:
 
-        try {
-          if(!await InternetConnection().hasInternetAccess){
-            throw InternetOffError();
-          }
-          final signedIn = await GoogleSignInService().restoreGoogleAccount();
-          MiniLogger.dp('signed in: $signedIn');
-          await MiniBox.initStorage();
-          final docsDir = await getApplicationDocumentsDirectory();
-          final objectBoxDirPath = path.join(docsDir.path, 'objectbox');
-          // final Store store = Store.attach(getObjectBoxModel(), objectBoxDirPath);
-          // BackupService().setStore(store);
-          ObjectBox().initForAnotherIsolate(objectBoxDirPath);
-          final jsonFile = await BackupService().generateBackupJsonFile();
-          final backupSuccessful = await BackupService().uploadFileToGoogleDrive(jsonFile);
-          if(backupSuccessful) {
-            await MiniBox.write(mLastBackupDate, DateTime.now().millisecondsSinceEpoch);
-          }
-          ObjectBox().close();
-        }catch(e,t){
-          MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
-          MiniLogger.t(t.toString());
-        }
-        break;
-    }
-    return Future.value(true);
-  });
-}
 
 enum MergeType {
   backup,

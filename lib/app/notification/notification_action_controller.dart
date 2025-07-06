@@ -2,6 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
+import 'package:minimaltodo/app/ui/settings_page.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
@@ -30,7 +31,7 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
         break;
       case snoozeActionKey:
         final now = DateTime.now();
-        final minutes = MiniBox.read(mSnoozeMinutes);
+        final minutes = MiniBox().read(mSnoozeMinutes);
         final nextTime = TimeOfDay.fromDateTime(now.add(Duration(minutes: minutes)));
         AwesomeNotifications().createNotification(
           content: NotificationContent(
@@ -55,8 +56,12 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
         );
         break;
       case quickSnoozeActionKey:
-        final minutes = MiniBox.read(mSnoozeMinutes);
+        final minutes = MiniBox().read(mSnoozeMinutes);
         NotificationService.scheduleQuickReminder(receivedAction.body ?? '', minutes);
+        break;
+      case openAppKey:
+        MiniTodo.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const SettingsPage()));
+        break;
       default:
         if (task != null) {
           MiniTodo.navigatorKey.currentState?.push(
@@ -71,14 +76,14 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     );
   }
 }
-
 const String finishedActionKey = 'FINISHED';
 const String snoozeActionKey = 'SNOOZE';
 const String finishedActionLabel = 'Finished';
 const String snoozeActionLabel = 'Snooze';
 const String quickSnoozeActionKey = 'QUICK_SNOOZE';
 const String quickSnoozeActionLabel = 'Quick Snooze';
-
+const String signInAndBackupActionKey = 'SIGN_IN_AND_BACKUP';
+const String openAppKey = 'OPEN_APP';
 final finishedActionButton = NotificationActionButton(
   key: finishedActionKey,
   label: finishedActionLabel,

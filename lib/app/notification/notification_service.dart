@@ -17,9 +17,9 @@ class NotificationService {
     try {
       await initNotifChannels();
       bool permissionGranted = await _notif.isNotificationAllowed();
-      if (!permissionGranted && (MiniBox.read(mFirstTimeNotifPermission) ?? true)) {
+      if (!permissionGranted && (MiniBox().read(mFirstTimeNotifPermission) ?? true)) {
         permissionGranted = await _notif.requestPermissionToSendNotifications();
-        await MiniBox.write(mFirstTimeNotifPermission, false);
+        await MiniBox().write(mFirstTimeNotifPermission, false);
         MiniLogger.d('First time permission request: $permissionGranted');
       }
 
