@@ -456,7 +456,7 @@ class NotificationService {
     );
   }
 
-  static Future<void> scheduleQuickReminder(String? title, int minutes, {String? type}) async {
+  static Future<void> scheduleQuickReminder(String? title, int minutes, {String? type,int? id}) async {
     final now = DateTime.now();
     final channelKey = type == alarmReminderType ? alarmChannelKey : notifChannelKey;
     final category = type == alarmReminderType
@@ -466,10 +466,10 @@ class NotificationService {
     final nextTime = TimeOfDay.fromDateTime(now.add(Duration(minutes: minutes)));
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
-        id: now.millisecondsSinceEpoch.remainder(1000000),
+        id: id ?? now.millisecondsSinceEpoch.remainder(1000000),
         channelKey: channelKey,
-        title: title != null ? 'Task due at ${formatTime(nextTime)}' :'Quick Reminder',
-        body: title ?? 'No title was set',
+        title: title == null || title.isEmpty ? 'Quick Reminder' : 'Task due at ${formatTime(nextTime)}',
+        body: title == null || title.isEmpty? 'No title was set' : title,
         category: category,
         criticalAlert: true,
       ),

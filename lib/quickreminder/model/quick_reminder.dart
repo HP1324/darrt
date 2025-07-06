@@ -5,10 +5,10 @@ import 'package:minimaltodo/helpers/consts.dart';
 @Entity()
 class QuickReminder {
   @Id()
-  int id = 0;
+  int id;
   String? title;
   String? type;
-
+  int notifId;
   int durationMinutes;
-  QuickReminder({required this.durationMinutes, this.title, this.type = notifReminderType});
+  QuickReminder({this.id = 0,required this.durationMinutes, this.title, this.type = notifReminderType,required this.notifId});
 }

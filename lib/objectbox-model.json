@@ -245,7 +245,7 @@
     },
     {
       "id": "9:3517275010729598994",
-      "lastPropertyId": "4:7987538131712612453",
+      "lastPropertyId": "5:9084756514200359992",
       "name": "QuickReminder",
       "properties": [
         {
@@ -267,6 +267,11 @@
         {
           "id": "4:7987538131712612453",
           "name": "durationMinutes",
+          "type": 6
+        },
+        {
+          "id": "5:9084756514200359992",
+          "name": "notifId",
           "type": 6
         }
       ],

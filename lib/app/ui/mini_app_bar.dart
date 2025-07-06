@@ -3,15 +3,14 @@ import 'dart:async';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/helpers/consts.dart';
-import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:minimaltodo/quickreminder/ui/quick_reminder_dialog.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:toastification/toastification.dart';
 
@@ -129,7 +128,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                     await showDialog(
                       context: context,
                       builder: (context) {
-                        return QuickReminderDialog();
+                        return QuickReminderDialog(edit: false);
                       },
                     );
                   }
@@ -303,171 +302,7 @@ class TimelineFilterButton extends StatelessWidget {
   }
 }
 
-class QuickReminderDialog extends StatefulWidget {
-  const QuickReminderDialog({super.key});
 
-  @override
-  State<QuickReminderDialog> createState() => _QuickReminderDialogState();
-}
-
-class _QuickReminderDialogState extends State<QuickReminderDialog> {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _minutesController = TextEditingController();
-  Set<String> reminderTypes = {notifReminderType, alarmReminderType};
-  late String reminderType = notifReminderType;
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _minutesController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return AlertDialog.adaptive(
-      shape: OutlineInputBorder(),
-      scrollable: true,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Quick reminder',
-            style: textTheme.titleMedium,
-          ),
-          Tooltip(
-            showDuration: Duration(milliseconds: 6000),
-            triggerMode: TooltipTriggerMode.tap,
-            message: Messages.mQuickReminderMessage,
-            child: Icon(Icons.info_outline_rounded),
-          ),
-        ],
-      ),
-      content: Column(
-        spacing: 10,
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Reminder type selection segmented buttons string
-          SegmentedButton<String>(
-            showSelectedIcon: false,
-            segments: [
-              ButtonSegment(
-                value: notifReminderType,
-                label: FittedBox(child: Text('Notification')),
-              ),
-              ButtonSegment(value: alarmReminderType, label: Text('Alarm')),
-            ],
-            selected: {reminderType},
-            onSelectionChanged: (selected) {
-              setState(() {
-                reminderType = selected.first;
-              });
-            },
-          ),
-          TextField(
-            controller: _titleController,
-            decoration: InputDecoration(
-              labelText: 'Title (optional)',
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-              ),
-            ),
-          ),
-          Flexible(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text('Remind me after'),
-                SizedBox(width: 8),
-                Flexible(
-                  child: IntrinsicWidth(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: 40,
-                        maxWidth: 80,
-                      ),
-                      child: TextField(
-                        controller: _minutesController,
-                        autofocus: true,
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        maxLength: 3,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 0,
-                          ),
-                          isDense: true,
-                          counterText: '',
-                          errorText: null,
-                        ),
-                        style: TextStyle(fontSize: 16, height: 1.2),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          TextInputFormatter.withFunction(
-                            (oldValue, newValue) {
-                              // Don't allow starting with 0
-                              if (newValue.text.startsWith('0') && newValue.text.isNotEmpty) {
-                                return oldValue;
-                              }
-
-                              if (newValue.text.isEmpty) return newValue;
-                              final intValue = int.tryParse(newValue.text);
-                              if (intValue != null && intValue > 999) {
-                                return oldValue;
-                              }
-                              return newValue;
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8),
-                Text('minutes'),
-              ],
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Cancel'),
-        ),
-        FilledButton(
-          onPressed: () async {
-            final title = _titleController.text;
-            final minutes = int.parse(_minutesController.text);
-            showToast(
-              context,
-              type: ToastificationType.success,
-              description:
-                  'Reminder set after ${minutes > 1 ? '$minutes minutes' : '$minutes minute'}',
-            );
-            Navigator.pop(context);
-            await NotificationService.scheduleQuickReminder(title, minutes, type: reminderType);
-            MiniLogger.dp('title: $title, minutes: $minutes, type: ${minutes.runtimeType}');
-          },
-          child: Text('Set Reminder'),
-        ),
-      ],
-    );
-  }
-}
 
 class _MiniAppBarAction extends StatelessWidget {
   const _MiniAppBarAction({required this.icon, required this.onTap});
