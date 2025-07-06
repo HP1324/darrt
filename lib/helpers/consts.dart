@@ -38,7 +38,6 @@ const micPermissionDeniedAgain = 'mic_permission_denied_again';
 ///How much minutes to snooze when user presses snooze action button in notification
 const mSnoozeMinutes = 'snooze_minutes';
 
-
 const alarmChannelKey = 'task_alarm';
 
 const notifChannelKey = 'task_notif';
@@ -53,6 +52,8 @@ const mLastBackupDate = 'last_backup_date';
 
 const mAutoBackup = 'auto_backup';
 
+const mAutoBackupFrequency = 'auto_backup_frequency';
+
 const mCanPop = 'can_pop';
 
 const tapHereToSignIn = 'Tap here to sign in to google account';
@@ -61,6 +62,6 @@ const googleClientId = "569574442549-543mjpqcfhsivrn5atcoblifvbkvg0vp.apps.googl
 
 Uint8List noteEmptyErrorBytes = Uint8List(0);
 
-final mInitialDate = DateTime(2000,1,1);
+final mInitialDate = DateTime(2000, 1, 1);
 
 const maxExtentDateDays = 7305;

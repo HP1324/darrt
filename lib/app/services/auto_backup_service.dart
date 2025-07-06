@@ -33,9 +33,9 @@ void callBackDispatcher() {
           }
           ObjectBox().close();
         } on InternetOffError {
-          await createBackupSuccessNotification();
+          await createBackupFailureNotification();
         } on GoogleClientNotAuthenticatedError {
-          await createBackupSuccessNotification();
+          await createBackupFailureNotification();
         } catch (e, t) {
           MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
           MiniLogger.t(t.toString());
@@ -64,8 +64,7 @@ Future<void> createBackupSuccessNotification() async {
     content: NotificationContent(
       id: 1,
       channelKey: notifChannelKey,
-      body: 'Backup successful',
+      body: 'Auto Backup successful',
     ),
-    actionButtons: [NotificationActionButton(key: openAppKey, label: 'Open Settings')],
   );
 }
