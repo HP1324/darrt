@@ -82,7 +82,7 @@ class _MiniTodoState extends State<MiniTodo> {
             ),
             themeMode: themeMode,
             debugShowCheckedModeBanner: false,
-            title: 'MiniTodo',
+            title: 'Darrt',
             home: const Home(),
           );
         }

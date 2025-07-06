@@ -17,7 +17,7 @@
         </intent>
     </queries>
     <application
-        android:label="MiniTodo"
+        android:label="Darrt"
         android:name="${applicationName}"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher">
