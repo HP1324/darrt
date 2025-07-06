@@ -56,6 +56,6 @@ class Messages {
 
   static final mNoRepeatingTasksYet = 'No repeating tasks for this date';
 
-  static final mQuickReminderMessage =  'Note: This is a quick reminder that will appear only as a notification. It won’t be added to your tasks list. Reminder type is set to the default reminder type in settings ';
+  static final mQuickReminderMessage =  'Set quick reminders here, the most recent 30 quick reminders can be seen in the Quick Reminders page.Also, they are not included in backup.';
 
 }

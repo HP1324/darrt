@@ -325,7 +325,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(9, 3517275010729598994),
     name: 'QuickReminder',
-    lastPropertyId: const obx_int.IdUid(4, 7987538131712612453),
+    lastPropertyId: const obx_int.IdUid(5, 9084756514200359992),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -349,6 +349,12 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(4, 7987538131712612453),
         name: 'durationMinutes',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 9084756514200359992),
+        name: 'notifId',
         type: 6,
         flags: 0,
       ),
@@ -857,17 +863,24 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final typeOffset = object.type == null
             ? null
             : fbb.writeString(object.type!);
-        fbb.startTable(5);
+        fbb.startTable(6);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, titleOffset);
         fbb.addOffset(2, typeOffset);
         fbb.addInt64(3, object.durationMinutes);
+        fbb.addInt64(4, object.notifId);
         fbb.finish(fbb.endTable());
         return object.id;
       },
       objectFromFB: (obx.Store store, ByteData fbData) {
         final buffer = fb.BufferContext(fbData);
         final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
         final durationMinutesParam = const fb.Int64Reader().vTableGet(
           buffer,
           rootOffset,
@@ -880,11 +893,19 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final typeParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 8);
+        final notifIdParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          0,
+        );
         final object = QuickReminder(
+          id: idParam,
           durationMinutes: durationMinutesParam,
           title: titleParam,
           type: typeParam,
-        )..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          notifId: notifIdParam,
+        );
 
         return object;
       },
@@ -1116,5 +1137,10 @@ class QuickReminder_ {
   /// See [QuickReminder.durationMinutes].
   static final durationMinutes = obx.QueryIntegerProperty<QuickReminder>(
     _entities[5].properties[3],
+  );
+
+  /// See [QuickReminder.notifId].
+  static final notifId = obx.QueryIntegerProperty<QuickReminder>(
+    _entities[5].properties[4],
   );
 }
