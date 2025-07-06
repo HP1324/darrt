@@ -90,8 +90,8 @@ class TimelineTaskContainer extends StatelessWidget {
                       // margin: const EdgeInsets.only(top: 1),
                       decoration: BoxDecoration(
                         color: hasTime
-                            ? scheme.outline.withValues(alpha:0.3)
-                            : scheme.outline.withValues(alpha:0.1),
+                            ? scheme.outline.withValues(alpha: 0.3)
+                            : scheme.outline.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(1),
                       ),
                     ),
@@ -100,18 +100,18 @@ class TimelineTaskContainer extends StatelessWidget {
                   TimelineCheckbox(task: task),
                   // Timeline line
                   // if (!isLast)
-                    Expanded(
-                      child: Container(
-                        width: 2,
-                        // margin: const EdgeInsets.only(top: 4),
-                        decoration: BoxDecoration(
-                          color: hasTime
-                              ? scheme.outline.withValues(alpha:0.3)
-                              : scheme.outline.withValues(alpha:0.1),
-                          borderRadius: BorderRadius.circular(1),
-                        ),
+                  Expanded(
+                    child: Container(
+                      width: 2,
+                      // margin: const EdgeInsets.only(top: 4),
+                      decoration: BoxDecoration(
+                        color: hasTime
+                            ? scheme.outline.withValues(alpha: 0.3)
+                            : scheme.outline.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(1),
                       ),
                     ),
+                  ),
                 ],
               ),
             ),
@@ -126,11 +126,11 @@ class TimelineTaskContainer extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? scheme.outline.withValues(alpha:0.7)
-                        : scheme.surface.withValues(alpha:0.05),
+                        ? scheme.outline.withValues(alpha: 0.7)
+                        : scheme.surface.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: scheme.outline.withValues(alpha:0.1),
+                      color: scheme.outline.withValues(alpha: 0.1),
                       width: 0.5,
                     ),
                   ),
@@ -170,10 +170,7 @@ class TimelineTaskContent extends StatelessWidget {
 }
 
 class TimelineTaskTitle extends StatelessWidget {
-  const TimelineTaskTitle({
-    super.key,
-    required this.task,
-  });
+  const TimelineTaskTitle({super.key, required this.task});
 
   final Task task;
 
@@ -186,24 +183,22 @@ class TimelineTaskTitle extends StatelessWidget {
         final repeat = task.isRepeating;
         final stc = g.taskVm.onetimeTaskCompletions;
         final rtc = g.taskVm.repeatingTaskCompletions;
-        final isFinished = repeat
-            ? rtc[task.id]?.contains(date) ?? false
-            : stc[task.id] ?? false;
+        final isFinished = repeat ? rtc[task.id]?.contains(date) ?? false : stc[task.id] ?? false;
         final theme = Theme.of(context);
         return Row(
           children: [
             Expanded(
               child: Text(
                 task.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: theme.textTheme.titleSmall!.fontSize,
                   fontWeight: FontWeight.w600,
                   decorationColor: theme.colorScheme.outline,
                   decorationThickness: 2,
                   decoration: isFinished ? TextDecoration.lineThrough : null,
-                  color: isFinished
-                      ? theme.colorScheme.outline
-                      : theme.colorScheme.onSurface,
+                  color: isFinished ? theme.colorScheme.outline : theme.colorScheme.onSurface,
                 ),
               ),
             ),
@@ -305,13 +300,13 @@ class TimelineTaskTime extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primaryContainer.withValues(alpha:0.8),
+        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         timeString,
         style: TextStyle(
-          fontSize:theme.textTheme.labelSmall!.fontSize,
+          fontSize: theme.textTheme.labelSmall!.fontSize,
           fontWeight: FontWeight.w500,
           color: theme.colorScheme.onPrimaryContainer,
         ),
@@ -373,7 +368,9 @@ class TimelineCheckbox extends StatelessWidget {
           );
         }
         return BorderSide(
-          color: hasTime ? colorScheme.primary.withValues(alpha:0.6) : colorScheme.outline.withValues(alpha:0.4),
+          color: hasTime
+              ? colorScheme.primary.withValues(alpha: 0.6)
+              : colorScheme.outline.withValues(alpha: 0.4),
           width: 2,
         );
       }),
@@ -391,7 +388,7 @@ class TimelineCheckbox extends StatelessWidget {
       }),
       overlayColor: WidgetStateProperty.resolveWith<Color>((states) {
         if (states.contains(WidgetState.pressed)) {
-          return (hasTime ? colorScheme.primary : colorScheme.outline).withValues(alpha:0.1);
+          return (hasTime ? colorScheme.primary : colorScheme.outline).withValues(alpha: 0.1);
         }
         return Colors.transparent;
       }),

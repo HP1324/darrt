@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -110,12 +112,14 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   onTap: () async {
                     if (kDebugMode) {
                       final user = GoogleSignInService().currentUser;
-                      MiniLogger.dp(user?.email ?? 'null is there in user');
+                      MiniLogger.dp(user?.email ?? 'No user is currently logged in');
                     }
                     final path = ObjectBox().store!.directoryPath;
                     debugPrint('ObjectBox path: $path');
                     final docsDir = await getApplicationDocumentsDirectory();
                     debugPrint('App docs dir: ${docsDir.path}/objectbox');
+
+                    await createNotification();
                   },
                 ),
               TimelineFilterButton(),
@@ -182,6 +186,58 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
       },
     );
   }
+
+  Future<void> createNotification() async {
+    final int notifId = DateTime.now().millisecondsSinceEpoch.remainder(1000000);
+    const totalDuration = Duration(minutes: 5); // 5 minutes
+
+    DateTime startTime = DateTime.now();
+
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: notifId,
+        channelKey: notifChannelKey,
+        autoDismissible: false,
+        locked: true,
+        body: 'Progress notification in progress...',
+        chronometer: Duration.zero,
+        timeoutAfter: totalDuration,
+        // category: NotificationCategory.Service,
+        showWhen: true,
+        progress: 0,
+        notificationLayout: NotificationLayout.ProgressBar,
+      ),
+    );
+
+    Timer.periodic(const Duration(seconds: 1), (timer) async {
+      final elapsed = DateTime.now().difference(startTime);
+      final progressPercent = (elapsed.inMilliseconds / totalDuration.inMilliseconds * 100)
+          .clamp(0, 100)
+          .toDouble();
+
+      // Update the notification
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: notifId,
+          channelKey: notifChannelKey,
+          title: 'Elapsed time: ${elapsed.inMinutes}:${(elapsed.inSeconds % 60).toString().padLeft(2, '0')}',
+          progress: progressPercent,
+          locked: true,
+          autoDismissible: false,
+          chronometer: Duration.zero,
+          timeoutAfter: totalDuration,
+          category: NotificationCategory.Service,
+          notificationLayout: NotificationLayout.ProgressBar,
+        ),
+      );
+
+      if (progressPercent >= 100) {
+        timer.cancel();
+        // optionally cancel the notification or mark it as done
+        // AwesomeNotifications().cancel(notifId);
+      }
+    });
+  }
 }
 
 class TimelineFilterButton extends StatelessWidget {
@@ -246,6 +302,7 @@ class TimelineFilterButton extends StatelessWidget {
     );
   }
 }
+
 class QuickReminderDialog extends StatefulWidget {
   const QuickReminderDialog({super.key});
 
@@ -398,7 +455,8 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
             showToast(
               context,
               type: ToastificationType.success,
-              description:'Reminder set after ${minutes > 1 ? '$minutes minutes' : '$minutes minute'}',
+              description:
+                  'Reminder set after ${minutes > 1 ? '$minutes minutes' : '$minutes minute'}',
             );
             Navigator.pop(context);
             await NotificationService.scheduleQuickReminder(title, minutes, type: reminderType);
