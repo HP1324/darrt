@@ -16,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:minimaltodo/note/models/folder.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/task/models/task.dart';
+import 'package:googleapis_auth/googleapis_auth.dart' as auth show AuthClient;
 
 const String backupFileJsonName = 'minitodo_backup.json';
 const String backupFileZipName = 'minitodo_backup.zip';
@@ -25,48 +26,50 @@ class BackupService {
   factory BackupService() => _instance;
   BackupService._internal();
 
-  Future<bool> performBackup() async {
+  /// Google account's authenticated client
+  auth.AuthClient? _authClient;
+
+  Future<void> performBackup() async {
     try {
       //1. Check internet connection
       if (!await InternetConnection().hasInternetAccess) throw InternetOffError();
 
-      final backupFile = await _generateBackupFile();
+      //2. Generate backup json file
+      final backupJsonFile = await _generateBackupFile();
 
+      //3. Upload backup file to google drive after compressing to zip
+      final uploaded = await uploadFileToGoogleDrive(backupJsonFile);
+
+      if(!uploaded){
+        throw Exception('Some google drive api error occurred during backup');
+      }
     } on InternetOffError {
       MiniLogger.e('Internet not connected');
       rethrow;
     } on GoogleClientNotAuthenticatedError {
       MiniLogger.e('Google client not authenticated');
       rethrow;
-    } on BackupFileNotFoundError {
-      MiniLogger.d('No previous backup file found in google drive');
+    }catch (e,t){
+      MiniLogger.e('Error performing backup ${e.toString()}, type: ${e.runtimeType}');
+      MiniLogger.t(t.toString());
     }
-    return true;
   }
 
   Future<dart.File> _generateBackupFile() async {
-
-    //2. Get authenticated google client if internet is on
-    final client = await GoogleSignInService().getAuthenticatedClient();
-
-    // Check if the client is not null
-    if (client == null) throw GoogleClientNotAuthenticatedError();
-
     //Get local data
     final localData = ObjectBox().getLocalData();
 
     Map<String, dynamic> mergedData = Map.from(localData);
 
     // Download old backup file in compressed zip format
-    final oldCompressedFile = await downloadCompressedFileFromGoogleDrive(client);
+    final oldCompressedFile = await downloadCompressedFileFromGoogleDrive();
 
-    if(oldCompressedFile != null){
-
+    if (oldCompressedFile != null) {
       //If there exists an old backup file, then 1. Decompress it to json file
       final oldDecompressedFile = _decompressToJsonFile(oldCompressedFile);
 
       // 2. Parse the old json file as [Map<String, dynamic>]
-      final oldData = await parseBackupJsonFileAsMap(oldDecompressedFile);
+      final oldData = await _parseBackupJsonFileAsMap(oldDecompressedFile);
 
       // 3. Merge the old and new data
       mergedData = BackupMergeService.mergeData(
@@ -89,150 +92,83 @@ class BackupService {
     return file;
   }
 
-  Future<dart.File> generateBackupJsonFile() async {
-    try {
-      if (!await InternetConnection().hasInternetAccess) {
-        throw InternetOffError();
-      }
-      final localData = ObjectBox().getLocalData();
-
-      Map<String, dynamic> mergedData = Map.from(localData);
-      try {
-        // Download the Old zip file which already exists in google drive
-        final oldCompressedFile = await downloadCompressedFileFromGoogleDrive();
-
-        // Decompress the old zip file to json file
-        final oldDecompressedFile = _decompressToJsonFile(oldCompressedFile!);
-
-        // Parse the old json file as map
-        final driveData = await parseBackupJsonFileAsMap(oldDecompressedFile);
-
-        // Merge the old and new data
-        mergedData = BackupMergeService.mergeData(
-          driveData,
-          localData,
-          mergeType: MergeType.backup,
-        );
-        // mergedData = _mergeData(oldData, newData);
-      } on BackupFileNotFoundError {
-        //Can't rethrow this error as it will not allow to proceed with the backup when first time backup and no backup file is there in drive
-        MiniLogger.d('No previous backup file found in google drive');
-      } on GoogleClientNotAuthenticatedError {
-        rethrow;
-      } catch (e, t) {
-        MiniLogger.e('Error downloading old backup file ${e.toString()}, type: ${e.runtimeType}');
-        MiniLogger.t(t.toString());
-      }
-
-      final jsonString = jsonEncode(mergedData);
-
-      dev.log('This is the merged data: $jsonString');
-      final dir = await getApplicationDocumentsDirectory();
-
-      final file = dart.File(path.join(dir.path, backupFileJsonName));
-
-      await file.writeAsString(jsonString);
-
-      return file;
-    } catch (e, t) {
-      MiniLogger.e('Error generating backup file ${e.toString()}, type: ${e.runtimeType}');
-      MiniLogger.t('Stacktrace: ${t.toString()}');
-      rethrow;
-    }
-  }
-
   /// Takes json file as input, compresses it using [_compressJsonFile] and uploads it to google drive.
   Future<bool> uploadFileToGoogleDrive(dart.File jsonFile) async {
-    try {
-      // Retrieve authenticated client to work with Drive API
-      final client = await GoogleSignInService().getAuthenticatedClient();
+    if (_authClient == null) throw GoogleClientNotAuthenticatedError();
 
-      if (client == null) {
-        throw GoogleClientNotAuthenticatedError();
-      }
+    final driveApi = drive.DriveApi(_authClient!);
 
-      final driveApi = drive.DriveApi(client);
+    // Check if file already exists
+    final existingFiles = await driveApi.files.list(
+      q: "name='$backupFileZipName' and trashed=false",
+      spaces: 'appDataFolder',
+    );
 
-      // Check if file already exists
-      final existingFiles = await driveApi.files.list(
-        q: "name='$backupFileZipName' and trashed=false",
-        spaces: 'appDataFolder',
-      );
+    if (existingFiles.files != null && existingFiles.files!.isNotEmpty) {
+      await driveApi.files.delete(existingFiles.files!.first.id!);
+    }
 
-      if (existingFiles.files != null && existingFiles.files!.isNotEmpty) {
-        await driveApi.files.delete(existingFiles.files!.first.id!);
-      }
+    // Compress JSON file
+    final zipFile = _compressJsonFile(jsonFile);
 
-      // Compress JSON file
-      final zipFile = _compressJsonFile(jsonFile);
+    final driveFile = drive.File()
+      ..name = backupFileZipName
+      ..parents = ['appDataFolder'];
 
-      final driveFile = drive.File()
-        ..name = backupFileZipName
-        ..parents = ['appDataFolder'];
+    final media = drive.Media(
+      zipFile.openRead(),
+      await zipFile.length(),
+      contentType: 'application/zip',
+    );
 
-      final media = drive.Media(
-        zipFile.openRead(),
-        await zipFile.length(),
-        contentType: 'application/zip',
-      );
+    final drive.File uploadedFile = await driveApi.files.create(driveFile, uploadMedia: media);
 
-      final uploaded = await driveApi.files.create(driveFile, uploadMedia: media);
+    _authClient?.close();
 
-      client.close();
-
-      if (uploaded.id != null) {
-        MiniLogger.d('Backup file uploaded to Google Drive (fileId: ${uploaded.id})');
-        return true;
-      } else {
-        MiniLogger.e('Upload returned null id');
-        return false;
-      }
-    } catch (e, t) {
-      MiniLogger.e('Error uploading file to Google Drive: $e');
-      MiniLogger.t('Stacktrace: $t');
+    if (uploadedFile.id != null) {
+      MiniLogger.d('Backup file uploaded to Google Drive (fileId: ${uploadedFile.id})');
+      return true;
+    } else {
+      MiniLogger.e('Upload returned null id');
       return false;
     }
   }
 
   ///Downloads the compressed backup file(not json) from google drive,stores it in the platform's temporary directory and returns it as a dart [File] object. The temporary directory is retrieved using [getTemporaryDirectory] method from the path_provider package.
-  Future<dart.File?> downloadCompressedFileFromGoogleDrive(dynamic client) async {
+  Future<dart.File?> downloadCompressedFileFromGoogleDrive() async {
+    if (_authClient == null) throw GoogleClientNotAuthenticatedError();
 
-    try {
-      final driveApi = drive.DriveApi(client);
-      // 1. Search for the file by name
-      final searchResult = await driveApi.files.list(
-        q: "name='$backupFileZipName' and trashed=false",
-        spaces: 'appDataFolder',
-        $fields: 'files(id, name)',
-      );
-      if (searchResult.files == null || searchResult.files!.isEmpty) {
-        throw BackupFileNotFoundError();
-      }
-
-      final fileId = searchResult.files!.first.id;
-
-      final tempDir = await getTemporaryDirectory();
-
-      // Here we are just creating a reference to an empty file object with the
-      // same name as the backup file, we will write data to the file using stream
-      final localPath = '${tempDir.path}/$backupFileZipName';
-
-      final outFile = dart.File(localPath);
-
-      //2.Download file as media
-      final media = await driveApi.files.get(fileId!, downloadOptions: drive.DownloadOptions.fullMedia)
-              as drive.Media;
-
-      final sink = outFile.openWrite();
-      await media.stream.pipe(sink);
-      await sink.close();
-      client.close();
-      return outFile;
-    } catch (e, t) {
-      MiniLogger.e('Error downloading file from Google Drive: ${e.toString()}');
-      MiniLogger.t(t.toString());
+    final driveApi = drive.DriveApi(_authClient!);
+    // 1. Search for the file by name
+    final searchResult = await driveApi.files.list(
+      q: "name='$backupFileZipName' and trashed=false",
+      spaces: 'appDataFolder',
+      $fields: 'files(id, name)',
+    );
+    //If there is no existing backup file in google drive, return null
+    if (searchResult.files == null || searchResult.files!.isEmpty) {
       return null;
     }
+
+    final fileId = searchResult.files!.first.id;
+
+    final tempDir = await getTemporaryDirectory();
+
+    // Here we are just creating a reference to an empty file object with the
+    // same name as the backup file, we will write data to the file using stream
+    final localPath = path.join(tempDir.path, backupFileZipName);
+
+    final outFile = dart.File(localPath);
+
+    //2.Download file as media
+    final media =
+        await driveApi.files.get(fileId!, downloadOptions: drive.DownloadOptions.fullMedia)
+            as drive.Media;
+
+    final sink = outFile.openWrite();
+    await media.stream.pipe(sink);
+    await sink.close();
+    return outFile;
   }
 
   Future<void> restoreDataFromBackupFile(dart.File backupFile) async {
@@ -240,7 +176,7 @@ class BackupService {
     final jsonBackupFile = _decompressToJsonFile(backupFile);
 
     //Parse the json file as map to work on it
-    Map<String, dynamic> driveData = await parseBackupJsonFileAsMap(jsonBackupFile);
+    Map<String, dynamic> driveData = await _parseBackupJsonFileAsMap(jsonBackupFile);
     Map<String, dynamic> localData = ObjectBox().getLocalData();
     MiniLogger.dp('error was not above');
     Map<String, dynamic> mergedData = BackupMergeService.mergeData(
@@ -271,7 +207,7 @@ class BackupService {
     MiniLogger.d('Data restored from google drive');
   }
 
-  Future<Map<String, dynamic>> parseBackupJsonFileAsMap(dart.File jsonFile) async {
+  Future<Map<String, dynamic>> _parseBackupJsonFileAsMap(dart.File jsonFile) async {
     try {
       final jsonString = await jsonFile.readAsString();
       final jsonMap = jsonDecode(jsonString);

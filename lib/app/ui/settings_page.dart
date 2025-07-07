@@ -165,7 +165,7 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
                             try {
                               final backupFile = await BackupService()
                                   .downloadCompressedFileFromGoogleDrive();
-                              await BackupService().restoreDataFromBackupFile(backupFile);
+                              await BackupService().restoreDataFromBackupFile(backupFile!);
 
                               if (context.mounted) {
                                 //Rationale dialog to restart the app using restart_app package
@@ -533,8 +533,8 @@ class _BackupButtonState extends State<_BackupButton> {
                       // final backupSuccessful = await backupService.uploadFileToGoogleDrive(
                       //   backupFile,
                       // );
-                      final backupSuccessful = await backupService.performBackup();
-                      if (context.mounted && backupSuccessful) {
+                      await backupService.performBackup();
+                      if (context.mounted) {
                         showToast(
                           context,
                           type: ToastificationType.success,
