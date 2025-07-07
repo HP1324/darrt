@@ -529,10 +529,11 @@ class _BackupButtonState extends State<_BackupButton> {
                   if (await GoogleSignInService().isSignedIn()) {
                     isBackingUp.value = true;
                     try {
-                      final backupFile = await backupService.generateBackupJsonFile();
-                      final backupSuccessful = await backupService.uploadFileToGoogleDrive(
-                        backupFile,
-                      );
+                      // final backupFile = await backupService.generateBackupJsonFile();
+                      // final backupSuccessful = await backupService.uploadFileToGoogleDrive(
+                      //   backupFile,
+                      // );
+                      final backupSuccessful = await backupService.performBackup();
                       if (context.mounted && backupSuccessful) {
                         showToast(
                           context,
