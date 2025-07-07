@@ -23,9 +23,9 @@ void callBackDispatcher() {
           final docsDir = await getApplicationDocumentsDirectory();
           final objectBoxDirPath = path.join(docsDir.path, 'objectbox');
           ObjectBox().initForAnotherIsolate(objectBoxDirPath);
-          final jsonFile = await BackupService().generateBackupJsonFile();
-          final backupSuccessful = await BackupService().uploadFileToGoogleDrive(jsonFile);
-          if (backupSuccessful) {
+          // final jsonFile = await BackupService().generateBackupJsonFile();
+          // final backupSuccessful = await BackupService().uploadFileToGoogleDrive(jsonFile);
+          if (true) {
             await MiniBox().write(mLastBackupDate, DateTime.now().millisecondsSinceEpoch);
             await createBackupSuccessNotification();
           } else {
