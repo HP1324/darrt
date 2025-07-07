@@ -25,6 +25,28 @@ class BackupService {
   factory BackupService() => _instance;
   BackupService._internal();
 
+  Future<bool> performBackup() async {
+    try {
+      if (!await InternetConnection().hasInternetAccess) throw InternetOffError();
+      if (GoogleSignInService().currentUser == null) throw GoogleClientNotAuthenticatedError();
+
+      final backupFile = await _generateBackupFile();
+    } on InternetOffError {
+      MiniLogger.e('Internet not connected');
+      rethrow;
+    } on GoogleClientNotAuthenticatedError {
+      MiniLogger.e('Google client not authenticated');
+      rethrow;
+    } catch (e) {}
+    return true;
+  }
+
+  Future<dart.File> _generateBackupFile() async {
+    final oldFile = await downloadCompressedFileFromGoogleDrive();
+    final localData = ObjectBox().getLocalData();
+    Map<String, dynamic> meregedData = Map.from(localData);
+  }
+
   Future<dart.File> generateBackupJsonFile() async {
     try {
       if (!await InternetConnection().hasInternetAccess) {
@@ -441,8 +463,6 @@ class BackupMergeService {
     return convertedData;
   }
 }
-
-
 
 enum MergeType {
   backup,
