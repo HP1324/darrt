@@ -5,7 +5,7 @@ import 'package:minimaltodo/app/notification/notification_action_controller.dart
 import 'package:minimaltodo/app/services/backup_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/helpers/consts.dart';
-import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:path/path.dart' as path;

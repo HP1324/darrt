@@ -11,7 +11,7 @@ import 'package:minimaltodo/category/ui/category_chip.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/messages.dart';
-import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';

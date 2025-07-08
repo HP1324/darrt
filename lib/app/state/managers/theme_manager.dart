@@ -1,6 +1,6 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 
