@@ -170,28 +170,9 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
                         : () async {
                             isRestoring.value = true;
                             try {
-                              final backupFile = await BackupService()
-                                  .downloadCompressedFileFromGoogleDrive();
-                              await BackupService().restoreDataFromBackupFile(backupFile!);
-
+                              await BackupService().performRestore();
                               if (context.mounted) {
-                                //Rationale dialog to restart the app using restart_app package
-                                await showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: Text('Restart app'),
-                                    content: Text(
-                                      "Restore completed. Don't forget to restart the app to see restored data correctly.",
-                                    ),
-                                    actions: [
-                                      FilledButton.icon(
-                                        onPressed: () => Navigator.pop(context),
-                                        label: Text('Got it'),
-                                        icon: Icon(Icons.restart_alt),
-                                      ),
-                                    ],
-                                  ),
-                                );
+                                await _showRestartDialog(context);
                               }
                             } on BackupFileNotFoundError catch (e) {
                               if (context.mounted) {
@@ -255,6 +236,25 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
           ),
           //Widget to delete backup from google drive
           _DeleteBackupSection(),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showRestartDialog(BuildContext context) async {
+     await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Restart app'),
+        content: Text(
+          "Restore completed. Don't forget to restart the app to see restored data correctly.",
+        ),
+        actions: [
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(context),
+            label: Text('Got it'),
+            icon: Icon(Icons.restart_alt),
+          ),
         ],
       ),
     );
@@ -555,6 +555,7 @@ class _BackupButtonState extends State<_BackupButton> {
                       );
                     }
                   } catch (e) {
+                    MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
                     if (context.mounted) {
                       showToast(
                         context,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io' as dart;
 import 'package:archive/archive_io.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:developer' as dev;
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -47,6 +48,9 @@ class BackupService {
 
     //3. Upload backup file to google drive after compressing to zip
     await uploadFileToGoogleDrive(backupJsonFile);
+
+    //4. Close [_authClient]
+    _authClient?.close();
   }
 
   Future<dart.File> _generateBackupFile() async {
@@ -121,7 +125,6 @@ class BackupService {
       'File uploaded to Google Drive: {id: ${uploadedFile.id}, name: ${uploadedFile.name}}',
     );
 
-    _authClient?.close();
   }
 
   ///Downloads the compressed backup file(not json) from google drive,stores it in the platform's temporary directory and returns it as a dart [File] object. The temporary directory is retrieved using [getTemporaryDirectory] method from the path_provider package.
@@ -159,6 +162,54 @@ class BackupService {
     return outFile;
   }
 
+  Future<void> performRestore()async{
+    //1. Init the service
+    await _init();
+
+    //2. Download compressed zip backup file from google drive
+    final backupZipFile = await downloadCompressedFileFromGoogleDrive();
+
+    if(backupZipFile==null) throw BackupFileNotFoundError();
+
+    //3. Decompress zip file to json file
+    final backupJsonFile = _decompressToJsonFile(backupZipFile);
+
+    //4. Parse json file as [Map<String,dynamic>]
+    final driveData = await _parseBackupJsonFileAsMap(backupJsonFile);
+
+    //5. Retrieve local data
+    final localData = ObjectBox().getLocalData();
+
+    //6. Merge local and drive data using uuid merging strategy
+    final mergedData = BackupMergeService.mergeData(localData, driveData,mergeType: MergeType.restore);
+
+    //7. Put merged data to local database
+    _putMergedDataToLocalDatabase(mergedData);
+
+    // await compute(_putMergedDataToLocalDatabase, mergedData);
+    //8. Close [_authClient]
+    _authClient?.close();
+  }
+  void _putMergedDataToLocalDatabase(Map<String, dynamic> mergedData) {
+   final tasks = (mergedData['tasks'] as List).map((e) => Task.fromJson(e)).toList();
+
+    final categories = (mergedData['categories'] as List)
+        .map((e) => TaskCategory.fromJson(e))
+        .toList();
+    g.catVm.putManyForRestore(categories, tasks: tasks);
+
+    final completions = (mergedData['completions'] as List)
+        .map((e) => TaskCompletion.fromJson(e))
+        .toList();
+
+    g.taskVm.putManyForRestore(tasks, completions: completions);
+
+    final notes = (mergedData['notes'] as List).map((e) => Note.fromJson(e)).toList();
+    final folders = (mergedData['folders'] as List).map((e) => Folder.fromJson(e)).toList();
+    g.folderVm.putManyForRestore(folders, notes: notes);
+
+    g.noteVm.putManyForRestore(notes);
+  }
   Future<void> restoreDataFromBackupFile(dart.File backupFile) async {
     //Decompress zip file back to JSON file
     final jsonBackupFile = _decompressToJsonFile(backupFile);
@@ -248,17 +299,10 @@ class BackupService {
   }
 
   Future<void> deleteBackupFromGoogleDrive() async {
-    if (!await InternetConnection().hasInternetAccess) {
-      throw InternetOffError();
-    }
+    await _init();
 
-    final client = await GoogleSignInService().getAuthenticatedClient();
 
-    if (client == null) {
-      throw GoogleClientNotAuthenticatedError();
-    }
-
-    final driveApi = drive.DriveApi(client);
+    final driveApi = drive.DriveApi(_authClient!);
 
     final searchResult = await driveApi.files.list(
       q: "name='$backupFileZipName' and trashed=false",
