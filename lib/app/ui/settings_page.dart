@@ -4,10 +4,11 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:minimaltodo/app/exceptions.dart';
 import 'package:minimaltodo/app/services/backup_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
+import 'package:minimaltodo/app/services/toast_service.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/utils.dart';
+import 'package:minimaltodo/helpers/utils.dart' show formatDate;
 import 'package:toastification/toastification.dart';
 import 'package:workmanager/workmanager.dart';
 import '../../helpers/consts.dart';
@@ -139,13 +140,7 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
                       }
                     }
                   } on GoogleClientNotAuthenticatedError {
-                    if (context.mounted) {
-                      showToast(
-                        context,
-                        type: ToastificationType.error,
-                        description: 'Sign in to continue',
-                      );
-                    }
+                    if (context.mounted) showErrorToast(context, 'Sign in to continue!');
                   }
                 },
                 title: Text('Auto backup'),
@@ -175,29 +170,11 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
                                 await _showRestartDialog(context);
                               }
                             } on BackupFileNotFoundError catch (e) {
-                              if (context.mounted) {
-                                showToast(
-                                  context,
-                                  type: ToastificationType.error,
-                                  description: e.userMessage!,
-                                );
-                              }
+                              if (context.mounted) showErrorToast(context, e.userMessage!);
                             } on GoogleClientNotAuthenticatedError catch (e) {
-                              if (context.mounted) {
-                                showToast(
-                                  context,
-                                  type: ToastificationType.error,
-                                  description: e.userMessage!,
-                                );
-                              }
+                              if (context.mounted) showErrorToast(context, e.userMessage!);
                             } on InternetOffError catch (e) {
-                              if (context.mounted) {
-                                showToast(
-                                  context,
-                                  type: ToastificationType.error,
-                                  description: e.userMessage!,
-                                );
-                              }
+                              if (context.mounted) showErrorToast(context, e.userMessage!);
                             } finally {
                               isRestoring.value = false;
                             }
@@ -218,13 +195,7 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
                   await _googleService.signOut();
                   currentEmail.value = tapHereToSignIn;
                   MiniBox().remove(mGoogleEmail);
-                  if (context.mounted) {
-                    showSignInToast(
-                      context,
-                      ToastificationType.warning,
-                      'Signed out of Google account',
-                    );
-                  }
+                  if (context.mounted)showWarningToast(context, 'Signed out');
                 },
                 icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
                 label: Text(
@@ -242,7 +213,7 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
   }
 
   Future<void> _showRestartDialog(BuildContext context) async {
-     await showDialog(
+    await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Restart app'),
@@ -280,10 +251,9 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
           await _googleService.signOut();
           currentEmail.value = tapHereToSignIn;
           MiniBox().remove(mGoogleEmail);
-          if (context.mounted) {
-            showSignInToast(context, ToastificationType.warning, 'Signed out');
-          }
-          await Future.delayed(Duration(milliseconds: 900));
+          if (context.mounted) showWarningToast(context, 'Signed out');
+
+          await Future.delayed(Duration(milliseconds: 500));
         }
       }
 
@@ -292,22 +262,13 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
       if (account != null) {
         final email = account.email;
         currentEmail.value = email;
-        showSignInToast(context, ToastificationType.success, 'Signed in to $email');
+        if (context.mounted) showSuccessToast(context, 'Signed in to $email');
         await MiniBox().write(mGoogleEmail, email);
       }
     } catch (e, t) {
       MiniLogger.e('Sign in error: ${e.toString()}');
       MiniLogger.t('Stacktrace: $t');
     }
-  }
-
-  void showSignInToast(context, type, description) {
-    showToast(
-      context,
-      type: type,
-      description: description,
-      duration: Duration(milliseconds: 1700),
-    );
   }
 }
 
@@ -530,39 +491,17 @@ class _BackupButtonState extends State<_BackupButton> {
                   isBackingUp.value = true;
                   try {
                     await BackupService().performBackup();
-                    if (context.mounted) {
-                      showToast(
-                        context,
-                        type: ToastificationType.success,
-                        description: 'Backup successful',
-                      );
-                    }
+                    if (context.mounted) showSuccessToast(context, 'Backup completed successfully');
+
                     g.settingsSc.updateLastBackupDate(DateTime.now());
                   } on GoogleClientNotAuthenticatedError catch (e) {
-                    if (context.mounted) {
-                      showToast(
-                        context,
-                        type: ToastificationType.error,
-                        description: e.userMessage!,
-                      );
-                    }
+                    if (context.mounted) showErrorToast(context, e.userMessage!);
                   } on InternetOffError catch (e) {
-                    if (context.mounted) {
-                      showToast(
-                        context,
-                        type: ToastificationType.error,
-                        description: e.userMessage!,
-                      );
-                    }
+                    if (context.mounted) showSuccessToast(context, e.userMessage!);
                   } catch (e) {
                     MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
-                    if (context.mounted) {
-                      showToast(
-                        context,
-                        type: ToastificationType.error,
-                        description: 'Unknown error occurred, try after sometime',
-                      );
-                    }
+                    if (context.mounted)
+                      showErrorToast(context, 'Unknown error occurred, try after sometime!');
                   } finally {
                     if (context.mounted) {
                       isBackingUp.value = false;
@@ -631,37 +570,14 @@ class _DeleteBackupSectionState extends State<_DeleteBackupSection> {
                           isDeleting.value = true;
                           try {
                             await BackupService().deleteBackupFromGoogleDrive();
-                            if (context.mounted) {
-                              showToast(
-                                context,
-                                type: ToastificationType.success,
-                                description: 'Backup deleted successfully.',
-                              );
-                            }
+                            if (context.mounted)
+                              showSuccessToast(context, 'Backup deleted successfully');
                           } on BackupFileNotFoundError catch (e) {
-                            if (context.mounted) {
-                              showToast(
-                                context,
-                                type: ToastificationType.error,
-                                description: e.message!,
-                              );
-                            }
+                            if (context.mounted) showErrorToast(context, e.userMessage!);
                           } on GoogleClientNotAuthenticatedError catch (e) {
-                            if (context.mounted) {
-                              showToast(
-                                context,
-                                type: ToastificationType.error,
-                                description: e.userMessage!,
-                              );
-                            }
+                            if (context.mounted) showErrorToast(context, e.userMessage!);
                           } on InternetOffError catch (e) {
-                            if (context.mounted) {
-                              showToast(
-                                context,
-                                type: ToastificationType.error,
-                                description: e.userMessage!,
-                              );
-                            }
+                            if (context.mounted) showErrorToast(context, e.userMessage!);
                           } finally {
                             isDeleting.value = false; // Use finally to ensure it's always reset
                           }
