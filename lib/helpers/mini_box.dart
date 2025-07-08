@@ -33,6 +33,9 @@ class MiniBox{
     await _prefs.remove(key);
   }
 
+  Future<void> reload()async{
+    await _prefs.reloadCache();
+  }
   ///Necessary method for writing only when the app first time installed.if it is null then it means the app was never installed or the developer has explicitly set it to [null] in some part of the code
   Future<void> writeIfNull(String key,dynamic value)async{
     if(read(key) == null) await write(key, value);
