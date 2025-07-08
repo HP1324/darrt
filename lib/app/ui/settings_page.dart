@@ -184,11 +184,15 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
 
       final GoogleSignInAccount? account = await _googleService.signIn();
 
+
       if (account != null) {
         final email = account.email;
         currentEmail.value = email;
         if (context.mounted) showSuccessToast(context, 'Signed in to $email');
         await MiniBox().write(mGoogleEmail, email);
+
+        final authentication = await account.authentication;
+        await MiniBox().write(mGoogleAuthToken, authentication.accessToken);
       }
     } catch (e, t) {
       MiniLogger.e('Sign in error: ${e.toString()}');

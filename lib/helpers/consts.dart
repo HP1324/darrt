@@ -48,6 +48,10 @@ const alarmReminderType = 'alarm';
 
 const mGoogleEmail = 'google_email';
 
+const mGoogleAuthToken = 'google_auth_token';
+
+const mGoogleRefreshToken = 'google_refresh_token';
+
 const mLastBackupDate = 'last_backup_date';
 
 const mAutoBackup = 'auto_backup';

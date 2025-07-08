@@ -23,6 +23,7 @@ void callBackDispatcher() {
           final objectBoxDirPath = path.join(docsDir.path, 'objectbox');
           ObjectBox().initForAnotherIsolate(objectBoxDirPath);
 
+          await GoogleSignInService().restoreGoogleAccount();
           await BackupService().performBackup();
           await createBackupSuccessNotification();
           ObjectBox().close();
@@ -33,7 +34,7 @@ void callBackDispatcher() {
           debugPrint("client not authenticated");
           final restored = await GoogleSignInService().restoreGoogleAccount();
           await createBackupFailureNotification();
-          if(!restored) await BackupService().performBackup();
+          if(restored) await BackupService().performBackup();
         } catch (e, t) {
           MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
           MiniLogger.t(t.toString());

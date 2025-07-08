@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io' as dart;
 import 'package:archive/archive_io.dart';
 import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:developer' as dev;
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -30,7 +31,7 @@ class BackupService {
   /// Google account's authenticated client
   auth.AuthClient? _authClient;
 
-  Future<void> _init() async {
+  Future<void> init() async {
     if (!await InternetConnection().hasInternetAccess) throw InternetOffError();
 
     _authClient = await GoogleSignInService().getAuthenticatedClient();
@@ -40,11 +41,15 @@ class BackupService {
   }
 
   Future<void> initForAnotherIsolate()async{
-    await _init();
+    if (!await InternetConnection().hasInternetAccess) throw InternetOffError();
+
+;
   }
-  Future<void> performBackup() async {
+  Future<void> performBackup({bool? isAutoBackup}) async {
     //1. Init the service
-    await _init();
+    // if(isAutoBackup != null && isAutoBackup) {
+      await init();
+    // }
 
     //2. Generate backup json file
     final backupJsonFile = await _generateBackupFile();
@@ -167,7 +172,7 @@ class BackupService {
 
   Future<void> performRestore()async{
     //1. Init the service
-    await _init();
+    await init();
 
     //2. Download compressed zip backup file from google drive
     final backupZipFile = await downloadCompressedFileFromGoogleDrive();
@@ -302,7 +307,7 @@ class BackupService {
   }
 
   Future<void> deleteBackupFromGoogleDrive() async {
-    await _init();
+    await init();
 
 
     final driveApi = drive.DriveApi(_authClient!);
