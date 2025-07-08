@@ -30,6 +30,9 @@ class MiniBox{
     } else if(value is List<String>) {
       type = 'stringList';
       serializedValue = jsonEncode(value);
+    } else if(value is DateTime) {
+      type = 'datetime';
+      serializedValue = value.millisecondsSinceEpoch.toString();
     } else {
       return; // unsupported type
     }
@@ -46,7 +49,7 @@ class MiniBox{
         value: serializedValue,
         type: type,
       );
-      await ObjectBox().prefsBox.putAsync(newPref);
+      ObjectBox().prefsBox.put(newPref);
     }
   }
 
@@ -67,6 +70,8 @@ class MiniBox{
           return pref.value as T?;
         case 'stringList':
           return (jsonDecode(pref.value) as List<dynamic>).cast<String>() as T?;
+        case 'datetime':
+          return DateTime.fromMillisecondsSinceEpoch(int.parse(pref.value)) as T?;
         default:
           return null;
       }

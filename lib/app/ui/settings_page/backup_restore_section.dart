@@ -19,11 +19,7 @@ class BackupRestoreSection extends StatefulWidget {
 }
 
 class _BackupRestoreSectionState extends State<BackupRestoreSection> {
-  final ValueNotifier<DateTime?> lastBackupDate = ValueNotifier(
-    MiniBox().read(mLastBackupDate) != null
-        ? DateTime.fromMillisecondsSinceEpoch(MiniBox().read(mLastBackupDate))
-        : null,
-  );
+  final ValueNotifier<DateTime?> lastBackupDate = ValueNotifier(MiniBox().read(mLastBackupDate));
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +37,181 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
           Divider(height: 0),
           SignInOutBackupRow(lastBackupDate: lastBackupDate),
           AutoBackupSection(lastBackupDate: lastBackupDate),
+          _RestoreDeleteBackupRow(),
+        ],
+      ),
+    );
+  }
+}
+
+class _RestoreDeleteBackupRow extends StatefulWidget {
+  const _RestoreDeleteBackupRow();
+
+  @override
+  State<_RestoreDeleteBackupRow> createState() => _RestoreDeleteBackupRowState();
+}
+
+class _RestoreDeleteBackupRowState extends State<_RestoreDeleteBackupRow> {
+  ValueNotifier<bool> isRestoring = ValueNotifier(false);
+  final ValueNotifier<String> currentEmail = ValueNotifier(
+    MiniBox().read(mGoogleEmail) ?? tapHereToSignIn,
+  );
+  final ValueNotifier<bool> isDeleting = ValueNotifier(false);
+  @override
+  void dispose() {
+    isRestoring.dispose();
+    isDeleting.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: ValueListenableBuilder<bool>(
+            valueListenable: isRestoring,
+            builder: (context, restoring, _) {
+              return OutlinedButton.icon(
+                onPressed: restoring
+                    ? null
+                    : () async {
+                        isRestoring.value = true;
+                        try {
+                          await BackupService().performRestore();
+                          if (context.mounted) {
+                            await _showRestartDialog(context);
+                          }
+                        } on BackupFileNotFoundError catch (e) {
+                          if (context.mounted) showErrorToast(context, e.userMessage!);
+                        } on GoogleClientNotAuthenticatedError catch (e) {
+                          if (context.mounted) showErrorToast(context, e.userMessage!);
+                        } on InternetOffError catch (e) {
+                          if (context.mounted) showErrorToast(context, e.userMessage!);
+                        } finally {
+                          isRestoring.value = false;
+                        }
+                      },
+                icon: const Icon(Icons.settings_backup_restore_sharp),
+                label: restoring
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : FittedBox(child: const Text('Restore data')),
+              );
+            },
+          ),
+        ),
+        SizedBox(width: 10),
+        Expanded(
+          child: ValueListenableBuilder(
+            valueListenable: isDeleting,
+            builder: (context, deleting, child) {
+              return OutlinedButton.icon(
+                onPressed: deleting
+                    ? null
+                    : () async {
+                        // Disable button while deleting
+                        final shouldDelete = await _showDeleteConfirmationDialog(context);
+                        if (shouldDelete) {
+                          isDeleting.value = true;
+                          try {
+                            await BackupService().deleteBackupFromGoogleDrive();
+                            if (context.mounted)
+                              showSuccessToast(context, 'Backup deleted successfully');
+                          } on BackupFileNotFoundError catch (e) {
+                            if (context.mounted) showErrorToast(context, e.userMessage!);
+                          } on GoogleClientNotAuthenticatedError catch (e) {
+                            if (context.mounted) showErrorToast(context, e.userMessage!);
+                          } on InternetOffError catch (e) {
+                            if (context.mounted) showErrorToast(context, e.userMessage!);
+                          } finally {
+                            isDeleting.value = false; // Use finally to ensure it's always reset
+                          }
+                        }
+                      },
+                icon: deleting
+                    ? const SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Icon(
+                        Icons.delete,
+                        color: Theme.of(context).colorScheme.error,
+                        size: 20,
+                      ),
+                label: FittedBox(child: Text('Delete backup')),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Row(
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    color: Theme.of(context).colorScheme.error,
+                    size: 28,
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('Delete Backup?'),
+                ],
+              ),
+              content: const Text(
+                'This will permanently delete your backup from Google Drive. This action cannot be undone.',
+              ),
+              actions: [
+                FilledButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                  child: const Text('Delete'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
+  Future<void> _showRestartDialog(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Restart app'),
+        content: Text(
+          "Restore completed. Don't forget to restart the app to see restored data correctly.",
+        ),
+        actions: [
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(context),
+            label: Text('Got it'),
+            icon: Icon(Icons.restart_alt),
+          ),
         ],
       ),
     );
@@ -352,7 +523,9 @@ class _BackupButtonState extends State<_BackupButton> {
                       await BackupService().performBackup();
                       if (context.mounted)
                         showSuccessToast(context, 'Backup completed successfully');
-                      widget.lastBackupDate.value = DateTime.now();
+                      final now = DateTime.now();
+                      widget.lastBackupDate.value = now;
+                      await MiniBox().write(mLastBackupDate, now);
                     } on GoogleClientNotAuthenticatedError catch (e) {
                       if (context.mounted) showErrorToast(context, e.userMessage!);
                     } on InternetOffError catch (e) {
