@@ -1,4 +1,4 @@
-package com.hp.minimaltodo
+package com.stellarmotion.darrt
 
 import android.content.Intent
 import android.net.Uri

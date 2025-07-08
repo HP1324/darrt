@@ -141,10 +141,12 @@ flutter_native_splash:
 #  ios: true
   color: "#9966CC"
   icon_background_color: "#9966CC"
+  image: assets/icon/1152.png
+
 #  branding: assets/icon/icon_2.png
 #  branding_mode: bottom
   android_12:
     color: "#9966CC"
-    image: assets/icon/icon_2.png
+    image: assets/icon/1152.png
 #    icon_background_color: "#9966CC"
 #    branding: assets/icon/icon_2.png
