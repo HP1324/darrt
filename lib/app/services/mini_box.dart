@@ -6,31 +6,31 @@ import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/objectbox.g.dart';
 
-class MiniBox{
+class MiniBox {
   static final _instance = MiniBox._internal();
   MiniBox._internal();
   factory MiniBox() => _instance;
 
-  void write(String key, dynamic value){
+  void write(String key, dynamic value) {
     String type = '';
     String serializedValue = '';
 
-    if(value is bool) {
+    if (value is bool) {
       type = 'bool';
       serializedValue = value.toString();
-    } else if(value is int) {
+    } else if (value is int) {
       type = 'int';
       serializedValue = value.toString();
-    } else if(value is double) {
+    } else if (value is double) {
       type = 'double';
       serializedValue = value.toString();
-    } else if(value is String) {
+    } else if (value is String) {
       type = 'string';
       serializedValue = value;
-    } else if(value is List<String>) {
+    } else if (value is List<String>) {
       type = 'stringList';
       serializedValue = jsonEncode(value);
-    } else if(value is DateTime) {
+    } else if (value is DateTime) {
       type = 'datetime';
       serializedValue = value.millisecondsSinceEpoch.toString();
     } else {
@@ -53,7 +53,7 @@ class MiniBox{
     }
   }
 
-  T? read<T>(String key){
+  T? read<T>(String key) {
     final pref = ObjectBox().prefsBox.query(BoxPref_.key.equals(key)).build().findFirst();
 
     if (pref == null) return null;
@@ -80,31 +80,29 @@ class MiniBox{
     }
   }
 
-  void remove(String key)async{
+  void remove(String key)  {
     final pref = ObjectBox().prefsBox.query(BoxPref_.key.equals(key)).build().findFirst();
     if (pref != null) {
       ObjectBox().prefsBox.remove(pref.id);
     }
   }
 
-  Future<void> reload()async{
+  Future<void> reload() async {
     // No-op for ObjectBox
   }
 
-  Future<void> writeIfNull(String key,dynamic value)async{
-    if(read(key) == null) await write(key, value);
+  void writeIfNull(String key, dynamic value) {
+    if (read(key) == null) write(key, value);
   }
 
-  Future<void> initStorage()async {
-    await Future.wait([
-      writeIfNull(mDefaultTaskList, 0),
-      writeIfNull(mFirstInstallDate, DateUtils.dateOnly(DateTime.now()).millisecondsSinceEpoch),
-      writeIfNull(firstTimeMicTap, true),
-      writeIfNull(micPermissionDeniedAgain, false),
-      writeIfNull(mSnoozeMinutes, 5),
-      writeIfNull(mDefaultReminderType, notifReminderType),
-      writeIfNull(mPickedAlarmSoundResourceUri, 'System alarm sound'),
-      writeIfNull(mNotificationSound, 'System notification sound'),
-    ]);
+  void initStorage() {
+    writeIfNull(mDefaultTaskList, 0);
+    writeIfNull(mFirstInstallDate, DateUtils.dateOnly(DateTime.now()).millisecondsSinceEpoch);
+    writeIfNull(firstTimeMicTap, true);
+    writeIfNull(micPermissionDeniedAgain, false);
+    writeIfNull(mSnoozeMinutes, 5);
+    writeIfNull(mDefaultReminderType, notifReminderType);
+    writeIfNull(mPickedAlarmSoundResourceUri, 'System alarm sound');
+    writeIfNull(mNotificationSound, 'System notification sound');
   }
 }
