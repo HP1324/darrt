@@ -1,13 +1,10 @@
 //ignore_for_file: curly_braces_in_flow_control_structures
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:minimaltodo/app/services/boxpref.dart';
 import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/objectbox.g.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MiniBox{
   static final _instance = MiniBox._internal();
@@ -52,7 +49,6 @@ class MiniBox{
       await ObjectBox().prefsBox.putAsync(newPref);
     }
   }
-
 
   T? read<T>(String key){
     final pref = ObjectBox().prefsBox.query(BoxPref_.key.equals(key)).build().findFirst();

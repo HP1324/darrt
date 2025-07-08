@@ -10,8 +10,8 @@ import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/utils.dart' show formatDate;
 import 'package:workmanager/workmanager.dart';
-import '../../helpers/consts.dart';
-
+import '../../../helpers/consts.dart';
+import 'package:minimaltodo/app/ui/settings_page/backup_restore_section.dart' as br;
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -35,7 +35,8 @@ class _SettingsPageState extends State<SettingsPage> {
               Divider(),
               SnoozeSection(),
               Divider(),
-              BackupRestoreSection(),
+              // BackupRestoreSection(),
+              br.BackupRestoreSection(),
             ],
           ),
         ),
@@ -85,11 +86,10 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
           Text('Backup & Restore', style: Theme.of(context).textTheme.titleMedium),
           Divider(height: 0),
           ListTile(
-            leading: CircleAvatar(backgroundImage: NetworkImage(GoogleSignInService().currentUser!.photoUrl!),onBackgroundImageError: (_,__){},),
             visualDensity: VisualDensity.compact,
             onTap: () => handleGoogleSignIn(context),
             contentPadding: EdgeInsets.zero,
-            title: Text(GoogleSignInService().currentUser!.displayName!),
+            title: Text('Google Account'),
             subtitle: ValueListenableBuilder(
               valueListenable: currentEmail,
               builder: (context, value, _) {
@@ -237,32 +237,29 @@ class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelecto
       child: InkWell(
         onTap: () => changeFrequency(label.toLowerCase()),
         borderRadius: BorderRadius.circular(6),
-        child: Container(
-          // padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Radio<String>(
-                value: label.toLowerCase(),
-                onChanged: changeFrequency,
-                groupValue: currentFrequency,
-                visualDensity: VisualDensity.compact,
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              // const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  label,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontSize: 13,
-                  ),
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Radio<String>(
+              value: label.toLowerCase(),
+              onChanged: changeFrequency,
+              groupValue: currentFrequency,
+              visualDensity: VisualDensity.compact,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            // const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontSize: 13,
                 ),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -674,3 +671,5 @@ class _DeleteBackupSectionState extends State<_DeleteBackupSection> {
         false;
   }
 }
+
+
