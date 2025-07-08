@@ -18,7 +18,7 @@ void callBackDispatcher() {
     switch (task) {
       case mAutoBackup:
         try {
-          await MiniBox().initStorage();
+          MiniBox().initStorage();
           final docsDir = await getApplicationDocumentsDirectory();
           final objectBoxDirPath = path.join(docsDir.path, 'objectbox');
           ObjectBox().initForAnotherIsolate(objectBoxDirPath);

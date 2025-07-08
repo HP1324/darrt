@@ -276,10 +276,41 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "10:6533416713158041885",
+      "lastPropertyId": "4:6417919618007841260",
+      "name": "BoxPref",
+      "properties": [
+        {
+          "id": "1:8797700107043626500",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:96898958566753866",
+          "name": "key",
+          "type": 9,
+          "flags": 2080,
+          "indexId": "2:2470644941414605064"
+        },
+        {
+          "id": "3:5872348964623481480",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "4:6417919618007841260",
+          "name": "value",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "9:3517275010729598994",
-  "lastIndexId": "1:7157772403585420880",
+  "lastEntityId": "10:6533416713158041885",
+  "lastIndexId": "2:2470644941414605064",
   "lastRelationId": "2:752695274466247110",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
