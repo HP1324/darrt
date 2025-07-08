@@ -1,6 +1,6 @@
+//ignore_for_file: curly_braces_in_flow_control_structures
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:minimaltodo/app/exceptions.dart';
 import 'package:minimaltodo/app/services/backup_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
@@ -9,7 +9,6 @@ import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/utils.dart' show formatDate;
-import 'package:toastification/toastification.dart';
 import 'package:workmanager/workmanager.dart';
 import '../../helpers/consts.dart';
 
@@ -59,10 +58,6 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
     MiniBox().read(mGoogleEmail) ?? tapHereToSignIn,
   );
 
-  final ValueNotifier<bool> isBackingUp = ValueNotifier(false);
-
-  final ValueNotifier<bool> isRestoring = ValueNotifier(false);
-
   final ValueNotifier<bool> autoBackUp = ValueNotifier(MiniBox().read(mAutoBackup) ?? false);
 
   void _updateAutoBackup(bool value) async {
@@ -73,8 +68,6 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
   @override
   void dispose() {
     currentEmail.dispose();
-    isBackingUp.dispose();
-    isRestoring.dispose();
     super.dispose();
   }
 
@@ -92,10 +85,11 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
           Text('Backup & Restore', style: Theme.of(context).textTheme.titleMedium),
           Divider(height: 0),
           ListTile(
+            leading: CircleAvatar(backgroundImage: NetworkImage(GoogleSignInService().currentUser!.photoUrl!),onBackgroundImageError: (_,__){},),
             visualDensity: VisualDensity.compact,
             onTap: () => handleGoogleSignIn(context),
             contentPadding: EdgeInsets.zero,
-            title: Text('Google Account'),
+            title: Text(GoogleSignInService().currentUser!.displayName!),
             subtitle: ValueListenableBuilder(
               valueListenable: currentEmail,
               builder: (context, value, _) {
@@ -153,58 +147,7 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
             },
           ),
           AutobackupFrequencySelector(autoBackup: autoBackUp),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ValueListenableBuilder<bool>(
-                valueListenable: isRestoring,
-                builder: (context, restoring, _) {
-                  return OutlinedButton.icon(
-                    onPressed: restoring
-                        ? null
-                        : () async {
-                            isRestoring.value = true;
-                            try {
-                              await BackupService().performRestore();
-                              if (context.mounted) {
-                                await _showRestartDialog(context);
-                              }
-                            } on BackupFileNotFoundError catch (e) {
-                              if (context.mounted) showErrorToast(context, e.userMessage!);
-                            } on GoogleClientNotAuthenticatedError catch (e) {
-                              if (context.mounted) showErrorToast(context, e.userMessage!);
-                            } on InternetOffError catch (e) {
-                              if (context.mounted) showErrorToast(context, e.userMessage!);
-                            } finally {
-                              isRestoring.value = false;
-                            }
-                          },
-                    icon: const Icon(Icons.settings_backup_restore_sharp),
-                    label: restoring
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Restore data'),
-                  );
-                },
-              ),
-              OutlinedButton.icon(
-                onPressed: () async {
-                  await _googleService.signOut();
-                  currentEmail.value = tapHereToSignIn;
-                  MiniBox().remove(mGoogleEmail);
-                  if (context.mounted)showWarningToast(context, 'Signed out');
-                },
-                icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
-                label: Text(
-                  'Sign out',
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
-              ),
-            ],
-          ),
+          _RestoreSignOutRow(),
           //Widget to delete backup from google drive
           _DeleteBackupSection(),
         ],
@@ -212,24 +155,6 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
     );
   }
 
-  Future<void> _showRestartDialog(BuildContext context) async {
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Restart app'),
-        content: Text(
-          "Restore completed. Don't forget to restart the app to see restored data correctly.",
-        ),
-        actions: [
-          FilledButton.icon(
-            onPressed: () => Navigator.pop(context),
-            label: Text('Got it'),
-            icon: Icon(Icons.restart_alt),
-          ),
-        ],
-      ),
-    );
-  }
 
   Future<void> handleGoogleSignIn(BuildContext context) async {
     try {
@@ -379,9 +304,15 @@ class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelecto
   }
 }
 
-class SnoozeSection extends StatelessWidget {
+class SnoozeSection extends StatefulWidget {
   const SnoozeSection({super.key});
 
+  @override
+  State<SnoozeSection> createState() => _SnoozeSectionState();
+}
+
+class _SnoozeSectionState extends State<SnoozeSection> {
+  int snoozeMinutes = MiniBox().read(mSnoozeMinutes) ?? 5;
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -401,20 +332,18 @@ class SnoozeSection extends StatelessWidget {
           spacing: 8,
           runSpacing: 4,
           children: [1, 5, 10, 15, 20, 25, 30, 45, 50, 60].map((minutes) {
-            return ValueListenableBuilder(
-              valueListenable: g.settingsSc.snoozeMinutes,
-              builder: (context, value, child) {
-                return ChoiceChip(
-                  showCheckmark: false,
-                  shape: StadiumBorder(),
-                  label: Text('$minutes'),
-                  selected: value == minutes,
-                  onSelected: (selected) {
-                    if (selected) {
-                      g.settingsSc.updateSnoozeMinutes(minutes);
-                    }
-                  },
-                );
+            return ChoiceChip(
+              showCheckmark: false,
+              shape: StadiumBorder(),
+              label: Text('$minutes'),
+              selected: snoozeMinutes == minutes,
+              onSelected: (selected) async {
+                if (selected) {
+                  setState(() {
+                    snoozeMinutes = minutes;
+                  });
+                  await MiniBox().write(mSnoozeMinutes, minutes);
+                }
               },
             );
           }).toList(),
@@ -424,9 +353,15 @@ class SnoozeSection extends StatelessWidget {
   }
 }
 
-class DefaultReminderTypeSection extends StatelessWidget {
+class DefaultReminderTypeSection extends StatefulWidget {
   const DefaultReminderTypeSection({super.key});
 
+  @override
+  State<DefaultReminderTypeSection> createState() => _DefaultReminderTypeSectionState();
+}
+
+class _DefaultReminderTypeSectionState extends State<DefaultReminderTypeSection> {
+  String defaultReminderType = MiniBox().read(mDefaultReminderType) ?? notifReminderType;
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -435,27 +370,25 @@ class DefaultReminderTypeSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Default reminder type', style: theme.textTheme.titleMedium),
-        ValueListenableBuilder(
-          valueListenable: g.settingsSc.defaultReminderType,
-          builder: (context, value, child) {
-            return SegmentedButton<String>(
-              segments: const [
-                ButtonSegment(
-                  value: notifReminderType,
-                  label: Text('Notification'),
-                  icon: Icon(Icons.notifications),
-                ),
-                ButtonSegment(
-                  value: alarmReminderType,
-                  label: Text('Alarm'),
-                  icon: Icon(Icons.alarm),
-                ),
-              ],
-              selected: {value},
-              onSelectionChanged: (Set<String> selection) {
-                g.settingsSc.updateDefaultReminder(selection.first);
-              },
-            );
+        SegmentedButton<String>(
+          segments: const [
+            ButtonSegment(
+              value: notifReminderType,
+              label: Text('Notification'),
+              icon: Icon(Icons.notifications),
+            ),
+            ButtonSegment(
+              value: alarmReminderType,
+              label: Text('Alarm'),
+              icon: Icon(Icons.alarm),
+            ),
+          ],
+          selected: {defaultReminderType},
+          onSelectionChanged: (Set<String> selection) async{
+            setState(() {
+              defaultReminderType = selection.first;
+            });
+            await MiniBox().write(mDefaultReminderType, selection.first);
           },
         ),
       ],
@@ -484,7 +417,7 @@ class _BackupButtonState extends State<_BackupButton> {
     return ValueListenableBuilder<bool>(
       valueListenable: isBackingUp,
       builder: (context, backingUp, _) {
-        return OutlinedButton.icon(
+        return IconButton(
           onPressed: backingUp
               ? null // optional: disable button while backing up
               : () async {
@@ -492,7 +425,6 @@ class _BackupButtonState extends State<_BackupButton> {
                   try {
                     await BackupService().performBackup();
                     if (context.mounted) showSuccessToast(context, 'Backup completed successfully');
-
                     g.settingsSc.updateLastBackupDate(DateTime.now());
                   } on GoogleClientNotAuthenticatedError catch (e) {
                     if (context.mounted) showErrorToast(context, e.userMessage!);
@@ -506,21 +438,110 @@ class _BackupButtonState extends State<_BackupButton> {
                     if (context.mounted) {
                       isBackingUp.value = false;
                     }
+
                   }
                 },
-          icon: const Icon(Icons.backup),
-          label: backingUp
-              ? const SizedBox(
-                  height: 16,
-                  width: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Text('Backup'),
+          icon: backingUp ? SizedBox(width: 16, height: 16,child: CircularProgressIndicator()) : const Icon(Icons.backup),
         );
       },
     );
   }
 }
+
+class _RestoreSignOutRow extends StatefulWidget {
+  const _RestoreSignOutRow({super.key});
+
+  @override
+  State<_RestoreSignOutRow> createState() => _RestoreSignOutRowState();
+}
+
+class _RestoreSignOutRowState extends State<_RestoreSignOutRow> {
+  ValueNotifier<bool> isRestoring = ValueNotifier(false);
+  final ValueNotifier<String> currentEmail = ValueNotifier(
+    MiniBox().read(mGoogleEmail) ?? tapHereToSignIn,
+  );
+
+  @override
+  void dispose(){
+    isRestoring.dispose();
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        ValueListenableBuilder<bool>(
+          valueListenable: isRestoring,
+          builder: (context, restoring, _) {
+            return OutlinedButton.icon(
+              onPressed: restoring
+                  ? null
+                  : () async {
+                isRestoring.value = true;
+                try {
+                  await BackupService().performRestore();
+                  if (context.mounted) {
+                    await _showRestartDialog(context);
+                  }
+                } on BackupFileNotFoundError catch (e) {
+                  if (context.mounted) showErrorToast(context, e.userMessage!);
+                } on GoogleClientNotAuthenticatedError catch (e) {
+                  if (context.mounted) showErrorToast(context, e.userMessage!);
+                } on InternetOffError catch (e) {
+                  if (context.mounted) showErrorToast(context, e.userMessage!);
+                } finally {
+                  isRestoring.value = false;
+                }
+              },
+              icon: const Icon(Icons.settings_backup_restore_sharp),
+              label: restoring
+                  ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+                  : const Text('Restore data'),
+            );
+          },
+        ),
+        OutlinedButton.icon(
+          onPressed: () async {
+            await GoogleSignInService().signOut();
+            currentEmail.value = tapHereToSignIn;
+            MiniBox().remove(mGoogleEmail);
+            if (context.mounted) showWarningToast(context, 'Signed out');
+          },
+          icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
+          label: Text(
+            'Sign out',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showRestartDialog(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Restart app'),
+        content: Text(
+          "Restore completed. Don't forget to restart the app to see restored data correctly.",
+        ),
+        actions: [
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(context),
+            label: Text('Got it'),
+            icon: Icon(Icons.restart_alt),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
 class _DeleteBackupSection extends StatefulWidget {
   const _DeleteBackupSection();

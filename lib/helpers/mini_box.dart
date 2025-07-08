@@ -1,33 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:minimaltodo/helpers/consts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+//ignore_for_file: curly_braces_in_flow_control_structures
 
 class MiniBox{
   static final _instance = MiniBox._internal();
   MiniBox._internal();
   factory MiniBox() => _instance;
 
-  final _box = GetStorage();
+
+  late final SharedPreferencesWithCache _prefs;
 
   Future<void> write(String key, dynamic value)async{
-    await _box.write(key, value);
+    if(value is bool) await _prefs.setBool(key, value);
+    else if(value is int) await _prefs.setInt(key, value);
+    else if(value is double) await _prefs.setDouble(key, value);
+    else if(value is String) await _prefs.setString(key, value);
+    else if(value is List<String>) await _prefs.setStringList(key, value);
   }
 
   T? read<T>(String key){
-    return _box.read(key);
+    if(T == bool) return _prefs.getBool(key) as T?;
+    else if(T == int) return _prefs.getInt(key) as T?;
+    else if(T == double) return _prefs.getDouble(key) as T?;
+    else if(T == String) return _prefs.getString(key) as T?;
+    else if(T == List<String>) return _prefs.getStringList(key) as T?;
+    return null;
   }
 
   void remove(String key)async{
-    await _box.remove(key);
+    await _prefs.remove(key);
   }
 
   ///Necessary method for writing only when the app first time installed.if it is null then it means the app was never installed or the developer has explicitly set it to [null] in some part of the code
   Future<void> writeIfNull(String key,dynamic value)async{
-      await _box.writeIfNull(key, value);
+    if(read(key) == null) await write(key, value);
   }
   ///Set global preferences and other settings like first time install date etc.
    Future<void> initStorage()async {
-    await GetStorage.init();
+    _prefs = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
     await Future.wait([
       writeIfNull(mDefaultTaskList, 0),
       writeIfNull(mFirstInstallDate, DateUtils.dateOnly(DateTime.now()).millisecondsSinceEpoch),
