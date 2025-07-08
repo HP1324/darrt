@@ -1,4 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:minimaltodo/app/exceptions.dart';
 import 'package:minimaltodo/app/notification/notification_action_controller.dart';
 import 'package:minimaltodo/app/services/backup_service.dart';
@@ -23,12 +24,16 @@ void callBackDispatcher() {
           ObjectBox().initForAnotherIsolate(objectBoxDirPath);
 
           await BackupService().performBackup();
-
+          await createBackupSuccessNotification();
           ObjectBox().close();
         } on InternetOffError {
+          debugPrint("internet off");
           await createBackupFailureNotification();
         } on GoogleClientNotAuthenticatedError {
+          debugPrint("client not authenticated");
+          final restored = await GoogleSignInService().restoreGoogleAccount();
           await createBackupFailureNotification();
+          if(!restored) await BackupService().performBackup();
         } catch (e, t) {
           MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
           MiniLogger.t(t.toString());

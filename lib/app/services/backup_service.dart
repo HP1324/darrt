@@ -39,6 +39,9 @@ class BackupService {
     // return true;
   }
 
+  Future<void> initForAnotherIsolate()async{
+    await _init();
+  }
   Future<void> performBackup() async {
     //1. Init the service
     await _init();
