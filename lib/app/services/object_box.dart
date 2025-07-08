@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/consts.dart';
-import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/note/models/folder.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/objectbox.g.dart';

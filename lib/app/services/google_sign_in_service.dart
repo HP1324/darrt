@@ -3,7 +3,7 @@ import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:googleapis_auth/googleapis_auth.dart' as auth show AuthClient;
 import 'package:minimaltodo/helpers/consts.dart';
-import 'package:minimaltodo/helpers/mini_box.dart';
+import 'package:minimaltodo/app/services/mini_box.dart';
 
 import '../../helpers/mini_logger.dart';
 class GoogleSignInService {
