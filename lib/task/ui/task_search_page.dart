@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/category/models/task_category.dart';
-import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/task_item.dart';
 

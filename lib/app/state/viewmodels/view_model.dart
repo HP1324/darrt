@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/app/services/backup_service.dart' show MergeType, BackupMergeService;
 import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:minimaltodo/objectbox.g.dart' show Box;
 import 'package:minimaltodo/task/models/task_completion.dart';
 

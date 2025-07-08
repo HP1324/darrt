@@ -1,4 +1,4 @@
-import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:objectbox/objectbox.dart';
 
