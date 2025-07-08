@@ -14,6 +14,7 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'app/services/boxpref.dart';
 import 'category/models/task_category.dart';
 import 'note/models/folder.dart';
 import 'note/models/note.dart';
@@ -362,6 +363,41 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(10, 6533416713158041885),
+    name: 'BoxPref',
+    lastPropertyId: const obx_int.IdUid(4, 6417919618007841260),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 8797700107043626500),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 96898958566753866),
+        name: 'key',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(2, 2470644941414605064),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 5872348964623481480),
+        name: 'type',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 6417919618007841260),
+        name: 'value',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -402,8 +438,8 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(9, 3517275010729598994),
-    lastIndexId: const obx_int.IdUid(1, 7157772403585420880),
+    lastEntityId: const obx_int.IdUid(10, 6533416713158041885),
+    lastIndexId: const obx_int.IdUid(2, 2470644941414605064),
     lastRelationId: const obx_int.IdUid(2, 752695274466247110),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [
@@ -910,6 +946,47 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    BoxPref: obx_int.EntityDefinition<BoxPref>(
+      model: _entities[6],
+      toOneRelations: (BoxPref object) => [],
+      toManyRelations: (BoxPref object) => {},
+      getId: (BoxPref object) => object.id,
+      setId: (BoxPref object, int id) {
+        object.id = id;
+      },
+      objectToFB: (BoxPref object, fb.Builder fbb) {
+        final keyOffset = fbb.writeString(object.key);
+        final typeOffset = fbb.writeString(object.type);
+        final valueOffset = fbb.writeString(object.value);
+        fbb.startTable(5);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, keyOffset);
+        fbb.addOffset(2, typeOffset);
+        fbb.addOffset(3, valueOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final keyParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final typeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final valueParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final object = BoxPref(
+          key: keyParam,
+          type: typeParam,
+          value: valueParam,
+        )..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -1142,5 +1219,28 @@ class QuickReminder_ {
   /// See [QuickReminder.notifId].
   static final notifId = obx.QueryIntegerProperty<QuickReminder>(
     _entities[5].properties[4],
+  );
+}
+
+/// [BoxPref] entity fields to define ObjectBox queries.
+class BoxPref_ {
+  /// See [BoxPref.id].
+  static final id = obx.QueryIntegerProperty<BoxPref>(
+    _entities[6].properties[0],
+  );
+
+  /// See [BoxPref.key].
+  static final key = obx.QueryStringProperty<BoxPref>(
+    _entities[6].properties[1],
+  );
+
+  /// See [BoxPref.type].
+  static final type = obx.QueryStringProperty<BoxPref>(
+    _entities[6].properties[2],
+  );
+
+  /// See [BoxPref.value].
+  static final value = obx.QueryStringProperty<BoxPref>(
+    _entities[6].properties[3],
   );
 }

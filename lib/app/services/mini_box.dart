@@ -1,48 +1,100 @@
+//ignore_for_file: curly_braces_in_flow_control_structures
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:minimaltodo/app/services/boxpref.dart';
+import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:minimaltodo/helpers/consts.dart';
+import 'package:minimaltodo/objectbox.g.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//ignore_for_file: curly_braces_in_flow_control_structures
 
 class MiniBox{
   static final _instance = MiniBox._internal();
   MiniBox._internal();
   factory MiniBox() => _instance;
 
-
-  late final SharedPreferencesWithCache _prefs;
-
   Future<void> write(String key, dynamic value)async{
-    if(value is bool) await _prefs.setBool(key, value);
-    else if(value is int) await _prefs.setInt(key, value);
-    else if(value is double) await _prefs.setDouble(key, value);
-    else if(value is String) await _prefs.setString(key, value);
-    else if(value is List<String>) await _prefs.setStringList(key, value);
+    String type = '';
+    String serializedValue = '';
+
+    if(value is bool) {
+      type = 'bool';
+      serializedValue = value.toString();
+    } else if(value is int) {
+      type = 'int';
+      serializedValue = value.toString();
+    } else if(value is double) {
+      type = 'double';
+      serializedValue = value.toString();
+    } else if(value is String) {
+      type = 'string';
+      serializedValue = value;
+    } else if(value is List<String>) {
+      type = 'stringList';
+      serializedValue = jsonEncode(value);
+    } else {
+      return; // unsupported type
+    }
+
+    final existingPref = ObjectBox().prefsBox.query(BoxPref_.key.equals(key)).build().findFirst();
+
+    if (existingPref != null) {
+      existingPref.value = serializedValue;
+      existingPref.type = type;
+      ObjectBox().prefsBox.put(existingPref);
+    } else {
+      final newPref = BoxPref(
+        key: key,
+        value: serializedValue,
+        type: type,
+      );
+      await ObjectBox().prefsBox.putAsync(newPref);
+    }
   }
 
+
   T? read<T>(String key){
-    if(T == bool) return _prefs.getBool(key) as T?;
-    else if(T == int) return _prefs.getInt(key) as T?;
-    else if(T == double) return _prefs.getDouble(key) as T?;
-    else if(T == String) return _prefs.getString(key) as T?;
-    else if(T == List<String>) return _prefs.getStringList(key) as T?;
-    return null;
+    final pref = ObjectBox().prefsBox.query(BoxPref_.key.equals(key)).build().findFirst();
+
+    if (pref == null) return null;
+
+    try {
+      switch (pref.type) {
+        case 'bool':
+          return (pref.value == 'true') as T?;
+        case 'int':
+          return int.parse(pref.value) as T?;
+        case 'double':
+          return double.parse(pref.value) as T?;
+        case 'string':
+          return pref.value as T?;
+        case 'stringList':
+          return (jsonDecode(pref.value) as List<dynamic>).cast<String>() as T?;
+        default:
+          return null;
+      }
+    } catch (e) {
+      return null;
+    }
   }
 
   void remove(String key)async{
-    await _prefs.remove(key);
+    final pref = ObjectBox().prefsBox.query(BoxPref_.key.equals(key)).build().findFirst();
+    if (pref != null) {
+      ObjectBox().prefsBox.remove(pref.id);
+    }
   }
 
   Future<void> reload()async{
-    await _prefs.reloadCache();
+    // No-op for ObjectBox
   }
-  ///Necessary method for writing only when the app first time installed.if it is null then it means the app was never installed or the developer has explicitly set it to [null] in some part of the code
+
   Future<void> writeIfNull(String key,dynamic value)async{
     if(read(key) == null) await write(key, value);
   }
-  ///Set global preferences and other settings like first time install date etc.
-   Future<void> initStorage()async {
-    _prefs = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
+
+  Future<void> initStorage()async {
     await Future.wait([
       writeIfNull(mDefaultTaskList, 0),
       writeIfNull(mFirstInstallDate, DateUtils.dateOnly(DateTime.now()).millisecondsSinceEpoch),

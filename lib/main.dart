@@ -22,16 +22,17 @@ Future<void> initApp() async {
     WidgetsFlutterBinding.ensureInitialized();
 
     // Initialize local storage & database
-    await MiniBox().initStorage();
     await ObjectBox().init();
+    MiniBox().initStorage();
 
     await GoogleSignInService().restoreGoogleAccount();
     // Initialize notifications
     await NotificationService.init();
 
     Workmanager().initialize(callBackDispatcher,isInDebugMode: kDebugMode);
-  } catch (e) {
+  } catch (e,t) {
     MiniLogger.e('Failed to initialize app: ${e.toString()}, Error type: ${e.runtimeType}');
+    MiniLogger.t(t.toString());
   }
 }
 

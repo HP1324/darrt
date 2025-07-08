@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:minimaltodo/app/services/boxpref.dart';
 import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
@@ -47,6 +48,9 @@ class ObjectBox {
   Box<Folder> get folderBox => _store!.box<Folder>();
 
   Box<Note> get noteBox => _store!.box<Note>();
+
+  Box<BoxPref> get prefsBox => _store!.box<BoxPref>();
+
   void close() {
     _store!.close();
   }
@@ -59,7 +63,6 @@ class ObjectBox {
     if (folderBox.isEmpty()) {
       folderBox.putMany(_getInitialFolders());
     }
-    await MiniBox().write(mFirstTimeInstall, false);
   }
 
   List<TaskCategory> _getInitialCategories() {
