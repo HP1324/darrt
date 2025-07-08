@@ -251,7 +251,7 @@ class _AddNotePageState extends State<AddNotePage> {
 
       if (MiniBox().read(firstTimeMicTap) ?? true) {
         MiniLogger.d('First time requesting permissions');
-        await MiniBox().write(firstTimeMicTap, false);
+        MiniBox().write(firstTimeMicTap, false);
 
         // Request microphone permission first
         final micResult = await Permission.microphone.request();
@@ -300,7 +300,7 @@ class _AddNotePageState extends State<AddNotePage> {
             }
           } else {
             MiniLogger.d('Some permissions denied on second request');
-            await MiniBox().write(micPermissionDeniedAgain, true);
+            MiniBox().write(micPermissionDeniedAgain, true);
             showPermissionDeniedToast();
           }
         } else {

@@ -72,7 +72,7 @@ class _SnoozeSectionState extends State<SnoozeSection> {
                   setState(() {
                     snoozeMinutes = minutes;
                   });
-                  await MiniBox().write(mSnoozeMinutes, minutes);
+                  MiniBox().write(mSnoozeMinutes, minutes);
                 }
               },
             );
@@ -118,7 +118,7 @@ class _DefaultReminderTypeSectionState extends State<DefaultReminderTypeSection>
             setState(() {
               defaultReminderType = selection.first;
             });
-            await MiniBox().write(mDefaultReminderType, selection.first);
+            MiniBox().write(mDefaultReminderType, selection.first);
           },
         ),
       ],

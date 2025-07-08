@@ -62,7 +62,7 @@ class ThemeManager extends ChangeNotifier {
 
   Future<void> setThemePreference(ThemePreference preference) async {
     try {
-      await MiniBox().write(mThemePreference, preference.index);
+      MiniBox().write(mThemePreference, preference.index);
       _themePreference = preference;
       notifyListeners();
     } catch (e) {
@@ -72,7 +72,7 @@ class ThemeManager extends ChangeNotifier {
 
   Future<void> setThemeColor(ThemeColors color) async {
     _selectedColor = color;
-    await MiniBox().write(mThemeColor, color.index);
+    MiniBox().write(mThemeColor, color.index);
     notifyListeners();
   }
 }

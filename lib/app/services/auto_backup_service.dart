@@ -27,7 +27,7 @@ void callBackDispatcher() {
           if (!isSignedIn) throw GoogleClientNotAuthenticatedError();
           await BackupService().performBackup();
           await createBackupSuccessNotification();
-          await MiniBox().write(mLastBackupDate, DateTime.now());
+          MiniBox().write(mLastBackupDate, DateTime.now());
           ObjectBox().close();
         } on InternetOffError {
           debugPrint("internet off");
