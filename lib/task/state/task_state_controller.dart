@@ -4,7 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:minimaltodo/app/state/controllers/state_controller.dart';
 import 'package:minimaltodo/task/models/reminder.dart';
 import 'package:minimaltodo/task/models/repeat_config.dart';

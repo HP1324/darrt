@@ -7,7 +7,7 @@ import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/quickreminder/ui/quick_reminder_dialog.dart';

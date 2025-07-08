@@ -11,7 +11,7 @@ import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/category/models/task_category.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';

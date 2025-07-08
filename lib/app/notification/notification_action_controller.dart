@@ -7,7 +7,7 @@ import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:minimaltodo/main.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';

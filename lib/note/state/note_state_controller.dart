@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_quill/flutter_quill.dart' show QuillController;
 import 'package:minimaltodo/app/state/controllers/state_controller.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:minimaltodo/note/models/folder.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';

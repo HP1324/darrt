@@ -3,7 +3,7 @@ import 'package:minimaltodo/app/notification/notification_service.dart';
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/object_box.dart';
+import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:minimaltodo/helpers/typedefs.dart';
 import 'package:minimaltodo/objectbox.g.dart';
 import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
