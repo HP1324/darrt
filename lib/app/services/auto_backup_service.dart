@@ -17,20 +17,13 @@ void callBackDispatcher() {
     switch (task) {
       case mAutoBackup:
         try {
-          final signedIn = await GoogleSignInService().restoreGoogleAccount();
-          MiniLogger.dp('signed in: $signedIn');
           await MiniBox().initStorage();
           final docsDir = await getApplicationDocumentsDirectory();
           final objectBoxDirPath = path.join(docsDir.path, 'objectbox');
           ObjectBox().initForAnotherIsolate(objectBoxDirPath);
-          // final jsonFile = await BackupService().generateBackupJsonFile();
-          // final backupSuccessful = await BackupService().uploadFileToGoogleDrive(jsonFile);
-          if (true) {
-            await MiniBox().write(mLastBackupDate, DateTime.now().millisecondsSinceEpoch);
-            await createBackupSuccessNotification();
-          } else {
-            await createBackupFailureNotification();
-          }
+
+          await BackupService().performBackup();
+
           ObjectBox().close();
         } on InternetOffError {
           await createBackupFailureNotification();
