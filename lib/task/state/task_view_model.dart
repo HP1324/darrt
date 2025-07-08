@@ -187,7 +187,7 @@ class TaskViewModel extends ViewModel<Task> {
   void toggleViewMode() async {
     _isTimelineView = !_isTimelineView;
     notifyListeners();
-    await MiniBox().write('isTimeLine', _isTimelineView);
+    MiniBox().write('isTimeLine', _isTimelineView);
   }
 
   // Set view mode explicitly
@@ -195,7 +195,7 @@ class TaskViewModel extends ViewModel<Task> {
     if (_isTimelineView != isTimeline) {
       _isTimelineView = isTimeline;
       notifyListeners();
-      await MiniBox().write('isTimeLine', _isTimelineView);
+      MiniBox().write('isTimeLine', _isTimelineView);
     }
   }
 

@@ -311,7 +311,7 @@ class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelecto
         mAutoBackup,
         frequency: duration,
       );
-      await MiniBox().write(mAutoBackupFrequency, newFrequency);
+      MiniBox().write(mAutoBackupFrequency, newFrequency);
     }
   }
 
@@ -479,10 +479,10 @@ class _SignInOutBackupRowState extends State<SignInOutBackupRow> {
           currentEmail = email;
         });
         if (context.mounted) showSuccessToast(context, 'Signed in to $email');
-        await MiniBox().write(mGoogleEmail, email);
+        MiniBox().write(mGoogleEmail, email);
 
         final authentication = await account.authentication;
-        await MiniBox().write(mGoogleAuthToken, authentication.accessToken);
+        MiniBox().write(mGoogleAuthToken, authentication.accessToken);
       }
     } catch (e, t) {
       MiniLogger.e('Sign in error: ${e.toString()}');
@@ -525,7 +525,7 @@ class _BackupButtonState extends State<_BackupButton> {
                         showSuccessToast(context, 'Backup completed successfully');
                       final now = DateTime.now();
                       widget.lastBackupDate.value = now;
-                      await MiniBox().write(mLastBackupDate, now);
+                      MiniBox().write(mLastBackupDate, now);
                     } on GoogleClientNotAuthenticatedError catch (e) {
                       if (context.mounted) showErrorToast(context, e.userMessage!);
                     } on InternetOffError catch (e) {

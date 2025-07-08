@@ -11,7 +11,7 @@ class MiniBox{
   MiniBox._internal();
   factory MiniBox() => _instance;
 
-  Future<void> write(String key, dynamic value)async{
+  void write(String key, dynamic value){
     String type = '';
     String serializedValue = '';
 
