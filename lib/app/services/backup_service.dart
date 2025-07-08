@@ -29,30 +29,24 @@ class BackupService {
   /// Google account's authenticated client
   auth.AuthClient? _authClient;
 
+  Future<void> _init() async {
+    if (!await InternetConnection().hasInternetAccess) throw InternetOffError();
+
+    _authClient = await GoogleSignInService().getAuthenticatedClient();
+
+    if (_authClient == null) throw GoogleClientNotAuthenticatedError();
+    // return true;
+  }
+
   Future<void> performBackup() async {
-    try {
-      //1. Check internet connection
-      if (!await InternetConnection().hasInternetAccess) throw InternetOffError();
+    //1. Init the service
+    await _init();
 
-      //2. Generate backup json file
-      final backupJsonFile = await _generateBackupFile();
+    //2. Generate backup json file
+    final backupJsonFile = await _generateBackupFile();
 
-      //3. Upload backup file to google drive after compressing to zip
-      final uploaded = await uploadFileToGoogleDrive(backupJsonFile);
-
-      if(!uploaded){
-        throw Exception('Some google drive api error occurred during backup');
-      }
-    } on InternetOffError {
-      MiniLogger.e('Internet not connected');
-      rethrow;
-    } on GoogleClientNotAuthenticatedError {
-      MiniLogger.e('Google client not authenticated');
-      rethrow;
-    }catch (e,t){
-      MiniLogger.e('Error performing backup ${e.toString()}, type: ${e.runtimeType}');
-      MiniLogger.t(t.toString());
-    }
+    //3. Upload backup file to google drive after compressing to zip
+    await uploadFileToGoogleDrive(backupJsonFile);
   }
 
   Future<dart.File> _generateBackupFile() async {
@@ -77,6 +71,8 @@ class BackupService {
         localData,
         mergeType: MergeType.backup,
       );
+
+      dev.log('Merged json data: $mergedData');
     }
 
     // Convert the merged data to json string
@@ -93,9 +89,7 @@ class BackupService {
   }
 
   /// Takes json file as input, compresses it using [_compressJsonFile] and uploads it to google drive.
-  Future<bool> uploadFileToGoogleDrive(dart.File jsonFile) async {
-    if (_authClient == null) throw GoogleClientNotAuthenticatedError();
-
+  Future<void> uploadFileToGoogleDrive(dart.File jsonFile) async {
     final driveApi = drive.DriveApi(_authClient!);
 
     // Check if file already exists
@@ -123,21 +117,15 @@ class BackupService {
 
     final drive.File uploadedFile = await driveApi.files.create(driveFile, uploadMedia: media);
 
-    _authClient?.close();
+    MiniLogger.d(
+      'File uploaded to Google Drive: {id: ${uploadedFile.id}, name: ${uploadedFile.name}}',
+    );
 
-    if (uploadedFile.id != null) {
-      MiniLogger.d('Backup file uploaded to Google Drive (fileId: ${uploadedFile.id})');
-      return true;
-    } else {
-      MiniLogger.e('Upload returned null id');
-      return false;
-    }
+    _authClient?.close();
   }
 
   ///Downloads the compressed backup file(not json) from google drive,stores it in the platform's temporary directory and returns it as a dart [File] object. The temporary directory is retrieved using [getTemporaryDirectory] method from the path_provider package.
   Future<dart.File?> downloadCompressedFileFromGoogleDrive() async {
-    if (_authClient == null) throw GoogleClientNotAuthenticatedError();
-
     final driveApi = drive.DriveApi(_authClient!);
     // 1. Search for the file by name
     final searchResult = await driveApi.files.list(
@@ -178,7 +166,6 @@ class BackupService {
     //Parse the json file as map to work on it
     Map<String, dynamic> driveData = await _parseBackupJsonFileAsMap(jsonBackupFile);
     Map<String, dynamic> localData = ObjectBox().getLocalData();
-    MiniLogger.dp('error was not above');
     Map<String, dynamic> mergedData = BackupMergeService.mergeData(
       localData,
       driveData,
@@ -312,7 +299,6 @@ class BackupMergeService {
 
       switch (key) {
         case 'categories':
-          dev.log('Old categories: ${oldData[key]}, New categories: ${newData[key]}');
           mergedList = g.catVm.mergeItemLists(
             oldList.cast<TaskCategory>(),
             newList.cast<TaskCategory>(),
@@ -366,7 +352,6 @@ class BackupMergeService {
       }
     }
 
-    dev.log('This is merged json data: $mergedData');
     return mergedData;
   }
 

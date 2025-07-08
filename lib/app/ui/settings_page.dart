@@ -114,13 +114,20 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
                 value: autoBackup,
                 onChanged: (value) async {
                   try {
-                    if (GoogleSignInService().currentUser == null) throw GoogleClientNotAuthenticatedError();
+                    if (GoogleSignInService().currentUser == null)
+                      throw GoogleClientNotAuthenticatedError();
                     if (value != null) {
                       _updateAutoBackup(value);
                       if (value) {
                         final frequency = MiniBox().read(mAutoBackupFrequency) ?? 'daily';
-                        Duration duration = frequency == 'daily' ? Duration(days: 1) :frequency == 'weekly' ? Duration(days: 7) : Duration(days: 30);
-                        MiniLogger.dp('Registering background task: frequency: $frequency, duration: $duration');
+                        Duration duration = frequency == 'daily'
+                            ? Duration(days: 1)
+                            : frequency == 'weekly'
+                            ? Duration(days: 7)
+                            : Duration(days: 30);
+                        MiniLogger.dp(
+                          'Registering background task: frequency: $frequency, duration: $duration',
+                        );
                         await Workmanager().registerPeriodicTask(
                           mAutoBackup,
                           mAutoBackup,
@@ -315,12 +322,16 @@ class AutobackupFrequencySelector extends StatefulWidget {
 class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelector> {
   String currentFrequency = MiniBox().read(mAutoBackupFrequency) ?? 'daily';
 
-  void changeFrequency(String? newFrequency) async{
+  void changeFrequency(String? newFrequency) async {
     if (newFrequency != null) {
       currentFrequency = newFrequency;
       setState(() {});
 
-      final duration = newFrequency == 'daily' ? Duration(days: 1) :newFrequency == 'weekly' ? Duration(days: 7) : Duration(days: 30);
+      final duration = newFrequency == 'daily'
+          ? Duration(days: 1)
+          : newFrequency == 'weekly'
+          ? Duration(days: 7)
+          : Duration(days: 30);
       await Workmanager().cancelByUniqueName(mAutoBackup);
       await Workmanager().registerPeriodicTask(
         mAutoBackup,
@@ -330,7 +341,6 @@ class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelecto
       await MiniBox().write(mAutoBackupFrequency, newFrequency);
     }
   }
-
 
   Widget buildRadioButton(String label) {
     return Flexible(
@@ -389,13 +399,13 @@ class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelecto
                 buildRadioButton('Daily'),
                 Container(
                   width: 1,
-                  color: theme.colorScheme.outline.withValues(alpha:0.2),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.2),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                 ),
                 buildRadioButton('Weekly'),
                 Container(
                   width: 1,
-                  color: theme.colorScheme.outline.withValues(alpha:0.2),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.2),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                 ),
                 buildRadioButton('Monthly'),
@@ -517,51 +527,44 @@ class _BackupButtonState extends State<_BackupButton> {
           onPressed: backingUp
               ? null // optional: disable button while backing up
               : () async {
-                  if (!await InternetConnection().hasInternetAccess && context.mounted) {
-                    showToast(
-                      context,
-                      type: ToastificationType.error,
-                      description: 'No internet connection',
-                    );
-                    return;
-                  }
-                  final backupService = BackupService();
-                  if (await GoogleSignInService().isSignedIn()) {
-                    isBackingUp.value = true;
-                    try {
-                      // final backupFile = await backupService.generateBackupJsonFile();
-                      // final backupSuccessful = await backupService.uploadFileToGoogleDrive(
-                      //   backupFile,
-                      // );
-                      await backupService.performBackup();
-                      if (context.mounted) {
-                        showToast(
-                          context,
-                          type: ToastificationType.success,
-                          description: 'Backup successful',
-                        );
-                      }
-                      g.settingsSc.updateLastBackupDate(DateTime.now());
-                    } on GoogleClientNotAuthenticatedError catch (e) {
-                      if (context.mounted) {
-                        showToast(
-                          context,
-                          type: ToastificationType.error,
-                          description: e.userMessage!,
-                        );
-                      }
-                    } on InternetOffError catch (e) {
-                      if (context.mounted) {
-                        showToast(
-                          context,
-                          type: ToastificationType.error,
-                          description: e.userMessage!,
-                        );
-                      }
-                    } finally {
-                      if (context.mounted) {
-                        isBackingUp.value = false;
-                      }
+                  isBackingUp.value = true;
+                  try {
+                    await BackupService().performBackup();
+                    if (context.mounted) {
+                      showToast(
+                        context,
+                        type: ToastificationType.success,
+                        description: 'Backup successful',
+                      );
+                    }
+                    g.settingsSc.updateLastBackupDate(DateTime.now());
+                  } on GoogleClientNotAuthenticatedError catch (e) {
+                    if (context.mounted) {
+                      showToast(
+                        context,
+                        type: ToastificationType.error,
+                        description: e.userMessage!,
+                      );
+                    }
+                  } on InternetOffError catch (e) {
+                    if (context.mounted) {
+                      showToast(
+                        context,
+                        type: ToastificationType.error,
+                        description: e.userMessage!,
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      showToast(
+                        context,
+                        type: ToastificationType.error,
+                        description: 'Unknown error occurred, try after sometime',
+                      );
+                    }
+                  } finally {
+                    if (context.mounted) {
+                      isBackingUp.value = false;
                     }
                   }
                 },
