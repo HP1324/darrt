@@ -156,4 +156,5 @@ Backup & restore
   - [x] The previous reminder logic will remain as it is
   - [x] Sort reminders by time in list
 - [x] When restoring data from drive, set task notifications if task has reminders      
+- [x] Make timeline's line more visible in dark mode
    
