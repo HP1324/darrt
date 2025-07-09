@@ -90,8 +90,8 @@ class TimelineTaskContainer extends StatelessWidget {
                       // margin: const EdgeInsets.only(top: 1),
                       decoration: BoxDecoration(
                         color: hasTime
-                            ? scheme.outline.withValues(alpha: 0.3)
-                            : scheme.outline.withValues(alpha: 0.1),
+                            ? scheme.outline.withValues(alpha: 0.8)
+                            : scheme.outline.withValues(alpha: 0.4),
                         borderRadius: BorderRadius.circular(1),
                       ),
                     ),
@@ -106,8 +106,8 @@ class TimelineTaskContainer extends StatelessWidget {
                       // margin: const EdgeInsets.only(top: 4),
                       decoration: BoxDecoration(
                         color: hasTime
-                            ? scheme.outline.withValues(alpha: 0.3)
-                            : scheme.outline.withValues(alpha: 0.1),
+                            ? scheme.outline.withValues(alpha: 0.8)
+                            : scheme.outline.withValues(alpha: 0.4),
                         borderRadius: BorderRadius.circular(1),
                       ),
                     ),
@@ -161,6 +161,10 @@ class TimelineTaskContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // if (task.time != null) ...[
+        //   TimelineTaskTime(task: task),
+        //   const SizedBox(height: 8),
+        // ],
         TimelineTaskTitle(task: task),
         const SizedBox(height: 8),
         TimelineTaskInfo(task: task),
