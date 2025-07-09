@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/messages.dart' show Messages;
 import 'package:minimaltodo/app/services/mini_box.dart';
@@ -90,83 +91,8 @@ class _AddNotePageState extends State<AddNotePage> {
         ),
         body: Column(
           children: [
-            QuillSimpleToolbar(
-              controller: g.noteSc.controller,
-              config: QuillSimpleToolbarConfig(
-                multiRowsDisplay: false,
-                toolbarIconAlignment: WrapAlignment.start,
-                buttonOptions: QuillSimpleToolbarButtonOptions(
-                  selectHeaderStyleDropdownButton:
-                      QuillToolbarSelectHeaderStyleDropdownButtonOptions(
-                        attributes: [
-                          Attribute.h1,
-                          Attribute.h2,
-                          Attribute.h3,
-                          Attribute.h4,
-                          Attribute.h5,
-                          Attribute.h6,
-                        ],
-                      ),
-                  fontFamily: QuillToolbarFontFamilyButtonOptions(attribute: Attribute.font),
-                  fontSize: QuillToolbarFontSizeButtonOptions(attribute: Attribute.size),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: QuillEditor(
-                  scrollController: g.noteSc.scrollController,
-                  controller: g.noteSc.controller,
-                  focusNode: g.noteSc.focusNode,
-                  config: QuillEditorConfig(
-                    contextMenuBuilder: (context, editableTextState) {
-                      final TextSelectionToolbarAnchors anchors =
-                          editableTextState.contextMenuAnchors;
-
-                      return AdaptiveTextSelectionToolbar(
-                        // Position below text
-                        anchors: TextSelectionToolbarAnchors(
-                          primaryAnchor: anchors.primaryAnchor + const Offset(0, 80),
-                          secondaryAnchor: anchors.secondaryAnchor! + const Offset(0, 80),
-                        ),
-                        children: [
-                          // Your custom toolbar buttons
-                          TextSelectionToolbarTextButton(
-                            onPressed: () =>
-                                editableTextState.cutSelection(SelectionChangedCause.toolbar),
-                            padding: TextSelectionToolbarTextButton.getPadding(0, 4),
-                            child: const Text('Cut'),
-                          ),
-                          TextSelectionToolbarTextButton(
-                            onPressed: () =>
-                                editableTextState.copySelection(SelectionChangedCause.toolbar),
-                            padding: TextSelectionToolbarTextButton.getPadding(0, 4),
-                            child: const Text('Copy'),
-                          ),
-                          TextSelectionToolbarTextButton(
-                            onPressed: () =>
-                                editableTextState.pasteText(SelectionChangedCause.toolbar),
-                            padding: TextSelectionToolbarTextButton.getPadding(0, 4),
-                            child: const Text('Paste'),
-                          ),
-                          TextSelectionToolbarTextButton(
-                            onPressed: () =>
-                                editableTextState.selectAll(SelectionChangedCause.toolbar),
-                            padding: TextSelectionToolbarTextButton.getPadding(0, 4),
-                            child: const Text('Select All'),
-                          ),
-                        ],
-                      );
-                    },
-                    // textSelectionControls: ,
-                    placeholder: 'Enter your note here...',
-                    autoFocus: true,
-                    textCapitalization: TextCapitalization.sentences,
-                  ),
-                ),
-              ),
-            ),
+            NotesQuillToolbar(),
+            NotesQuillEditor(),
           ],
         ),
         floatingActionButton: Column(
@@ -315,6 +241,120 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 }
 
+class NotesQuillToolbar extends StatelessWidget {
+  const NotesQuillToolbar({super.key});
+
+  // Map<String,String> fontSizes = {};
+  @override
+  Widget build(BuildContext context) {
+    final fontSizeMap = {'Clear': '0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','10':'10','12':'12','14':'14','16':'16','18':'18','20':'20','22':'22','24':'24','26':'26','28':'28','30':'30','32':'32','34':'34','36':'36','38':'38','40':'40','42':'42','44':'44','46':'46','48':'48','50':'50','52':'52','54':'54','56':'56','58':'58','60':'60'};
+    return QuillSimpleToolbar(
+      controller: g.noteSc.controller,
+      config: QuillSimpleToolbarConfig(
+        multiRowsDisplay: false,
+        toolbarIconAlignment: WrapAlignment.start,
+        buttonOptions: QuillSimpleToolbarButtonOptions(
+          selectHeaderStyleDropdownButton: QuillToolbarSelectHeaderStyleDropdownButtonOptions(
+            attributes: [
+              Attribute.h1,
+              Attribute.h2,
+              Attribute.h3,
+              Attribute.h4,
+              Attribute.h5,
+              Attribute.h6,
+            ],
+          ),
+          fontFamily: QuillToolbarFontFamilyButtonOptions(attribute: Attribute.font),
+          fontSize: QuillToolbarFontSizeButtonOptions(
+            items: fontSizeMap,
+            initialValue: '16'
+          ),
+          codeBlock: QuillToolbarToggleStyleButtonOptions(iconData: FontAwesomeIcons.solidFileCode),
+        ),
+      ),
+    );
+  }
+}
+
+class NotesQuillEditor extends StatelessWidget {
+  const NotesQuillEditor({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: QuillEditor(
+          scrollController: g.noteSc.scrollController,
+          controller: g.noteSc.controller,
+          focusNode: g.noteSc.focusNode,
+          config: QuillEditorConfig(
+            contextMenuBuilder: (context, editableTextState) {
+              final TextSelectionToolbarAnchors anchors = editableTextState.contextMenuAnchors;
+
+              return AdaptiveTextSelectionToolbar(
+                // Position below text
+                anchors: TextSelectionToolbarAnchors(
+                  primaryAnchor: anchors.primaryAnchor + const Offset(0, 80),
+                  secondaryAnchor: anchors.secondaryAnchor! + const Offset(0, 80),
+                ),
+                children: [
+                  // Your custom toolbar buttons
+                  TextSelectionToolbarTextButton(
+                    onPressed: () => editableTextState.cutSelection(SelectionChangedCause.toolbar),
+                    padding: TextSelectionToolbarTextButton.getPadding(0, 4),
+                    child: const Text('Cut'),
+                  ),
+                  TextSelectionToolbarTextButton(
+                    onPressed: () => editableTextState.copySelection(SelectionChangedCause.toolbar),
+                    padding: TextSelectionToolbarTextButton.getPadding(0, 4),
+                    child: const Text('Copy'),
+                  ),
+                  TextSelectionToolbarTextButton(
+                    onPressed: () => editableTextState.pasteText(SelectionChangedCause.toolbar),
+                    padding: TextSelectionToolbarTextButton.getPadding(0, 4),
+                    child: const Text('Paste'),
+                  ),
+                  TextSelectionToolbarTextButton(
+                    onPressed: () => editableTextState.selectAll(SelectionChangedCause.toolbar),
+                    padding: TextSelectionToolbarTextButton.getPadding(0, 4),
+                    child: const Text('Select All'),
+                  ),
+                ],
+              );
+            },
+            // textSelectionControls: ,
+            placeholder: 'Enter your note here...',
+            autoFocus: true,
+            textCapitalization: TextCapitalization.sentences,
+            customStyles: DefaultStyles(
+              inlineCode: InlineCodeStyle(
+                style: GoogleFonts.sourceCodeProTextTheme().labelMedium!.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+                backgroundColor: scheme.surfaceContainerHighest,
+              ),
+              code: DefaultTextBlockStyle(
+                GoogleFonts.sourceCodeProTextTheme().labelMedium!.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+                HorizontalSpacing(5, 5),
+                VerticalSpacing(10, 10),
+                VerticalSpacing(5, 5),
+                BoxDecoration(
+                  color: scheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class SaveNotePdfButton extends StatelessWidget {
   const SaveNotePdfButton({super.key});
 
@@ -336,8 +376,6 @@ class SaveNotePdfButton extends StatelessWidget {
     );
   }
 }
-
-
 
 class FolderSelector extends StatelessWidget {
   const FolderSelector({super.key});
