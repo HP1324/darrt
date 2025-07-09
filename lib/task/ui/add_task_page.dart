@@ -160,7 +160,7 @@ class TimeSelector extends StatelessWidget {
             expanded: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Time'),
+                Text('Time (Optional)'),
                 Text(
                   time != null ? TimeOfDay.fromDateTime(time).format(context) : 'No time set',
                   style: textTheme.labelMedium,
