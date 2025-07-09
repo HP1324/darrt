@@ -36,11 +36,11 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
     return ListenableBuilder(
       listenable: g.catSc,
       builder: (context, child) {
-        final folderColor = IconColorStorage.colors[g.catSc.color] ?? scheme.primary;
+        final categoryColor = IconColorStorage.colors[g.catSc.color] ?? scheme.primary;
         return Scaffold(
           appBar: AppBar(
-            title: Text(widget.edit ? widget.category!.name : 'Add Folder'),
-            backgroundColor: folderColor.withValues(alpha: 0.1),
+            title: Text(widget.edit ? widget.category!.name : 'Add Category'),
+            backgroundColor: categoryColor.withValues(alpha: 0.1),
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -50,27 +50,27 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                 const SizedBox(height: 20),
                 Theme(
                   data: Theme.of(context).copyWith(
-                    textSelectionTheme: TextSelectionThemeData(selectionHandleColor: folderColor),
+                    textSelectionTheme: TextSelectionThemeData(selectionHandleColor: categoryColor),
                   ),
                   child: TextField(
                     textCapitalization: TextCapitalization.sentences,
                     controller: g.catSc.textController,
                     autofocus: true,
-                    cursorColor: folderColor,
+                    cursorColor: categoryColor,
                     decoration: InputDecoration(
-                      hintText: 'Enter Folder Name Here',
+                      hintText: 'Enter Category Name Here',
                       filled: true,
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: folderColor)),
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: categoryColor)),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: folderColor, width: 2),
+                        borderSide: BorderSide(color: categoryColor, width: 2),
                       ),
-                      border: OutlineInputBorder(borderSide: BorderSide(color: folderColor)),
+                      border: OutlineInputBorder(borderSide: BorderSide(color: categoryColor)),
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Customize Folder',
+                  'Customize Category',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 16),
@@ -81,7 +81,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                       children: [
                         Expanded(
                           child: SelectionTile(
-                            borderColor: folderColor.withValues(alpha: 0.6),
+                            borderColor: categoryColor.withValues(alpha: 0.6),
                             title: 'Icon',
                             selectedValue: g.catSc.icon,
                             onTap: () => showIconPicker(
@@ -104,7 +104,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: SelectionTile(
-                            borderColor: folderColor.withValues(alpha: 0.6),
+                            borderColor: categoryColor.withValues(alpha: 0.6),
                             title: 'Color',
                             selectedValue: g.catSc.color,
                             onTap: () => showColorPicker(
