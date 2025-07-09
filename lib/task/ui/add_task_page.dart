@@ -176,7 +176,7 @@ class TimeSelector extends StatelessWidget {
                       size: 20,
                       color: ColorScheme.of(context).error,
                     ),
-                    onPressed: ()=> g.taskSc.resetTime(),
+                    onPressed: () => g.taskSc.resetTime(),
                   );
                 }
                 return SizedBox.shrink();
@@ -441,7 +441,8 @@ class AddRemindersSection extends StatelessWidget {
             builder: (context, child) {
               final textTheme = Theme.of(context).textTheme;
               final scheme = Theme.of(context).colorScheme;
-              final reminders = g.taskSc.reminders;
+              final reminders = List.from(g.taskSc.reminders);
+              reminders.sort((a, b) => a.time.compareTo(b.time));
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -460,6 +461,7 @@ class AddRemindersSection extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
+                  if (g.taskSc.time != null) Flexible(child: EasyReminderActions()),
                   Flexible(
                     child: reminders.isEmpty
                         ? Center(
@@ -496,7 +498,7 @@ class AddRemindersSection extends StatelessWidget {
                     child: FilledButton.icon(
                       onPressed: () => showReminderDialog(context),
                       icon: const Icon(Icons.add),
-                      label: const Text('Add Reminder'),
+                      label: const Text('Add Custom Reminder'),
                     ),
                   ),
                 ],
@@ -506,6 +508,65 @@ class AddRemindersSection extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class EasyReminderActions extends StatelessWidget {
+  const EasyReminderActions({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = ColorScheme.of(context);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: GridView(
+        shrinkWrap: true,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3,childAspectRatio: 2.2),
+        children: [
+          _buildTimeChip(context, minutes: null),
+          _buildTimeChip(context, minutes: 5),
+          _buildTimeChip(context, minutes: 10),
+          _buildTimeChip(context, minutes: 15),
+          _buildTimeChip(context, minutes: 30),
+          _buildTimeChip(context, minutes: 45),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimeChip(BuildContext context, {required int? minutes}) {
+    return Tooltip(
+      message: minutes == null ? 'On time reminder' : 'Before $minutes min',
+      child: Center(
+        child: FilledButton(
+          onPressed: () {
+            final reminder = buildReminder(minutes: minutes);
+            final message = g.taskSc.putReminder(
+              edit: false,
+              reminder: reminder,
+            );
+            final type = message == Messages.mReminderAdded
+                ? ToastificationType.success
+                : ToastificationType.error;
+            showToast(context, type: type, description: message);
+          },
+          child: Text(minutes != null ? '- $minutes min' : 'On time'),
+        ),
+      ),
+    );
+  }
+  Reminder buildReminder({required int? minutes}){
+    Reminder? reminder;
+    TimeOfDay reminderTime = TimeOfDay.now();
+    if(minutes == null){
+      reminderTime = TimeOfDay.fromDateTime(g.taskSc.time!);
+    }else{
+      reminderTime =  TimeOfDay.fromDateTime(g.taskSc.time!.subtract(Duration(minutes: minutes)));
+    }
+    reminder = Reminder(time: reminderTime);
+    return reminder;
   }
 }
 
