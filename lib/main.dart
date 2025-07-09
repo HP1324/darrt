@@ -38,18 +38,18 @@ Future<void> initApp() async {
 
 void main() async {
   await initApp();
-  runApp(MiniTodo());
+  runApp(Darrt());
 }
 
-class MiniTodo extends StatefulWidget {
-  const MiniTodo({super.key});
+class Darrt extends StatefulWidget {
+  const Darrt({super.key});
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
-  State<MiniTodo> createState() => _MiniTodoState();
+  State<Darrt> createState() => _DarrtState();
 }
 
-class _MiniTodoState extends State<MiniTodo> {
+class _DarrtState extends State<Darrt> {
   @override
   void initState() {
     super.initState();
@@ -74,7 +74,7 @@ class _MiniTodoState extends State<MiniTodo> {
               GlobalWidgetsLocalizations.delegate,
               FlutterQuillLocalizations.delegate,
             ],
-            navigatorKey: MiniTodo.navigatorKey,
+            navigatorKey: Darrt.navigatorKey,
             theme: lightTheme.copyWith(
               textTheme: GoogleFonts.gabaritoTextTheme(lightTheme.textTheme),
             ),

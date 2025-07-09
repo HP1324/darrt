@@ -148,7 +148,7 @@ Backup & restore
 - [x] Auto backup checkbox state fix
 - [x] Change category and folder uuid's to their names
 - [x] Make timeline view default
-- [ ] Change **MiniTodo** to **Darrt** everywhere in the app
+- [x] Change **MiniTodo** to **Darrt** everywhere in the app
 - [ ] In app drawer, change order, make quick reminders first, then theme and then settings
 - [ ] Optimize and improve auto backup code, so that it works perfectly
       

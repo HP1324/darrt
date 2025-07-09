@@ -60,11 +60,11 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
         NotificationService.scheduleQuickReminder(receivedAction.body ?? '', minutes);
         break;
       case openAppKey:
-        MiniTodo.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const SettingsPage()));
+        Darrt.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const SettingsPage()));
         break;
       default:
         if (task != null) {
-          MiniTodo.navigatorKey.currentState?.push(
+          Darrt.navigatorKey.currentState?.push(
             MaterialPageRoute(builder: (_) => AddTaskPage(edit: true, task: task)),
           );
         }
