@@ -54,7 +54,7 @@ class ThemeManager extends ChangeNotifier {
 
   ThemeData get lightTheme => FlexColorScheme.light(colors: selectedScheme).toTheme;
   ThemeData get darkTheme => FlexColorScheme.dark(
-    colors: selectedScheme.toDark(),
+    colors: selectedScheme.toDark(27),
     surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
     appBarStyle: FlexAppBarStyle.background,
     darkIsTrueBlack: false,

@@ -80,6 +80,7 @@ class _DarrtState extends State<Darrt> {
             ),
             darkTheme: darkTheme.copyWith(
               textTheme: GoogleFonts.gabaritoTextTheme(darkTheme.textTheme),
+
             ),
             themeMode: themeMode,
             debugShowCheckedModeBanner: false,
