@@ -18,8 +18,8 @@ import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:googleapis_auth/googleapis_auth.dart' as auth show AuthClient;
 
-const String backupFileJsonName = 'minitodo_backup.json';
-const String backupFileZipName = 'minitodo_backup.zip';
+const String backupFileJsonName = 'darrt_backup.json';
+const String backupFileZipName = 'darrt_backup.zip';
 
 class BackupService {
   static final BackupService _instance = BackupService._internal();

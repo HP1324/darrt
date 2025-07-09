@@ -24,7 +24,7 @@ class AppDrawer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Text('MiniTodo',
+                  const Text('Darrt',
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   Text(
                     dateFormat.format(now),
