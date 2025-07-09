@@ -157,4 +157,7 @@ Backup & restore
   - [x] Sort reminders by time in list
 - [x] When restoring data from drive, set task notifications if task has reminders      
 - [x] Make timeline's line more visible in dark mode
+- [x] In add category page, hints are for folders, fix it
+- [x] Fix new added folder not showing in folder bottom sheet in add note page
+- [x] Also fix bottom overflow error in folder bottom sheet
    

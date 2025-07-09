@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/messages.dart' show Messages;
 import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -345,54 +346,79 @@ class FolderSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.create_new_folder_outlined),
-      onPressed: () {
-        showModalBottomSheet(
-          context: context,
-          builder: (context) => Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(20),
+      onPressed: () => _showFolderSelectionBottomSheet(context),
+    );
+  }
+
+  Future<dynamic> _showFolderSelectionBottomSheet(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 8),
+            ListTile(
+              onTap: () => MiniRouter.to(context, AddFolderPage(edit: false)),
+              title: const Text(
+                'Create New Folder',
+                style: TextStyle(fontWeight: FontWeight.w500),
               ),
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                child: const Icon(Icons.add),
+              ),
+              trailing: const Icon(Icons.list_alt),
             ),
-            child: Column(
-              children: [
-                ListTile(
-                  title: Text('Add Folder'),
-                  leading: Icon(Icons.add),
-                  onTap: () {
-                    Navigator.pop(context);
-                    MiniRouter.to(context, AddFolderPage(edit: false));
-                  },
-                ),
-                const Divider(),
-                ListenableBuilder(
-                  listenable: Listenable.merge([g.folderVm, g.noteSc]),
-                  builder: (context, child) {
-                    final folders = g.folderVm.folders;
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: folders.length,
-                      itemBuilder: (context, index) {
-                        final folder = folders[index];
-                        // print('Folder Selection: ${controller.folderSelection}');
-                        return CheckboxListTile(
-                          title: Text(folder.name),
-                          value: g.noteSc.folderSelection[folder] ?? false,
-                          onChanged: (value) {
-                            if (value != null) {
-                              g.noteSc.setFolder(folder, value);
+            Expanded(
+              child: Scrollbar(
+                thickness: 8,
+                radius: const Radius.circular(4),
+                child: ListenableBuilder(
+                  listenable: Listenable.merge([g.noteSc, g.folderVm]),
+                  builder: (context, child) => ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    itemCount: g.folderVm.folders.length,
+                    itemBuilder: (_, index) {
+                      final folder = g.folderVm.folders[index];
+                      final map = g.noteSc.folderSelection;
+                      return ListTile(
+                        selected: map[folder] ?? false,
+                        selectedColor: IconColorStorage.colors[folder.color],
+                        leading: Icon(IconColorStorage.flattenedIcons[folder.icon]),
+                        trailing: Checkbox(
+                          fillColor: WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.selected)) {
+                              return IconColorStorage.colors[folder.color];
+                            }
+                            return null;
+                          }),
+                          value: map[folder] ?? false,
+                          onChanged: (selected) {
+                            if (selected != null) {
+                              g.noteSc.setFolder(folder, selected);
                             }
                           },
-                        );
-                      },
-                    );
-                  },
+                        ),
+                        title: Text(
+                          folder.name,
+                          style: const TextStyle(overflow: TextOverflow.ellipsis),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ],
+              ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 }
