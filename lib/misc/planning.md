@@ -155,5 +155,5 @@ Backup & restore
   - [x] Allow to set reminder on time, or before some minutes
   - [x] The previous reminder logic will remain as it is
   - [x] Sort reminders by time in list
-      
+- [x] When restoring data from drive, set task notifications if task has reminders      
    
