@@ -34,6 +34,14 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
           ),
+
+          ListTile(
+            leading: const Icon(Icons.alarm),
+            title: const Text('Quick Reminders'),
+            onTap: () {
+              MiniRouter.to(context, QuickRemindersPage());
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.color_lens_outlined),
             title: const Text('Theme'),
@@ -47,13 +55,6 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Settings'),
             onTap: () {
                 MiniRouter.to(context, SettingsPage());
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.alarm),
-            title: const Text('Quick Reminders'),
-            onTap: () {
-                MiniRouter.to(context, QuickRemindersPage());
             },
           ),
           const Spacer(),
