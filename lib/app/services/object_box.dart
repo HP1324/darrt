@@ -64,24 +64,22 @@ class ObjectBox {
   }
 
   List<TaskCategory> _getInitialCategories() {
-    final Map<String, String> categories = {
-      'General': 'folder',
-      'Work': 'briefcase',
-      'Study': 'book',
-      'Personal': 'heart',
-      'Fitness': 'dumbbell',
-      'Shopping': 'cart',
-    };
-
-    return categories.entries.map((e) => TaskCategory(name: e.key, icon: e.value)).toList();
+    return [
+        TaskCategory(name: 'General (Default)', icon: 'folder',uuid: 'general'),
+        TaskCategory(name: 'Work', icon: 'briefcase',uuid: 'work'),
+        TaskCategory(name: 'Study', icon: 'book',uuid: 'study'),
+        TaskCategory(name: 'Personal', icon: 'heart',uuid: 'personal'),
+        TaskCategory(name: 'Fitness', icon: 'dumbbell',uuid: 'fitness'),
+        TaskCategory(name: 'Shopping', icon: 'cart',uuid: 'shopping'),
+    ];
   }
 
   List<Folder> _getInitialFolders() {
     return [
-      Folder(name: 'General'),
-      Folder(name: 'Work'),
-      Folder(name: 'Study'),
-      Folder(name: 'Journal'),
+      Folder(name: 'General (Default)', uuid: 'general', icon: 'folder'),
+      Folder(name: 'Work', uuid: 'work', icon: 'work'),
+      Folder(name: 'Study', uuid: 'study', icon: 'school'),
+      Folder(name: 'Journal', uuid: 'journal', icon: 'book'),
     ];
   }
 
