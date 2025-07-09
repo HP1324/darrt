@@ -82,7 +82,7 @@ class CategoryNameLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      category.name,
+      category.uuid == 'general' ?  '${category.name} (Default)':category.name,
       overflow: TextOverflow.ellipsis,
       maxLines: 1,
       style: textTheme.titleMedium?.copyWith(),

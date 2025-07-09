@@ -87,6 +87,23 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
                 final notes = g.noteVm.notes
                     .where((n) => n.folders.contains(widget.folder))
                     .toList();
+                final icon = IconColorStorage.flattenedIcons[widget.folder.icon];
+                final color = IconColorStorage.colors[widget.folder.color];
+                if (notes.isEmpty) {
+                  return SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: Center(
+                        child: Icon(
+                          icon,
+                          color: color,
+                          size: getIconSize(context),
+                        ),
+                      ),
+                    ),
+                  );
+
+                }
                 return SliverPadding(
                   padding: const EdgeInsets.all(12),
                   sliver: SliverMasonryGrid.count(
@@ -113,5 +130,11 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
         ),
       ),
     );
+  }
+  double getIconSize(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    double iconSize = screenWidth * 0.2;
+
+    return iconSize.clamp(60.0, 120.0);
   }
 }

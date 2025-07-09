@@ -34,7 +34,7 @@ class _FolderItemState extends State<FolderItem> {
           MiniRouter.to(context, NotesForFolderPage(folder: widget.folder));
         },
         leading: Icon(icon, color: color),
-        title: Text(widget.folder.name),
+        title: Text(widget.folder.uuid == 'general' ?  '${widget.folder.name} (Default)':widget.folder.name,),
         trailing: widget.folder.id != 1
             ? PopupMenuButton(
                 itemBuilder: (context) => [

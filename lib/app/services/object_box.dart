@@ -65,7 +65,7 @@ class ObjectBox {
 
   List<TaskCategory> _getInitialCategories() {
     return [
-        TaskCategory(name: 'General (Default)', icon: 'folder',uuid: 'general'),
+        TaskCategory(name: 'General', icon: 'folder',uuid: 'general'),
         TaskCategory(name: 'Work', icon: 'briefcase',uuid: 'work'),
         TaskCategory(name: 'Study', icon: 'book',uuid: 'study'),
         TaskCategory(name: 'Personal', icon: 'heart',uuid: 'personal'),
@@ -76,7 +76,7 @@ class ObjectBox {
 
   List<Folder> _getInitialFolders() {
     return [
-      Folder(name: 'General (Default)', uuid: 'general', icon: 'folder'),
+      Folder(name: 'General', uuid: 'general', icon: 'folder'),
       Folder(name: 'Work', uuid: 'work', icon: 'work'),
       Folder(name: 'Study', uuid: 'study', icon: 'school'),
       Folder(name: 'Journal', uuid: 'journal', icon: 'book'),
