@@ -77,8 +77,8 @@ class ObjectBox {
   List<Folder> _getInitialFolders() {
     return [
       Folder(name: 'General', uuid: 'general', icon: 'folder'),
-      Folder(name: 'Work', uuid: 'work', icon: 'work'),
-      Folder(name: 'Study', uuid: 'study', icon: 'school'),
+      Folder(name: 'Work', uuid: 'work', icon: 'briefcase'),
+      Folder(name: 'Study', uuid: 'study', icon: 'graduation_cap'),
       Folder(name: 'Journal', uuid: 'journal', icon: 'book'),
     ];
   }
