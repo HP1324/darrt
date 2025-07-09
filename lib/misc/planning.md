@@ -151,5 +151,9 @@ Backup & restore
 - [x] Change **MiniTodo** to **Darrt** everywhere in the app
 - [x] In app drawer, change order, make quick reminders first, then theme and then settings
 - [x] Optimize and improve auto backup code, so that it works perfectly
+- [x] Change reminder settings
+  - [x] Allow to set reminder on time, or before some minutes
+  - [x] The previous reminder logic will remain as it is
+  - [x] Sort reminders by time in list
       
    
