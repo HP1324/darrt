@@ -150,6 +150,6 @@ Backup & restore
 - [x] Make timeline view default
 - [x] Change **MiniTodo** to **Darrt** everywhere in the app
 - [x] In app drawer, change order, make quick reminders first, then theme and then settings
-- [ ] Optimize and improve auto backup code, so that it works perfectly
+- [x] Optimize and improve auto backup code, so that it works perfectly
       
    
