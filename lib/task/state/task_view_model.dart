@@ -180,7 +180,7 @@ class TaskViewModel extends ViewModel<Task> {
     return objectList.map((task) => task.toJson()).toList();
   }
 
-  bool _isTimelineView = MiniBox().read('isTimeLine') ?? false;
+  bool _isTimelineView = MiniBox().read('isTimeLine') ?? true;
   bool get isTimelineView => _isTimelineView;
 
   // Toggle between timeline and normal view
