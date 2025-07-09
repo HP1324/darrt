@@ -18,10 +18,11 @@ void callBackDispatcher() {
     switch (task) {
       case mAutoBackup:
         try {
-          MiniBox().initStorage();
           final docsDir = await getApplicationDocumentsDirectory();
           final objectBoxDirPath = path.join(docsDir.path, 'objectbox');
+
           ObjectBox().initForAnotherIsolate(objectBoxDirPath);
+          MiniBox().initStorage();
 
           final isSignedIn = await GoogleSignInService().restoreGoogleAccount();
           if (!isSignedIn) throw GoogleClientNotAuthenticatedError();
@@ -38,6 +39,7 @@ void callBackDispatcher() {
         } catch (e, t) {
           MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
           MiniLogger.t(t.toString());
+          await createBackupFailureNotification();
         }
 
         break;
