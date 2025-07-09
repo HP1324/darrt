@@ -243,6 +243,7 @@ class _AutoBackupSectionState extends State<AutoBackupSection> {
                 setState(() {
                   autoBackup = value;
                 });
+                MiniBox().write(mAutoBackup, value);
                 if (value) {
                   final frequency = MiniBox().read(mAutoBackupFrequency) ?? 'daily';
                   Duration duration = frequency == 'daily'
