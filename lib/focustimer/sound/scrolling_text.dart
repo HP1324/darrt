@@ -4,20 +4,21 @@ class ScrollingText extends StatefulWidget {
   final String text;
   final TextStyle? style;
   final double scrollSpeed;
+  final double? width;
 
   const ScrollingText({
     super.key,
     required this.text,
     this.style,
     this.scrollSpeed = 50.0,
+    this.width,
   });
 
   @override
   State<ScrollingText> createState() => _ScrollingTextState();
 }
 
-class _ScrollingTextState extends State<ScrollingText>
-    with SingleTickerProviderStateMixin {
+class _ScrollingTextState extends State<ScrollingText> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   late ScrollController _scrollController;
@@ -25,11 +26,17 @@ class _ScrollingTextState extends State<ScrollingText>
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+
+    // Calculate duration based on text length and scroll speed
+    final duration = Duration(
+      milliseconds: (widget.text.length * widget.scrollSpeed).clamp(2000, 10000).toInt(),
+    );
+
     _controller = AnimationController(
-      duration: Duration(milliseconds: (widget.text.length * 100).clamp(2000, 8000)),
+      duration: duration,
       vsync: this,
     );
-    _scrollController = ScrollController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startScrolling();
@@ -40,13 +47,16 @@ class _ScrollingTextState extends State<ScrollingText>
     if (_scrollController.hasClients) {
       final maxScrollExtent = _scrollController.position.maxScrollExtent;
       if (maxScrollExtent > 0) {
-        _animation = Tween<double>(
-          begin: 0.0,
-          end: maxScrollExtent,
-        ).animate(CurvedAnimation(
-          parent: _controller,
-          curve: Curves.linear,
-        ));
+        _animation =
+            Tween<double>(
+              begin: 0.0,
+              end: maxScrollExtent,
+            ).animate(
+              CurvedAnimation(
+                parent: _controller,
+                curve: Curves.linear,
+              ),
+            );
 
         _animation.addListener(() {
           if (_scrollController.hasClients) {
@@ -68,14 +78,18 @@ class _ScrollingTextState extends State<ScrollingText>
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      controller: _scrollController,
-      scrollDirection: Axis.horizontal,
-      child: Text(
-        widget.text,
-        style: widget.style,
-        maxLines: 1,
-        overflow: TextOverflow.visible,
+    return SizedBox(
+      width: widget.width ?? double.infinity,
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(), // Prevent manual scrolling
+        child: Text(
+          widget.text,
+          style: widget.style,
+          maxLines: 1,
+          overflow: TextOverflow.visible,
+        ),
       ),
     );
   }
