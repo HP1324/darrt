@@ -57,7 +57,7 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
         break;
       case quickSnoozeActionKey:
         final minutes = MiniBox().read(mSnoozeMinutes);
-        NotificationService.scheduleQuickReminder(receivedAction.body ?? '', minutes);
+        await NotificationService.scheduleQuickReminder(receivedAction.body ?? '', minutes);
         break;
       case openAppKey:
         Darrt.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const SettingsPage()));

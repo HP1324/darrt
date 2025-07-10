@@ -1,10 +1,7 @@
-//ignore_for_file: curly_braces_in_flow_control_structures
-import 'dart:ui';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:googleapis/networkservices/v1.dart';
 import 'package:minimaltodo/app/exceptions.dart';
 import 'package:minimaltodo/app/notification/notification_action_controller.dart';
 import 'package:minimaltodo/app/services/backup_service.dart';
@@ -12,9 +9,7 @@ import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/app/services/object_box.dart';
-import 'package:objectbox/objectbox.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
-import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:workmanager/workmanager.dart';
 
