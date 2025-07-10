@@ -97,106 +97,86 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
       ),
       elevation: 8,
       content: ListView(
+        padding: const EdgeInsets.symmetric(vertical: 16),
         children: [
-          // Content
-          Flexible(
-            child: Column(
-              children: [
-                // No Sound option
-                _buildSoundTile(
-                  title: 'No Sound',
-                  subtitle: 'Silent mode',
-                  icon: Icons.volume_off,
-                  value: null,
-                  isSelected: _selectedSound == null,
-                ),
-
-                const SizedBox(height: 8),
-
-                // Built-in sounds
-                ...(_builtInSounds.entries.map((entry) {
-                  return _buildSoundTile(
-                    title: entry.value,
-                    subtitle: 'Built-in sound',
-                    icon: _getSoundIcon(entry.key),
-                    value: entry.key,
-                    isSelected: _selectedSound == entry.key,
-                  );
-                }).toList()),
-
-                // Custom sounds
-                ...(_soundService.customSounds.map((sound) {
-                  return _buildSoundTile(
-                    title: sound['name']!,
-                    subtitle: 'Custom sound',
-                    icon: Icons.audiotrack,
-                    value: sound['path']!,
-                    isSelected: _selectedSound == sound['path'],
-                  );
-                }).toList()),
-
-                const SizedBox(height: 8),
-
-                // Custom sound picker
-                Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: _pickCustomSound,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
+          _buildSoundTile(
+            title: 'No Sound',
+            subtitle: 'Silent mode',
+            icon: Icons.volume_off,
+            value: null,
+            isSelected: _selectedSound == null,
+          ),
+          const SizedBox(height: 8),
+          ..._builtInSounds.entries.map((entry) => _buildSoundTile(
+            title: entry.value,
+            subtitle: 'Built-in sound',
+            icon: _getSoundIcon(entry.key),
+            value: entry.key,
+            isSelected: _selectedSound == entry.key,
+          )),
+          ..._soundService.customSounds.map((sound) => _buildSoundTile(
+            title: sound['name']!,
+            subtitle: 'Custom sound',
+            icon: Icons.audiotrack,
+            value: sound['path']!,
+            isSelected: _selectedSound == sound['path'],
+          )),
+          const SizedBox(height: 8),
+          Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: _pickCustomSound,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.add,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.secondary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              Icons.add,
-                              color: Theme.of(context).colorScheme.secondary,
+                          Text(
+                            'Add Custom Sound',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Add Custom Sound',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                SizedBox(height: 2),
-                                Text(
-                                  'Browse your device',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
+                          SizedBox(height: 2),
+                          Text(
+                            'Browse your device',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
                             ),
                           ),
-                          const Icon(Icons.arrow_forward_ios, size: 16),
                         ],
                       ),
                     ),
-                  ),
+                    const Icon(Icons.arrow_forward_ios, size: 16),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ],
       ),
+
       actions: [
         // Actions
         Container(
@@ -244,7 +224,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
     required bool isSelected,
   }) {
     return Card(
-      elevation: isSelected ? 4 : 1,
+      elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: isSelected
@@ -263,7 +243,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
           await _soundService.playSound(value);
         },
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(13),
           child: Row(
             children: [
               Container(
@@ -271,7 +251,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
-                      : Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
+                      : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -281,7 +261,6 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                       : Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,14 +275,13 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
-                    ),
+                    // Text(
+                    //   subtitle,
+                    //   style: TextStyle(
+                    //     color: Colors.grey,
+                    //     fontSize: 12,
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

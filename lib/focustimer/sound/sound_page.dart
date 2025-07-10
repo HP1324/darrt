@@ -46,7 +46,7 @@ class _SoundPageState extends State<SoundPage> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Theme.of(context).colorScheme.primary.withAlpha(25),
+            Theme.of(context).colorScheme.primary.withAlpha(10),
             Theme.of(context).colorScheme.surface,
           ],
         ),
@@ -54,50 +54,11 @@ class _SoundPageState extends State<SoundPage> {
       child: SafeArea(
         child: Column(
           children: [
-            // Mimicking AppBar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: Text(
-                      'Sound Picker Demo',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  StreamBuilder<PlayerState>(
-                    stream: _soundService.audioPlayer.onPlayerStateChanged,
-                    builder: (context, snapshot) {
-                      final isPlaying = snapshot.data == PlayerState.playing;
-                      return IconButton(
-                        icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
-                        onPressed: () {
-                          if (isPlaying) {
-                            _soundService.pauseAudio();
-                          } else {
-                            _soundService.resumeAudio();
-                          }
-                        },
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.stop),
-                    onPressed: () {
-                      _soundService.stopAudio();
-                    },
-                  ),
-                ],
-              ),
-            ),
-
             // Main Body
             Expanded(
               child: Center(
                 child: Column(
+                  spacing: 16,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     StreamBuilder<PlayerState>(
@@ -111,65 +72,99 @@ class _SoundPageState extends State<SoundPage> {
                         );
                       },
                     ),
-                    const SizedBox(height: 24),
                     Text(
                       'Current Sound:',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withAlpha(200),
+                        color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
                       ),
                     ),
-                    const SizedBox(height: 16),
                     Container(
                       width: 300,
                       height: 50,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerHighest,
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Center(
                         child: _soundService.currentSound != null
                             ? ScrollingText(
-                          text: _soundService.getDisplayName(
-                              _soundService.currentSound),
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary,
-                          ),
-                        )
+                                text: _soundService.getDisplayName(_soundService.currentSound),
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              )
                             : Text(
-                          'No Sound',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary,
-                          ),
-                        ),
+                                'No Sound',
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    StreamBuilder<PlayerState>(
+                      stream: _soundService.audioPlayer.onPlayerStateChanged,
+                      builder: (context, snapshot) {
+                        final isPlaying = snapshot.data == PlayerState.playing;
+                        return Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [
+                             Theme.of(context).colorScheme.primary,
+                             Theme.of(context).colorScheme.primaryContainer,
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(40),
+                              onTap: () {
+                                if (isPlaying) {
+                                  _soundService.pauseAudio();
+                                } else {
+                                  _soundService.resumeAudio();
+                                }
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.2),
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 300),
+                                    child: Icon(
+                                      isPlaying ? Icons.pause : Icons.play_arrow,
+                                      key: ValueKey(isPlaying),
+                                      color: Colors.white,
+                                      size: 32,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+
                     FilledButton.icon(
                       onPressed: _showSoundPicker,
                       icon: const Icon(Icons.library_music),
                       label: const Text('Choose Sound'),
                       style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 32, vertical: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),

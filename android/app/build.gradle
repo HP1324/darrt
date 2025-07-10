@@ -45,6 +45,8 @@ android {
     buildTypes {
         release{
             signingConfig = signingConfigs.debug
+            minifyEnabled true // Shrinks unused code
+            shrinkResources true // Shrinks unused resources
         }
     }
 
