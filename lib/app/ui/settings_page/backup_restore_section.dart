@@ -254,10 +254,11 @@ class _AutoBackupSectionState extends State<AutoBackupSection> {
                   MiniLogger.dp(
                     'Registering background task: frequency: $frequency, duration: $duration',
                   );
-                  await Workmanager().registerOneOffTask(
+                  await Workmanager().registerPeriodicTask(
                     mAutoBackup,
                     mAutoBackup,
                     initialDelay: Duration(seconds: 5),
+                    frequency: Duration(minutes: 15),
                   );
                 } else {
                   MiniLogger.dp('Cancelling background task');
