@@ -1,4 +1,3 @@
-//ignore_for_file: curly_braces_in_flow_control_structures
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/services/boxpref.dart';

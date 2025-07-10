@@ -1,6 +1,7 @@
 //ignore_for_file: curly_braces_in_flow_control_structures
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/cloudsearch/v1.dart';
 import 'package:minimaltodo/app/exceptions.dart';
 import 'package:minimaltodo/app/services/backup_service.dart';
 import 'package:minimaltodo/app/services/google_sign_in_service.dart';
@@ -20,7 +21,7 @@ class BackupRestoreSection extends StatefulWidget {
 
 class _BackupRestoreSectionState extends State<BackupRestoreSection> {
   final ValueNotifier<DateTime?> lastBackupDate = ValueNotifier(MiniBox().read(mLastBackupDate));
-
+  final ValueNotifier<bool> autoBackup = ValueNotifier(MiniBox().read(mAutoBackup) ?? false);
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -35,8 +36,8 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
         children: [
           Text('Backup & Restore', style: theme.textTheme.titleMedium),
           Divider(height: 0),
-          SignInOutBackupRow(lastBackupDate: lastBackupDate),
-          AutoBackupSection(lastBackupDate: lastBackupDate),
+          SignInOutBackupRow(lastBackupDate: lastBackupDate, autoBackup: autoBackup),
+          AutoBackupSection(lastBackupDate: lastBackupDate, autoBackup: autoBackup),
           _RestoreDeleteBackupRow(),
         ],
       ),
@@ -53,9 +54,6 @@ class _RestoreDeleteBackupRow extends StatefulWidget {
 
 class _RestoreDeleteBackupRowState extends State<_RestoreDeleteBackupRow> {
   ValueNotifier<bool> isRestoring = ValueNotifier(false);
-  final ValueNotifier<String> currentEmail = ValueNotifier(
-    MiniBox().read(mGoogleEmail) ?? tapHereToSignIn,
-  );
   final ValueNotifier<bool> isDeleting = ValueNotifier(false);
   @override
   void dispose() {
@@ -219,70 +217,73 @@ class _RestoreDeleteBackupRowState extends State<_RestoreDeleteBackupRow> {
 }
 
 class AutoBackupSection extends StatefulWidget {
-  const AutoBackupSection({super.key, required this.lastBackupDate});
+  const AutoBackupSection({super.key, required this.lastBackupDate, required this.autoBackup});
   final ValueNotifier<DateTime?> lastBackupDate;
+  final ValueNotifier<bool> autoBackup;
   @override
   State<AutoBackupSection> createState() => _AutoBackupSectionState();
 }
 
 class _AutoBackupSectionState extends State<AutoBackupSection> {
-  bool autoBackup = MiniBox().read(mAutoBackup) ?? false;
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CheckboxListTile(
-          contentPadding: EdgeInsets.zero,
-          visualDensity: VisualDensity.compact,
-          value: autoBackup,
-          onChanged: (value) async {
-            try {
-              if (GoogleSignInService().currentUser == null)
-                throw GoogleClientNotAuthenticatedError();
-              if (value != null) {
-                setState(() {
-                  autoBackup = value;
-                });
-                MiniBox().write(mAutoBackup, value);
-                if (value) {
-                  final frequency = MiniBox().read(mAutoBackupFrequency) ?? 'daily';
-                  Duration duration = frequency == 'daily'
-                      ? Duration(days: 1)
-                      : frequency == 'weekly'
-                      ? Duration(days: 7)
-                      : Duration(days: 30);
-                  MiniLogger.dp(
-                    'Registering background task: frequency: $frequency, duration: $duration',
-                  );
-                  await Workmanager().registerPeriodicTask(
-                    mAutoBackup,
-                    mAutoBackup,
-                    initialDelay: Duration(seconds: 5),
-                    frequency: Duration(minutes: 15),
-                  );
-                } else {
-                  MiniLogger.dp('Cancelling background task');
-                  await Workmanager().cancelByUniqueName(mAutoBackup);
+    return ValueListenableBuilder(
+      valueListenable: widget.autoBackup,
+      builder: (context, autoBackup, child) {
+        return Column(
+          children: [
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              visualDensity: VisualDensity.compact,
+              value: autoBackup,
+              onChanged: (value) async {
+                try {
+                  if (GoogleSignInService().currentUser == null)
+                    throw GoogleClientNotAuthenticatedError();
+                  if (value != null) {
+                    autoBackup = value;
+                    MiniBox().write(mAutoBackup, value);
+                    if (value) {
+                      final frequency = MiniBox().read(mAutoBackupFrequency) ?? 'daily';
+                      Duration duration = frequency == 'daily'
+                          ? Duration(days: 1)
+                          : frequency == 'weekly'
+                          ? Duration(days: 7)
+                          : Duration(days: 30);
+                      MiniLogger.dp(
+                        'Registering background task: frequency: $frequency, duration: $duration',
+                      );
+                      await Workmanager().registerPeriodicTask(
+                        mAutoBackup,
+                        mAutoBackup,
+                        initialDelay: Duration(seconds: 5),
+                        frequency: Duration(minutes: 15),
+                      );
+                    } else {
+                      MiniLogger.dp('Cancelling background task');
+                      await Workmanager().cancelByUniqueName(mAutoBackup);
+                    }
+                  }
+                } on GoogleClientNotAuthenticatedError {
+                  if (context.mounted) showErrorToast(context, 'Sign in to continue!');
                 }
-              }
-            } on GoogleClientNotAuthenticatedError {
-              if (context.mounted) showErrorToast(context, 'Sign in to continue!');
-            }
-          },
-          title: Text('Auto backup'),
-          subtitle: ValueListenableBuilder(
-            valueListenable: widget.lastBackupDate,
-            builder: (context, value, child) {
-              return Text(
-                value != null
-                    ? 'Last backup: ${formatDate(value, 'dd/MM/yyyy')}'
-                    : 'Backup has not been done yet',
-              );
-            },
-          ),
-        ),
-        if (autoBackup) AutobackupFrequencySelector(),
-      ],
+              },
+              title: Text('Auto backup'),
+              subtitle: ValueListenableBuilder(
+                valueListenable: widget.lastBackupDate,
+                builder: (context, value, child) {
+                  return Text(
+                    value != null
+                        ? 'Last backup: ${formatDate(value, 'dd/MM/yyyy')}'
+                        : 'Backup has not been done yet',
+                  );
+                },
+              ),
+            ),
+            if (autoBackup) AutobackupFrequencySelector(),
+          ],
+        );
+      },
     );
   }
 }
@@ -385,8 +386,9 @@ class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelecto
 }
 
 class SignInOutBackupRow extends StatefulWidget {
-  const SignInOutBackupRow({super.key, required this.lastBackupDate});
+  const SignInOutBackupRow({super.key, required this.lastBackupDate, required this.autoBackup});
   final ValueNotifier<DateTime?> lastBackupDate;
+  final ValueNotifier<bool> autoBackup;
   @override
   State<SignInOutBackupRow> createState() => _SignInOutBackupRowState();
 }
@@ -433,6 +435,9 @@ class _SignInOutBackupRowState extends State<SignInOutBackupRow> {
                 setState(() {
                   currentEmail = null;
                 });
+                widget.autoBackup.value = false;
+                MiniBox().write(mAutoBackup, false);
+                await Workmanager().cancelByUniqueName(mAutoBackup);
                 await GoogleSignInService().signOut();
                 MiniBox().remove(mGoogleEmail);
                 if (context.mounted) showWarningToast(context, 'Signed out');
@@ -485,6 +490,12 @@ class _SignInOutBackupRowState extends State<SignInOutBackupRow> {
 
         final authentication = await account.authentication;
         MiniBox().write(mGoogleAuthToken, authentication.accessToken);
+      } else {
+        MiniBox().write(mAutoBackup, false);
+        setState(() {
+          currentEmail = null;
+          widget.autoBackup.value = false;
+        });
       }
     } catch (e, t) {
       MiniLogger.e('Sign in error: ${e.toString()}');
