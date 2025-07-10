@@ -1,25 +1,16 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/focustimer/sound/sound_service.dart';
+
+import '../../helpers/globals.dart' as g show soundController;
 
 class SoundPickerDialog extends StatefulWidget {
-  final String? selectedSound;
-  final Function(String?) onSoundSelected;
-
-  const SoundPickerDialog({
-    super.key,
-    this.selectedSound,
-    required this.onSoundSelected,
-  });
+  const SoundPickerDialog({super.key});
 
   @override
   State<SoundPickerDialog> createState() => _SoundPickerDialogState();
 }
 
 class _SoundPickerDialogState extends State<SoundPickerDialog> {
-  final SoundService _soundService = SoundService();
-  String? _selectedSound;
-
   // Map of sound files to their display names
   final Map<String, String> _builtInSounds = {
     'assets/sounds/brown_noise.mp3': 'Brown Noise',
@@ -36,7 +27,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
   @override
   void initState() {
     super.initState();
-    _selectedSound = widget.selectedSound;
+    g.soundController.initializeDialog();
   }
 
   Future<void> _pickCustomSound() async {
@@ -51,13 +42,10 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
         String customSoundName = result.files.single.name.split('.').first;
 
         // Add to custom sounds list
-        await _soundService.addCustomSound(customSoundPath, customSoundName);
+        await g.soundController.addCustomSound(customSoundPath, customSoundName);
 
-        setState(() {
-          _selectedSound = customSoundPath;
-        });
-
-        await _soundService.playSound(customSoundPath);
+        g.soundController.setSelectedSoundInDialog(customSoundPath);
+        await g.soundController.playSound(customSoundPath);
       }
     } catch (e) {
       print('Error picking custom sound: $e');
@@ -75,8 +63,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: // Header
-        Row(
+      title: Row(
         children: [
           Icon(
             Icons.music_note,
@@ -96,87 +83,104 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
         borderRadius: BorderRadius.circular(20),
       ),
       elevation: 8,
-      content: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        children: [
-          _buildSoundTile(
-            title: 'No Sound',
-            subtitle: 'Silent mode',
-            icon: Icons.volume_off,
-            value: null,
-            isSelected: _selectedSound == null,
-          ),
-          const SizedBox(height: 8),
-          ..._builtInSounds.entries.map((entry) => _buildSoundTile(
-            title: entry.value,
-            subtitle: 'Built-in sound',
-            icon: _getSoundIcon(entry.key),
-            value: entry.key,
-            isSelected: _selectedSound == entry.key,
-          )),
-          ..._soundService.customSounds.map((sound) => _buildSoundTile(
-            title: sound['name']!,
-            subtitle: 'Custom sound',
-            icon: Icons.audiotrack,
-            value: sound['path']!,
-            isSelected: _selectedSound == sound['path'],
-          )),
-          const SizedBox(height: 8),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: _pickCustomSound,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
+      content: ListenableBuilder(
+        listenable: g.soundController,
+        builder: (context, child) {
+          return ValueListenableBuilder<String?>(
+            valueListenable: g.soundController.selectedSoundInDialog,
+            builder: (context, selectedSound, child) {
+              return SizedBox(
+                width: double.maxFinite,
+                child: ListView(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        color: Theme.of(context).colorScheme.secondary,
+                    _buildSoundTile(
+                      title: 'No Sound',
+                      subtitle: 'Silent mode',
+                      icon: Icons.volume_off,
+                      value: null,
+                      isSelected: selectedSound == null,
+                    ),
+                    const SizedBox(height: 8),
+                    ..._builtInSounds.entries.map(
+                      (entry) => _buildSoundTile(
+                        title: entry.value,
+                        subtitle: 'Built-in sound',
+                        icon: _getSoundIcon(entry.key),
+                        value: entry.key,
+                        isSelected: selectedSound == entry.key,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Add Custom Sound',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'Browse your device',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                    ...g.soundController.customSounds.map(
+                      (sound) => _buildSoundTile(
+                        title: sound['name']!,
+                        subtitle: 'Custom sound',
+                        icon: Icons.audiotrack,
+                        value: sound['path']!,
+                        isSelected: selectedSound == sound['path'],
                       ),
                     ),
-                    const Icon(Icons.arrow_forward_ios, size: 16),
+                    const SizedBox(height: 8),
+                    Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: _pickCustomSound,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  Icons.add,
+                                  color: Theme.of(context).colorScheme.secondary,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Add Custom Sound',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    SizedBox(height: 2),
+                                    Text(
+                                      'Browse your device',
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(Icons.arrow_forward_ios, size: 16),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-              ),
-            ),
-          ),
-        ],
+              );
+            },
+          );
+        },
       ),
-
     );
   }
 
@@ -201,10 +205,8 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () async {
-          setState(() {
-            _selectedSound = value;
-          });
-          await _soundService.playSound(value);
+          g.soundController.setSelectedSoundInDialog(value);
+          await g.soundController.playSound(value);
         },
         child: Padding(
           padding: const EdgeInsets.all(13),
@@ -215,7 +217,9 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
-                      : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                      : Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -225,6 +229,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                       : Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,13 +244,6 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    // Text(
-                    //   subtitle,
-                    //   style: TextStyle(
-                    //     color: Colors.grey,
-                    //     fontSize: 12,
-                    //   ),
-                    // ),
                   ],
                 ),
               ),

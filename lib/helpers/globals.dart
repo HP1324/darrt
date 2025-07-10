@@ -4,6 +4,7 @@ import 'package:minimaltodo/app/state/managers/theme_manager.dart' show ThemeMan
 import 'package:minimaltodo/app/state/controllers/settings_state_controller.dart';
 import 'package:minimaltodo/category/state/category_state_controller.dart' show CategoryStateController;
 import 'package:minimaltodo/category/state/category_view_model.dart' show CategoryViewModel;
+import 'package:minimaltodo/focustimer/sound/sound_controller.dart';
 import 'package:minimaltodo/note/state/folder_state_controller.dart' show FolderStateController;
 import 'package:minimaltodo/note/state/folder_view_model.dart' show FolderViewModel;
 import 'package:minimaltodo/note/state/note_state_controller.dart';
@@ -49,6 +50,8 @@ final settingsSc = SettingsStateController();
 final completionVm = CompletionViewModel();
 
 final quickVm = QuickReminderViewModel();
+
+final soundController = SoundController();
 
 final Uuid uuid = Uuid();
 
