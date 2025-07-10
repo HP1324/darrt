@@ -2,6 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:minimaltodo/app/notification/notification_action_controller.dart';
@@ -19,7 +20,8 @@ import 'package:workmanager/workmanager.dart';
 /// Initializes app services and state
 Future<void> initApp() async {
   try {
-    WidgetsFlutterBinding.ensureInitialized();
+    final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
     // Initialize local storage & database
     await ObjectBox().init();
@@ -30,6 +32,8 @@ Future<void> initApp() async {
     await NotificationService.init();
 
     Workmanager().initialize(callBackDispatcher,isInDebugMode: kDebugMode);
+
+    FlutterNativeSplash.remove();
   } catch (e,t) {
     MiniLogger.e('Failed to initialize app: ${e.toString()}, Error type: ${e.runtimeType}');
     MiniLogger.t(t.toString());

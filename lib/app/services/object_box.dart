@@ -6,6 +6,7 @@ import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/objectbox.g.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
+import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 late final Admin admin;
 
@@ -15,12 +16,15 @@ class ObjectBox {
   ObjectBox._internal();
 
   Store? _store;
-  bool _initialized = false;
 
   Future<void> init() async {
-    if (_initialized) return;
-    _store = await openStore();
-    _initialized = true;
+    Store.debugLogs = true;
+    final path = (await defaultStoreDirectory()).path;
+    if(Store.isOpen(path)) {
+      _store = Store.attach(getObjectBoxModel(), path);
+    }else {
+      _store = await openStore();
+    }
     _putInitialData();
     if (kDebugMode) {
       if (Admin.isAvailable()) {
@@ -29,10 +33,8 @@ class ObjectBox {
     }
   }
 
-  void initForAnotherIsolate(String dbPath) async {
+  Future<void> initForAnotherIsolate(String dbPath) async {
     _store = Store.attach(getObjectBoxModel(), dbPath);
-    _initialized = true;
-    _putInitialData();
   }
 
   Store? get store => _store;
