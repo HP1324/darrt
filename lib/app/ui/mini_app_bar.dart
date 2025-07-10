@@ -179,6 +179,9 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
             ],
           );
         }
+        else if(value == 1){
+          return AppBar(title: Text('Focus Sessions'));
+        }
         return AppBar(
           title: Text('Categories', style: Theme.of(context).textTheme.titleMedium),
         );
