@@ -241,7 +241,7 @@ class _AutoBackupSectionState extends State<AutoBackupSection> {
                   if (GoogleSignInService().currentUser == null)
                     throw GoogleClientNotAuthenticatedError();
                   if (value != null) {
-                    autoBackup = value;
+                    widget.autoBackup.value = value;
                     MiniBox().write(mAutoBackup, value);
                     if (value) {
                       final frequency = MiniBox().read(mAutoBackupFrequency) ?? 'daily';
