@@ -177,42 +177,6 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
         ],
       ),
 
-      actions: [
-        // Actions
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
-            border: Border(
-              top: BorderSide(
-                color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
-              ),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              FilledButton(
-                onPressed: () {
-                  widget.onSoundSelected(_selectedSound);
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Confirm'),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 

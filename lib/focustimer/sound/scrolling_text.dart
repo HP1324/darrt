@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class ScrollingText extends StatefulWidget {
   final String text;
   final TextStyle? style;
-  final double scrollSpeed;
+  final double scrollSpeed; // pixels per second
   final double? width;
+  final Duration pauseDuration; // pause between loops
 
   const ScrollingText({
     super.key,
@@ -12,83 +13,119 @@ class ScrollingText extends StatefulWidget {
     this.style,
     this.scrollSpeed = 50.0,
     this.width,
+    this.pauseDuration = const Duration(seconds: 1),
   });
 
   @override
   State<ScrollingText> createState() => _ScrollingTextState();
 }
 
-class _ScrollingTextState extends State<ScrollingText> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
-  late ScrollController _scrollController;
+class _ScrollingTextState extends State<ScrollingText>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _controller;
+  Animation<double>? _animation;
+  final GlobalKey _textKey = GlobalKey();
+  double _textWidth = 0.0;
+  double _containerWidth = 0.0;
+  bool _shouldScroll = false;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
-
-    // Calculate duration based on text length and scroll speed
-    final duration = Duration(
-      milliseconds: (widget.text.length * widget.scrollSpeed).clamp(2000, 10000).toInt(),
-    );
-
-    _controller = AnimationController(
-      duration: duration,
-      vsync: this,
-    );
-
+    _controller = AnimationController(vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startScrolling();
+      if (mounted) {
+        _measureAndStartAnimation();
+      }
     });
   }
 
-  void _startScrolling() {
-    if (_scrollController.hasClients) {
-      final maxScrollExtent = _scrollController.position.maxScrollExtent;
-      if (maxScrollExtent > 0) {
-        _animation =
-            Tween<double>(
-              begin: 0.0,
-              end: maxScrollExtent,
-            ).animate(
-              CurvedAnimation(
-                parent: _controller,
-                curve: Curves.linear,
-              ),
-            );
+  void _measureAndStartAnimation() {
+    final RenderBox? renderBox = _textKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null && mounted) {
+      setState(() {
+        _textWidth = renderBox.size.width;
+        _containerWidth = widget.width ?? (context.size?.width ?? 300);
+        _shouldScroll = _textWidth > _containerWidth;
+      });
 
-        _animation.addListener(() {
-          if (_scrollController.hasClients) {
-            _scrollController.jumpTo(_animation.value);
-          }
-        });
-
-        _controller.repeat();
+      if (_shouldScroll) {
+        _startScrolling();
       }
     }
   }
 
+  void _startScrolling() {
+    if (_controller == null || !mounted) return;
+
+    // Total distance to scroll: text width + container width
+    final totalDistance = _textWidth + _containerWidth;
+
+    final duration = Duration(
+      milliseconds: ((totalDistance / widget.scrollSpeed) * 1000).toInt(),
+    );
+
+    _controller!.duration = duration;
+
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: totalDistance,
+    ).animate(CurvedAnimation(
+      parent: _controller!,
+      curve: Curves.linear,
+    ))..addStatusListener((status) async {
+      if (status == AnimationStatus.completed && mounted) {
+        await Future.delayed(widget.pauseDuration);
+        if (mounted && _controller != null) {
+          _controller!.reset();
+          _controller!.forward();
+        }
+      }
+    });
+
+    _controller!.forward();
+  }
+
   @override
   void dispose() {
-    _controller.dispose();
-    _scrollController.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: widget.width ?? double.infinity,
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        physics: const NeverScrollableScrollPhysics(), // Prevent manual scrolling
-        child: Text(
+    return ClipRect(
+      child: SizedBox(
+        width: widget.width ?? double.infinity,
+        height: widget.style?.height ??
+            (widget.style?.fontSize ?? 14) * (widget.style?.height ?? 1.2),
+        child: _shouldScroll && _animation != null
+            ? AnimatedBuilder(
+          animation: _animation!,
+          builder: (context, child) {
+            return Stack(
+              children: [
+                Positioned(
+                  left: _containerWidth - _animation!.value,
+                  child: Text(
+                    widget.text,
+                    style: widget.style,
+                    maxLines: 1,
+                    overflow: TextOverflow.visible,
+                    softWrap: false,
+                  ),
+                ),
+              ],
+            );
+          },
+        )
+            : Text(
           widget.text,
+          key: _textKey,
           style: widget.style,
           maxLines: 1,
-          overflow: TextOverflow.visible,
+          overflow: TextOverflow.ellipsis,
+          softWrap: false,
         ),
       ),
     );

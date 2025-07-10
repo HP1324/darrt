@@ -1,12 +1,10 @@
 import 'dart:convert';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
 
-class SoundService {
-  static final SoundService _instance = SoundService._internal();
-  factory SoundService() => _instance;
-  SoundService._internal();
+class SoundController extends ChangeNotifier{
 
   late AudioPlayer _audioPlayer;
   String? _currentSound;

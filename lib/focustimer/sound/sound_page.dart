@@ -88,12 +88,14 @@ class _SoundPageState extends State<SoundPage> {
                       ),
                       child: Center(
                         child: _soundService.currentSound != null
-                            ? ScrollingText(
-                                text: _soundService.getDisplayName(_soundService.currentSound),
+                            ? Text(
+                                _soundService.getDisplayName(_soundService.currentSound),
                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               )
                             : Text(
                                 'No Sound',
@@ -115,8 +117,8 @@ class _SoundPageState extends State<SoundPage> {
                             shape: BoxShape.circle,
                             gradient: LinearGradient(
                               colors: [
-                             Theme.of(context).colorScheme.primary,
-                             Theme.of(context).colorScheme.primaryContainer,
+                                Theme.of(context).colorScheme.primary,
+                                Theme.of(context).colorScheme.primaryContainer,
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
@@ -127,29 +129,22 @@ class _SoundPageState extends State<SoundPage> {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(40),
                               onTap: () {
-                                if (isPlaying) {
-                                  _soundService.pauseAudio();
-                                } else {
-                                  _soundService.resumeAudio();
+                                if (_soundService.currentSound != null) {
+                                  if (isPlaying) {
+                                    _soundService.pauseAudio();
+                                  } else {
+                                    _soundService.resumeAudio();
+                                  }
                                 }
                               },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.2),
-                                    width: 2,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 300),
-                                    child: Icon(
-                                      isPlaying ? Icons.pause : Icons.play_arrow,
-                                      key: ValueKey(isPlaying),
-                                      color: Colors.white,
-                                      size: 32,
-                                    ),
+                              child: Center(
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 300),
+                                  child: Icon(
+                                    isPlaying ? Icons.pause : Icons.play_arrow,
+                                    key: ValueKey(isPlaying),
+                                    color: Colors.white,
+                                    size: 32,
                                   ),
                                 ),
                               ),
