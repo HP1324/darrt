@@ -4,6 +4,7 @@ import 'package:minimaltodo/app/ui/app_drawer.dart';
 import 'package:minimaltodo/app/ui/mini_app_bar.dart';
 import 'package:minimaltodo/app/ui/mini_bottom_nav_bar.dart';
 import 'package:minimaltodo/category/ui/categories_page.dart';
+import 'package:minimaltodo/focustimer/focus_timer_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/note/ui/notes_page.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
@@ -27,6 +28,7 @@ class Home extends StatelessWidget {
                 index: value,
                 children: [
                   const TasksPage(),
+                  const FocusTimerPage(),
                   const CategoriesPage(),
                 ],
               );
@@ -69,12 +71,12 @@ class _BottomNavBarWidget extends StatelessWidget {
                 onTap: () => g.navMan.onDestinationChanged(0),
                 i: 0,
               ),
-              // MiniBottomNavBarItem(
-              //   icon: Icons.timeline,
-              //   label: 'Timelines',
-              //   onTap: () => MiniRouter.to(context, const TaskSearchPage()),
-              //   i: -1,
-              // ),
+              MiniBottomNavBarItem(
+                icon: Icons.psychology_outlined,
+                label: 'Focus',
+                onTap: () => g.navMan.onDestinationChanged(1),
+                i: 1,
+              ),
               MiniBottomNavBarItem(
                 icon: Icons.search,
                 label: 'Search',
@@ -84,8 +86,8 @@ class _BottomNavBarWidget extends StatelessWidget {
               MiniBottomNavBarItem(
                 icon: Iconsax.category,
                 label: 'Categories',
-                onTap: () => g.navMan.onDestinationChanged(1),
-                i: 1,
+                onTap: () => g.navMan.onDestinationChanged(2),
+                i: 2,
               ),
               MiniBottomNavBarItem(
                 icon: Icons.assignment_outlined,
