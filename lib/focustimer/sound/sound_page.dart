@@ -1,8 +1,8 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/focustimer/sound/scrolling_text.dart';
 import 'package:minimaltodo/focustimer/sound/sound_picker_dialog.dart';
-import 'package:minimaltodo/focustimer/sound/sound_service.dart';
+
+import '../../helpers/globals.dart' as g show soundController;
 
 class SoundPage extends StatefulWidget {
   const SoundPage({super.key});
@@ -12,29 +12,16 @@ class SoundPage extends StatefulWidget {
 }
 
 class _SoundPageState extends State<SoundPage> {
-  final SoundService _soundService = SoundService();
-
   @override
   void initState() {
     super.initState();
-    _soundService.initialize();
-  }
-
-  @override
-  void dispose() {
-    _soundService.dispose();
-    super.dispose();
+    g.soundController.initialize();
   }
 
   void _showSoundPicker() {
     showDialog(
       context: context,
-      builder: (context) => SoundPickerDialog(
-        selectedSound: _soundService.currentSound,
-        onSoundSelected: (sound) {
-          setState(() {});
-        },
-      ),
+      builder: (context) => SoundPickerDialog(),
     );
   }
 
@@ -62,7 +49,7 @@ class _SoundPageState extends State<SoundPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     StreamBuilder<PlayerState>(
-                      stream: _soundService.audioPlayer.onPlayerStateChanged,
+                      stream: g.soundController.audioPlayer.onPlayerStateChanged,
                       builder: (context, snapshot) {
                         final isPlaying = snapshot.data == PlayerState.playing;
                         return Icon(
@@ -87,27 +74,34 @@ class _SoundPageState extends State<SoundPage> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Center(
-                        child: _soundService.currentSound != null
-                            ? Text(
-                                _soundService.getDisplayName(_soundService.currentSound),
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              )
-                            : Text(
-                                'No Sound',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
+                        child: ListenableBuilder(
+                          listenable: g.soundController,
+                          builder: (context, child) {
+                            return g.soundController.currentSound != null
+                                ? Text(
+                                    g.soundController.getDisplayName(
+                                      g.soundController.currentSound,
+                                    ),
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  )
+                                : Text(
+                                    'No Sound',
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                  );
+                          },
+                        ),
                       ),
                     ),
                     StreamBuilder<PlayerState>(
-                      stream: _soundService.audioPlayer.onPlayerStateChanged,
+                      stream: g.soundController.audioPlayer.onPlayerStateChanged,
                       builder: (context, snapshot) {
                         final isPlaying = snapshot.data == PlayerState.playing;
                         return Container(
@@ -129,11 +123,11 @@ class _SoundPageState extends State<SoundPage> {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(40),
                               onTap: () {
-                                if (_soundService.currentSound != null) {
+                                if (g.soundController.currentSound != null) {
                                   if (isPlaying) {
-                                    _soundService.pauseAudio();
+                                    g.soundController.pauseAudio();
                                   } else {
-                                    _soundService.resumeAudio();
+                                    g.soundController.resumeAudio();
                                   }
                                 }
                               },
@@ -153,7 +147,6 @@ class _SoundPageState extends State<SoundPage> {
                         );
                       },
                     ),
-
                     FilledButton.icon(
                       onPressed: _showSoundPicker,
                       icon: const Icon(Icons.library_music),

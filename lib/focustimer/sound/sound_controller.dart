@@ -4,17 +4,19 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
 
-class SoundController extends ChangeNotifier{
-
+class SoundController extends ChangeNotifier {
   late AudioPlayer _audioPlayer;
   String? _currentSound;
   List<Map<String, String>> _customSounds = [];
 
+  // ValueNotifier for dialog-specific state
+  final ValueNotifier<String?> _selectedSoundInDialog = ValueNotifier<String?>(null);
+
   // Getters
   String? get currentSound => _currentSound;
-
   List<Map<String, String>> get customSounds => _customSounds;
   AudioPlayer get audioPlayer => _audioPlayer;
+  ValueNotifier<String?> get selectedSoundInDialog => _selectedSoundInDialog;
 
   // Initialize the service
   Future<void> initialize() async {
@@ -28,6 +30,7 @@ class SoundController extends ChangeNotifier{
     final soundsJson = MiniBox().read('custom_sounds') ?? '[]';
     final List<dynamic> soundsList = jsonDecode(soundsJson);
     _customSounds = soundsList.map((sound) => Map<String, String>.from(sound)).toList();
+    notifyListeners();
   }
 
   // Save custom sounds to SharedPreferences
@@ -43,6 +46,7 @@ class SoundController extends ChangeNotifier{
     if (!exists) {
       _customSounds.add({'path': path, 'name': name});
       await _saveCustomSounds();
+      notifyListeners();
     }
   }
 
@@ -51,6 +55,7 @@ class SoundController extends ChangeNotifier{
     try {
       await _audioPlayer.stop();
       _currentSound = soundPath;
+      notifyListeners();
 
       if (soundPath == null) {
         return;
@@ -80,6 +85,17 @@ class SoundController extends ChangeNotifier{
   Future<void> stopAudio() async {
     await _audioPlayer.stop();
     _currentSound = null;
+    notifyListeners();
+  }
+
+  // Set selected sound in dialog
+  void setSelectedSoundInDialog(String? sound) {
+    _selectedSoundInDialog.value = sound;
+  }
+
+  // Initialize dialog with current sound
+  void initializeDialog() {
+    _selectedSoundInDialog.value = _currentSound;
   }
 
   // Get display name for a sound
@@ -117,7 +133,10 @@ class SoundController extends ChangeNotifier{
   }
 
   // Dispose resources
+  @override
   void dispose() {
     _audioPlayer.dispose();
+    _selectedSoundInDialog.dispose();
+    super.dispose();
   }
 }
