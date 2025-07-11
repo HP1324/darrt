@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -22,11 +24,12 @@ import 'package:minimaltodo/helpers/globals.dart' as g;
 import '../../helpers/consts.dart';
 
 class AddNotePage extends StatefulWidget {
-  const AddNotePage({super.key, required this.edit, this.note, this.folder})
+  const AddNotePage({super.key, required this.edit, this.note, this.folder, this.isTaskNote})
     : assert(!edit || note != null);
   final bool edit;
   final Note? note;
   final Folder? folder;
+  final bool? isTaskNote;
   @override
   State<AddNotePage> createState() => _AddNotePageState();
 }
@@ -86,6 +89,7 @@ class _AddNotePageState extends State<AddNotePage> {
           leading: const BackButton(),
           actions: [
             // const SaveNotePdfButton(),
+            if (widget.isTaskNote == null)
             const FolderSelector(),
           ],
         ),
@@ -122,6 +126,17 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 
   void _saveNote(BuildContext context) {
+    if (widget.isTaskNote != null) {
+      if (!g.noteSc.controller.document.isEmpty()) {
+        final note = g.noteSc.buildModel(
+          edit: widget.edit,
+          model: widget.edit ? widget.note : null,
+        );
+        g.taskSc.putNote(note: note, edit: widget.edit);
+        Navigator.pop(context);
+      }
+      return;
+    }
     var message = '';
     if (!g.noteSc.controller.document.isEmpty()) {
       final note = g.noteSc.buildModel(
@@ -247,7 +262,44 @@ class NotesQuillToolbar extends StatelessWidget {
   // Map<String,String> fontSizes = {};
   @override
   Widget build(BuildContext context) {
-    final fontSizeMap = {'Clear': '0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9','10':'10','12':'12','14':'14','16':'16','18':'18','20':'20','22':'22','24':'24','26':'26','28':'28','30':'30','32':'32','34':'34','36':'36','38':'38','40':'40','42':'42','44':'44','46':'46','48':'48','50':'50','52':'52','54':'54','56':'56','58':'58','60':'60'};
+    final fontSizeMap = {
+      'Clear': '0',
+      '1': '1',
+      '2': '2',
+      '3': '3',
+      '4': '4',
+      '5': '5',
+      '6': '6',
+      '7': '7',
+      '8': '8',
+      '9': '9',
+      '10': '10',
+      '12': '12',
+      '14': '14',
+      '16': '16',
+      '18': '18',
+      '20': '20',
+      '22': '22',
+      '24': '24',
+      '26': '26',
+      '28': '28',
+      '30': '30',
+      '32': '32',
+      '34': '34',
+      '36': '36',
+      '38': '38',
+      '40': '40',
+      '42': '42',
+      '44': '44',
+      '46': '46',
+      '48': '48',
+      '50': '50',
+      '52': '52',
+      '54': '54',
+      '56': '56',
+      '58': '58',
+      '60': '60',
+    };
     return QuillSimpleToolbar(
       controller: g.noteSc.controller,
       config: QuillSimpleToolbarConfig(
@@ -265,10 +317,7 @@ class NotesQuillToolbar extends StatelessWidget {
             ],
           ),
           fontFamily: QuillToolbarFontFamilyButtonOptions(attribute: Attribute.font),
-          fontSize: QuillToolbarFontSizeButtonOptions(
-            items: fontSizeMap,
-            initialValue: '16'
-          ),
+          fontSize: QuillToolbarFontSizeButtonOptions(items: fontSizeMap, initialValue: '16'),
           codeBlock: QuillToolbarToggleStyleButtonOptions(iconData: FontAwesomeIcons.solidFileCode),
         ),
       ),
