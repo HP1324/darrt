@@ -8,11 +8,38 @@ class FocusTimerPage extends StatefulWidget {
   State<FocusTimerPage> createState() => _FocusTimerPageState();
 }
 
-class _FocusTimerPageState extends State<FocusTimerPage> {
+class _FocusTimerPageState extends State<FocusTimerPage> with SingleTickerProviderStateMixin{
+  late TabController tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: 2, vsync: this);
+  }
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SoundPage(),
+    return Scaffold(
+      appBar: AppBar(title: Text('Focus Sessions')),
+      body: Column(
+        children: [
+          TabBar(
+            controller: tabController,
+            tabs: [
+              Tab(text: 'Timer'),
+              Tab(text: 'Listen to sounds')
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: tabController,
+              children: [
+                Text('hsuen'),
+                SoundPage()
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
