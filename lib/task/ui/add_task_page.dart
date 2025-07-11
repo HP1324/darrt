@@ -145,6 +145,7 @@ class TaskNoteSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = TextTheme.of(context);
+    final scheme = ColorScheme.of(context);
     return InkWell(
       onTap: () async {
         g.taskSc.textFieldNode.unfocus();
@@ -158,13 +159,13 @@ class TaskNoteSection extends StatelessWidget {
         expanded: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Notes', style: textTheme.titleMedium),
+            Text('Notes', style: textTheme.titleSmall),
             ListenableBuilder(
               listenable: g.taskSc,
               builder: (context, child) {
                 final length = g.taskSc.notes?.length ?? 0;
                 final text = length != 0 ? length > 1 ? '$length notes' : '$length note' : 'Tap here to add notes for this task';
-                return Text(text, style: textTheme.titleSmall);
+                return Text(text, style: textTheme.bodySmall);
               },
             ),
           ],
@@ -342,10 +343,10 @@ class TimeSelector extends StatelessWidget {
             expanded: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Time (Optional)'),
+                Text('Time (Optional)',style: textTheme.titleSmall),
                 Text(
                   time != null ? TimeOfDay.fromDateTime(time).format(context) : 'No time set',
-                  style: textTheme.labelMedium,
+                  style: textTheme.bodySmall,
                 ),
               ],
             ),
@@ -550,8 +551,8 @@ class AddRemindersSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Reminders",
-              style: theme.textTheme.titleMedium?.copyWith(fontSize: 14),
+              'Reminders',
+              style: theme.textTheme.titleSmall,
             ),
             ListenableBuilder(
               listenable: g.taskSc,
@@ -559,7 +560,7 @@ class AddRemindersSection extends StatelessWidget {
                 final reminders = g.taskSc.reminders;
                 return Text(
                   reminders.isEmpty
-                      ? 'Click here to add reminders per day'
+                      ? 'Tap here to add reminders per day'
                       : reminders.map((r) => r.time.format(context)).join(', '),
                   style: theme.textTheme.bodySmall,
                 );
