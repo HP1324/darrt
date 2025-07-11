@@ -8,7 +8,7 @@ class FocusTimerPage extends StatefulWidget {
   State<FocusTimerPage> createState() => _FocusTimerPageState();
 }
 
-class _FocusTimerPageState extends State<FocusTimerPage> with SingleTickerProviderStateMixin{
+class _FocusTimerPageState extends State<FocusTimerPage> with SingleTickerProviderStateMixin,AutomaticKeepAliveClientMixin{
   late TabController tabController;
 
   @override
@@ -18,9 +18,8 @@ class _FocusTimerPageState extends State<FocusTimerPage> with SingleTickerProvid
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Focus Sessions')),
-      body: Column(
+    super.build(context);
+    return Column(
         children: [
           TabBar(
             controller: tabController,
@@ -42,8 +41,11 @@ class _FocusTimerPageState extends State<FocusTimerPage> with SingleTickerProvid
             ),
           ),
         ],
-      ),
-    );
+      );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
 
