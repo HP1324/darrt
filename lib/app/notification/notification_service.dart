@@ -29,8 +29,6 @@ class NotificationService {
     }
   }
 
-
-
   static Future<void> initNotifChannels() async {
     try {
       MiniLogger.d('Initializing notification channels');
@@ -40,8 +38,7 @@ class NotificationService {
           NotificationChannel(
             channelKey: notifChannelKey,
             channelName: 'Task Notifications',
-            channelDescription:
-                'Channel used to notify users about their tasks with simple notification',
+            channelDescription:'Channel used to notify users about their tasks with simple notification',
             importance: NotificationImportance.Max,
             playSound: true,
             defaultRingtoneType: DefaultRingtoneType.Notification,

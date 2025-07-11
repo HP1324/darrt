@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/focustimer/sound/sound_page.dart';
+import 'package:minimaltodo/focustimer/timer/focus_timer_tab.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 
 class FocusTimerPage extends StatefulWidget {
   const FocusTimerPage({super.key});
@@ -35,7 +37,7 @@ class _FocusTimerPageState extends State<FocusTimerPage> with SingleTickerProvid
             child: TabBarView(
               controller: tabController,
               children: [
-                Text('hsuen'),
+                FocusTimerTab(controller: g.timerController),
                 SoundPage()
               ],
             ),
