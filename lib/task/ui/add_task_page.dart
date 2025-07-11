@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:app_settings/app_settings.dart';
 import 'package:awesome_notifications/awesome_notifications.dart' show AwesomeNotifications;
 import 'package:flutter/material.dart';
@@ -15,17 +13,14 @@ import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/note/ui/add_note_page.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart';
 import 'package:minimaltodo/task/models/reminder.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/task_note_item.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:toastification/toastification.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:speech_to_text/speech_to_text.dart';
 
 class AddTaskPage extends StatefulWidget {
   const AddTaskPage({super.key, required this.edit, this.task, this.category})
