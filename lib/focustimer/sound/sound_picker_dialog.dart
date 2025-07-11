@@ -193,13 +193,14 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
     required String? value,
     required bool isSelected,
   }) {
+    final scheme = ColorScheme.of(context);
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: isSelected
             ? BorderSide(
-          color: Theme.of(context).colorScheme.primary,
+          color: scheme.primary,
           width: 2,
         )
             : BorderSide.none,
@@ -223,17 +224,15 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
-                      : Theme.of(
-                    context,
-                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                      ? scheme.primary.withValues(alpha: 0.1)
+                      : scheme.surfaceContainerHighest.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   icon,
                   color: isSelected
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                      ? scheme.primary
+                      : scheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(width: 12),
@@ -246,7 +245,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
-                        color: isSelected ? Theme.of(context).colorScheme.primary : null,
+                        color: isSelected ? scheme.primary : null,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -264,7 +263,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
               if (isSelected)
                 Icon(
                   Icons.check_circle,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: scheme.primary,
                 ),
             ],
           ),
