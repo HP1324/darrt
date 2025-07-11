@@ -28,7 +28,6 @@ class Home extends StatelessWidget {
                 index: value,
                 children: [
                   const TasksPage(),
-                  const FocusTimerPage(),
                   const CategoriesPage(),
                 ],
               );
@@ -74,8 +73,8 @@ class _BottomNavBarWidget extends StatelessWidget {
               MiniBottomNavBarItem(
                 icon: Icons.psychology_outlined,
                 label: 'Focus',
-                onTap: () => g.navMan.onDestinationChanged(1),
-                i: 1,
+                onTap: () => MiniRouter.to(context, FocusTimerPage()),
+                i: -1,
               ),
               MiniBottomNavBarItem(
                 icon: Icons.search,
@@ -86,8 +85,8 @@ class _BottomNavBarWidget extends StatelessWidget {
               MiniBottomNavBarItem(
                 icon: Iconsax.category,
                 label: 'Categories',
-                onTap: () => g.navMan.onDestinationChanged(2),
-                i: 2,
+                onTap: () => g.navMan.onDestinationChanged(1),
+                i: 1,
               ),
               MiniBottomNavBarItem(
                 icon: Icons.assignment_outlined,
