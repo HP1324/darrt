@@ -52,8 +52,8 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
       print('Error picking custom sound: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Error selecting custom sound'),
+          const SnackBar(
+            content: Text('Error selecting custom sound'),
             backgroundColor: Colors.red,
           ),
         );
@@ -71,6 +71,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
             color: Theme.of(context).colorScheme.primary,
             size: 28,
           ),
+          const SizedBox(width: 8),
           Text(
             'Choose Sound',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -105,7 +106,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                     ),
                     const SizedBox(height: 8),
                     ..._builtInSounds.entries.map(
-                      (entry) => _buildSoundTile(
+                          (entry) => _buildSoundTile(
                         title: entry.value,
                         subtitle: 'Built-in sound',
                         icon: _getSoundIcon(entry.key),
@@ -114,7 +115,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                       ),
                     ),
                     ...g.soundController.customSounds.map(
-                      (sound) => _buildSoundTile(
+                          (sound) => _buildSoundTile(
                         title: sound['name']!,
                         subtitle: 'Custom sound',
                         icon: Icons.audiotrack,
@@ -198,16 +199,21 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
         borderRadius: BorderRadius.circular(12),
         side: isSelected
             ? BorderSide(
-                color: Theme.of(context).colorScheme.primary,
-                width: 2,
-              )
+          color: Theme.of(context).colorScheme.primary,
+          width: 2,
+        )
             : BorderSide.none,
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () async {
           g.soundController.setSelectedSoundInDialog(value);
-          await g.soundController.playSound(value);
+          // Preview the sound but don't set it as current until Apply is pressed
+          if (value != null) {
+            await g.soundController.playSound(value);
+          } else {
+            await g.soundController.stopAudio();
+          }
         },
         child: Padding(
           padding: const EdgeInsets.all(13),
@@ -219,8 +225,8 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                   color: isSelected
                       ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
                       : Theme.of(
-                          context,
-                        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    context,
+                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -245,6 +251,13 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -268,6 +281,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
     if (soundPath.contains('wind')) return Icons.air;
     if (soundPath.contains('waterfall')) return Icons.water;
     if (soundPath.contains('noise')) return Icons.graphic_eq;
+    if (soundPath.contains('birds')) return Icons.flutter_dash;
     return Icons.music_note;
   }
 }

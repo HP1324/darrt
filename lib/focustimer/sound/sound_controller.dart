@@ -8,6 +8,7 @@ class SoundController extends ChangeNotifier {
   late AudioPlayer _audioPlayer;
   String? _currentSound;
   List<Map<String, String>> _customSounds = [];
+  bool _isPlaying = false;
 
   // ValueNotifier for dialog-specific state
   final ValueNotifier<String?> _selectedSoundInDialog = ValueNotifier<String?>(null);
@@ -17,11 +18,25 @@ class SoundController extends ChangeNotifier {
   List<Map<String, String>> get customSounds => _customSounds;
   AudioPlayer get audioPlayer => _audioPlayer;
   ValueNotifier<String?> get selectedSoundInDialog => _selectedSoundInDialog;
+  bool get isPlaying => _isPlaying;
 
   // Initialize the service
   Future<void> initialize() async {
     _audioPlayer = AudioPlayer();
     _audioPlayer.setReleaseMode(ReleaseMode.loop);
+
+    // Listen to player state changes to keep UI in sync
+    _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
+      _isPlaying = state == PlayerState.playing;
+      notifyListeners();
+    });
+
+    // Listen to player completion to reset state
+    _audioPlayer.onPlayerComplete.listen((event) {
+      _isPlaying = false;
+      notifyListeners();
+    });
+
     await _loadCustomSounds();
   }
 
@@ -50,24 +65,46 @@ class SoundController extends ChangeNotifier {
     }
   }
 
-  // Play sound
+  // Play sound - Fixed version
   Future<void> playSound(String? soundPath) async {
     try {
+      // Always stop current audio first
       await _audioPlayer.stop();
-      _currentSound = soundPath;
-      notifyListeners();
 
       if (soundPath == null) {
+        // If null is passed, we want to stop and clear current sound
+        _currentSound = null;
+        _isPlaying = false;
+        notifyListeners();
         return;
       }
+
+      // Set current sound and play
+      _currentSound = soundPath;
 
       if (soundPath.startsWith('assets/')) {
         await _audioPlayer.play(AssetSource(soundPath.replaceFirst('assets/', '')));
       } else {
         await _audioPlayer.play(DeviceFileSource(soundPath));
       }
+
+      // Note: _isPlaying will be updated by the state listener
+      notifyListeners();
     } catch (e) {
       print('Error playing sound: $e');
+      _isPlaying = false;
+      notifyListeners();
+    }
+  }
+
+  // Toggle sound - New method for better UX
+  Future<void> toggleSound(String? soundPath) async {
+    if (_currentSound == soundPath && _isPlaying) {
+      // If the same sound is playing, stop it
+      await stopAudio();
+    } else {
+      // Play the new sound or restart current sound
+      await playSound(soundPath);
     }
   }
 
@@ -81,11 +118,21 @@ class SoundController extends ChangeNotifier {
     await _audioPlayer.resume();
   }
 
-  // Stop audio
+  // Stop audio - Enhanced version
   Future<void> stopAudio() async {
-    await _audioPlayer.stop();
-    _currentSound = null;
-    notifyListeners();
+    try {
+      await _audioPlayer.stop();
+      _currentSound = null;
+      _isPlaying = false;
+      notifyListeners();
+    } catch (e) {
+      print('Error stopping audio: $e');
+    }
+  }
+
+  // Check if a specific sound is currently playing
+  bool isSoundPlaying(String? soundPath) {
+    return _currentSound == soundPath && _isPlaying;
   }
 
   // Set selected sound in dialog
