@@ -11,7 +11,7 @@ class SoundPage extends StatefulWidget {
   State<SoundPage> createState() => _SoundPageState();
 }
 
-class _SoundPageState extends State<SoundPage> {
+class _SoundPageState extends State<SoundPage> with AutomaticKeepAliveClientMixin{
   @override
   void initState() {
     super.initState();
@@ -108,4 +108,8 @@ class _SoundPageState extends State<SoundPage> {
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

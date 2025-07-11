@@ -24,9 +24,12 @@ class _FocusTimerPageState extends State<FocusTimerPage> with SingleTickerProvid
         children: [
           TabBar(
             controller: tabController,
-            tabs: [
-              Tab(text: 'Timer'),
-              Tab(text: 'Listen to sounds')
+            indicatorWeight: 3,
+            indicatorSize: TabBarIndicatorSize.tab,
+            labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+            tabs: const [
+              Tab(text: 'Focus Timer'),
+              Tab(text: 'Relaxing Sounds'),
             ],
           ),
           Expanded(
