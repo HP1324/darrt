@@ -104,6 +104,7 @@ class Task {
     'categoryIds': categories.map((c) => c.id).toList(),
     'categoryUuids': categories.map((c) => c.uuid).toList(),
     'uuid': uuid,
+    'notes': notes,
   };
 
   // Create a Task from JSON
@@ -127,6 +128,7 @@ class Task {
         reminders: json['reminders'],
         uuid: json['uuid'],
         categoryUuids: List<String>.from(json['categoryUuids'] ?? []),
+        notes: json['notes'],
       );
       // Restore category relations
 
