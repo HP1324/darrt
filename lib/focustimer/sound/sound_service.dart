@@ -98,6 +98,7 @@ class SoundService {
       'assets/sounds/rain.mp3': 'Rain Sounds',
       'assets/sounds/silent_room.mp3': 'Silent Room',
       'assets/sounds/waterfall.mp3': 'Waterfall',
+      'assets/sounds/birds_near_river.mp3':'Birds + River',
     };
 
     if (builtInSounds.containsKey(soundPath)) {

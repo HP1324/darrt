@@ -92,52 +92,6 @@ class _SoundPageState extends State<SoundPage> {
               ),
             ),
             const SizedBox(height: 24),
-            StreamBuilder<PlayerState>(
-              stream: g.soundController.audioPlayer.onPlayerStateChanged,
-              builder: (context, snapshot) {
-                final isPlaying = snapshot.data == PlayerState.playing;
-                return Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        theme.colorScheme.primary,
-                        theme.colorScheme.primaryContainer,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(40),
-                      onTap: () {
-                        if (g.soundController.currentSound != null) {
-                          isPlaying
-                              ? g.soundController.pauseAudio()
-                              : g.soundController.resumeAudio();
-                        }
-                      },
-                      child: Center(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: Icon(
-                            isPlaying ? Icons.pause : Icons.play_arrow,
-                            key: ValueKey(isPlaying),
-                            color: Colors.white,
-                            size: 32,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: _showSoundPicker,
               icon: const Icon(Icons.library_music),
