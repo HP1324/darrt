@@ -17,6 +17,7 @@ class _FocusTimerPageState extends State<FocusTimerPage> with SingleTickerProvid
   void initState() {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
+    g.soundController.initialize();
   }
   @override
   Widget build(BuildContext context) {

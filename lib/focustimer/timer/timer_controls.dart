@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/focustimer/timer/timer_controller.dart';
 
+import '../../helpers/globals.dart' as g show soundController;
+
 class TimerControls extends StatelessWidget {
   final TimerController controller;
 
@@ -39,12 +41,12 @@ class TimerControls extends StatelessWidget {
   }
 
   Widget _buildControlButton(
-      BuildContext context, {
-        required IconData icon,
-        required VoidCallback? onPressed,
-        required bool isPrimary,
-        required ColorScheme scheme,
-      }) {
+    BuildContext context, {
+    required IconData icon,
+    required VoidCallback? onPressed,
+    required bool isPrimary,
+    required ColorScheme scheme,
+  }) {
     return SizedBox(
       width: 56,
       height: 56,
@@ -69,8 +71,16 @@ class TimerControls extends StatelessWidget {
   void _handlePlayPause() {
     if (controller.isRunning) {
       controller.pauseTimer();
+      if (g.soundController.isPlaying) {
+        g.soundController.pauseAudio();
+      }
     } else {
       controller.startTimer();
+      if (g.soundController.isPaused) {
+        g.soundController.resumeAudio();
+      } else if (g.soundController.isStopped) {
+        g.soundController.playSound(g.soundController.currentSound);
+      }
     }
   }
 }

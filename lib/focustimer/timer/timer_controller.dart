@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
 
+import '../../helpers/globals.dart' as g;
+
 enum TimerType { focus, timerBreak }
 enum TimerState { idle, running, paused, completed }
 
@@ -209,6 +211,7 @@ class TimerController extends ChangeNotifier {
     _startTime = null;
     _pausedSeconds = 0;
     _saveToStorage();
+    g.soundController.stopAudio();
     notifyListeners();
   }
 

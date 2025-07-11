@@ -5,34 +5,42 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
 
 class SoundController extends ChangeNotifier {
-  late AudioPlayer _audioPlayer;
+  AudioPlayer? _audioPlayer;
   String? _currentSound;
   List<Map<String, String>> _customSounds = [];
   bool _isPlaying = false;
-
+  bool _isStopped = false;
+  bool _isPaused = false;
+  bool _isDisposed = false;
   // ValueNotifier for dialog-specific state
   final ValueNotifier<String?> _selectedSoundInDialog = ValueNotifier<String?>(null);
 
   // Getters
   String? get currentSound => _currentSound;
   List<Map<String, String>> get customSounds => _customSounds;
-  AudioPlayer get audioPlayer => _audioPlayer;
+  AudioPlayer get audioPlayer => _audioPlayer!;
   ValueNotifier<String?> get selectedSoundInDialog => _selectedSoundInDialog;
   bool get isPlaying => _isPlaying;
+  bool get isStopped => _isStopped;
+  bool get isPaused => _isPaused;
+  bool get isDisposed => _isDisposed;
 
   // Initialize the service
   Future<void> initialize() async {
     _audioPlayer = AudioPlayer();
-    _audioPlayer.setReleaseMode(ReleaseMode.loop);
+    _audioPlayer?.setReleaseMode(ReleaseMode.loop);
 
     // Listen to player state changes to keep UI in sync
-    _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
+    _audioPlayer?.onPlayerStateChanged.listen((PlayerState state) {
       _isPlaying = state == PlayerState.playing;
+      _isStopped = state == PlayerState.stopped;
+      _isPaused = state == PlayerState.paused;
+      _isDisposed = state == PlayerState.disposed;
       notifyListeners();
     });
 
     // Listen to player completion to reset state
-    _audioPlayer.onPlayerComplete.listen((event) {
+    _audioPlayer?.onPlayerComplete.listen((event) {
       _isPlaying = false;
       notifyListeners();
     });
@@ -69,7 +77,7 @@ class SoundController extends ChangeNotifier {
   Future<void> playSound(String? soundPath) async {
     try {
       // Always stop current audio first
-      await _audioPlayer.stop();
+      await _audioPlayer?.stop();
 
       if (soundPath == null) {
         // If null is passed, we want to stop and clear current sound
@@ -83,9 +91,9 @@ class SoundController extends ChangeNotifier {
       _currentSound = soundPath;
 
       if (soundPath.startsWith('assets/')) {
-        await _audioPlayer.play(AssetSource(soundPath.replaceFirst('assets/', '')));
+        await _audioPlayer?.play(AssetSource(soundPath.replaceFirst('assets/', '')));
       } else {
-        await _audioPlayer.play(DeviceFileSource(soundPath));
+        await _audioPlayer?.play(DeviceFileSource(soundPath));
       }
 
       // Note: _isPlaying will be updated by the state listener
@@ -110,18 +118,18 @@ class SoundController extends ChangeNotifier {
 
   // Pause audio
   Future<void> pauseAudio() async {
-    await _audioPlayer.pause();
+    await _audioPlayer?.pause();
   }
 
   // Resume audio
   Future<void> resumeAudio() async {
-    await _audioPlayer.resume();
+    await _audioPlayer?.resume();
   }
 
   // Stop audio - Enhanced version
   Future<void> stopAudio() async {
     try {
-      await _audioPlayer.stop();
+      await _audioPlayer?.stop();
       _currentSound = null;
       _isPlaying = false;
       notifyListeners();
@@ -183,7 +191,7 @@ class SoundController extends ChangeNotifier {
   // Dispose resources
   @override
   void dispose() {
-    _audioPlayer.dispose();
+    _audioPlayer?.dispose();
     _selectedSoundInDialog.dispose();
     super.dispose();
   }

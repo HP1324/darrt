@@ -24,8 +24,8 @@ class FocusTimerTab extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
+            scheme.primary.withAlpha(5),
             scheme.surface,
-            scheme.surfaceContainer.withValues(alpha: 0.3),
           ],
         ),
       ),

@@ -15,7 +15,6 @@ class _SoundPageState extends State<SoundPage> {
   @override
   void initState() {
     super.initState();
-    g.soundController.initialize();
   }
 
   void _showSoundPicker() {
