@@ -13,8 +13,8 @@ import 'package:minimaltodo/note/ui/add_note_page.dart';
 import 'package:minimaltodo/quickreminder/state/quick_reminder_view_model.dart';
 import 'package:minimaltodo/task/state/completion_view_model.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart' show TaskStateController;
+import 'package:minimaltodo/task/state/task_stt_controller.dart';
 import 'package:minimaltodo/task/state/task_view_model.dart' show TaskViewModel;
-import 'package:minimaltodo/task/ui/add_task_page.dart';
 import 'package:uuid/uuid.dart';
 
 

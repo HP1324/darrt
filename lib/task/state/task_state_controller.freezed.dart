@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TaskState {
 
- Map<TaskCategory, bool> get categorySelection; DateTime get dueDate; bool get isRepeating; DateTime get startDate; DateTime? get endDate; DateTime? get time; RepeatConfig get repeatConfig; List<Reminder> get reminders; String get priority; int get currentPriority;
+ Map<TaskCategory, bool> get categorySelection; DateTime get dueDate; bool get isRepeating; DateTime get startDate; DateTime? get endDate; DateTime? get time; RepeatConfig get repeatConfig; List<Reminder> get reminders; List<Note>? get notes; String get priority; int get currentPriority;
 /// Create a copy of TaskState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $TaskStateCopyWith<TaskState> get copyWith => _$TaskStateCopyWithImpl<TaskState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskState&&const DeepCollectionEquality().equals(other.categorySelection, categorySelection)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.isRepeating, isRepeating) || other.isRepeating == isRepeating)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.time, time) || other.time == time)&&(identical(other.repeatConfig, repeatConfig) || other.repeatConfig == repeatConfig)&&const DeepCollectionEquality().equals(other.reminders, reminders)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.currentPriority, currentPriority) || other.currentPriority == currentPriority));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TaskState&&const DeepCollectionEquality().equals(other.categorySelection, categorySelection)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.isRepeating, isRepeating) || other.isRepeating == isRepeating)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.time, time) || other.time == time)&&(identical(other.repeatConfig, repeatConfig) || other.repeatConfig == repeatConfig)&&const DeepCollectionEquality().equals(other.reminders, reminders)&&const DeepCollectionEquality().equals(other.notes, notes)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.currentPriority, currentPriority) || other.currentPriority == currentPriority));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(categorySelection),dueDate,isRepeating,startDate,endDate,time,repeatConfig,const DeepCollectionEquality().hash(reminders),priority,currentPriority);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(categorySelection),dueDate,isRepeating,startDate,endDate,time,repeatConfig,const DeepCollectionEquality().hash(reminders),const DeepCollectionEquality().hash(notes),priority,currentPriority);
 
 @override
 String toString() {
-  return 'TaskState(categorySelection: $categorySelection, dueDate: $dueDate, isRepeating: $isRepeating, startDate: $startDate, endDate: $endDate, time: $time, repeatConfig: $repeatConfig, reminders: $reminders, priority: $priority, currentPriority: $currentPriority)';
+  return 'TaskState(categorySelection: $categorySelection, dueDate: $dueDate, isRepeating: $isRepeating, startDate: $startDate, endDate: $endDate, time: $time, repeatConfig: $repeatConfig, reminders: $reminders, notes: $notes, priority: $priority, currentPriority: $currentPriority)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $TaskStateCopyWith<$Res>  {
   factory $TaskStateCopyWith(TaskState value, $Res Function(TaskState) _then) = _$TaskStateCopyWithImpl;
 @useResult
 $Res call({
- Map<TaskCategory, bool> categorySelection, DateTime dueDate, bool isRepeating, DateTime startDate, DateTime? endDate, DateTime? time, RepeatConfig repeatConfig, List<Reminder> reminders, String priority, int currentPriority
+ Map<TaskCategory, bool> categorySelection, DateTime dueDate, bool isRepeating, DateTime startDate, DateTime? endDate, DateTime? time, RepeatConfig repeatConfig, List<Reminder> reminders, List<Note>? notes, String priority, int currentPriority
 });
 
 
@@ -63,7 +63,7 @@ class _$TaskStateCopyWithImpl<$Res>
 
 /// Create a copy of TaskState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? categorySelection = null,Object? dueDate = null,Object? isRepeating = null,Object? startDate = null,Object? endDate = freezed,Object? time = freezed,Object? repeatConfig = null,Object? reminders = null,Object? priority = null,Object? currentPriority = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? categorySelection = null,Object? dueDate = null,Object? isRepeating = null,Object? startDate = null,Object? endDate = freezed,Object? time = freezed,Object? repeatConfig = null,Object? reminders = null,Object? notes = freezed,Object? priority = null,Object? currentPriority = null,}) {
   return _then(_self.copyWith(
 categorySelection: null == categorySelection ? _self.categorySelection : categorySelection // ignore: cast_nullable_to_non_nullable
 as Map<TaskCategory, bool>,dueDate: null == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
@@ -73,7 +73,8 @@ as DateTime,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cas
 as DateTime?,time: freezed == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as DateTime?,repeatConfig: null == repeatConfig ? _self.repeatConfig : repeatConfig // ignore: cast_nullable_to_non_nullable
 as RepeatConfig,reminders: null == reminders ? _self.reminders : reminders // ignore: cast_nullable_to_non_nullable
-as List<Reminder>,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
+as List<Reminder>,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as List<Note>?,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as String,currentPriority: null == currentPriority ? _self.currentPriority : currentPriority // ignore: cast_nullable_to_non_nullable
 as int,
   ));
@@ -86,7 +87,7 @@ as int,
 
 
 class _TaskState extends TaskState {
-  const _TaskState({required final  Map<TaskCategory, bool> categorySelection, required this.dueDate, required this.isRepeating, required this.startDate, this.endDate, this.time, required this.repeatConfig, required final  List<Reminder> reminders, required this.priority, required this.currentPriority}): _categorySelection = categorySelection,_reminders = reminders,super._();
+  const _TaskState({required final  Map<TaskCategory, bool> categorySelection, required this.dueDate, required this.isRepeating, required this.startDate, this.endDate, this.time, required this.repeatConfig, required final  List<Reminder> reminders, final  List<Note>? notes, required this.priority, required this.currentPriority}): _categorySelection = categorySelection,_reminders = reminders,_notes = notes,super._();
   
 
  final  Map<TaskCategory, bool> _categorySelection;
@@ -109,6 +110,15 @@ class _TaskState extends TaskState {
   return EqualUnmodifiableListView(_reminders);
 }
 
+ final  List<Note>? _notes;
+@override List<Note>? get notes {
+  final value = _notes;
+  if (value == null) return null;
+  if (_notes is EqualUnmodifiableListView) return _notes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
 @override final  String priority;
 @override final  int currentPriority;
 
@@ -122,16 +132,16 @@ _$TaskStateCopyWith<_TaskState> get copyWith => __$TaskStateCopyWithImpl<_TaskSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskState&&const DeepCollectionEquality().equals(other._categorySelection, _categorySelection)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.isRepeating, isRepeating) || other.isRepeating == isRepeating)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.time, time) || other.time == time)&&(identical(other.repeatConfig, repeatConfig) || other.repeatConfig == repeatConfig)&&const DeepCollectionEquality().equals(other._reminders, _reminders)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.currentPriority, currentPriority) || other.currentPriority == currentPriority));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TaskState&&const DeepCollectionEquality().equals(other._categorySelection, _categorySelection)&&(identical(other.dueDate, dueDate) || other.dueDate == dueDate)&&(identical(other.isRepeating, isRepeating) || other.isRepeating == isRepeating)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.time, time) || other.time == time)&&(identical(other.repeatConfig, repeatConfig) || other.repeatConfig == repeatConfig)&&const DeepCollectionEquality().equals(other._reminders, _reminders)&&const DeepCollectionEquality().equals(other._notes, _notes)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.currentPriority, currentPriority) || other.currentPriority == currentPriority));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_categorySelection),dueDate,isRepeating,startDate,endDate,time,repeatConfig,const DeepCollectionEquality().hash(_reminders),priority,currentPriority);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_categorySelection),dueDate,isRepeating,startDate,endDate,time,repeatConfig,const DeepCollectionEquality().hash(_reminders),const DeepCollectionEquality().hash(_notes),priority,currentPriority);
 
 @override
 String toString() {
-  return 'TaskState(categorySelection: $categorySelection, dueDate: $dueDate, isRepeating: $isRepeating, startDate: $startDate, endDate: $endDate, time: $time, repeatConfig: $repeatConfig, reminders: $reminders, priority: $priority, currentPriority: $currentPriority)';
+  return 'TaskState(categorySelection: $categorySelection, dueDate: $dueDate, isRepeating: $isRepeating, startDate: $startDate, endDate: $endDate, time: $time, repeatConfig: $repeatConfig, reminders: $reminders, notes: $notes, priority: $priority, currentPriority: $currentPriority)';
 }
 
 
@@ -142,7 +152,7 @@ abstract mixin class _$TaskStateCopyWith<$Res> implements $TaskStateCopyWith<$Re
   factory _$TaskStateCopyWith(_TaskState value, $Res Function(_TaskState) _then) = __$TaskStateCopyWithImpl;
 @override @useResult
 $Res call({
- Map<TaskCategory, bool> categorySelection, DateTime dueDate, bool isRepeating, DateTime startDate, DateTime? endDate, DateTime? time, RepeatConfig repeatConfig, List<Reminder> reminders, String priority, int currentPriority
+ Map<TaskCategory, bool> categorySelection, DateTime dueDate, bool isRepeating, DateTime startDate, DateTime? endDate, DateTime? time, RepeatConfig repeatConfig, List<Reminder> reminders, List<Note>? notes, String priority, int currentPriority
 });
 
 
@@ -159,7 +169,7 @@ class __$TaskStateCopyWithImpl<$Res>
 
 /// Create a copy of TaskState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? categorySelection = null,Object? dueDate = null,Object? isRepeating = null,Object? startDate = null,Object? endDate = freezed,Object? time = freezed,Object? repeatConfig = null,Object? reminders = null,Object? priority = null,Object? currentPriority = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? categorySelection = null,Object? dueDate = null,Object? isRepeating = null,Object? startDate = null,Object? endDate = freezed,Object? time = freezed,Object? repeatConfig = null,Object? reminders = null,Object? notes = freezed,Object? priority = null,Object? currentPriority = null,}) {
   return _then(_TaskState(
 categorySelection: null == categorySelection ? _self._categorySelection : categorySelection // ignore: cast_nullable_to_non_nullable
 as Map<TaskCategory, bool>,dueDate: null == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
@@ -169,7 +179,8 @@ as DateTime,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cas
 as DateTime?,time: freezed == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as DateTime?,repeatConfig: null == repeatConfig ? _self.repeatConfig : repeatConfig // ignore: cast_nullable_to_non_nullable
 as RepeatConfig,reminders: null == reminders ? _self._reminders : reminders // ignore: cast_nullable_to_non_nullable
-as List<Reminder>,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
+as List<Reminder>,notes: freezed == notes ? _self._notes : notes // ignore: cast_nullable_to_non_nullable
+as List<Note>?,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as String,currentPriority: null == currentPriority ? _self.currentPriority : currentPriority // ignore: cast_nullable_to_non_nullable
 as int,
   ));

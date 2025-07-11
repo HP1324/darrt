@@ -15,9 +15,12 @@ import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
+import 'package:minimaltodo/note/models/note.dart';
+import 'package:minimaltodo/note/ui/add_note_page.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart';
 import 'package:minimaltodo/task/models/reminder.dart';
 import 'package:minimaltodo/task/models/task.dart';
+import 'package:minimaltodo/task/ui/task_note_item.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:toastification/toastification.dart';
@@ -104,6 +107,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 const DueDateOrRepeatConfigSection(),
                 const TimeSelector(),
                 const AddRemindersSection(),
+                const TaskNoteSection(),
                 const SizedBox(height: 100),
               ],
             ),
@@ -132,6 +136,184 @@ class _AddTaskPageState extends State<AddTaskPage> {
       type = ToastificationType.error;
     }
     showToast(context, type: type, description: message);
+  }
+}
+
+class TaskNoteSection extends StatelessWidget {
+  const TaskNoteSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = TextTheme.of(context);
+    return InkWell(
+      onTap: () async {
+        g.taskSc.textFieldNode.unfocus();
+        await showModalBottomSheet(
+          context: context,
+          builder: (context) => _buildTaskNoteBottomSheet(context),
+        );
+      },
+      child: StructuredRow(
+        leadingIcon: Icons.note_alt_sharp,
+        expanded: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Notes', style: textTheme.titleMedium),
+            ListenableBuilder(
+              listenable: g.taskSc,
+              builder: (context, child) {
+                final length = g.taskSc.notes?.length ?? 0;
+                final text = length != 0 ? length > 1 ? '$length notes' : '$length note' : 'Tap here to add notes for this task';
+                return Text(text, style: textTheme.titleSmall);
+              },
+            ),
+          ],
+        ),
+        trailing: IconButton(
+          onPressed: () {
+            g.taskSc.textFieldNode.unfocus();
+            _showTaskNoteDialog(context);
+          },
+          icon: Icon(Icons.info_outline),
+        ),
+      ),
+    );
+  }
+
+  void _showTaskNoteDialog(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          content: Text('Task notes are different than regular notes'),
+        );
+      },
+    );
+  }
+
+  Widget _buildTaskNoteBottomSheet(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final scheme = ColorScheme.of(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          // Handle bar
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(top: 12, bottom: 8),
+            decoration: BoxDecoration(
+              color: scheme.onSurface.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.sticky_note_2_outlined,
+                  color: scheme.primary,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Task Notes',
+                  style: textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: scheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Content area
+          Expanded(
+            child: ListenableBuilder(
+              listenable: g.taskSc,
+              builder: (context, child) {
+                if (g.taskSc.notes == null || g.taskSc.notes!.isEmpty) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.note_add_outlined,
+                        size: 64,
+                        color: scheme.onSurface.withOpacity(0.3),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No notes for this task',
+                        style: textTheme.bodyLarge?.copyWith(
+                          color: scheme.onSurface.withOpacity(0.6),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Add your first note to get started',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurface.withOpacity(0.5),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: g.taskSc.notes!.length,
+                  itemBuilder: (context, index) {
+                    final notes = g.taskSc.notes;
+                    return TaskNoteItem(note: notes![index]);
+                  },
+                );
+              },
+            ),
+          ),
+          // Add button
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              border: Border(
+                top: BorderSide(
+                  color: scheme.outline.withOpacity(0.1),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () {
+                  MiniRouter.to(context, const AddNotePage(edit: false, isTaskNote: true));
+                },
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon: const Icon(Icons.add),
+                label: const Text(
+                  'Add Note',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -498,7 +680,7 @@ class AddRemindersSection extends StatelessWidget {
                     child: FilledButton.icon(
                       onPressed: () => showReminderDialog(context),
                       icon: const Icon(Icons.add),
-                      label: const Text('Add Custom Reminder'),
+                      label: Text(g.taskSc.time == null ? 'Add Reminder' : 'Add Custom Reminder'),
                     ),
                   ),
                 ],
@@ -523,7 +705,10 @@ class EasyReminderActions extends StatelessWidget {
       ),
       child: GridView(
         shrinkWrap: true,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3,childAspectRatio: 2.2),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 2.2,
+        ),
         children: [
           _buildTimeChip(context, minutes: null),
           _buildTimeChip(context, minutes: 5),
@@ -557,13 +742,14 @@ class EasyReminderActions extends StatelessWidget {
       ),
     );
   }
-  Reminder buildReminder({required int? minutes}){
+
+  Reminder buildReminder({required int? minutes}) {
     Reminder? reminder;
     TimeOfDay reminderTime = TimeOfDay.now();
-    if(minutes == null){
+    if (minutes == null) {
       reminderTime = TimeOfDay.fromDateTime(g.taskSc.time!);
-    }else{
-      reminderTime =  TimeOfDay.fromDateTime(g.taskSc.time!.subtract(Duration(minutes: minutes)));
+    } else {
+      reminderTime = TimeOfDay.fromDateTime(g.taskSc.time!.subtract(Duration(minutes: minutes)));
     }
     reminder = Reminder(time: reminderTime);
     return reminder;
@@ -1585,81 +1771,5 @@ class StructuredRow extends StatelessWidget {
         trailing ?? const SizedBox.shrink(),
       ],
     );
-  }
-}
-
-class TaskSttController extends ChangeNotifier {
-  final SpeechToText speech = SpeechToText();
-  String hintText = "What's on your mind? ";
-  String? _originalTitleText;
-  String _speechFinalized = '';
-  String _currentLiveSpeech = '';
-  int previousSpeechLength = 0;
-  int originalCursorPosition = 0;
-  Future<bool> initSpeech() async {
-    return await speech.initialize();
-  }
-
-  void startListening() async {
-    originalCursorPosition = g.taskSc.textController.selection.baseOffset;
-    previousSpeechLength = 0;
-    _speechFinalized = '';
-    _currentLiveSpeech = '';
-    await speech.listen(
-      onResult: onSpeechResult,
-      pauseFor: Duration(seconds: 10),
-      listenOptions: SpeechListenOptions(
-        listenMode: ListenMode.dictation,
-        autoPunctuation: true,
-      ),
-    );
-  }
-
-  void clearSttState() async {
-    await speech.stop();
-    _speechFinalized = '';
-    _currentLiveSpeech = '';
-  }
-
-  void onSpeechResult(SpeechRecognitionResult result) {
-    final titleController = g.taskSc.textController;
-    _currentLiveSpeech = result.recognizedWords.trim();
-
-    if (result.finalResult) {
-      // Append only once, when final
-      if (_currentLiveSpeech.isNotEmpty) {
-        _speechFinalized = ('$_speechFinalized $_currentLiveSpeech').trim();
-      }
-      _currentLiveSpeech = '';
-    }
-
-    // Combine finalized + live speech
-    final combinedSpeechText = [
-      _speechFinalized,
-      _currentLiveSpeech,
-    ].where((text) => text.isNotEmpty).join(' ');
-
-    if (combinedSpeechText.isNotEmpty) {
-      // Get current text and cursor position
-      final currentText = titleController.text;
-      final cursorPosition = originalCursorPosition;
-
-      // Calculate text parts
-      final textBeforeCursor = currentText.substring(0, cursorPosition);
-      final textAfterSpeech = currentText.substring(cursorPosition + previousSpeechLength);
-
-      // Combine: text before cursor + new speech + text after previous speech
-      final newText = textBeforeCursor + combinedSpeechText + textAfterSpeech;
-
-      // Update controller
-      titleController.text = newText;
-
-      // Update tracked length for next iteration
-      previousSpeechLength = combinedSpeechText.length;
-
-      // Set cursor at the end of the inserted speech
-      final newCursorPosition = cursorPosition + combinedSpeechText.length;
-      titleController.selection = TextSelection.collapsed(offset: newCursorPosition);
-    }
   }
 }

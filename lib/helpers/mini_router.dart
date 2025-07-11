@@ -6,4 +6,7 @@ class MiniRouter{
     Navigator.push(context, PageTransition(type: type,child: child));
   }
 
+  static Future<dynamic> toWithResult(BuildContext context, Widget child,{PageTransitionType type = PageTransitionType.fade})async{
+    return Navigator.push(context, PageTransition(type: type,child: child));
+  }
 }

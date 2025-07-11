@@ -25,6 +25,7 @@ class Task {
     this.priority = 'Low',
     this.repeatConfig,
     this.reminders,
+    this.notes,
     String? uuid,
     List<String>? categoryUuids,
   }) : dueDate = dueDate ?? DateTime.now(),
@@ -40,6 +41,7 @@ class Task {
   String? reminders, repeatConfig;
   final String uuid;
   List<String> categoryUuids;
+  String? notes;
   final categories = ToMany<TaskCategory>();
   @Backlink()
   final completions = ToMany<TaskCompletion>();

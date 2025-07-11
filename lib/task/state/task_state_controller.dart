@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -6,6 +8,7 @@ import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/app/services/object_box.dart';
 import 'package:minimaltodo/app/state/controllers/state_controller.dart';
+import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/task/models/reminder.dart';
 import 'package:minimaltodo/task/models/repeat_config.dart';
 import 'package:minimaltodo/task/models/task.dart';
@@ -24,6 +27,7 @@ abstract class TaskState with _$TaskState {
     DateTime? time,
     required RepeatConfig repeatConfig,
     required List<Reminder> reminders,
+    List<Note>? notes,
     required String priority,
     required int currentPriority,
   }) = _TaskState;
@@ -34,26 +38,31 @@ abstract class TaskState with _$TaskState {
 class TaskStateController extends StateController<TaskState, Task> {
   @override
   void initState(bool edit, [Task? task, TaskCategory? category]) {
-
     textController.text = edit ? task!.title : '';
     final categories = g.catVm.categories;
     state = TaskState(
-      categorySelection:category == null? edit
-          ? {for (var cat in categories) cat: task!.categories.contains(cat)}
-          : {TaskCategory(id: 1, name: 'General'): true} : {category: true},
+      categorySelection: category == null
+          ? edit
+                ? {for (var cat in categories) cat: task!.categories.contains(cat)}
+                : {TaskCategory(id: 1, name: 'General'): true}
+          : {category: true},
       priority: edit ? task!.priority : priorities[3],
       dueDate: edit ? task!.dueDate : g.calMan.selectedDate,
-      isRepeating: edit ? task!.isRepeating : g.navMan.currentTab.value == 2 ? true : false,
+      isRepeating: edit
+          ? task!.isRepeating
+          : g.navMan.currentTab.value == 2
+          ? true
+          : false,
       startDate: edit ? task!.startDate : g.calMan.selectedDate,
       endDate: edit ? task!.endDate : null,
-      time : edit ? task!.time : null,
+      time: edit ? task!.time : null,
       repeatConfig: edit && task!.isRepeating
           ? RepeatConfig.fromJsonString(task.repeatConfig!)
           : RepeatConfig(),
+      notes: edit && task!.notes != null ? _notesFromJsonString(task.notes) : null,
       reminders: edit ? task!.reminderObjects : [],
       currentPriority: 3,
     );
-
   }
 
   @override
@@ -64,17 +73,17 @@ class TaskStateController extends StateController<TaskState, Task> {
       isRepeating: false,
       startDate: DateTime.now(),
       endDate: null,
-      time : null,
+      time: null,
       repeatConfig: RepeatConfig(),
       reminders: [],
       priority: priorities[3],
+      notes: null,
     );
     textController.clear();
   }
 
   @override
   Task buildModel({required bool edit, Task? model}) {
-
     Task task;
 
     if (edit) {
@@ -90,6 +99,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       task.isRepeating = isRepeating;
       task.repeatConfig = isRepeating ? repeatConfig.toJsonString() : null;
       task.reminders = Reminder.remindersToJsonString(reminders);
+      task.notes = _notesToJsonString();
     } else {
       // Create new task
       task = Task(
@@ -103,12 +113,16 @@ class TaskStateController extends StateController<TaskState, Task> {
         isRepeating: isRepeating,
         repeatConfig: isRepeating ? repeatConfig.toJsonString() : null,
         reminders: Reminder.remindersToJsonString(reminders),
+        notes: _notesToJsonString(),
       );
     }
-    final categories = g.catVm.categories.where((c) => g.taskSc.categorySelection[c] == true).toList();
+    final categories = g.catVm.categories
+        .where((c) => g.taskSc.categorySelection[c] == true)
+        .toList();
     task.categories.clear();
     if (categories.isEmpty) {
-      final generalCategory = ObjectBox().categoryBox.get(1) ?? TaskCategory(id: 1, name: 'General');
+      final generalCategory =
+          ObjectBox().categoryBox.get(1) ?? TaskCategory(id: 1, name: 'General');
       task.categories.add(generalCategory);
       task.categoryUuids = [generalCategory.uuid];
     } else {
@@ -119,6 +133,34 @@ class TaskStateController extends StateController<TaskState, Task> {
     return task;
   }
 
+  String? _notesToJsonString() {
+    if (notes == null) return null;
+
+    final Map<String, String> notesMap = {};
+    for (final note in notes!) {
+      notesMap[note.uuid] = note.content;
+    }
+
+    return jsonEncode(notesMap);
+  }
+  static List<Note>? _notesFromJsonString(String? jsonString) {
+    if (jsonString == null || jsonString.isEmpty || jsonString == '{}') {
+      return null;
+    }
+
+    try {
+      final Map<String, dynamic> decoded = jsonDecode(jsonString);
+      return decoded.entries.map((entry) {
+        return Note(
+          uuid: entry.key,        // UUID from JSON key
+          content: entry.value.toString(),  // Content from JSON value
+        );
+      }).toList();
+    } catch (e) {
+      print('Error parsing notes JSON: $e');
+      return [];
+    }
+  }
   void setCategory(TaskCategory category, bool value) {
     state = state.copyWith(categorySelection: {...categorySelection, category: value});
     notifyListeners();
@@ -227,7 +269,9 @@ class TaskStateController extends StateController<TaskState, Task> {
       }
     }
     updatedDays.sort();
-    state = state.copyWith(repeatConfig: RepeatConfig(type: repeatConfig.type, days: updatedDays));
+    state = state.copyWith(
+      repeatConfig: RepeatConfig(type: repeatConfig.type, days: updatedDays),
+    );
     notifyListeners();
   }
 
@@ -251,15 +295,17 @@ class TaskStateController extends StateController<TaskState, Task> {
     notifyListeners();
   }
 
-  void setTime(TimeOfDay selectedTime){
-    final dateTime = DateTime( 1970, 1, 1, selectedTime.hour,selectedTime.minute);
+  void setTime(TimeOfDay selectedTime) {
+    final dateTime = DateTime(1970, 1, 1, selectedTime.hour, selectedTime.minute);
     state = state.copyWith(time: dateTime);
     notifyListeners();
   }
+
   void resetTime() {
     state = state.copyWith(time: null);
     notifyListeners();
   }
+
   ///Add or edit a reminder.
   ///[oldReminder] is necessary to provide when editing task to match if this reminder exists
   String putReminder({bool edit = false, required Reminder reminder, Reminder? oldReminder}) {
@@ -294,7 +340,29 @@ class TaskStateController extends StateController<TaskState, Task> {
     notifyListeners();
   }
 
+  void putNote({required Note note, required bool edit}) {
+    List<Note> updatedNotes = List.from(notes ?? []);
+    if (edit) {
+      final index = updatedNotes.indexWhere((n) => n.uuid == note.uuid);
+      if (index != -1) {
+        updatedNotes[index] = note;
+      } else {
+        MiniLogger.e('Error: Invalid index for editing note');
+        return;
+      }
+    } else {
+      updatedNotes.add(note);
+    }
+    state = state.copyWith(notes: updatedNotes);
+    notifyListeners();
+  }
 
+  void removeNote(Note note) {
+    List<Note> updatedNotes = List.from(notes ?? []);
+    updatedNotes.removeWhere((n) => n.uuid == note.uuid);
+    state = state.copyWith(notes: updatedNotes);
+    notifyListeners();
+  }
 }
 
 extension AccessState on TaskStateController {
@@ -308,4 +376,5 @@ extension AccessState on TaskStateController {
   String get priority => state.priority;
   int get currentPriority => state.currentPriority;
   Map<TaskCategory, bool> get categorySelection => state.categorySelection;
+  List<Note>? get notes => state.notes;
 }

@@ -28,7 +28,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 8058497308889952526),
     name: 'Task',
-    lastPropertyId: const obx_int.IdUid(14, 9114797388521663395),
+    lastPropertyId: const obx_int.IdUid(15, 6053700481326688970),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -113,6 +113,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(14, 9114797388521663395),
         name: 'time',
         type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(15, 6053700481326688970),
+        name: 'notes',
+        type: 9,
         flags: 0,
       ),
     ],
@@ -500,7 +506,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final categoryUuidsOffset = fbb.writeList(
           object.categoryUuids.map(fbb.writeString).toList(growable: false),
         );
-        fbb.startTable(15);
+        final notesOffset = object.notes == null
+            ? null
+            : fbb.writeString(object.notes!);
+        fbb.startTable(16);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, titleOffset);
         fbb.addInt64(2, object.createdAt?.millisecondsSinceEpoch);
@@ -515,6 +524,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(11, uuidOffset);
         fbb.addOffset(12, categoryUuidsOffset);
         fbb.addInt64(13, object.time?.millisecondsSinceEpoch);
+        fbb.addOffset(14, notesOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -581,6 +591,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final remindersParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 22);
+        final notesParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 32);
         final uuidParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 26, '');
@@ -601,6 +614,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           priority: priorityParam,
           repeatConfig: repeatConfigParam,
           reminders: remindersParam,
+          notes: notesParam,
           uuid: uuidParam,
           categoryUuids: categoryUuidsParam,
         );
@@ -1059,6 +1073,11 @@ class Task_ {
 
   /// See [Task.time].
   static final time = obx.QueryDateProperty<Task>(_entities[0].properties[13]);
+
+  /// See [Task.notes].
+  static final notes = obx.QueryStringProperty<Task>(
+    _entities[0].properties[14],
+  );
 
   /// see [Task.categories]
   static final categories = obx.QueryRelationToMany<Task, TaskCategory>(
