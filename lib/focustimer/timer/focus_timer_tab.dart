@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/focustimer/timer/duration_selector.dart';
-import 'package:minimaltodo/focustimer/timer/task_selection_button.dart';
 import 'package:minimaltodo/focustimer/timer/timer_controller.dart';
 import 'package:minimaltodo/focustimer/timer/timer_controls.dart';
 import 'package:minimaltodo/focustimer/timer/timer_display.dart';
 import 'package:minimaltodo/focustimer/timer/timer_type_selector.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
+
+import '../../helpers/globals.dart' as g show timerController;
 
 class FocusTimerTab extends StatelessWidget {
-  final TimerController controller;
 
-  const FocusTimerTab({super.key, required this.controller});
+  const FocusTimerTab({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +29,7 @@ class FocusTimerTab extends StatelessWidget {
         ),
       ),
       child: ListenableBuilder(
-        listenable: controller,
+        listenable: g.timerController,
         builder: (context, child) {
           return Container(
             height: availableHeight,
@@ -40,16 +39,16 @@ class FocusTimerTab extends StatelessWidget {
               children: [
 
                 // Timer type selector
-                TimerTypeSelector(controller: controller),
+                TimerTypeSelector(),
 
                 // Timer display
-                TimerDisplay(controller: controller),
+                TimerDisplay(),
 
                 // Duration selector
-                DurationSelector(controller: controller),
+                DurationSelector(),
 
                 // Controls
-                TimerControls(controller: controller),
+                TimerControls(),
 
                 // // Completion actions (if completed)
                 // if (controller.isCompleted)

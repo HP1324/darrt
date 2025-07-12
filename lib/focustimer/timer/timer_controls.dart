@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/focustimer/timer/timer_controller.dart';
 
-import '../../helpers/globals.dart' as g show soundController;
+import '../../helpers/globals.dart' as g show timerController,soundController;
 
 class TimerControls extends StatelessWidget {
-  final TimerController controller;
 
-  const TimerControls({super.key, required this.controller});
+  const TimerControls({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,22 +15,22 @@ class TimerControls extends StatelessWidget {
       children: [
         _buildControlButton(
           context,
-          icon: controller.isRunning ? Icons.pause : Icons.play_arrow,
-          onPressed: controller.isCompleted ? null : _handlePlayPause,
+          icon: g.timerController.isRunning ? Icons.pause : Icons.play_arrow,
+          onPressed: g.timerController.isCompleted ? null : _handlePlayPause,
           isPrimary: true,
           scheme: scheme,
         ),
         _buildControlButton(
           context,
           icon: Icons.stop,
-          onPressed: controller.isIdle ? null : controller.stopTimer,
+          onPressed: g.timerController.isIdle ? null : g.timerController.stopTimer,
           isPrimary: false,
           scheme: scheme,
         ),
         _buildControlButton(
           context,
           icon: Icons.refresh,
-          onPressed: controller.resetTimer,
+          onPressed: g.timerController.resetTimer,
           isPrimary: false,
           scheme: scheme,
         ),
@@ -69,13 +67,13 @@ class TimerControls extends StatelessWidget {
   }
 
   void _handlePlayPause() {
-    if (controller.isRunning) {
-      controller.pauseTimer();
+    if (g.timerController.isRunning) {
+      g.timerController.pauseTimer();
       if (g.soundController.isPlaying) {
         g.soundController.pauseAudio();
       }
     } else {
-      controller.startTimer();
+      g.timerController.startTimer();
       if (g.soundController.isPaused) {
         g.soundController.resumeAudio();
       } else if (g.soundController.isStopped) {

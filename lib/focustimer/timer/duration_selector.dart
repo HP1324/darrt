@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/focustimer/timer/timer_controller.dart';
 
-class DurationSelector extends StatelessWidget {
-  final TimerController controller;
+import '../../helpers/globals.dart' as g show timerController;
 
-  const DurationSelector({super.key, required this.controller});
+class DurationSelector extends StatelessWidget {
+  const DurationSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +26,13 @@ class DurationSelector extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           child: InkWell(
             borderRadius: BorderRadius.circular(8),
-            onTap: controller.isIdle ? () => _showDurationPicker(context) : null,
+            onTap: g.timerController.isIdle ? () => _showDurationPicker(context) : null,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: Text(
-                _formatDuration(controller.currentDuration),
+                _formatDuration(g.timerController.currentDuration),
                 style: textTheme.bodyMedium?.copyWith(
-                  color: controller.isIdle
+                  color: g.timerController.isIdle
                       ? scheme.primary
                       : scheme.onSurfaceVariant.withValues(alpha: 0.5),
                   fontWeight: FontWeight.w500,
@@ -54,22 +54,16 @@ class DurationSelector extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => DurationPickerDialog(
-        controller: controller,
-        initialDuration: controller.currentDuration,
+        initialDuration: g.timerController.currentDuration,
       ),
     );
   }
 }
 
 class DurationPickerDialog extends StatefulWidget {
-  final TimerController controller;
   final int initialDuration;
 
-  const DurationPickerDialog({
-    super.key,
-    required this.controller,
-    required this.initialDuration,
-  });
+  const DurationPickerDialog({super.key, required this.initialDuration});
 
   @override
   State<DurationPickerDialog> createState() => _DurationPickerDialogState();
@@ -91,7 +85,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
 
     return AlertDialog(
       title: Text(
-        'Set ${widget.controller.timerTypeLabel} Duration',
+        'Set ${g.timerController.timerTypeLabel} Duration',
         style: textTheme.headlineSmall?.copyWith(
           color: scheme.onSurface,
         ),
@@ -128,10 +122,10 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
         FilledButton(
           onPressed: () {
             final seconds = _selectedMinutes * 60;
-            if (widget.controller.currentType == TimerType.focus) {
-              widget.controller.setFocusDuration(seconds);
+            if (g.timerController.currentType == TimerType.focus) {
+              g.timerController.setFocusDuration(seconds);
             } else {
-              widget.controller.setBreakDuration(seconds);
+              g.timerController.setBreakDuration(seconds);
             }
             Navigator.pop(context);
           },

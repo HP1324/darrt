@@ -2,10 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/focustimer/timer/timer_controller.dart';
 
-class TimerTypeSelector extends StatelessWidget {
-  final TimerController controller;
+import '../../helpers/globals.dart' as g show timerController;
 
-  const TimerTypeSelector({super.key, required this.controller});
+class TimerTypeSelector extends StatelessWidget {
+
+  const TimerTypeSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +49,8 @@ class TimerTypeSelector extends StatelessWidget {
       ColorScheme scheme,
       TextTheme textTheme,
       ) {
-    final isSelected = controller.currentType == type;
-    final isDisabled = !controller.isIdle;
+    final isSelected = g.timerController.currentType == type;
+    final isDisabled = !g.timerController.isIdle;
 
     return Material(
       color: isSelected ? scheme.primary : Colors.transparent,
@@ -77,9 +78,9 @@ class TimerTypeSelector extends StatelessWidget {
 
   void _selectType(TimerType type) {
     if (type == TimerType.focus) {
-      controller.switchToFocus();
+      g.timerController.switchToFocus();
     } else {
-      controller.switchToBreak();
+      g.timerController.switchToBreak();
     }
   }
 }
