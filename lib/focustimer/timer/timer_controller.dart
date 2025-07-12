@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
 
 import '../../helpers/globals.dart' as g;
+import '../../task/models/task.dart' show Task;
 
 enum TimerType { focus, timerBreak }
 
@@ -281,38 +282,33 @@ class TimerController extends ChangeNotifier {
       notifyListeners();
     }
   }
-  // Add these new properties for task management
-  List<dynamic> _selectedTasks = [];
 
-  // Getter for selected tasks
-  List<dynamic> get selectedTasks => _selectedTasks;
 
-  // Method to add a task to selected tasks
-  void addTask(dynamic task) {
+  final List<Task> _selectedTasks = [];
+
+  List<Task> get selectedTasks => _selectedTasks;
+
+  void addTask(Task task) {
     if (!_selectedTasks.contains(task)) {
       _selectedTasks.add(task);
       notifyListeners();
     }
   }
 
-  // Method to remove a task from selected tasks
   void removeTask(dynamic task) {
     _selectedTasks.remove(task);
     notifyListeners();
   }
 
-  // Method to clear all selected tasks
   void clearSelectedTasks() {
     _selectedTasks.clear();
     notifyListeners();
   }
 
-  // Method to check if a task is selected
-  bool isTaskSelected(dynamic task) {
+  bool isTaskSelected(Task task) {
     return _selectedTasks.contains(task);
   }
 
-  // Method to get selected tasks count
   int get selectedTasksCount => _selectedTasks.length;
 
   // Method to toggle task selection

@@ -1,11 +1,11 @@
-// focus_timer_tab.dart
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/focustimer/timer/completion_actions.dart';
 import 'package:minimaltodo/focustimer/timer/duration_selector.dart';
+import 'package:minimaltodo/focustimer/timer/task_selection_button.dart';
 import 'package:minimaltodo/focustimer/timer/timer_controller.dart';
 import 'package:minimaltodo/focustimer/timer/timer_controls.dart';
 import 'package:minimaltodo/focustimer/timer/timer_display.dart';
 import 'package:minimaltodo/focustimer/timer/timer_type_selector.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 
 class FocusTimerTab extends StatelessWidget {
   final TimerController controller;
@@ -38,6 +38,7 @@ class FocusTimerTab extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+
                 // Timer type selector
                 TimerTypeSelector(controller: controller),
 
