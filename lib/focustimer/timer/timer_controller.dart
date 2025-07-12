@@ -6,6 +6,7 @@ import 'package:minimaltodo/app/services/mini_box.dart';
 import '../../helpers/globals.dart' as g;
 
 enum TimerType { focus, timerBreak }
+
 enum TimerState { idle, running, paused, completed }
 
 class TimerController extends ChangeNotifier {
@@ -49,13 +50,13 @@ class TimerController extends ChangeNotifier {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  String get timerTypeLabel => _currentType == TimerType.focus ? 'Focus' : 'Break';
+  String get timerTypeLabel => _currentType == TimerType.focus ? 'Focus Mode' : 'Break Mode';
 
   TimerController() {
     _initializeFromStorage();
   }
 
-  Future<void> _initializeFromStorage() async {
+  void _initializeFromStorage() {
     try {
       final stateStr = MiniBox().read(_timerStateKey);
       final typeStr = MiniBox().read(_timerTypeKey);
@@ -74,11 +75,11 @@ class TimerController extends ChangeNotifier {
 
       if (stateStr != null && typeStr != null) {
         _state = TimerState.values.firstWhere(
-              (e) => e.toString() == stateStr,
+          (e) => e.toString() == stateStr,
           orElse: () => TimerState.idle,
         );
         _currentType = TimerType.values.firstWhere(
-              (e) => e.toString() == typeStr,
+          (e) => e.toString() == typeStr,
           orElse: () => TimerType.focus,
         );
 
@@ -89,7 +90,8 @@ class TimerController extends ChangeNotifier {
           _remainingSeconds = totalDuration - elapsed;
 
           if (_remainingSeconds <= 0) {
-            _completeTimer();
+            stopTimer();
+            g.soundController.pauseAudio();
           } else {
             _startTicker();
           }
@@ -158,7 +160,8 @@ class TimerController extends ChangeNotifier {
         _remainingSeconds = currentDuration - elapsed;
 
         if (_remainingSeconds <= 0) {
-          _completeTimer();
+          stopTimer();
+          g.soundController.pauseAudio();
         } else {
           notifyListeners();
         }
@@ -204,6 +207,7 @@ class TimerController extends ChangeNotifier {
     _saveToStorage();
     notifyListeners();
   }
+
   void stopTimer() {
     _stopTicker();
     _state = TimerState.idle;
@@ -242,14 +246,14 @@ class TimerController extends ChangeNotifier {
     if (_currentType != TimerType.timerBreak) {
       _stopTicker();
       _currentType = TimerType.timerBreak;
-    _state = TimerState.idle;
-    _remainingSeconds = _breakDuration;
-    _startTime = null;
-    _pausedSeconds = 0;
-    _saveToStorage();
-    notifyListeners();
+      _state = TimerState.idle;
+      _remainingSeconds = _breakDuration;
+      _startTime = null;
+      _pausedSeconds = 0;
+      _saveToStorage();
+      notifyListeners();
     }
-    }
+  }
 
   void setFocusDuration(int seconds) {
     _focusDuration = seconds;

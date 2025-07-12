@@ -50,9 +50,9 @@ class FocusTimerTab extends StatelessWidget {
                 // Controls
                 TimerControls(controller: controller),
 
-                // Completion actions (if completed)
-                if (controller.isCompleted)
-                  CompletionActions(controller: controller),
+                // // Completion actions (if completed)
+                // if (controller.isCompleted)
+                //   CompletionActions(controller: controller),
               ],
             ),
           );
