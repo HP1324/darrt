@@ -24,12 +24,13 @@ import 'package:minimaltodo/helpers/globals.dart' as g;
 import '../../helpers/consts.dart';
 
 class AddNotePage extends StatefulWidget {
-  const AddNotePage({super.key, required this.edit, this.note, this.folder, this.isTaskNote})
+  const AddNotePage({super.key, required this.edit, this.note, this.folder, this.isTaskNote, this.isTaskTimerNote})
     : assert(!edit || note != null);
   final bool edit;
   final Note? note;
   final Folder? folder;
   final bool? isTaskNote;
+  final bool? isTaskTimerNote;
   @override
   State<AddNotePage> createState() => _AddNotePageState();
 }
