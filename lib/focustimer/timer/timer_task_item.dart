@@ -1,7 +1,8 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/task/models/task.dart';
 
-import '../../helpers/globals.dart' as g show timerController, taskVm;
+import '../../helpers/globals.dart' as g show timerController, taskVm,soundController;
 
 class TimerTaskItem extends StatefulWidget {
   const TimerTaskItem({super.key, required this.task});
@@ -14,32 +15,38 @@ class _TimerTaskItemState extends State<TimerTaskItem> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([g.taskVm]),
+      listenable: g.taskVm,
       builder: (context, child) {
         final task = widget.task;
         final repeat = task.isRepeating;
         final repeatingCompletions = g.taskVm.repeatingTaskCompletions;
         final oneTimeCompletions = g.taskVm.onetimeTaskCompletions;
-        final date = DateTime.now().millisecondsSinceEpoch;
+        final date = DateUtils.dateOnly(DateTime.now()).millisecondsSinceEpoch;
+
         return Row(
           children: [
-            Checkbox(
-              value: repeat
-                  ? repeatingCompletions[task.id]?.contains(date) ?? false
-                  : oneTimeCompletions[task.id] ?? false,
-              onChanged: (newValue) async {
-                if (newValue != null) {
-                  g.taskVm.toggleStatus(task, newValue, DateTime.now());
-                  if (newValue) {
-                    await Future.delayed(Duration(milliseconds: 900));
-                    g.timerController.removeTask(task);
+            Transform.scale(
+              scale: 1.1,
+              child: Checkbox(
+                shape: StadiumBorder(),
+                value: repeat
+                    ? repeatingCompletions[task.id]?.contains(date) ?? false
+                    : oneTimeCompletions[task.id] ?? false,
+                onChanged: (newValue) async {
+                  if (newValue != null) {
+                    if(newValue) {
+                      g.soundController.audioPlayer.setReleaseMode(ReleaseMode.stop);
+                      g.soundController.playSound('assets/sounds/bell_sound.mp3');
+                      g.soundController.audioPlayer.setReleaseMode(ReleaseMode.release);
+                    }
+                    g.taskVm.toggleStatus(task, newValue, DateTime.now());
                   }
-                }
-              },
+                },
+              ),
             ),
             Expanded(child: Text(task.title)),
             Transform.scale(
-              scale: 0.6,
+              scale: 0.4,
               child: IconButton.filled(
                 onPressed: () {
                   g.timerController.removeTask(task);

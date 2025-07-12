@@ -93,6 +93,7 @@ class TaskViewModel extends ViewModel<Task> {
 
   void toggleStatus(Task task, bool value, DateTime d) async {
     if (task.isRepeating) {
+      debugPrint("Task is repeating");
       final date = DateUtils.dateOnly(d).millisecondsSinceEpoch;
       if (value) {
         final completion = TaskCompletion(date: DateUtils.dateOnly(d), isDone: value);
