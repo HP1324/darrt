@@ -59,7 +59,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       repeatConfig: edit && task!.isRepeating
           ? RepeatConfig.fromJsonString(task.repeatConfig!)
           : RepeatConfig(),
-      notes: edit && task!.notes != null ? _notesFromJsonString(task.notes) : null,
+      notes: edit && task!.notes != null ? Note.notesFromJsonString(task.notes) : null,
       reminders: edit ? task!.reminderObjects : [],
       currentPriority: 3,
     );
@@ -99,7 +99,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       task.isRepeating = isRepeating;
       task.repeatConfig = isRepeating ? repeatConfig.toJsonString() : null;
       task.reminders = Reminder.remindersToJsonString(reminders);
-      task.notes = _notesToJsonString();
+      task.notes = Note.notesToJsonString(notes);
     } else {
       // Create new task
       task = Task(
@@ -113,7 +113,7 @@ class TaskStateController extends StateController<TaskState, Task> {
         isRepeating: isRepeating,
         repeatConfig: isRepeating ? repeatConfig.toJsonString() : null,
         reminders: Reminder.remindersToJsonString(reminders),
-        notes: _notesToJsonString(),
+        notes: Note.notesToJsonString(notes),
       );
     }
     final categories = g.catVm.categories
@@ -133,34 +133,8 @@ class TaskStateController extends StateController<TaskState, Task> {
     return task;
   }
 
-  String? _notesToJsonString() {
-    if (notes == null) return null;
 
-    final Map<String, String> notesMap = {};
-    for (final note in notes!) {
-      notesMap[note.uuid] = note.content;
-    }
 
-    return jsonEncode(notesMap);
-  }
-  static List<Note>? _notesFromJsonString(String? jsonString) {
-    if (jsonString == null || jsonString.isEmpty || jsonString == '{}') {
-      return null;
-    }
-
-    try {
-      final Map<String, dynamic> decoded = jsonDecode(jsonString);
-      return decoded.entries.map((entry) {
-        return Note(
-          uuid: entry.key,        // UUID from JSON key
-          content: entry.value.toString(),  // Content from JSON value
-        );
-      }).toList();
-    } catch (e) {
-      print('Error parsing notes JSON: $e');
-      return [];
-    }
-  }
   void setCategory(TaskCategory category, bool value) {
     state = state.copyWith(categorySelection: {...categorySelection, category: value});
     notifyListeners();

@@ -22,15 +22,16 @@ import 'package:toastification/toastification.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 
 import '../../helpers/consts.dart';
+import '../../task/models/task.dart';
 
 class AddNotePage extends StatefulWidget {
-  const AddNotePage({super.key, required this.edit, this.note, this.folder, this.isTaskNote, this.isTaskTimerNote})
+  const AddNotePage({super.key, required this.edit, this.note, this.folder, this.isTaskNote, this.task})
     : assert(!edit || note != null);
   final bool edit;
   final Note? note;
   final Folder? folder;
   final bool? isTaskNote;
-  final bool? isTaskTimerNote;
+  final Task? task;
   @override
   State<AddNotePage> createState() => _AddNotePageState();
 }
@@ -127,6 +128,15 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 
   void _saveNote(BuildContext context) {
+    if(widget.task != null){
+      if (!g.noteSc.controller.document.isEmpty()) {
+        final note = g.noteSc.buildModel(
+          edit: widget.edit,
+          model: widget.edit ? widget.note : null,
+        );
+        g.taskVm.putNote(task: widget.task!, note: note, edit: widget.edit);
+      }
+    }
     if (widget.isTaskNote != null) {
       if (!g.noteSc.controller.document.isEmpty()) {
         final note = g.noteSc.buildModel(
