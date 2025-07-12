@@ -291,23 +291,32 @@ class _TaskSelectionItemState extends State<_TaskSelectionItem> {
   }
 }
 
-class TaskSelectionTab extends StatelessWidget {
+class TaskSelectionTab extends StatefulWidget {
   const TaskSelectionTab({super.key, required this.tasks});
   final List<Task> tasks;
 
   @override
+  State<TaskSelectionTab> createState() => _TaskSelectionTabState();
+}
+
+class _TaskSelectionTabState extends State<TaskSelectionTab> with AutomaticKeepAliveClientMixin{
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final scheme = ColorScheme.of(context);
     final textTheme = Theme.of(context).textTheme;
 
-    final uniqueDates = tasks.map((task) => DateUtils.dateOnly(task.dueDate)).toSet().toList()
+    final uniqueDates = widget.tasks.map((task) => DateUtils.dateOnly(task.dueDate)).toSet().toList()
       ..sort();
 
     return ListView.builder(
       itemCount: uniqueDates.length,
       itemBuilder: (context, index) {
         final date = uniqueDates[index];
-        final tasksForDate = tasks
+        final tasksForDate = widget.tasks
             .where((task) => DateUtils.dateOnly(task.dueDate) == date)
             .toList();
         final title = getFormattedDateTitle(date);
