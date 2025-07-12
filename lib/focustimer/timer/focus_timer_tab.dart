@@ -3,6 +3,7 @@ import 'package:minimaltodo/focustimer/timer/duration_selector.dart';
 import 'package:minimaltodo/focustimer/timer/timer_controller.dart';
 import 'package:minimaltodo/focustimer/timer/timer_controls.dart';
 import 'package:minimaltodo/focustimer/timer/timer_display.dart';
+import 'package:minimaltodo/focustimer/timer/timer_task_selection_expansion_tile.dart';
 import 'package:minimaltodo/focustimer/timer/timer_type_selector.dart';
 
 import '../../helpers/globals.dart' as g show timerController;
@@ -31,12 +32,14 @@ class FocusTimerTab extends StatelessWidget {
       child: ListenableBuilder(
         listenable: g.timerController,
         builder: (context, child) {
-          return Container(
-            height: availableHeight,
-            padding: const EdgeInsets.all(24),
+          return SingleChildScrollView(
             child: Column(
+              spacing: 10,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+
+                // Button to add tasks for this timer
+                TimerTaskSelectionExpansionTile(),
 
                 // Timer type selector
                 TimerTypeSelector(),
@@ -49,7 +52,7 @@ class FocusTimerTab extends StatelessWidget {
 
                 // Controls
                 TimerControls(),
-
+                SizedBox(height: 20),
                 // // Completion actions (if completed)
                 // if (controller.isCompleted)
                 //   CompletionActions(controller: controller),
@@ -61,3 +64,4 @@ class FocusTimerTab extends StatelessWidget {
     );
   }
 }
+
