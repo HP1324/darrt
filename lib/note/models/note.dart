@@ -131,4 +131,33 @@ class Note {
     return '$content|$created|$updated|$foldersStr';
   }
 
+  static String? notesToJsonString(List<Note>? notes) {
+    if (notes == null) return null;
+
+    final Map<String, String> notesMap = {};
+    for (final note in notes) {
+      notesMap[note.uuid] = note.content;
+    }
+
+    return jsonEncode(notesMap);
+  }
+  static List<Note>? notesFromJsonString(String? jsonString) {
+    if (jsonString == null || jsonString.isEmpty || jsonString == '{}') {
+      return null;
+    }
+
+    try {
+      final Map<String, dynamic> decoded = jsonDecode(jsonString);
+      return decoded.entries.map((entry) {
+        return Note(
+          uuid: entry.key,        // UUID from JSON key
+          content: entry.value.toString(),  // Content from JSON value
+        );
+      }).toList();
+    } catch (e) {
+      print('Error parsing notes JSON: $e');
+      return [];
+    }
+  }
+
 }

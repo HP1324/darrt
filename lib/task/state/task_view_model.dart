@@ -10,6 +10,8 @@ import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/models/task_completion.dart';
 
+import '../../note/models/note.dart' show Note;
+
 class TaskViewModel extends ViewModel<Task> {
   @override
   void initializeItems() {
@@ -221,5 +223,57 @@ class TaskViewModel extends ViewModel<Task> {
 
     // Return tasks with time first, then tasks without time
     return [...tasksWithTime, ...tasksWithoutTime];
+  }
+
+  List<Note>? taskTimerNotes;
+  void putNote({required Task task, required Note note, required bool edit}) {
+    final List<Note> updatedNotes = Note.notesFromJsonString(task.notes) ?? [];
+
+    final noteIndex = updatedNotes.indexWhere((n) => n.uuid == note.uuid);
+    if (edit) {
+      if (noteIndex != -1) {
+        updatedNotes[noteIndex] = note;
+      } else {
+        updatedNotes.add(note); // Optional, depending on your logic
+      }
+    } else {
+      updatedNotes.add(note);
+    }
+
+    // Update the task's notes string
+    task.notes = Note.notesToJsonString(updatedNotes);
+
+    // Update the global tasks list
+
+    // Update taskTimerNotes with a new list (to trigger UI updates)
+    taskTimerNotes = List<Note>.from(updatedNotes);
+    final id = box.put(task);
+    int taskIndex = tasks.indexWhere((i) => getItemId(i) == id);
+    if (taskIndex != -1) {
+      tasks[taskIndex] = task;
+    }
+    notifyListeners();
+  }
+
+  void removeNoteFromTask({required Task task, required Note note}) {
+    // Step 1: Remove from UI-local taskTimerNotes
+    taskTimerNotes = List<Note>.from(taskTimerNotes ?? [])..removeWhere((n) => n.uuid == note.uuid);
+
+    // Step 2: Decode notes and remove from task.notes
+    final List<Note> updatedNotes = Note.notesFromJsonString(task.notes) ?? [];
+    updatedNotes.removeWhere((n) => n.uuid == note.uuid);
+    task.notes = Note.notesToJsonString(updatedNotes);
+
+    // Step 3: Update this task in the global tasks list
+    final id = box.put(task);
+    int index = tasks.indexWhere((i) => getItemId(i) == id);
+    if (index != -1) {
+      tasks[index] = task;
+    }
+    // Step 4: Notify listeners to update UI
+    notifyListeners();
+  }
+  void initTaskNotesState(Task task){
+    taskTimerNotes = Note.notesFromJsonString(task.notes);
   }
 }
