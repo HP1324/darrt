@@ -1,8 +1,9 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/task/models/task.dart';
+import 'package:minimaltodo/task/ui/task_note_bottom_sheet.dart';
 
-import '../../helpers/globals.dart' as g show timerController, taskVm,soundController;
+import '../../helpers/globals.dart' as g show timerController, taskVm,soundController, taskSc;
 
 class TimerTaskItem extends StatefulWidget {
   const TimerTaskItem({super.key, required this.task});
@@ -45,6 +46,12 @@ class _TimerTaskItemState extends State<TimerTaskItem> {
               ),
             ),
             Expanded(child: Text(task.title)),
+            IconButton(onPressed: ()async{
+              await showModalBottomSheet(
+              context: context,
+              builder: (context) => TaskNoteBottomSheet(task: task,controller: g.taskVm),
+              );
+            }, icon: Icon(Icons.note_alt_outlined)),
             Transform.scale(
               scale: 0.4,
               child: IconButton.filled(

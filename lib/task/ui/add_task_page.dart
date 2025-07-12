@@ -17,6 +17,7 @@ import 'package:minimaltodo/note/ui/add_note_page.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart';
 import 'package:minimaltodo/task/models/reminder.dart';
 import 'package:minimaltodo/task/models/task.dart';
+import 'package:minimaltodo/task/ui/task_note_bottom_sheet.dart';
 import 'package:minimaltodo/task/ui/task_note_item.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:toastification/toastification.dart';
@@ -140,13 +141,12 @@ class TaskNoteSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = TextTheme.of(context);
-    final scheme = ColorScheme.of(context);
     return InkWell(
       onTap: () async {
         g.taskSc.textFieldNode.unfocus();
         await showModalBottomSheet(
           context: context,
-          builder: (context) => _buildTaskNoteBottomSheet(context),
+          builder: (context) => TaskNoteBottomSheet(controller: g.taskSc),
         );
       },
       child: StructuredRow(
@@ -159,7 +159,11 @@ class TaskNoteSection extends StatelessWidget {
               listenable: g.taskSc,
               builder: (context, child) {
                 final length = g.taskSc.notes?.length ?? 0;
-                final text = length != 0 ? length > 1 ? '$length notes' : '$length note' : 'Tap here to add notes for this task';
+                final text = length != 0
+                    ? length > 1
+                          ? '$length notes'
+                          : '$length note'
+                    : 'Tap here to add notes for this task';
                 return Text(text, style: textTheme.bodySmall);
               },
             ),
@@ -188,130 +192,9 @@ class TaskNoteSection extends StatelessWidget {
     );
   }
 
-  Widget _buildTaskNoteBottomSheet(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final scheme = ColorScheme.of(context);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          // Handle bar
-          Container(
-            width: 40,
-            height: 4,
-            margin: const EdgeInsets.only(top: 12, bottom: 8),
-            decoration: BoxDecoration(
-              color: scheme.onSurface.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          // Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.sticky_note_2_outlined,
-                  color: scheme.primary,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'Task Notes',
-                  style: textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: scheme.onSurface,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Content area
-          Expanded(
-            child: ListenableBuilder(
-              listenable: g.taskSc,
-              builder: (context, child) {
-                if (g.taskSc.notes == null || g.taskSc.notes!.isEmpty) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.note_add_outlined,
-                        size: 64,
-                        color: scheme.onSurface.withOpacity(0.3),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No notes for this task',
-                        style: textTheme.bodyLarge?.copyWith(
-                          color: scheme.onSurface.withOpacity(0.6),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Add your first note to get started',
-                        style: textTheme.bodySmall?.copyWith(
-                          color: scheme.onSurface.withOpacity(0.5),
-                        ),
-                      ),
-                    ],
-                  );
-                }
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: g.taskSc.notes!.length,
-                  itemBuilder: (context, index) {
-                    final notes = g.taskSc.notes;
-                    return TaskNoteItem(note: notes![index]);
-                  },
-                );
-              },
-            ),
-          ),
-          // Add button
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: scheme.surface,
-              border: Border(
-                top: BorderSide(
-                  color: scheme.outline.withOpacity(0.1),
-                  width: 1,
-                ),
-              ),
-            ),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () {
-                  MiniRouter.to(context, const AddNotePage(edit: false, isTaskNote: true));
-                },
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                icon: const Icon(Icons.add),
-                label: const Text(
-                  'Add Note',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
+
+
 
 class TimeSelector extends StatelessWidget {
   const TimeSelector({super.key});
@@ -338,7 +221,7 @@ class TimeSelector extends StatelessWidget {
             expanded: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Time (Optional)',style: textTheme.titleSmall),
+                Text('Time (Optional)', style: textTheme.titleSmall),
                 Text(
                   time != null ? TimeOfDay.fromDateTime(time).format(context) : 'No time set',
                   style: textTheme.bodySmall,

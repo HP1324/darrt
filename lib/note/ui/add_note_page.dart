@@ -128,16 +128,26 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 
   void _saveNote(BuildContext context) {
-    if(widget.task != null){
+    // Note note;
+    // if (!g.noteSc.controller.document.isEmpty()) {
+    //   final note = g.noteSc.buildModel(
+    //     edit: widget.edit,
+    //     model: widget.edit ? widget.note : null,
+    //   );
+    // }
+    if (widget.isTaskNote != null && widget.task != null) {
+      debugPrint('we are here');
       if (!g.noteSc.controller.document.isEmpty()) {
         final note = g.noteSc.buildModel(
           edit: widget.edit,
           model: widget.edit ? widget.note : null,
         );
         g.taskVm.putNote(task: widget.task!, note: note, edit: widget.edit);
+        Navigator.pop(context);
       }
+      return;
     }
-    if (widget.isTaskNote != null) {
+    else if (widget.isTaskNote != null) {
       if (!g.noteSc.controller.document.isEmpty()) {
         final note = g.noteSc.buildModel(
           edit: widget.edit,
@@ -147,23 +157,25 @@ class _AddNotePageState extends State<AddNotePage> {
         Navigator.pop(context);
       }
       return;
-    }
-    var message = '';
-    if (!g.noteSc.controller.document.isEmpty()) {
-      final note = g.noteSc.buildModel(
-        edit: widget.edit,
-        model: widget.edit ? widget.note : null,
-      );
-      message = g.noteVm.putItem(note, edit: widget.edit);
-      Navigator.pop(context);
     } else {
-      message = Messages.mNoteEmpty;
+      var message = '';
+      if (!g.noteSc.controller.document.isEmpty()) {
+        final note = g.noteSc.buildModel(
+          edit: widget.edit,
+          model: widget.edit ? widget.note : null,
+        );
+        message = g.noteVm.putItem(note, edit: widget.edit);
+        Navigator.pop(context);
+      } else {
+        message = Messages.mNoteEmpty;
+      }
+      showToast(
+        context,
+        type: message == Messages.mNoteEmpty ? ToastificationType.error : ToastificationType
+            .success,
+        description: message,
+      );
     }
-    showToast(
-      context,
-      type: message == Messages.mNoteEmpty ? ToastificationType.error : ToastificationType.success,
-      description: message,
-    );
   }
 
   Future<void> _handleSpeechToText(BuildContext context) async {

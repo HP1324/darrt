@@ -4,10 +4,16 @@ import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/note/models/note.dart';
 import 'package:minimaltodo/note/ui/add_note_page.dart';
+import 'package:minimaltodo/task/state/task_state_controller.dart';
+import 'package:minimaltodo/task/state/task_view_model.dart';
+
+import '../models/task.dart' show Task;
 
 class TaskNoteItem extends StatefulWidget {
-  const TaskNoteItem({super.key, required this.note});
+  const TaskNoteItem({super.key, required this.note, required this.controller, this.task});
   final Note note;
+  final Listenable controller;
+  final Task? task;
   @override
   State<TaskNoteItem> createState() => _TaskNoteItemState();
 }
@@ -19,7 +25,7 @@ class _TaskNoteItemState extends State<TaskNoteItem> {
     final textTheme = Theme.of(context).textTheme;
 
     return InkWell(
-      onTap: () => MiniRouter.to(context, AddNotePage(edit: true, note: widget.note)),
+      onTap: () => MiniRouter.to(context, AddNotePage(edit: true, note: widget.note,task: widget.task, isTaskNote: widget.controller is TaskViewModel ? true : null)),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(16),
@@ -94,7 +100,8 @@ class _TaskNoteItemState extends State<TaskNoteItem> {
                         actions: [
                           FilledButton(
                             onPressed: () {
-                              g.taskSc.removeNote(widget.note);
+                              if(widget.controller is TaskStateController) g.taskSc.removeNote(widget.note);
+                              else g.taskVm.removeNoteFromTask(task: widget.task!, note: widget.note);
                               Navigator.pop(context);
                               showSuccessToast(context, 'Note remove');
                             },
