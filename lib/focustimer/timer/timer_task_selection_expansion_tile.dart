@@ -19,6 +19,7 @@ class _TimerTaskSelectionExpansionTileState extends State<TimerTaskSelectionExpa
       builder: (context, child) {
         final tasks = g.timerController.selectedTasks;
         return ExpansionTile(
+          maintainState: true,
           title: Text('Tasks in progress'),
           children: [
             if (tasks.isEmpty) _EmptyTaskTimerListIndicator(),
@@ -58,7 +59,7 @@ class _EmptyTaskTimerListIndicator extends StatelessWidget {
 }
 
 class _SelectTasksButton extends StatelessWidget {
-  const _SelectTasksButton({super.key});
+  const _SelectTasksButton();
 
   @override
   Widget build(BuildContext context) {

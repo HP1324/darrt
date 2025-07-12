@@ -1,5 +1,6 @@
 // timer_controller.dart
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
 
@@ -73,7 +74,6 @@ class TimerController extends ChangeNotifier {
       if (breakDurStr != null) {
         _breakDuration = int.parse(breakDurStr);
       }
-
       if (stateStr != null && typeStr != null) {
         _state = TimerState.values.firstWhere(
           (e) => e.toString() == stateStr,
@@ -107,6 +107,7 @@ class TimerController extends ChangeNotifier {
       } else {
         _remainingSeconds = currentDuration;
       }
+      _loadSelectedTasksFromStorage();
     } catch (e) {
       debugPrint('Error initializing timer from storage: $e');
       _resetToDefaults();
@@ -114,13 +115,29 @@ class TimerController extends ChangeNotifier {
     notifyListeners();
   }
 
+// Modify your existing _resetToDefaults method:
   void _resetToDefaults() {
     _state = TimerState.idle;
     _currentType = TimerType.focus;
     _remainingSeconds = currentDuration;
     _startTime = null;
     _pausedSeconds = 0;
+    _selectedTasks.clear(); // Clear selected tasks too
     _clearStorage();
+  }
+
+// Modify your existing _clearStorage method:
+  void _clearStorage() {
+    try {
+      MiniBox().remove(_timerStateKey);
+      MiniBox().remove(_timerTypeKey);
+      MiniBox().remove(_startTimeKey);
+      MiniBox().remove(_durationKey);
+      MiniBox().remove(_pausedTimeKey);
+      MiniBox().remove(_selectedTasksKey); // Add this line
+    } catch (e) {
+      debugPrint('Error clearing timer storage: $e');
+    }
   }
 
   void _saveToStorage() {
@@ -141,17 +158,6 @@ class TimerController extends ChangeNotifier {
     }
   }
 
-  void _clearStorage() {
-    try {
-      MiniBox().remove(_timerStateKey);
-      MiniBox().remove(_timerTypeKey);
-      MiniBox().remove(_startTimeKey);
-      MiniBox().remove(_durationKey);
-      MiniBox().remove(_pausedTimeKey);
-    } catch (e) {
-      debugPrint('Error clearing timer storage: $e');
-    }
-  }
 
   void _startTicker() {
     _ticker?.cancel();
@@ -284,6 +290,9 @@ class TimerController extends ChangeNotifier {
   }
 
 
+  static const String _selectedTasksKey = 'selected_tasks';
+
+// Modify the existing task selection code:
   final List<Task> _selectedTasks = [];
 
   List<Task> get selectedTasks => _selectedTasks;
@@ -291,17 +300,20 @@ class TimerController extends ChangeNotifier {
   void addTask(Task task) {
     if (!_selectedTasks.contains(task)) {
       _selectedTasks.add(task);
+      _saveSelectedTasksToStorage();
       notifyListeners();
     }
   }
 
   void removeTask(dynamic task) {
     _selectedTasks.remove(task);
+    _saveSelectedTasksToStorage();
     notifyListeners();
   }
 
   void clearSelectedTasks() {
     _selectedTasks.clear();
+    _saveSelectedTasksToStorage();
     notifyListeners();
   }
 
@@ -311,12 +323,45 @@ class TimerController extends ChangeNotifier {
 
   int get selectedTasksCount => _selectedTasks.length;
 
-  // Method to toggle task selection
   void toggleTaskSelection(dynamic task) {
     if (isTaskSelected(task)) {
       removeTask(task);
     } else {
       addTask(task);
+    }
+  }
+
+// Add these new methods for persistent storage:
+
+  void _saveSelectedTasksToStorage() {
+    try {
+      // Convert tasks to JSON strings for storage
+      final taskJsonList = _selectedTasks.map((task) => task.toJson()).toList();
+      final jsonString = jsonEncode(taskJsonList);
+      MiniBox().write(_selectedTasksKey, jsonString);
+    } catch (e) {
+      debugPrint('Error saving selected tasks to storage: $e');
+    }
+  }
+
+  void _loadSelectedTasksFromStorage() {
+    try {
+      final jsonString = MiniBox().read(_selectedTasksKey);
+      if (jsonString != null) {
+        final List<dynamic> taskJsonList = jsonDecode(jsonString);
+        _selectedTasks.clear();
+        for (final taskJson in taskJsonList) {
+          try {
+            final task = Task.fromJson(taskJson);
+            _selectedTasks.add(task);
+          } catch (e) {
+            debugPrint('Error parsing task from storage: $e');
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error loading selected tasks from storage: $e');
+      _selectedTasks.clear();
     }
   }
 
