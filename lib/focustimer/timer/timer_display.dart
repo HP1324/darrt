@@ -5,14 +5,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/focustimer/timer/timer_controller.dart';
 
+import '../../helpers/globals.dart' as g show timerController;
+
 
 
 
 
 class TimerDisplay extends StatelessWidget {
-  final TimerController controller;
 
-  const TimerDisplay({super.key, required this.controller});
+  const TimerDisplay({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +46,9 @@ class TimerDisplay extends StatelessWidget {
           CustomPaint(
             size: const Size(280, 280),
             painter: ProgressRingPainter(
-              progress: controller.progress,
+              progress: g.timerController.progress,
               backgroundColor: scheme.outline.withValues(alpha: 0.2),
-              progressColor: controller.currentType == TimerType.focus
+              progressColor: g.timerController.currentType == TimerType.focus
                   ? scheme.primary
                   : scheme.tertiary,
               strokeWidth: 8,
@@ -59,7 +60,7 @@ class TimerDisplay extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  controller.timerTypeLabel,
+                  g.timerController.timerTypeLabel,
                   style: textTheme.titleMedium?.copyWith(
                     color: scheme.onSurface.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
@@ -67,7 +68,7 @@ class TimerDisplay extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  controller.formattedTime,
+                  g.timerController.formattedTime,
                   style: textTheme.displayLarge?.copyWith(
                     color: scheme.onSurface,
                     fontWeight: FontWeight.w300,
@@ -75,7 +76,7 @@ class TimerDisplay extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                TimerStateIndicator(controller: controller),
+                TimerStateIndicator(),
               ],
             ),
           ),
@@ -134,9 +135,8 @@ class ProgressRingPainter extends CustomPainter {
 }
 
 class TimerStateIndicator extends StatelessWidget {
-  final TimerController controller;
 
-  const TimerStateIndicator({super.key, required this.controller});
+  const TimerStateIndicator({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +175,7 @@ class TimerStateIndicator extends StatelessWidget {
   }
 
   Color _getStateColor(ColorScheme scheme) {
-    switch (controller.state) {
+    switch (g.timerController.state) {
       case TimerState.running:
         return scheme.primary;
       case TimerState.paused:
@@ -188,7 +188,7 @@ class TimerStateIndicator extends StatelessWidget {
   }
 
   IconData _getStateIcon() {
-    switch (controller.state) {
+    switch (g.timerController.state) {
       case TimerState.running:
         return Icons.play_arrow;
       case TimerState.paused:
@@ -201,7 +201,7 @@ class TimerStateIndicator extends StatelessWidget {
   }
 
   String _getStateText() {
-    switch (controller.state) {
+    switch (g.timerController.state) {
       case TimerState.running:
         return 'Running';
       case TimerState.paused:

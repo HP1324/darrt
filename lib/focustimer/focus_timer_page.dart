@@ -38,7 +38,7 @@ class _FocusTimerPageState extends State<FocusTimerPage> with SingleTickerProvid
             child: TabBarView(
               controller: tabController,
               children: [
-                FocusTimerTab(controller: g.timerController),
+                FocusTimerTab(),
                 SoundPage()
               ],
             ),
