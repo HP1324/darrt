@@ -1,5 +1,7 @@
+import 'package:audioplayers/audioplayers.dart' show ReleaseMode;
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/notification/notification_service.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/messages.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
@@ -92,6 +94,11 @@ class TaskViewModel extends ViewModel<Task> {
   }
 
   void toggleStatus(Task task, bool value, DateTime d) async {
+    if (value) {
+      g.soundController.audioPlayer.setReleaseMode(ReleaseMode.stop);
+      g.soundController.playSoundOnly('assets/sounds/bell_sound.mp3');
+      g.soundController.audioPlayer.setReleaseMode(ReleaseMode.release);
+    }
     if (task.isRepeating) {
       debugPrint("Task is repeating");
       final date = DateUtils.dateOnly(d).millisecondsSinceEpoch;
@@ -274,7 +281,8 @@ class TaskViewModel extends ViewModel<Task> {
     // Step 4: Notify listeners to update UI
     notifyListeners();
   }
-  void initTaskNotesState(Task task){
+
+  void initTaskNotesState(Task task) {
     taskTimerNotes = Note.notesFromJsonString(task.notes);
   }
 }

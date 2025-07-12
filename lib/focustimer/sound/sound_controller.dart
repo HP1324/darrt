@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
 
 class SoundController extends ChangeNotifier {
-  AudioPlayer? _audioPlayer;
+  final AudioPlayer _audioPlayer = AudioPlayer();
   String? _currentSound;
   List<Map<String, String>> _customSounds = [];
   bool _isPlaying = false;
@@ -26,12 +26,11 @@ class SoundController extends ChangeNotifier {
   bool get isDisposed => _isDisposed;
 
   // Initialize the service
-  Future<void> initialize() async {
-    _audioPlayer = AudioPlayer();
-    _audioPlayer?.setReleaseMode(ReleaseMode.loop);
+  void initialize() async {
+    _audioPlayer.setReleaseMode(ReleaseMode.loop);
 
     // Listen to player state changes to keep UI in sync
-    _audioPlayer?.onPlayerStateChanged.listen((PlayerState state) {
+    _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
       _isPlaying = state == PlayerState.playing;
       _isStopped = state == PlayerState.stopped;
       _isPaused = state == PlayerState.paused;
@@ -40,16 +39,16 @@ class SoundController extends ChangeNotifier {
     });
 
     // Listen to player completion to reset state
-    _audioPlayer?.onPlayerComplete.listen((event) {
+    _audioPlayer.onPlayerComplete.listen((event) {
       _isPlaying = false;
       notifyListeners();
     });
 
-    await _loadCustomSounds();
+    _loadCustomSounds();
   }
 
   // Load custom sounds from SharedPreferences
-  Future<void> _loadCustomSounds() async {
+  void _loadCustomSounds() {
     final soundsJson = MiniBox().read('custom_sounds') ?? '[]';
     final List<dynamic> soundsList = jsonDecode(soundsJson);
     _customSounds = soundsList.map((sound) => Map<String, String>.from(sound)).toList();
@@ -57,18 +56,18 @@ class SoundController extends ChangeNotifier {
   }
 
   // Save custom sounds to SharedPreferences
-  Future<void> _saveCustomSounds() async {
+  void _saveCustomSounds()  {
     final soundsJson = jsonEncode(_customSounds);
     MiniBox().write('custom_sounds', soundsJson);
   }
 
   // Add custom sound to the list
-  Future<void> addCustomSound(String path, String name) async {
+  void addCustomSound(String path, String name)  {
     // Check if sound already exists
     bool exists = _customSounds.any((sound) => sound['path'] == path);
     if (!exists) {
       _customSounds.add({'path': path, 'name': name});
-      await _saveCustomSounds();
+      _saveCustomSounds();
       notifyListeners();
     }
   }
@@ -77,7 +76,7 @@ class SoundController extends ChangeNotifier {
   Future<void> playSound(String? soundPath) async {
     try {
       // Always stop current audio first
-      await _audioPlayer?.stop();
+      await _audioPlayer.stop();
 
       if (soundPath == null) {
         // If null is passed, we want to stop and clear current sound
@@ -91,9 +90,9 @@ class SoundController extends ChangeNotifier {
       _currentSound = soundPath;
 
       if (soundPath.startsWith('assets/')) {
-        await _audioPlayer?.play(AssetSource(soundPath.replaceFirst('assets/', '')));
+        await _audioPlayer.play(AssetSource(soundPath.replaceFirst('assets/', '')));
       } else {
-        await _audioPlayer?.play(DeviceFileSource(soundPath));
+        await _audioPlayer.play(DeviceFileSource(soundPath));
       }
 
       // Note: _isPlaying will be updated by the state listener
@@ -105,6 +104,11 @@ class SoundController extends ChangeNotifier {
     }
   }
 
+  Future<void> playSoundOnly(String assetPath) async {
+    assert(assetPath.startsWith('assets/'), 'Only asset paths are supported');
+    final trimmed = assetPath.replaceFirst('assets/', '');
+    await _audioPlayer.play(AssetSource(trimmed));
+  }
   // Toggle sound - New method for better UX
   Future<void> toggleSound(String? soundPath) async {
     if (_currentSound == soundPath && _isPlaying) {
@@ -118,18 +122,18 @@ class SoundController extends ChangeNotifier {
 
   // Pause audio
   Future<void> pauseAudio() async {
-    await _audioPlayer?.pause();
+    await _audioPlayer.pause();
   }
 
   // Resume audio
   Future<void> resumeAudio() async {
-    await _audioPlayer?.resume();
+    await _audioPlayer.resume();
   }
 
   // Stop audio - Enhanced version
   Future<void> stopAudio() async {
     try {
-      await _audioPlayer?.stop();
+      await _audioPlayer.stop();
       _currentSound = null;
       _isPlaying = false;
       notifyListeners();
@@ -191,7 +195,7 @@ class SoundController extends ChangeNotifier {
   // Dispose resources
   @override
   void dispose() {
-    _audioPlayer?.dispose();
+    _audioPlayer.dispose();
     _selectedSoundInDialog.dispose();
     super.dispose();
   }

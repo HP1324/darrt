@@ -43,7 +43,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
         String customSoundName = result.files.single.name.split('.').first;
 
         // Add to custom sounds list
-        await g.soundController.addCustomSound(customSoundPath, customSoundName);
+        g.soundController.addCustomSound(customSoundPath, customSoundName);
 
         g.soundController.setSelectedSoundInDialog(customSoundPath);
         await g.soundController.playSound(customSoundPath);

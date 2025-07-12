@@ -35,11 +35,6 @@ class _TimerTaskItemState extends State<TimerTaskItem> {
                     : oneTimeCompletions[task.id] ?? false,
                 onChanged: (newValue) async {
                   if (newValue != null) {
-                    if(newValue) {
-                      g.soundController.audioPlayer.setReleaseMode(ReleaseMode.stop);
-                      g.soundController.playSound('assets/sounds/bell_sound.mp3');
-                      g.soundController.audioPlayer.setReleaseMode(ReleaseMode.release);
-                    }
                     g.taskVm.toggleStatus(task, newValue, DateTime.now());
                   }
                 },
