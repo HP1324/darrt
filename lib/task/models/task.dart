@@ -245,6 +245,16 @@ class Task {
 
     return '$basicFields|$dateFields|$stringFields|$categoriesStr|$completionsStr';
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is Task && uuid == other.uuid;
+  }
+
+  @override
+  // TODO: implement hashCode
+  int get hashCode => uuid.hashCode;
+
 }
 
 extension TaskUtilities on Task {
