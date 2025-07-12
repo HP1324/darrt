@@ -281,7 +281,62 @@ class TimerController extends ChangeNotifier {
       notifyListeners();
     }
   }
+  // Add these new properties for task management
+  List<dynamic> _selectedTasks = [];
 
+  // Getter for selected tasks
+  List<dynamic> get selectedTasks => _selectedTasks;
+
+  // Method to add a task to selected tasks
+  void addTask(dynamic task) {
+    if (!_selectedTasks.contains(task)) {
+      _selectedTasks.add(task);
+      notifyListeners();
+    }
+  }
+
+  // Method to remove a task from selected tasks
+  void removeTask(dynamic task) {
+    _selectedTasks.remove(task);
+    notifyListeners();
+  }
+
+  // Method to clear all selected tasks
+  void clearSelectedTasks() {
+    _selectedTasks.clear();
+    notifyListeners();
+  }
+
+  // Method to check if a task is selected
+  bool isTaskSelected(dynamic task) {
+    return _selectedTasks.contains(task);
+  }
+
+  // Method to get selected tasks count
+  int get selectedTasksCount => _selectedTasks.length;
+
+  // Method to toggle task selection
+  void toggleTaskSelection(dynamic task) {
+    if (isTaskSelected(task)) {
+      removeTask(task);
+    } else {
+      addTask(task);
+    }
+  }
+
+  // Optional: Method to automatically start break timer after focus timer completes
+  void _handleTimerCompletion() {
+    // Your existing completion logic...
+
+    // Add automatic break start functionality
+    if (currentType == TimerType.focus) {
+      // Wait a brief moment, then automatically switch to break
+      Future.delayed(const Duration(seconds: 1), () {
+        switchToBreak();
+        startTimer();
+      });
+    }
+  }
   @override
   void dispose() {
     _stopTicker();
