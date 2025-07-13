@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:minimaltodo/app/ads/my_banner_ad_widget.dart';
+import 'package:minimaltodo/app/ads/timed_banner_ad_widget.dart';
 import 'package:minimaltodo/app/ui/app_drawer.dart';
 import 'package:minimaltodo/app/ui/mini_app_bar.dart';
 import 'package:minimaltodo/app/ui/mini_bottom_nav_bar.dart';
@@ -12,8 +14,14 @@ import 'package:minimaltodo/task/ui/task_search_page.dart';
 import 'package:minimaltodo/task/ui/tasks_page.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -22,24 +30,25 @@ class Home extends StatelessWidget {
         appBar: const MiniAppBar(),
         drawer: const AppDrawer(),
         body: ValueListenableBuilder(
-            valueListenable: g.navMan.currentDestination,
-            builder: (context,value, child) {
-              return IndexedStack(
-                index: value,
-                children: [
-                  const TasksPage(),
-                  const FocusTimerPage(),
-                  const CategoriesPage(),
-                ],
-              );
-            }),
+          valueListenable: g.navMan.currentDestination,
+          builder: (context, value, child) {
+            return IndexedStack(
+              index: value,
+              children: [
+                const TasksPage(),
+                const FocusTimerPage(),
+                const CategoriesPage(),
+              ],
+            );
+          },
+        ),
         floatingActionButton: ValueListenableBuilder(
           valueListenable: g.navMan.currentDestination,
-          builder: (context, value ,child) {
+          builder: (context, value, child) {
             if (value == 0) {
               return const _FloatingActionButtonWidget();
             }
-            return const SizedBox.shrink(); // Return an invisible widget instead of null
+            return const SizedBox.shrink();
           },
         ),
         bottomNavigationBar: const _BottomNavBarWidget(),
@@ -50,55 +59,67 @@ class Home extends StatelessWidget {
 
 class _BottomNavBarWidget extends StatelessWidget {
   const _BottomNavBarWidget();
+
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: g.navMan.currentDestination,
-      builder: (context, value,child) {
-        return Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withAlpha(20),
-              width: 0.5,
-            ),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: MiniBottomNavBar(
-            children: [
-              MiniBottomNavBarItem(
-                icon: Icons.calendar_month,
-                label: 'Tasks',
-                onTap: () => g.navMan.onDestinationChanged(0),
-                i: 0,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ValueListenableBuilder(
+          valueListenable: g.navMan.currentDestination,
+          builder: (context, value, child) {
+            return Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary.withAlpha(20),
+                  width: 0.5,
+                ),
+                borderRadius: BorderRadius.circular(20),
               ),
-              MiniBottomNavBarItem(
-                icon: Icons.psychology_outlined,
-                label: 'Focus',
-                onTap: () => g.navMan.onDestinationChanged(1),
-                i: 1,
+              child: MiniBottomNavBar(
+                children: [
+                  MiniBottomNavBarItem(
+                    icon: Icons.calendar_month,
+                    label: 'Tasks',
+                    onTap: () => g.navMan.onDestinationChanged(0),
+                    i: 0,
+                  ),
+                  MiniBottomNavBarItem(
+                    icon: Icons.psychology_outlined,
+                    label: 'Focus',
+                    onTap: () => g.navMan.onDestinationChanged(1),
+                    i: 1,
+                  ),
+                  MiniBottomNavBarItem(
+                    icon: Icons.search,
+                    label: 'Search',
+                    onTap: () => MiniRouter.to(context, const TaskSearchPage()),
+                    i: -2,
+                  ),
+                  MiniBottomNavBarItem(
+                    icon: Iconsax.category,
+                    label: 'Categories',
+                    onTap: () => g.navMan.onDestinationChanged(2),
+                    i: 2,
+                  ),
+                  MiniBottomNavBarItem(
+                    icon: Icons.assignment_outlined,
+                    label: 'Notes',
+                    onTap: () => MiniRouter.to(context, NotesPage()),
+                    i: -3,
+                  ),
+                ],
               ),
-              MiniBottomNavBarItem(
-                icon: Icons.search,
-                label: 'Search',
-                onTap: () => MiniRouter.to(context, const TaskSearchPage()),
-                i: -2,
-              ),
-              MiniBottomNavBarItem(
-                icon: Iconsax.category,
-                label: 'Categories',
-                onTap: () => g.navMan.onDestinationChanged(2),
-                i: 2,
-              ),
-              MiniBottomNavBarItem(
-                icon: Icons.assignment_outlined,
-                label: 'Notes',
-                onTap: () => MiniRouter.to(context, NotesPage()),
-                i: -3,
-              ),
-            ],
-          ),
-        );
-      },
+            );
+          },
+        ),
+        TimedBannerWidget(
+          adInitializer: () => g.adsController.initializeHomePageBannerAd(),
+          showFor: const Duration(seconds: 40),
+          hideFor: const Duration(seconds: 30),
+          childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.homePageBannerAd),
+        ),
+      ],
     );
   }
 }

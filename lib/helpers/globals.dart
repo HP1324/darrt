@@ -1,3 +1,4 @@
+import 'package:minimaltodo/app/ads/ads_controller.dart';
 import 'package:minimaltodo/app/state/managers/calendar_manager.dart' show CalendarManager;
 import 'package:minimaltodo/app/state/managers/navigation_manager.dart' show NavigationManager;
 import 'package:minimaltodo/app/state/managers/theme_manager.dart' show ThemeManager;
@@ -55,6 +56,8 @@ final quickVm = QuickReminderViewModel();
 final soundController = SoundController();
 
 final timerController = TimerController();
+
+final adsController = AdsController();
 
 final Uuid uuid = Uuid();
 
