@@ -40,6 +40,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   void initState() {
     super.initState();
     g.taskSc.initState(widget.edit, widget.edit ? widget.task : null, widget.category);
+    g.adsController.initializeFullPageAfterTaskPutAd();
   }
 
   @override
@@ -112,8 +113,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
         floatingActionButton: Transform.scale(
           scale: 0.9,
           child: FloatingActionButton(
-            onPressed: () {
+            onPressed: () async{
               _putTask(context);
+              if(TaskStateController.taskCount.isOdd) {
+                await g.adsController.fullPageAfterTaskPutAd.show();
+              }
             },
             child: Icon(Icons.done),
           ),
