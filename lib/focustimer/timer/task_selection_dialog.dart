@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/task/models/task.dart';
+import 'package:minimaltodo/task/ui/add_task_page.dart';
 
 import '../../helpers/globals.dart' as g show taskVm, timerController;
 
@@ -107,35 +109,45 @@ class _TaskSelectionDialogState extends State<TaskSelectionDialog>
         color: scheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: TabBar(
-        controller: _tabController,
-        labelColor: scheme.onPrimary,
-        unselectedLabelColor: scheme.onSurfaceVariant,
-        labelStyle: textTheme.titleSmall?.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
-        unselectedLabelStyle: textTheme.titleSmall?.copyWith(
-          fontWeight: FontWeight.w500,
-        ),
-        indicator: BoxDecoration(
-          color: scheme.primary,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        indicatorSize: TabBarIndicatorSize.tab,
-        indicatorPadding: const EdgeInsets.all(4),
-        dividerColor: Colors.transparent,
-        tabs: const [
-          Tab(text: 'One-time'),
-          Tab(text: 'Repeating'),
+      child: Row(
+        children: [
+          Expanded(
+            child: TabBar(
+              controller: _tabController,
+              labelColor: scheme.onPrimary,
+              unselectedLabelColor: scheme.onSurfaceVariant,
+              labelStyle: textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+              unselectedLabelStyle: textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+              indicator: BoxDecoration(
+                color: scheme.primary,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicatorPadding: const EdgeInsets.all(4),
+              dividerColor: Colors.transparent,
+              tabs: const [
+                Tab(text: 'One-time'),
+                Tab(text: 'Repeating'),
+              ],
+            ),
+          ),
+          IconButton.filled(
+            onPressed: () {
+              MiniRouter.to(context, AddTaskPage(edit: false));
+            },
+            icon: Icon(Icons.add_rounded),
+            tooltip: 'Add new task',
+          ),
         ],
       ),
     );
   }
 
   Widget _buildContent(List<Task> allTasks, ColorScheme scheme, TextTheme textTheme) {
-    if (allTasks.isEmpty) {
-      return _buildEmptyState(scheme, textTheme);
-    }
 
     return Flexible(
       child: Padding(
@@ -151,7 +163,19 @@ class _TaskSelectionDialogState extends State<TaskSelectionDialog>
     );
   }
 
-  Widget _buildEmptyState(ColorScheme scheme, TextTheme textTheme) {
+  Widget _buildTaskTab(List<Task> tasks) {
+    return TaskSelectionTab(tasks: tasks);
+  }
+}
+
+class _EmptyStateIndicator extends StatelessWidget {
+  const _EmptyStateIndicator({required this.message});
+  final String message;
+  @override
+  Widget build(BuildContext context) {
+    final scheme = ColorScheme.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
     return Padding(
       padding: const EdgeInsets.all(48),
       child: Column(
@@ -178,20 +202,9 @@ class _TaskSelectionDialogState extends State<TaskSelectionDialog>
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Create some tasks to get started',
-            style: textTheme.bodyMedium?.copyWith(
-              color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
-            ),
-          ),
         ],
       ),
     );
-  }
-
-  Widget _buildTaskTab(List<Task> tasks) {
-    return TaskSelectionTab(tasks: tasks);
   }
 }
 
@@ -268,10 +281,10 @@ class _TaskSelectionItemState extends State<_TaskSelectionItem> {
       ),
       child: isSelected
           ? Icon(
-        Icons.check_rounded,
-        size: 16,
-        color: scheme.onPrimary,
-      )
+              Icons.check_rounded,
+              size: 16,
+              color: scheme.onPrimary,
+            )
           : null,
     );
   }
@@ -282,9 +295,7 @@ class _TaskSelectionItemState extends State<_TaskSelectionItem> {
         task.title,
         style: textTheme.bodyLarge?.copyWith(
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-          color: isSelected
-              ? scheme.onSurface
-              : scheme.onSurface.withValues(alpha: 0.8),
+          color: isSelected ? scheme.onSurface : scheme.onSurface.withValues(alpha: 0.8),
         ),
       ),
     );
@@ -299,18 +310,19 @@ class TaskSelectionTab extends StatefulWidget {
   State<TaskSelectionTab> createState() => _TaskSelectionTabState();
 }
 
-class _TaskSelectionTabState extends State<TaskSelectionTab> with AutomaticKeepAliveClientMixin{
+class _TaskSelectionTabState extends State<TaskSelectionTab> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    if(widget.tasks.isEmpty) return _EmptyStateIndicator(message: 'No tasks available');
     final scheme = ColorScheme.of(context);
     final textTheme = Theme.of(context).textTheme;
 
-    final uniqueDates = widget.tasks.map((task) => DateUtils.dateOnly(task.dueDate)).toSet().toList()
-      ..sort();
+    final uniqueDates =
+        widget.tasks.map((task) => DateUtils.dateOnly(task.dueDate)).toSet().toList()..sort();
 
     return ListView.builder(
       itemCount: uniqueDates.length,

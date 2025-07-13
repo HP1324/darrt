@@ -24,9 +24,63 @@ class _SoundPageState extends State<SoundPage> {
     );
   }
 
+  void _playNextSound() {
+    // Get current sound index
+    final currentSound = g.soundController.currentSound;
+    final allSounds = _getAllSounds();
+
+    if (allSounds.isEmpty) return;
+
+    int currentIndex = -1;
+    if (currentSound != null) {
+      currentIndex = allSounds.indexWhere((sound) => sound['path'] == currentSound);
+    }
+
+    // Get next sound (loop to beginning if at end)
+    int nextIndex = (currentIndex + 1) % allSounds.length;
+    g.soundController.playSound(allSounds[nextIndex]['path']);
+  }
+
+  void _playPreviousSound() {
+    // Get current sound index
+    final currentSound = g.soundController.currentSound;
+    final allSounds = _getAllSounds();
+
+    if (allSounds.isEmpty) return;
+
+    int currentIndex = -1;
+    if (currentSound != null) {
+      currentIndex = allSounds.indexWhere((sound) => sound['path'] == currentSound);
+    }
+
+    // Get previous sound (loop to end if at beginning)
+    int previousIndex = currentIndex <= 0 ? allSounds.length - 1 : currentIndex - 1;
+    g.soundController.playSound(allSounds[previousIndex]['path']);
+  }
+
+  List<Map<String, String>> _getAllSounds() {
+    // Built-in sounds
+    final builtInSounds = [
+      {'path': 'assets/sounds/brown_noise.mp3', 'name': 'Brown Noise'},
+      {'path': 'assets/sounds/clock_ticking.mp3', 'name': 'Clock Ticking'},
+      {'path': 'assets/sounds/fire.mp3', 'name': 'Crackling Fire'},
+      {'path': 'assets/sounds/forest_1.mp3', 'name': 'Forest Ambience'},
+      {'path': 'assets/sounds/forest_2.mp3', 'name': 'Deep Forest'},
+      {'path': 'assets/sounds/mountain_winds.mp3', 'name': 'Mountain Winds'},
+      {'path': 'assets/sounds/rain.mp3', 'name': 'Rain Sounds'},
+      {'path': 'assets/sounds/silent_room.mp3', 'name': 'Silent Room'},
+      {'path': 'assets/sounds/waterfall.mp3', 'name': 'Waterfall'},
+      {'path': 'assets/sounds/birds_near_river.mp3', 'name': 'Birds + River'},
+    ];
+
+    // Combine with custom sounds
+    return [...builtInSounds, ...g.soundController.customSounds];
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final scheme = ColorScheme.of(context);
+    final textTheme = TextTheme.of(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -34,78 +88,201 @@ class _SoundPageState extends State<SoundPage> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            theme.colorScheme.primary.withAlpha(5),
-            theme.colorScheme.surface,
+            scheme.primary.withAlpha(5),
+            scheme.surface,
           ],
         ),
       ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            StreamBuilder<PlayerState>(
-              stream: g.soundController.audioPlayer.onPlayerStateChanged,
-              builder: (context, snapshot) {
-                final isPlaying = snapshot.data == PlayerState.playing;
-                return Icon(
-                  isPlaying ? Icons.music_note : Icons.music_off,
-                  size: 80,
-                  color: theme.colorScheme.primary,
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Current Sound:',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(200),
+      child: Column(
+        children: [
+          // Player Controller Bar - Sticks to top
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: scheme.outline.withAlpha(50),
+                  width: 0.5,
+                ),
               ),
             ),
-            const SizedBox(height: 12),
-            Container(
-              width: 300,
-              height: 50,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Center(
-                child: ListenableBuilder(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Previous Button
+                IconButton(
+                  onPressed: _playPreviousSound,
+                  icon: const Icon(Icons.skip_previous),
+                  iconSize: 20,
+                  color: scheme.primary,
+                  style: IconButton.styleFrom(
+                    backgroundColor: scheme.primary.withAlpha(20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+
+                // Play/Pause Button
+                ListenableBuilder(
                   listenable: g.soundController,
                   builder: (context, child) {
-                    final current = g.soundController.currentSound;
-                    return Text(
-                      current != null
-                          ? g.soundController.getDisplayName(current)
-                          : 'No Sound',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.primary,
+                    final isPlaying = g.soundController.isPlaying;
+                    final isPaused = g.soundController.isPaused;
+
+                    return IconButton(
+                      onPressed: () {
+                        if (isPlaying) {
+                          g.soundController.pauseAudio();
+                        } else if (isPaused) {
+                          g.soundController.resumeAudio();
+                        } else {
+                          // If stopped, play the current sound or first available
+                          final currentSound = g.soundController.currentSound;
+                          if (currentSound != null) {
+                            g.soundController.playSound(currentSound);
+                          } else {
+                            final allSounds = _getAllSounds();
+                            if (allSounds.isNotEmpty) {
+                              g.soundController.playSound(allSounds[0]['path']);
+                            }
+                          }
+                        }
+                      },
+                      icon: Icon(
+                        isPlaying
+                            ? Icons.pause
+                            : Icons.play_arrow,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      iconSize: 25,
+                      color: scheme.onPrimary,
+                      style: IconButton.styleFrom(
+                        backgroundColor: scheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     );
                   },
                 ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: _showSoundPicker,
-              icon: const Icon(Icons.library_music),
-              label: const Text('Choose Sound'),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
+
+                // Stop Button
+                ListenableBuilder(
+                  listenable: g.soundController,
+                  builder: (context, child) {
+                    final isPlaying = g.soundController.isPlaying;
+                    final isPaused = g.soundController.isPaused;
+
+                    return IconButton(
+                      onPressed: (isPlaying || isPaused)
+                          ? () => g.soundController.stopAudio()
+                          : null,
+                      icon: const Icon(Icons.stop),
+                      iconSize: 25,
+                      color: (isPlaying || isPaused)
+                          ? scheme.error
+                          : scheme.outline,
+                      style: IconButton.styleFrom(
+                        backgroundColor: (isPlaying || isPaused)
+                            ? scheme.error.withAlpha(20)
+                            : scheme.outline.withAlpha(10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    );
+                  },
                 ),
+
+                // Next Button
+                IconButton(
+                  onPressed: _playNextSound,
+                  icon: const Icon(Icons.skip_next),
+                  iconSize: 20,
+                  color: scheme.primary,
+                  style: IconButton.styleFrom(
+                    backgroundColor: scheme.primary.withAlpha(20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Rest of the content - Centered
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  StreamBuilder<PlayerState>(
+                    stream: g.soundController.audioPlayer.onPlayerStateChanged,
+                    builder: (context, snapshot) {
+                      final isPlaying = snapshot.data == PlayerState.playing;
+                      return Icon(
+                        isPlaying ? Icons.music_note : Icons.music_off,
+                        size: 80,
+                        color: scheme.primary,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Current Sound:',
+                    style: textTheme.titleLarge?.copyWith(
+                      color: scheme.onSurface.withAlpha(200),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 300,
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: scheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Center(
+                      child: ListenableBuilder(
+                        listenable: g.soundController,
+                        builder: (context, child) {
+                          final current = g.soundController.currentSound;
+                          return Text(
+                            current != null
+                                ? g.soundController.getDisplayName(current)
+                                : 'No Sound',
+                            style: textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: scheme.primary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  FilledButton.icon(
+                    onPressed: _showSoundPicker,
+                    icon: const Icon(Icons.library_music),
+                    label: const Text('Choose Sound'),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-
 }
