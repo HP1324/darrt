@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:minimaltodo/app/ads/my_banner_ad_widget.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
@@ -32,6 +33,7 @@ class _NotesPageState extends State<NotesPage> {
     super.initState();
     _filteredNotes = g.noteVm.notes;
     _searchController.addListener(_onSearchChanged);
+    g.adsController.initializeNotesPageBannerAd();
   }
 
   @override
@@ -493,6 +495,8 @@ class _NotesPageState extends State<NotesPage> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+
+      bottomNavigationBar: MyBannerAdWidget(bannerAd: g.adsController.notesPageBannerAd)
     );
   }
 }
