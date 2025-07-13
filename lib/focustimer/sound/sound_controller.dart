@@ -18,7 +18,7 @@ class SoundController extends ChangeNotifier {
   // Getters
   String? get currentSound => _currentSound;
   List<Map<String, String>> get customSounds => _customSounds;
-  AudioPlayer get audioPlayer => _audioPlayer!;
+  AudioPlayer get audioPlayer => _audioPlayer;
   ValueNotifier<String?> get selectedSoundInDialog => _selectedSoundInDialog;
   bool get isPlaying => _isPlaying;
   bool get isStopped => _isStopped;
