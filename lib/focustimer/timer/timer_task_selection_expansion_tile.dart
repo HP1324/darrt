@@ -19,6 +19,7 @@ class _TimerTaskSelectionExpansionTileState extends State<TimerTaskSelectionExpa
       builder: (context, child) {
         final tasks = g.timerController.selectedTasks;
         return ExpansionTile(
+          shape: RoundedRectangleBorder(),
           maintainState: true,
           title: Text('Tasks in progress'),
           children: [
