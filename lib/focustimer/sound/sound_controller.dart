@@ -18,7 +18,7 @@ class SoundController extends ChangeNotifier {
   // Getters
   String? get currentSound => _currentSound;
   List<Map<String, String>> get customSounds => _customSounds;
-  AudioPlayer get audioPlayer => _audioPlayer!;
+  AudioPlayer get audioPlayer => _audioPlayer;
   ValueNotifier<String?> get selectedSoundInDialog => _selectedSoundInDialog;
   bool get isPlaying => _isPlaying;
   bool get isStopped => _isStopped;
@@ -28,6 +28,11 @@ class SoundController extends ChangeNotifier {
   // Initialize the service
   void initialize() async {
     _audioPlayer.setReleaseMode(ReleaseMode.loop);
+
+    // Setting audio config like this is necessary to play simultaneous audio files at the same time,
+    // before setting this AudioContextConfig, one audioplayer instance would stop another audioplayer instance
+    final audioContext = AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers).build();
+    await AudioPlayer.global.setAudioContext(audioContext);
 
     // Listen to player state changes to keep UI in sync
     _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
@@ -56,13 +61,13 @@ class SoundController extends ChangeNotifier {
   }
 
   // Save custom sounds to SharedPreferences
-  void _saveCustomSounds()  {
+  void _saveCustomSounds() {
     final soundsJson = jsonEncode(_customSounds);
     MiniBox().write('custom_sounds', soundsJson);
   }
 
   // Add custom sound to the list
-  void addCustomSound(String path, String name)  {
+  void addCustomSound(String path, String name) {
     // Check if sound already exists
     bool exists = _customSounds.any((sound) => sound['path'] == path);
     if (!exists) {
@@ -105,10 +110,13 @@ class SoundController extends ChangeNotifier {
   }
 
   Future<void> playSoundOnly(String assetPath) async {
+    AudioPlayer player = AudioPlayer();
+    await player.setReleaseMode(ReleaseMode.stop);
     assert(assetPath.startsWith('assets/'), 'Only asset paths are supported');
     final trimmed = assetPath.replaceFirst('assets/', '');
-    await _audioPlayer.play(AssetSource(trimmed));
+    await player.play(AssetSource(trimmed),mode: PlayerMode.lowLatency);
   }
+
   // Toggle sound - New method for better UX
   Future<void> toggleSound(String? soundPath) async {
     if (_currentSound == soundPath && _isPlaying) {
@@ -180,7 +188,7 @@ class SoundController extends ChangeNotifier {
 
     // Check custom sounds
     final customSound = _customSounds.firstWhere(
-          (sound) => sound['path'] == soundPath,
+      (sound) => sound['path'] == soundPath,
       orElse: () => {},
     );
 
