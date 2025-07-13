@@ -95,9 +95,7 @@ class TaskViewModel extends ViewModel<Task> {
 
   void toggleStatus(Task task, bool value, DateTime d) async {
     if (value) {
-      g.soundController.audioPlayer.setReleaseMode(ReleaseMode.stop);
       g.soundController.playSoundOnly('assets/sounds/bell_sound.mp3');
-      g.soundController.audioPlayer.setReleaseMode(ReleaseMode.release);
     }
     if (task.isRepeating) {
       debugPrint("Task is repeating");
