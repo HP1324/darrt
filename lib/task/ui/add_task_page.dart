@@ -13,12 +13,10 @@ import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
 import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/note/ui/add_note_page.dart';
 import 'package:minimaltodo/task/state/task_state_controller.dart';
 import 'package:minimaltodo/task/models/reminder.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/task_note_bottom_sheet.dart';
-import 'package:minimaltodo/task/ui/task_note_item.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:toastification/toastification.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
@@ -52,52 +50,61 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   Future<void> _showFullPageAd() async {
     final int popCount = MiniBox().read('add_task_pop_count') ?? 1;
-    if (popCount.isEven) {
+      MiniLogger.d('add task pop count: $popCount');
+    if (popCount % 4 == 0) {
+      //print popcount and if condition result
       await g.adsController.fullPageAdOnAddTaskPagePop.show();
     }
     MiniBox().write('add_task_pop_count', popCount + 1);
   }
+  bool _isHandlingPop = false;
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (!didPop) {
-          final navigator = Navigator.of(context);
-          // Show confirmation dialog for user-initiated back attempts
-          final shouldPop = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('Quit without saving?'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Are you sure you want to quit without saving?'),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: Text('Yes'),
-                ),
-                FilledButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: Text('No'),
-                ),
+
+        onPopInvokedWithResult: (didPop, result) async {
+      if (_isHandlingPop) return;
+
+      if (!didPop) {
+        final navigator = Navigator.of(context);
+        final shouldPop = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Quit without saving?'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Are you sure you want to quit without saving?'),
               ],
             ),
-          );
+            actions: [
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text('Yes'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('No'),
+              ),
+            ],
+          ),
+        );
 
-          // If user confirmed, actually pop the page
-          if (shouldPop == true) {
-            navigator.pop();
-            await _showFullPageAd();
-          }
+        if (shouldPop == true) {
+          _isHandlingPop = true;
+          navigator.pop();
+          await _showFullPageAd();
+          _isHandlingPop = false;
         }
-
-        await _showFullPageAd();
-      },
+      } else {
+        // Only show ad if we haven't already handled this pop
+        if (!_isHandlingPop) {
+          await _showFullPageAd();
+        }
+      }
+    },
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.edit ? widget.task!.title.replaceAll('\n', ' ') : 'Add New Task'),
