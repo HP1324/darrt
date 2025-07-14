@@ -34,17 +34,14 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                 showModalBottomSheet(
                   context: context,
                   builder: (context) {
-                    return Container(
-                      decoration: BoxDecoration(),
-                      child: CalendarDatePicker(
-                        initialDate: DateTime.now(),
-                        firstDate: getFirstDate(),
-                        lastDate: getMaxDate(),
-                        onDateChanged: (selectedDate) {
-                          final date = DateUtils.dateOnly(selectedDate);
-                          g.calMan.scrollToDate(date);
-                        },
-                      ),
+                    return CalendarDatePicker(
+                      initialDate: DateTime.now(),
+                      firstDate: getFirstDate(),
+                      lastDate: getMaxDate(),
+                      onDateChanged: (selectedDate) {
+                        final date = DateUtils.dateOnly(selectedDate);
+                        g.calMan.scrollToDate(date);
+                      },
                     );
                   },
                 );
@@ -100,7 +97,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                       );
                     },
                   ),
-                  Icon(Icons.arrow_drop_down_rounded),
+                  Expanded(child: Icon(Icons.arrow_drop_down_rounded)),
                 ],
               ),
             ),
@@ -114,9 +111,9 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                       MiniLogger.dp(user?.email ?? 'No user is currently logged in');
                     }
                     final path = ObjectBox().store!.directoryPath;
-                    debugPrint('ObjectBox path: $path');
+                    MiniLogger.dp('ObjectBox path: $path');
                     final docsDir = await getApplicationDocumentsDirectory();
-                    debugPrint('App docs dir: ${docsDir.path}/objectbox');
+                    MiniLogger.dp('App docs dir: ${docsDir.path}/objectbox');
 
                     await createNotification();
                   },
@@ -245,38 +242,21 @@ class TimelineFilterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = ColorScheme.of(context);
     return ListenableBuilder(
       listenable: g.taskVm,
       builder: (context, child) {
         return PopupMenuButton<bool>(
           icon: Icon(
             g.taskVm.isTimelineView ? Icons.timeline : Icons.view_agenda,
-            color: Theme.of(context).colorScheme.onSurface,
+            color: scheme.onSurface,
           ),
           tooltip: 'View Mode',
           onSelected: (value) {
             g.taskVm.setViewMode(value);
           },
           itemBuilder: (context) => [
-            PopupMenuItem<bool>(
-              value: false,
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.view_agenda,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                  const SizedBox(width: 12),
-                  const Text('List View'),
-                  const Spacer(),
-                  if (!g.taskVm.isTimelineView)
-                    Icon(
-                      Icons.check,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                ],
-              ),
-            ),
+
             PopupMenuItem<bool>(
               value: true,
               child: Row(
@@ -292,6 +272,25 @@ class TimelineFilterButton extends StatelessWidget {
                     Icon(
                       Icons.check,
                       color: Theme.of(context).colorScheme.primary,
+                    ),
+                ],
+              ),
+            ),
+            PopupMenuItem<bool>(
+              value: false,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.view_agenda,
+                    color: scheme.onSurface,
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('List View'),
+                  const Spacer(),
+                  if (!g.taskVm.isTimelineView)
+                    Icon(
+                      Icons.check,
+                      color: scheme.primary,
                     ),
                 ],
               ),

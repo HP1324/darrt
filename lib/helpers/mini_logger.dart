@@ -24,10 +24,10 @@ class MiniLogger {
     _logger.w(message);
   }
 
-  /// Just [debugPrint] guarded with [kDebugMode]
+  /// Just [MiniLogger.dp] guarded with [kDebugMode]
   static void dp(String message){
     if(kDebugMode){
-      debugPrint(message);
+      MiniLogger.dp(message);
     }
   }
 }

@@ -375,11 +375,13 @@ class TitleTextField extends StatelessWidget {
           if (initResult) {
             g.taskSttController.startListening();
           } else {
-            showToast(
-              context,
-              type: ToastificationType.error,
-              description: 'Microphone permission denied',
-            );
+            if(context.mounted) {
+              showToast(
+                context,
+                type: ToastificationType.error,
+                description: 'Microphone permission denied',
+              );
+            }
           }
         } else {
           MiniLogger.d('Some permissions denied on first request');

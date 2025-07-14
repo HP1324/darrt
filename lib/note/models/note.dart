@@ -155,7 +155,7 @@ class Note {
         );
       }).toList();
     } catch (e) {
-      print('Error parsing notes JSON: $e');
+      MiniLogger.dp('Error parsing notes JSON: $e');
       return [];
     }
   }

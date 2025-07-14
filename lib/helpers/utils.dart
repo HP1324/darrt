@@ -59,12 +59,11 @@ String formatDateAndTime(DateTime dateTime, String format) {
   return DateFormat(format).add_jm().format(dateTime);
 }
 
-DateTime getFirstDate() =>mInitialDate;
+DateTime getFirstDate() => mInitialDate;
 
 DateTime getMaxDate() {
   return DateTime.now().add(Duration(days: maxExtentDateDays));
 }
-
 
 Future<List<pw.Font>> loadAllFonts() async {
   final fontPaths = [
@@ -385,4 +384,14 @@ void showSettingsDialog(BuildContext context) {
       );
     },
   );
+}
+
+Color getScaffoldBackgroundColor(BuildContext context) {
+  final theme = Theme.of(context);
+  final isDark = theme.brightness == Brightness.dark;
+  final scheme = theme.colorScheme;
+  Color backgroundColorHSV = isDark
+      ? HSVColor.fromColor(Color.lerp(scheme.surface, scheme.primary, 0.05)!).toColor()
+      : HSVColor.fromColor(Color.lerp(Colors.white, scheme.primary, 0.03)!).toColor();
+  return backgroundColorHSV;
 }
