@@ -22,6 +22,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
+  @override
+  void initState(){
+    super.initState();
+    // g.adsController.initializeHomePageBannerAd();
+  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(

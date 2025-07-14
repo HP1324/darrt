@@ -56,8 +56,10 @@ class AdsController extends ChangeNotifier {
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           isHomePageBannerAdLoaded = true;
+          notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
+          debugPrint("Home page banner ad failed to load: ${error.message}, response info: ${error.responseInfo?.adapterResponses?.first.adError?.message} ");
           isHomePageBannerAdLoaded = false;
           ad.dispose();
         },
@@ -74,8 +76,10 @@ class AdsController extends ChangeNotifier {
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           isNotesPageBannerAdLoaded = true;
+          notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
+          debugPrint('Notes page banner app failed to load: ${error.message}');
           isNotesPageBannerAdLoaded = false;
           ad.dispose();
         },
@@ -92,8 +96,10 @@ class AdsController extends ChangeNotifier {
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           isAddNotePageBannerAdLoaded = true;
+          notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
+          debugPrint('Add note page banner app failed to load: ${error.message}');
           isAddNotePageBannerAdLoaded = false;
           ad.dispose();
         },
@@ -102,6 +108,25 @@ class AdsController extends ChangeNotifier {
     _addNotePageBannerAd.load();
   }
 
+  void initializeThemePageBannerAd() {
+    _themePageBannerAd = BannerAd(
+      adUnitId: _themePageBannerUnitId,
+      size: AdSize.banner,
+      request: AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          isThemePageBannerAdLoaded = true;
+          notifyListeners();
+        },
+        onAdFailedToLoad: (ad, error) {
+          debugPrint('Theme page banner app failed to load: ${error.message}');
+          isThemePageBannerAdLoaded = false;
+          ad.dispose();
+        },
+      ),
+    );
+    _themePageBannerAd.load();
+  }
   void initializeFullPageAdOnAddTaskPagePop() async {
     await InterstitialAd.load(
       adUnitId: _fullPageOnAddTaskPagePopUnitId,
@@ -128,7 +153,6 @@ class AdsController extends ChangeNotifier {
           isFullPageAdOnAddCategoryPopLoaded = true;
         },
         onAdFailedToLoad: (adError) {
-          debugPrint('${adError.message}');
           isFullPageAdOnAddCategoryPopLoaded = false;
         },
       ),
@@ -183,21 +207,4 @@ class AdsController extends ChangeNotifier {
     );
   }
 
-  void initializeThemePageBannerAd() {
-    _themePageBannerAd = BannerAd(
-      adUnitId: _themePageBannerUnitId,
-      size: AdSize.banner,
-      request: AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          isThemePageBannerAdLoaded = true;
-        },
-        onAdFailedToLoad: (ad, error) {
-          isThemePageBannerAdLoaded = false;
-          ad.dispose();
-        },
-      ),
-    );
-    _themePageBannerAd.load();
-  }
 }
