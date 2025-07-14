@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 
 import '../../helpers/globals.dart' as g show soundController, adsController;
 
@@ -61,7 +62,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
         await g.soundController.playSound(customSoundPath);
       }
     } catch (e) {
-      print('Error picking custom sound: $e');
+      MiniLogger.dp('Error picking custom sound: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

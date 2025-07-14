@@ -8,6 +8,7 @@ import 'package:minimaltodo/app/ui/mini_bottom_nav_bar.dart';
 import 'package:minimaltodo/category/ui/categories_page.dart';
 import 'package:minimaltodo/focustimer/focus_timer_page.dart';
 import 'package:minimaltodo/helpers/mini_router.dart';
+import 'package:minimaltodo/helpers/utils.dart';
 import 'package:minimaltodo/note/ui/notes_page.dart';
 import 'package:minimaltodo/task/ui/add_task_page.dart';
 import 'package:minimaltodo/task/ui/task_search_page.dart';
@@ -30,9 +31,11 @@ class _HomeState extends State<Home> {
   }
   @override
   Widget build(BuildContext context) {
+
     return SafeArea(
       top: false,
       child: Scaffold(
+        backgroundColor: getScaffoldBackgroundColor(context),
         appBar: const MiniAppBar(),
         drawer: const AppDrawer(),
         body: ValueListenableBuilder(

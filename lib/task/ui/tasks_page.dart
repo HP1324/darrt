@@ -34,6 +34,7 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
       listenable: Listenable.merge([g.taskVm, g.calMan]),
       builder: (context, child) {
         final tasks = g.taskVm.tasks.where((t) => t.isActiveOn(g.calMan.selectedDate)).toList();
+        final textTheme = TextTheme.of(context);
         return NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverToBoxAdapter(
@@ -49,12 +50,8 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
                   controller: _tabController,
                   splashBorderRadius: BorderRadius.circular(10),
                   dividerHeight: 0,
-                  labelStyle: Theme.of(
-                    context,
-                  ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
-                  unselectedLabelStyle: Theme.of(
-                    context,
-                  ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w500),
+                  labelStyle: textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
+                  unselectedLabelStyle: textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w500),
                   tabs: const [
                     Tab(text: 'All'),
                     Tab(text: 'One-time'),
@@ -226,7 +223,7 @@ class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin 
           return _getEmptyIndicator();
         }
 
-        final sortedTasks =  g.taskVm.getTasksSortedByTime(filteredTasks);
+        final sortedTasks = g.taskVm.getTasksSortedByTime(filteredTasks);
 
         return CustomScrollView(
           slivers: [
@@ -358,7 +355,7 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Material(color: Theme.of(context).scaffoldBackgroundColor, child: _tabBar);
+    return Material(color: getScaffoldBackgroundColor(context), child: _tabBar);
   }
 
   @override
