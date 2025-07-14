@@ -9,6 +9,7 @@ import 'package:minimaltodo/app/services/google_sign_in_service.dart';
 import 'package:minimaltodo/helpers/consts.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/app/services/object_box.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:workmanager/workmanager.dart';
@@ -20,7 +21,7 @@ void callBackDispatcher() {
       case mAutoBackup:
         try {
           final state = WidgetsBinding.instance.lifecycleState;
-          debugPrint("App state right now: $state");
+          MiniLogger.dp("App state right now: $state");
 
           final docsDir = await getApplicationDocumentsDirectory();
           // final objectBoxDirPath = path.join(docsDir.path, 'objectbox');
@@ -46,14 +47,14 @@ void callBackDispatcher() {
           MiniBox().write(mLastBackupDate, DateTime.now());
           ObjectBox().close();
         } on InternetOffError catch (e) {
-          debugPrint("internet off");
+          MiniLogger.dp("internet off");
           await createBackupFailureNotification(e.userMessage!);
         } on GoogleClientNotAuthenticatedError catch (e) {
-          debugPrint("client not authenticated");
+          MiniLogger.dp("client not authenticated");
           await createBackupFailureNotification(e.userMessage!);
         } catch (e, t) {
-          debugPrint('${e.toString()}, type: ${e.runtimeType}');
-          debugPrint(t.toString());
+          MiniLogger.dp('${e.toString()}, type: ${e.runtimeType}');
+          MiniLogger.dp(t.toString());
           await createBackupFailureNotification('Something went wrong');
         }
 

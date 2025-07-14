@@ -62,7 +62,7 @@ class _AddNotePageState extends State<AddNotePage> {
   Future<void> showFullPageAd() async {
     final popCount = MiniBox().read('add_note_pop_count') ?? 1;
     if (popCount % 4 == 0) {
-      debugPrint("pop count $popCount");
+      MiniLogger.dp("pop count $popCount");
       await g.adsController.fullPageAdOnAddNotePagePop.show();
     }
     MiniBox().write('add_note_pop_count', popCount + 1);
@@ -170,7 +170,7 @@ class _AddNotePageState extends State<AddNotePage> {
     //   );
     // }
     if (widget.isTaskNote != null && widget.task != null) {
-      debugPrint('we are here');
+      MiniLogger.dp('we are here');
       if (!g.noteSc.controller.document.isEmpty()) {
         final note = g.noteSc.buildModel(
           edit: widget.edit,

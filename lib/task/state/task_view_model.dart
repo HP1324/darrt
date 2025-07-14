@@ -98,7 +98,7 @@ class TaskViewModel extends ViewModel<Task> {
       g.soundController.playSoundOnly('assets/sounds/bell_sound.mp3');
     }
     if (task.isRepeating) {
-      debugPrint("Task is repeating");
+      MiniLogger.dp("Task is repeating");
       final date = DateUtils.dateOnly(d).millisecondsSinceEpoch;
       if (value) {
         final completion = TaskCompletion(date: DateUtils.dateOnly(d), isDone: value);

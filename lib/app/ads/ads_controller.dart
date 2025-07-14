@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 
 class AdsController extends ChangeNotifier {
-  final String _homePageBannerUnitId = "ca-app-pub-4229818111096005/5755031111";
-  final String _fullPageOnAddTaskPagePopUnitId = "ca-app-pub-4229818111096005/2381642757";
-  final String _notesPageBannerUnitId = "ca-app-pub-4229818111096005/8650138833";
-  final String _addNotePageBannerUnitId = "ca-app-pub-4229818111096005/1130773287";
-  final String _fullPageOnAddCategoryPagePopAdUnitId = "ca-app-pub-4229818111096005/5638114063";
-  final String _fullPageOnAddFolderPagePopAdUnitId = "ca-app-pub-4229818111096005/4710893828";
-  final String _fullPageOnAddNotePagePopUnitId = "ca-app-pub-4229818111096005/7943593642";
-  final String _fullPageOnCustomSoundPickUnitId = "ca-app-pub-4229818111096005/5233669822";
-  final String _themePageBannerUnitId = "ca-app-pub-4229818111096005/6880394618";
+  // final String _homePageBannerUnitId = "ca-app-pub-4229818111096005/5755031111";
+  // final String _fullPageOnAddTaskPagePopUnitId = "ca-app-pub-4229818111096005/2381642757";
+  // final String _notesPageBannerUnitId = "ca-app-pub-4229818111096005/8650138833";
+  // final String _addNotePageBannerUnitId = "ca-app-pub-4229818111096005/1130773287";
+  // final String _fullPageOnAddCategoryPagePopAdUnitId = "ca-app-pub-4229818111096005/5638114063";
+  // final String _fullPageOnAddFolderPagePopAdUnitId = "ca-app-pub-4229818111096005/4710893828";
+  // final String _fullPageOnAddNotePagePopUnitId = "ca-app-pub-4229818111096005/7943593642";
+  // final String _fullPageOnCustomSoundPickUnitId = "ca-app-pub-4229818111096005/5233669822";
+  // final String _themePageBannerUnitId = "ca-app-pub-4229818111096005/6880394618";
+
+  final String _homePageBannerUnitId = "ca-app-pub-3940256099942544/6300978111";
+  final String _fullPageOnAddTaskPagePopUnitId = "ca-app-pub-3940256099942544/1033173712";
+  final String _notesPageBannerUnitId = "ca-app-pub-3940256099942544/6300978111";
+  final String _addNotePageBannerUnitId = "ca-app-pub-3940256099942544/6300978111";
+  final String _fullPageOnAddCategoryPagePopAdUnitId = "ca-app-pub-3940256099942544/1033173712";
+  final String _fullPageOnAddFolderPagePopAdUnitId = "ca-app-pub-3940256099942544/1033173712";
+  final String _fullPageOnAddNotePagePopUnitId = "ca-app-pub-3940256099942544/1033173712";
+  final String _fullPageOnCustomSoundPickUnitId = "ca-app-pub-3940256099942544/1033173712";
+  final String _themePageBannerUnitId = "ca-app-pub-3940256099942544/6300978111";
 
   late BannerAd _homePageBannerAd;
   BannerAd get homePageBannerAd => _homePageBannerAd;
@@ -59,7 +70,7 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          debugPrint("Home page banner ad failed to load: ${error.message}, ${error.code}, domain: ${error.domain}, message: ${error.message}");
+          MiniLogger.dp("Home page banner ad failed to load: ${error.message}, ${error.code}, domain: ${error.domain}, message: ${error.message}");
           isHomePageBannerAdLoaded = false;
           notifyListeners();
           ad.dispose();
@@ -80,7 +91,7 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          debugPrint('Notes page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}');
+          MiniLogger.dp('Notes page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}');
           isNotesPageBannerAdLoaded = false;
           ad.dispose();
         },
@@ -100,7 +111,7 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          debugPrint('Add note page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}');
+          MiniLogger.dp('Add note page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}');
           isAddNotePageBannerAdLoaded = false;
           ad.dispose();
         },
@@ -120,7 +131,7 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          debugPrint('Theme page banner app failed to load: ${error.code}, domain: ${error.domain}, message: ${error.message}');
+          MiniLogger.dp('Theme page banner app failed to load: ${error.code}, domain: ${error.domain}, message: ${error.message}');
           isThemePageBannerAdLoaded = false;
           ad.dispose();
         },
