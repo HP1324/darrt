@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 
 import '../../helpers/globals.dart' as g;
 import '../../task/models/task.dart' show Task;
@@ -109,7 +110,7 @@ class TimerController extends ChangeNotifier {
       }
       _loadSelectedTasksFromStorage();
     } catch (e) {
-      debugPrint('Error initializing timer from storage: $e');
+      MiniLogger.dp('Error initializing timer from storage: $e');
       _resetToDefaults();
     }
     notifyListeners();
@@ -136,7 +137,7 @@ class TimerController extends ChangeNotifier {
       MiniBox().remove(_pausedTimeKey);
       MiniBox().remove(_selectedTasksKey); // Add this line
     } catch (e) {
-      debugPrint('Error clearing timer storage: $e');
+      MiniLogger.dp('Error clearing timer storage: $e');
     }
   }
 
@@ -154,7 +155,7 @@ class TimerController extends ChangeNotifier {
         MiniBox().write(_pausedTimeKey, _remainingSeconds.toString());
       }
     } catch (e) {
-      debugPrint('Error saving timer to storage: $e');
+      MiniLogger.dp('Error saving timer to storage: $e');
     }
   }
 
@@ -340,7 +341,7 @@ class TimerController extends ChangeNotifier {
       final jsonString = jsonEncode(taskJsonList);
       MiniBox().write(_selectedTasksKey, jsonString);
     } catch (e) {
-      debugPrint('Error saving selected tasks to storage: $e');
+      MiniLogger.dp('Error saving selected tasks to storage: $e');
     }
   }
 
@@ -355,12 +356,12 @@ class TimerController extends ChangeNotifier {
             final task = Task.fromJson(taskJson);
             _selectedTasks.add(task);
           } catch (e) {
-            debugPrint('Error parsing task from storage: $e');
+            MiniLogger.dp('Error parsing task from storage: $e');
           }
         }
       }
     } catch (e) {
-      debugPrint('Error loading selected tasks from storage: $e');
+      MiniLogger.dp('Error loading selected tasks from storage: $e');
       _selectedTasks.clear();
     }
   }

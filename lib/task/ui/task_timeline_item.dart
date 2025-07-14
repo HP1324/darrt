@@ -123,14 +123,14 @@ class TimelineTaskContainer extends StatelessWidget {
                 onLongPress: onLongPress,
                 child: Container(
                   // margin: const EdgeInsets.only(left: 12, top: 4),
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? scheme.outline.withValues(alpha: 0.7)
                         : scheme.surface.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: scheme.outline.withValues(alpha: 0.1),
+                      color: scheme.outline.withValues(alpha: 0.25),
                       width: 0.5,
                     ),
                   ),

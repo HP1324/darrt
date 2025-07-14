@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
+import 'package:minimaltodo/helpers/mini_logger.dart';
 
 class SoundController extends ChangeNotifier {
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -103,7 +104,7 @@ class SoundController extends ChangeNotifier {
       // Note: _isPlaying will be updated by the state listener
       notifyListeners();
     } catch (e) {
-      print('Error playing sound: $e');
+      MiniLogger.dp('Error playing sound: $e');
       _isPlaying = false;
       notifyListeners();
     }
@@ -146,7 +147,7 @@ class SoundController extends ChangeNotifier {
       _isPlaying = false;
       notifyListeners();
     } catch (e) {
-      print('Error stopping audio: $e');
+      MiniLogger.dp('Error stopping audio: $e');
     }
   }
 

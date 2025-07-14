@@ -362,54 +362,6 @@ class _NotesPageState extends State<NotesPage> {
     );
   }
 
-  Widget _buildGroupedNotes() {
-    if (_isSearching) {
-      return _buildSearchResults();
-    }
-
-    final groupedNotes = _groupNotesByDate(_filteredNotes);
-
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final entries = groupedNotes.entries.toList();
-          final entry = entries[index];
-          final dateLabel = entry.key;
-          final notesForDate = entry.value;
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Date header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: Text(
-                  dateLabel,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-              ),
-              // Notes grid for this date
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: StaggeredGrid.count(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  children: notesForDate.map((note) {
-                    return NoteItem(note: note);
-                  }).toList(),
-                ),
-              ),
-            ],
-          );
-        },
-        childCount: groupedNotes.length,
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
