@@ -31,9 +31,10 @@ class _AddFolderPageState extends State<AddFolderPage> {
     super.dispose();
     g.folderSc.clearState();
   }
+
   Future<void> showFullPageAd() async {
     final popCount = MiniBox().read('add_folder_pop_count') ?? 0;
-    if (popCount.isEven) {
+    if (popCount % 3 == 0) {
       await g.adsController.fullPageAdOnAddFolderPagePop.show();
     }
     MiniBox().write('add_folder_pop_count', popCount + 1);
@@ -73,7 +74,9 @@ class _AddFolderPageState extends State<AddFolderPage> {
                       decoration: InputDecoration(
                         hintText: 'Enter Folder Name Here',
                         filled: true,
-                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: folderColor)),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: folderColor),
+                        ),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: folderColor, width: 2),
                         ),
@@ -109,7 +112,8 @@ class _AddFolderPageState extends State<AddFolderPage> {
                                 return Icon(
                                   iconData ?? Icons.folder,
                                   size: 28,
-                                  color: IconColorStorage.colors[g.folderSc.color] ?? scheme.primary,
+                                  color:
+                                      IconColorStorage.colors[g.folderSc.color] ?? scheme.primary,
                                 );
                               },
                             ),

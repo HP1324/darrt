@@ -34,7 +34,6 @@ class _NotesPageState extends State<NotesPage> {
     super.initState();
     _filteredNotes = g.noteVm.notes;
     _searchController.addListener(_onSearchChanged);
-    g.adsController.initializeNotesPageBannerAd();
   }
 
   @override
@@ -434,6 +433,8 @@ class _NotesPageState extends State<NotesPage> {
 
               if (_isSearching) ...[
                 _buildSearchResults(),
+              ] else if (_filteredNotes.isEmpty) ...[
+                _NotesEmptyIndicator(),
               ] else ...[
                 // Build grouped sections
                 ...(_groupNotesByDate(_filteredNotes).entries.map((entry) {
@@ -491,7 +492,7 @@ class _NotesPageState extends State<NotesPage> {
           children: [
             Icon(Icons.add),
             const SizedBox(width: 8),
-            Text('Add Note'),
+            Text('Write note'),
           ],
         ),
       ),
@@ -499,7 +500,53 @@ class _NotesPageState extends State<NotesPage> {
 
       bottomNavigationBar: TimedBannerAdWidget(
         adInitializer: () => g.adsController.initializeNotesPageBannerAd(),
-        childBuilder: () =>MyBannerAdWidget(bannerAd: g.adsController.notesPageBannerAd),
+        childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.notesPageBannerAd),
+      ),
+    );
+  }
+}
+
+class _NotesEmptyIndicator extends StatelessWidget {
+  const _NotesEmptyIndicator({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverFillRemaining(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.note_add_outlined,
+                size: 60,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+              ),
+            ),
+            SizedBox(height: 24),
+            Text(
+              'No Notes Yet',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Start capturing your thoughts and ideas',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -61,51 +61,61 @@ class _AddNotePageState extends State<AddNotePage> {
 
   Future<void> showFullPageAd() async {
     final popCount = MiniBox().read('add_note_pop_count') ?? 1;
-    if (popCount % 3 == 0) {
+    if (popCount % 4 == 0) {
       debugPrint("pop count $popCount");
       await g.adsController.fullPageAdOnAddNotePagePop.show();
     }
     MiniBox().write('add_note_pop_count', popCount + 1);
   }
+  bool _isHandlingPop = false;
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (!didPop) {
-          final navigator = Navigator.of(context);
-          final shouldPop = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('Quit without saving?'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Are you sure you want to quit without saving?'),
-                ],
-              ),
-              actions: [
-                FilledButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: Text('Yes'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: Text('No'),
-                ),
+
+        onPopInvokedWithResult: (didPop, result) async {
+      if (_isHandlingPop) return;
+
+      if (!didPop) {
+        final navigator = Navigator.of(context);
+        final shouldPop = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Quit without saving?'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Are you sure you want to quit without saving?'),
               ],
             ),
-          );
+            actions: [
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text('Yes'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('No'),
+              ),
+            ],
+          ),
+        );
 
-          // If user confirmed, actually pop the page
-          if (shouldPop == true) {
-            navigator.pop();
-            await showFullPageAd();
-          }
+        // If user confirmed, actually pop the page
+        if (shouldPop == true) {
+          _isHandlingPop = true;
+          navigator.pop();
+          await showFullPageAd();
+          _isHandlingPop = false;
         }
-        await showFullPageAd();
-      },
+      } else {
+        // Only show ad if we haven't already handled this pop
+        if (!_isHandlingPop) {
+          await showFullPageAd();
+        }
+      }
+    },
       child: Scaffold(
         appBar: AppBar(
           leading: const BackButton(),
