@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:minimaltodo/helpers/globals.dart' as g;
 
 class MyBannerAdWidget extends StatefulWidget {
   final AdSize adSize;
@@ -21,7 +22,7 @@ class _MyBannerAdWidgetState extends State<MyBannerAdWidget> {
       child: SizedBox(
         width: widget.adSize.width.toDouble(),
         height: widget.adSize.height.toDouble(),
-        child: AdWidget(ad: widget.bannerAd),
+        child:  AdWidget(ad: widget.bannerAd),
       ),
     );
   }
