@@ -59,8 +59,9 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          debugPrint("Home page banner ad failed to load: ${error.message}, response info: ${error.responseInfo?.adapterResponses?.first.adError?.message} ");
+          debugPrint("Home page banner ad failed to load: ${error.message}, ${error.code}, domain: ${error.domain}, message: ${error.message}");
           isHomePageBannerAdLoaded = false;
+          notifyListeners();
           ad.dispose();
         },
       ),
@@ -79,7 +80,7 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          debugPrint('Notes page banner app failed to load: ${error.message}');
+          debugPrint('Notes page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}');
           isNotesPageBannerAdLoaded = false;
           ad.dispose();
         },
@@ -99,7 +100,7 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          debugPrint('Add note page banner app failed to load: ${error.message}');
+          debugPrint('Add note page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}');
           isAddNotePageBannerAdLoaded = false;
           ad.dispose();
         },
@@ -119,7 +120,7 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          debugPrint('Theme page banner app failed to load: ${error.message}');
+          debugPrint('Theme page banner app failed to load: ${error.code}, domain: ${error.domain}, message: ${error.message}');
           isThemePageBannerAdLoaded = false;
           ad.dispose();
         },
