@@ -40,7 +40,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   void initState() {
     super.initState();
     g.taskSc.initState(widget.edit, widget.edit ? widget.task : null, widget.category);
-    g.adsController.initializeFullPageAfterTaskPutAd();
+    g.adsController.initializeFullPageAdOnAddTaskPagePop();
   }
 
   @override
@@ -48,6 +48,14 @@ class _AddTaskPageState extends State<AddTaskPage> {
     g.taskSc.clearState();
     g.taskSttController.clearSttState();
     super.dispose();
+  }
+
+  Future<void> _showFullPageAd() async {
+    final int popCount = MiniBox().read('add_task_pop_count') ?? 1;
+    if (popCount.isEven) {
+      await g.adsController.fullPageAdOnAddTaskPagePop.show();
+    }
+    MiniBox().write('add_task_pop_count', popCount + 1);
   }
 
   @override
@@ -84,8 +92,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
           // If user confirmed, actually pop the page
           if (shouldPop == true) {
             navigator.pop();
+            await _showFullPageAd();
           }
         }
+
+        await _showFullPageAd();
       },
       child: Scaffold(
         appBar: AppBar(
@@ -113,11 +124,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
         floatingActionButton: Transform.scale(
           scale: 0.9,
           child: FloatingActionButton(
-            onPressed: () async{
+            onPressed: () async {
               _putTask(context);
-              if(TaskStateController.taskCount.isOdd) {
-                await g.adsController.fullPageAfterTaskPutAd.show();
-              }
             },
             child: Icon(Icons.done),
           ),
@@ -195,10 +203,7 @@ class TaskNoteSection extends StatelessWidget {
       },
     );
   }
-
 }
-
-
 
 class TimeSelector extends StatelessWidget {
   const TimeSelector({super.key});

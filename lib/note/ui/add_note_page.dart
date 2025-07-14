@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:minimaltodo/app/ads/my_banner_ad_widget.dart';
+import 'package:minimaltodo/app/ads/timed_banner_ad_widget.dart';
 import 'package:minimaltodo/helpers/icon_color_storage.dart';
 import 'package:minimaltodo/helpers/messages.dart' show Messages;
 import 'package:minimaltodo/app/services/mini_box.dart';
@@ -25,8 +27,14 @@ import '../../helpers/consts.dart';
 import '../../task/models/task.dart';
 
 class AddNotePage extends StatefulWidget {
-  const AddNotePage({super.key, required this.edit, this.note, this.folder, this.isTaskNote, this.task})
-    : assert(!edit || note != null);
+  const AddNotePage({
+    super.key,
+    required this.edit,
+    this.note,
+    this.folder,
+    this.isTaskNote,
+    this.task,
+  }) : assert(!edit || note != null);
   final bool edit;
   final Note? note;
   final Folder? folder;
@@ -41,6 +49,7 @@ class _AddNotePageState extends State<AddNotePage> {
   void initState() {
     super.initState();
     g.noteSc.initState(widget.edit, widget.edit ? widget.note : null, widget.folder);
+    g.adsController.initializeFullPageAdOnAddNotePagePop();
   }
 
   @override
@@ -48,6 +57,15 @@ class _AddNotePageState extends State<AddNotePage> {
     g.noteSc.clearState();
     g.noteSttController.clearSttState();
     super.dispose();
+  }
+
+  Future<void> showFullPageAd() async {
+    final popCount = MiniBox().read('add_note_pop_count') ?? 1;
+    if (popCount % 3 == 0) {
+      debugPrint("pop count $popCount");
+      await g.adsController.fullPageAdOnAddNotePagePop.show();
+    }
+    MiniBox().write('add_note_pop_count', popCount + 1);
   }
 
   @override
@@ -68,11 +86,11 @@ class _AddNotePageState extends State<AddNotePage> {
                 ],
               ),
               actions: [
-                TextButton(
+                FilledButton(
                   onPressed: () => Navigator.pop(context, true),
                   child: Text('Yes'),
                 ),
-                FilledButton(
+                TextButton(
                   onPressed: () => Navigator.pop(context, false),
                   child: Text('No'),
                 ),
@@ -83,20 +101,26 @@ class _AddNotePageState extends State<AddNotePage> {
           // If user confirmed, actually pop the page
           if (shouldPop == true) {
             navigator.pop();
+            await showFullPageAd();
           }
         }
+        await showFullPageAd();
       },
       child: Scaffold(
         appBar: AppBar(
           leading: const BackButton(),
           actions: [
             // const SaveNotePdfButton(),
-            if (widget.isTaskNote == null)
-            const FolderSelector(),
+            if (widget.isTaskNote == null) const FolderSelector(),
           ],
         ),
         body: Column(
           children: [
+            TimedBannerAdWidget(
+              adInitializer: () => g.adsController.initializeAddNotePageBannerAd(),
+              childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.addNotePageBannerAd),
+              showFirst: false,
+            ),
             NotesQuillToolbar(),
             NotesQuillEditor(),
           ],
@@ -146,8 +170,7 @@ class _AddNotePageState extends State<AddNotePage> {
         Navigator.pop(context);
       }
       return;
-    }
-    else if (widget.isTaskNote != null) {
+    } else if (widget.isTaskNote != null) {
       if (!g.noteSc.controller.document.isEmpty()) {
         final note = g.noteSc.buildModel(
           edit: widget.edit,
@@ -171,8 +194,9 @@ class _AddNotePageState extends State<AddNotePage> {
       }
       showToast(
         context,
-        type: message == Messages.mNoteEmpty ? ToastificationType.error : ToastificationType
-            .success,
+        type: message == Messages.mNoteEmpty
+            ? ToastificationType.error
+            : ToastificationType.success,
         description: message,
       );
     }

@@ -1,7 +1,8 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:minimaltodo/app/services/mini_box.dart';
 
-import '../../helpers/globals.dart' as g show soundController;
+import '../../helpers/globals.dart' as g show soundController, adsController;
 
 class SoundPickerDialog extends StatefulWidget {
   const SoundPickerDialog({super.key});
@@ -29,15 +30,25 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
   void initState() {
     super.initState();
     g.soundController.initializeDialog();
+    g.adsController.initializeFullPageAdOnCustomSoundPick();
   }
 
+  Future<void> showFullPageAd()async{
+    final pickCount = MiniBox().read('sound_pick_count') ?? 1;
+    if(pickCount % 3 == 0){
+      if(g.adsController.isFullPageOnCustomSoundPickAdLoaded){
+        g.adsController.fullPageOnCustomSoundPickAd.show();
+      }
+    }
+    MiniBox().write('sound_pick_count', pickCount + 1);
+  }
   Future<void> _pickCustomSound() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.audio,
         allowMultiple: false,
       );
-
+      await showFullPageAd();
       if (result != null && result.files.single.path != null) {
         String customSoundPath = result.files.single.path!;
         String customSoundName = result.files.single.name.split('.').first;
@@ -46,6 +57,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
         g.soundController.addCustomSound(customSoundPath, customSoundName);
 
         g.soundController.setSelectedSoundInDialog(customSoundPath);
+
         await g.soundController.playSound(customSoundPath);
       }
     } catch (e) {

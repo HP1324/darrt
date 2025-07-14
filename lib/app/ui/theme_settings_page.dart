@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:minimaltodo/app/ads/my_banner_ad_widget.dart';
+import 'package:minimaltodo/app/ads/timed_banner_ad_widget.dart';
 import 'package:minimaltodo/app/state/managers/theme_manager.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 
-class ThemeSettingsPage extends StatelessWidget {
+class ThemeSettingsPage extends StatefulWidget {
   const ThemeSettingsPage({super.key});
+
+  @override
+  State<ThemeSettingsPage> createState() => _ThemeSettingsPageState();
+}
+
+class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,65 +26,52 @@ class ThemeSettingsPage extends StatelessWidget {
         title: Text('Theme Colors'),
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildThemeSelector(context),
-            const SizedBox(height: 32),
-            Text(
+      body: Column(
+        spacing: 15,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _ThemeModeSelector(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
               'Select Your Theme Color',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(height: 20),
-            _buildColorGrid(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildColorGrid() {
-    return GridView.builder(
-      shrinkWrap: true,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 5,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 16,
-        childAspectRatio: 1,
-      ),
-      itemCount: ThemeColors.values.length,
-      itemBuilder: (context, index) {
-        final color = ThemeColors.values[index];
-        final isSelected = g.themeMan.selectedColor == color;
-
-        return _ColorOption(
-          color: color.color,
-          isSelected: isSelected,
-          onTap: () => g.themeMan.setThemeColor(color),
-        );
-      },
-    );
-  }
-
-  Widget _buildThemeSelector(BuildContext context) {
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.topLeft,
-          child: Text(
-            'Theme Mode',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
           ),
-        ),
-        const SizedBox(height: 12),
-        ListenableBuilder(
+          _ColorGrid(),
+          TimedBannerAdWidget(
+            childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.themePageBannerAd,adSize: AdSize.fullBanner),
+            adInitializer: () => g.adsController.initializeThemePageBannerAd(),
+            showFor: Duration(seconds: 60),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
+class _ThemeModeSelector extends StatelessWidget {
+  const _ThemeModeSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          Align(
+            alignment: Alignment.topLeft,
+            child: Text(
+              'Theme Mode',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          ListenableBuilder(
             listenable: g.themeMan,
             builder: (context, child) {
               return SegmentedButton<ThemePreference>(
@@ -97,8 +97,38 @@ class ThemeSettingsPage extends StatelessWidget {
                   g.themeMan.setThemePreference(newSelection.first);
                 },
               );
-            }),
-      ],
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ColorGrid extends StatelessWidget {
+  const _ColorGrid();
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 5,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 1,
+      ),
+      itemCount: ThemeColors.values.length,
+      itemBuilder: (context, index) {
+        final value = ThemeColors.values[index];
+        final isSelected = g.themeMan.selectedColor == value;
+
+        return _ColorOption(
+          color: value.color,
+          isSelected: isSelected,
+          onTap: () => g.themeMan.setThemeColor(value),
+        );
+      },
     );
   }
 }

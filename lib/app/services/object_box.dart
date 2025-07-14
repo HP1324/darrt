@@ -23,7 +23,7 @@ class ObjectBox {
     if(Store.isOpen(path)) {
       _store = Store.attach(getObjectBoxModel(), path);
     }else {
-      _store = await openStore();
+      _store = await openStore(directory: path);
     }
     _putInitialData();
     if (kDebugMode) {
