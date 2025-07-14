@@ -1,30 +1,33 @@
 import 'package:flutter/material.dart';
 
-class TimedBannerWidget extends StatefulWidget {
+class TimedBannerAdWidget extends StatefulWidget {
   final Widget Function() childBuilder;
   final Duration showFor;
   final Duration hideFor;
   final VoidCallback adInitializer;
+  final bool showFirst;
 
-  const TimedBannerWidget({
+  const TimedBannerAdWidget({
     super.key,
     required this.childBuilder,
     required this.adInitializer,
     this.showFor = const Duration(seconds: 20),
     this.hideFor = const Duration(seconds: 30),
+    this.showFirst = true,
   });
 
   @override
-  State<TimedBannerWidget> createState() => _TimedBannerWidgetState();
+  State<TimedBannerAdWidget> createState() => _TimedBannerAdWidgetState();
 }
 
-class _TimedBannerWidgetState extends State<TimedBannerWidget> {
-  bool _isVisible = true;
+class _TimedBannerAdWidgetState extends State<TimedBannerAdWidget> {
+  late bool _isVisible;
   bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
+    _isVisible = widget.showFirst;
     _initializeAd();
   }
 
@@ -44,7 +47,11 @@ class _TimedBannerWidgetState extends State<TimedBannerWidget> {
   }
 
   void _startCycle() {
-    _scheduleHide();
+    if (widget.showFirst) {
+      _scheduleHide();
+    } else {
+      _scheduleShow();
+    }
   }
 
   void _scheduleHide() {
