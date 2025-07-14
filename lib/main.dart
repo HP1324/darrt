@@ -28,6 +28,7 @@ Future<void> initApp() async {
 
     // Initialize google mobile ads sdk
     unawaited(MobileAds.instance.initialize());
+
     // Initialize local storage & database
     await ObjectBox().init();
     MiniBox().initStorage();

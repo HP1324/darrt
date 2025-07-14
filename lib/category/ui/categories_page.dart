@@ -3,6 +3,7 @@ import 'package:minimaltodo/category/ui/add_category_page.dart';
 import 'package:minimaltodo/category/ui/category_item.dart';
 import 'package:minimaltodo/helpers/globals.dart' as g;
 import 'package:minimaltodo/helpers/mini_logger.dart' show MiniLogger;
+import 'package:minimaltodo/helpers/mini_router.dart';
 
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
@@ -36,10 +37,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
             children: [
               Expanded(
                 child: ListTile(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => AddCategoryPage(edit: false)));
-                  },
+                  onTap: () => MiniRouter.to(context, AddCategoryPage(edit: false)),
                   leading: Icon(Icons.list_alt_sharp),
                   title: Text('Add New Category'),
                   trailing: Icon(Icons.add),
