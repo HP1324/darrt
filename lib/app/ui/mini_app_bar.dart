@@ -25,8 +25,10 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
     return ValueListenableBuilder(
       valueListenable: g.navMan.currentDestination,
       builder: (context, value, child) {
+        final backgroundColor = getScaffoldBackgroundColor(context);
         if (value == 0) {
           return AppBar(
+            backgroundColor: backgroundColor,
             elevation: 0,
             title: InkWell(
               splashFactory: NoSplash.splashFactory,
@@ -175,9 +177,13 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
               // ),
             ],
           );
-        }
-        else if(value ==1) return AppBar(title: Text('Focus Sessions'));
+        } else if (value == 1)
+          return AppBar(
+            backgroundColor: backgroundColor,
+            title: Text('Focus Sessions'),
+          );
         return AppBar(
+          backgroundColor: backgroundColor,
           title: Text('Categories', style: Theme.of(context).textTheme.titleMedium),
         );
       },
@@ -217,7 +223,8 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
         content: NotificationContent(
           id: notifId,
           channelKey: notifChannelKey,
-          title: 'Elapsed time: ${elapsed.inMinutes}:${(elapsed.inSeconds % 60).toString().padLeft(2, '0')}',
+          title:
+              'Elapsed time: ${elapsed.inMinutes}:${(elapsed.inSeconds % 60).toString().padLeft(2, '0')}',
           progress: progressPercent,
           locked: true,
           autoDismissible: false,
@@ -256,7 +263,6 @@ class TimelineFilterButton extends StatelessWidget {
             g.taskVm.setViewMode(value);
           },
           itemBuilder: (context) => [
-
             PopupMenuItem<bool>(
               value: true,
               child: Row(
@@ -301,8 +307,6 @@ class TimelineFilterButton extends StatelessWidget {
     );
   }
 }
-
-
 
 class _MiniAppBarAction extends StatelessWidget {
   const _MiniAppBarAction({required this.icon, required this.onTap});
