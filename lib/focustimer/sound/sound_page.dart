@@ -1,4 +1,3 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/focustimer/sound/sound_picker_dialog.dart';
 
@@ -12,8 +11,6 @@ class SoundPage extends StatefulWidget {
 }
 
 class _SoundPageState extends State<SoundPage> {
-
-
   void _showSoundPicker() {
     showDialog(
       context: context,
@@ -147,9 +144,7 @@ class _SoundPageState extends State<SoundPage> {
                         }
                       },
                       icon: Icon(
-                        isPlaying
-                            ? Icons.pause
-                            : Icons.play_arrow,
+                        isPlaying ? Icons.pause : Icons.play_arrow,
                       ),
                       iconSize: 25,
                       color: scheme.onPrimary,
@@ -176,9 +171,7 @@ class _SoundPageState extends State<SoundPage> {
                           : null,
                       icon: const Icon(Icons.stop),
                       iconSize: 25,
-                      color: (isPlaying || isPaused)
-                          ? scheme.error
-                          : scheme.outline,
+                      color: (isPlaying || isPaused) ? scheme.error : scheme.outline,
                       style: IconButton.styleFrom(
                         backgroundColor: (isPlaying || isPaused)
                             ? scheme.error.withAlpha(20)
@@ -214,10 +207,10 @@ class _SoundPageState extends State<SoundPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  StreamBuilder<PlayerState>(
-                    stream: g.audioController.audioPlayer.onPlayerStateChanged,
+                  ListenableBuilder(
+                    listenable: g.audioController,
                     builder: (context, snapshot) {
-                      final isPlaying = snapshot.data == PlayerState.playing;
+                      final isPlaying = g.audioController.isPlaying;
                       return Icon(
                         isPlaying ? Icons.music_note : Icons.music_off,
                         size: 80,

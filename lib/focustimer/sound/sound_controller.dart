@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 
@@ -28,26 +28,29 @@ class SoundController extends ChangeNotifier {
 
   // Initialize the service
   void initialize() async {
-    _audioPlayer.setReleaseMode(ReleaseMode.loop);
-
-    // Setting audio config like this is necessary to play simultaneous audio files at the same time,
-    // before setting this AudioContextConfig, one audioplayer instance would stop another audioplayer instance
-    final audioContext = AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers).build();
-    await AudioPlayer.global.setAudioContext(audioContext);
+    // Set loop mode for continuous playback
+    _audioPlayer.setLoopMode(LoopMode.one);
 
     // Listen to player state changes to keep UI in sync
-    _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
-      _isPlaying = state == PlayerState.playing;
-      _isStopped = state == PlayerState.stopped;
-      _isPaused = state == PlayerState.paused;
-      _isDisposed = state == PlayerState.disposed;
+    _audioPlayer.playerStateStream.listen((PlayerState state) {
+      _isPlaying = state.playing;
+      _isStopped = !state.playing && state.processingState == ProcessingState.idle;
+      _isPaused = !state.playing && state.processingState != ProcessingState.idle;
+      notifyListeners();
+    });
+
+    // Listen to processing state changes
+    _audioPlayer.processingStateStream.listen((ProcessingState state) {
+      _isDisposed = state == ProcessingState.idle;
       notifyListeners();
     });
 
     // Listen to player completion to reset state
-    _audioPlayer.onPlayerComplete.listen((event) {
-      _isPlaying = false;
-      notifyListeners();
+    _audioPlayer.playerStateStream.listen((PlayerState state) {
+      if (state.processingState == ProcessingState.completed) {
+        _isPlaying = false;
+        notifyListeners();
+      }
     });
 
     _loadCustomSounds();
@@ -94,11 +97,15 @@ class SoundController extends ChangeNotifier {
       // Set current sound and play
       _currentSound = soundPath;
 
+      AudioSource audioSource;
       if (soundPath.startsWith('assets/')) {
-        await _audioPlayer.play(AssetSource(soundPath.replaceFirst('assets/', '')));
+        audioSource = AudioSource.asset(soundPath);
       } else {
-        await _audioPlayer.play(DeviceFileSource(soundPath));
+        audioSource = AudioSource.file(soundPath);
       }
+
+      await _audioPlayer.setAudioSource(audioSource);
+      await _audioPlayer.play();
 
       // Note: _isPlaying will be updated by the state listener
       notifyListeners();
@@ -111,10 +118,23 @@ class SoundController extends ChangeNotifier {
 
   Future<void> playSoundOnly(String assetPath) async {
     AudioPlayer player = AudioPlayer();
-    await player.setReleaseMode(ReleaseMode.stop);
-    assert(assetPath.startsWith('assets/'), 'Only asset paths are supported');
-    final trimmed = assetPath.replaceFirst('assets/', '');
-    await player.play(AssetSource(trimmed),mode: PlayerMode.lowLatency);
+    try {
+      assert(assetPath.startsWith('assets/'), 'Only asset paths are supported');
+
+      final audioSource = AudioSource.asset(assetPath);
+      await player.setAudioSource(audioSource);
+      await player.play();
+
+      // Listen for completion to dispose the player
+      player.playerStateStream.listen((state) {
+        if (state.processingState == ProcessingState.completed) {
+          player.dispose();
+        }
+      });
+    } catch (e) {
+      MiniLogger.dp('Error playing sound only: $e');
+      player.dispose();
+    }
   }
 
   // Toggle sound - New method for better UX
@@ -135,7 +155,7 @@ class SoundController extends ChangeNotifier {
 
   // Resume audio
   Future<void> resumeAudio() async {
-    await _audioPlayer.resume();
+    await _audioPlayer.play();
   }
 
   // Stop audio - Enhanced version
@@ -188,7 +208,7 @@ class SoundController extends ChangeNotifier {
 
     // Check custom sounds
     final customSound = _customSounds.firstWhere(
-      (sound) => sound['path'] == soundPath,
+          (sound) => sound['path'] == soundPath,
       orElse: () => {},
     );
 
