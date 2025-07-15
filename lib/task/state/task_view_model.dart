@@ -110,12 +110,11 @@ class TaskViewModel extends ViewModel<Task> {
         _completionBox.put(completion);
         repeatingTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
       } else {
-        final removed =
-            _completionBox
-                .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
-                .build()
-              ..remove()
-              ..close();
+        final query = _completionBox
+            .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
+            .build();
+        final removed = query.remove();
+        query.close();
         MiniLogger.d('removed $removed completions for task ${task.id}');
         repeatingTaskCompletions[task.id]?.remove(date);
       }
