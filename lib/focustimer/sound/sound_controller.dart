@@ -67,9 +67,31 @@ class SoundController extends ChangeNotifier {
       }
     });
 
+    _audioPlayer.positionStream.listen((p) {
+      _position = p;
+      notifyListeners();
+    });
+    _audioPlayer.durationStream.listen((d) {
+      if (d != null) {
+        _duration = d;
+        notifyListeners();
+      }
+    });
     _loadCustomSounds();
   }
 
+  Duration _duration = Duration.zero;
+  Duration _position = Duration.zero;
+  Duration get duration => _duration;
+  Duration get position => _position;
+
+  void setPosition(double value){
+    _position = Duration(milliseconds: value.toInt());
+    notifyListeners();
+  }
+  Future<void> seek(Duration seekDuration) async{
+    await _audioPlayer.seek(seekDuration);
+  }
   // Load custom sounds from SharedPreferences
   void _loadCustomSounds() {
     final soundsJson = MiniBox().read('custom_sounds') ?? '[]';
@@ -123,12 +145,14 @@ class SoundController extends ChangeNotifier {
 
       // Update media item for audio service
       final displayName = getDisplayName(soundPath);
-      await _audioHandler?.updateMediaItem(MediaItem(
-        id: soundPath,
-        title: displayName,
-        artist: 'Darrt',
-        duration: const Duration(hours: 24),
-      ));
+      await _audioHandler?.updateMediaItem(
+        MediaItem(
+          id: soundPath,
+          title: displayName,
+          artist: 'Darrt',
+          duration: const Duration(hours: 24),
+        ),
+      );
 
       await _audioPlayer.play();
       await _audioHandler?.play();
@@ -176,7 +200,7 @@ class SoundController extends ChangeNotifier {
 
   // Pause audio
   Future<void> pauseAudio() async {
-    if(isPlaying) {
+    if (isPlaying) {
       await _audioPlayer.pause();
       await _audioHandler?.pause();
     }
@@ -184,7 +208,7 @@ class SoundController extends ChangeNotifier {
 
   // Resume audio
   Future<void> resumeAudio() async {
-    if(isPaused) {
+    if (isPaused) {
       await _audioPlayer.play();
       await _audioHandler?.play();
     }
@@ -243,7 +267,7 @@ class SoundController extends ChangeNotifier {
 
     // Check custom sounds
     final customSound = _customSounds.firstWhere(
-          (sound) => sound['path'] == soundPath,
+      (sound) => sound['path'] == soundPath,
       orElse: () => {},
     );
 

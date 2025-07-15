@@ -197,11 +197,21 @@ class _SoundPageState extends State<SoundPage> {
                     ),
                   ),
                 ),
-
               ],
             ),
           ),
-          Slider(value: 0.5, onChanged: (value){}),
+          ListenableBuilder(
+           listenable:  g.audioController,
+            builder: (context,child) {
+              return Slider(
+                min: 0.0,
+                max: g.audioController.duration.inMilliseconds.toDouble(),
+                value: g.audioController.position.inMilliseconds.clamp(0, g.audioController.duration.inMilliseconds).toDouble(),
+                onChanged: (value) { g.audioController.setPosition(value);},
+                onChangeEnd: (value){g.audioController.seek(Duration(milliseconds: value.toInt()));},
+              );
+            }
+          ),
           // Rest of the content - Centered
           Expanded(
             child: Center(
