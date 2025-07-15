@@ -94,7 +94,7 @@ class TimerControls extends StatelessWidget {
   }
 
   Future<void> _handleStop()async{
-    if(g.timerController.isRunning){
+    if(g.timerController.isRunning || g.timerController.isPaused){
       g.timerController.stopTimer();
       if(g.audioController.isPlaying){
         g.audioController.pauseAudio();
