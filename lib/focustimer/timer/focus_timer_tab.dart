@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:darrt/focustimer/timer/duration_selector.dart';
-import 'package:darrt/focustimer/timer/timer_controller.dart';
 import 'package:darrt/focustimer/timer/timer_controls.dart';
 import 'package:darrt/focustimer/timer/timer_display.dart';
 import 'package:darrt/focustimer/timer/timer_task_selection_expansion_tile.dart';

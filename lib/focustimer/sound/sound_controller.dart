@@ -10,17 +10,52 @@ import 'package:darrt/helpers/mini_logger.dart';
 class SoundController extends ChangeNotifier {
   final AudioPlayer _audioPlayer = AudioPlayer();
   AudioHandler? _audioHandler;
-  String? _currentSound;
+
+  // Single source of truth for playlist
+  final ConcatenatingAudioSource _playlist = ConcatenatingAudioSource(
+    children: [
+      AudioSource.asset('assets/sounds/brown_noise.mp3'),
+      AudioSource.asset('assets/sounds/clock_ticking.mp3'),
+      AudioSource.asset('assets/sounds/fire.mp3'),
+      AudioSource.asset('assets/sounds/forest_1.mp3'),
+      AudioSource.asset('assets/sounds/forest_2.mp3'),
+      AudioSource.asset('assets/sounds/mountain_winds.mp3'),
+      AudioSource.asset('assets/sounds/rain.mp3'),
+      AudioSource.asset('assets/sounds/silent_room.mp3'),
+      AudioSource.asset('assets/sounds/waterfall.mp3'),
+      AudioSource.asset('assets/sounds/birds_near_river.mp3'),
+    ],
+  );
+
   List<Map<String, String>> _customSounds = [];
   bool _isPlaying = false;
   bool _isStopped = false;
   bool _isPaused = false;
   bool _isDisposed = false;
+  Duration _duration = Duration.zero;
+  Duration _position = Duration.zero;
+  LoopMode _loopMode = LoopMode.all;
+  int? _currentIndex;
+
   // ValueNotifier for dialog-specific state
   final ValueNotifier<String?> _selectedSoundInDialog = ValueNotifier<String?>(null);
 
+  // Built-in sounds mapping (single source of truth)
+  static const Map<String, String> _builtInSounds = {
+    'assets/sounds/brown_noise.mp3': 'Brown Noise',
+    'assets/sounds/clock_ticking.mp3': 'Clock Ticking',
+    'assets/sounds/fire.mp3': 'Crackling Fire',
+    'assets/sounds/forest_1.mp3': 'Forest Ambience',
+    'assets/sounds/forest_2.mp3': 'Deep Forest',
+    'assets/sounds/mountain_winds.mp3': 'Mountain Winds',
+    'assets/sounds/rain.mp3': 'Rain Sounds',
+    'assets/sounds/silent_room.mp3': 'Silent Room',
+    'assets/sounds/waterfall.mp3': 'Waterfall',
+    'assets/sounds/birds_near_river.mp3': 'Birds + River',
+  };
+
   // Getters
-  String? get currentSound => _currentSound;
+  String? get currentSound => _currentIndex != null ? _getSoundPathByIndex(_currentIndex!) : null;
   List<Map<String, String>> get customSounds => _customSounds;
   AudioPlayer get audioPlayer => _audioPlayer;
   ValueNotifier<String?> get selectedSoundInDialog => _selectedSoundInDialog;
@@ -28,6 +63,10 @@ class SoundController extends ChangeNotifier {
   bool get isStopped => _isStopped;
   bool get isPaused => _isPaused;
   bool get isDisposed => _isDisposed;
+  Duration get duration => _duration;
+  Duration get position => _position;
+  LoopMode get loopMode => _loopMode;
+  int? get currentIndex => _currentIndex;
 
   // Initialize the service
   void initialize() async {
@@ -37,15 +76,20 @@ class SoundController extends ChangeNotifier {
       config: const AudioServiceConfig(
         androidNotificationChannelId: 'com.stellarmotion.darrt.audio',
         androidNotificationChannelName: 'Audio Service',
-        androidNotificationOngoing: true,
         androidStopForegroundOnPause: true,
       ),
     );
 
-    // Set loop mode for continuous playback
-    _audioPlayer.setLoopMode(LoopMode.one);
+    // Load custom sounds first
+    await _loadCustomSounds();
 
-    // Listen to player state changes to keep UI in sync
+    // Set up the playlist with both built-in and custom sounds
+    await _setupPlaylist();
+
+    // Set initial loop mode
+    await _audioPlayer.setLoopMode(_loopMode);
+
+    // Listen to player state changes
     _audioPlayer.playerStateStream.listen((PlayerState state) {
       _isPlaying = state.playing;
       _isStopped = !state.playing && state.processingState == ProcessingState.idle;
@@ -59,106 +103,116 @@ class SoundController extends ChangeNotifier {
       notifyListeners();
     });
 
-    // Listen to player completion to reset state
-    _audioPlayer.playerStateStream.listen((PlayerState state) {
-      if (state.processingState == ProcessingState.completed) {
-        _isPlaying = false;
-        notifyListeners();
-      }
-    });
-
-    _audioPlayer.positionStream.listen((p) {
-      _position = p;
+    // Listen to current index changes
+    _audioPlayer.currentIndexStream.listen((index) {
+      _currentIndex = index;
+      _updateMediaItem();
       notifyListeners();
     });
-    _audioPlayer.durationStream.listen((d) {
-      if (d != null) {
-        _duration = d;
+
+    // Listen to position changes
+    _audioPlayer.positionStream.listen((position) {
+      _position = position;
+      notifyListeners();
+    });
+
+    // Listen to duration changes
+    _audioPlayer.durationStream.listen((duration) {
+      if (duration != null) {
+        _duration = duration;
         notifyListeners();
       }
     });
-    _loadCustomSounds();
+
+    // Listen to loop mode changes
+    _audioPlayer.loopModeStream.listen((mode) {
+      _loopMode = mode;
+      notifyListeners();
+    });
   }
 
-  Duration _duration = Duration.zero;
-  Duration _position = Duration.zero;
-  Duration get duration => _duration;
-  Duration get position => _position;
+  // Setup playlist with built-in and custom sounds
+  Future<void> _setupPlaylist() async {
+    try {
+      // Create playlist with built-in sounds
+      final List<AudioSource> allSources = [
+        ..._playlist.children,
+      ];
 
-  void setPosition(double value){
-    _position = Duration(milliseconds: value.toInt());
-    notifyListeners();
+      // Add custom sounds to playlist
+      for (final customSound in _customSounds) {
+        allSources.add(AudioSource.file(customSound['path']!));
+      }
+
+      // Clear and rebuild playlist
+      await _playlist.clear();
+      await _playlist.addAll(allSources);
+
+      // Set the playlist to the player
+      await _audioPlayer.setAudioSource(
+        _playlist,
+        initialIndex: 0,
+        initialPosition: Duration.zero,
+      );
+    } catch (e) {
+      MiniLogger.dp('Error setting up playlist: $e');
+    }
   }
-  Future<void> seek(Duration seekDuration) async{
-    await _audioPlayer.seek(seekDuration);
-  }
+
   // Load custom sounds from SharedPreferences
-  void _loadCustomSounds() {
-    final soundsJson = MiniBox().read('custom_sounds') ?? '[]';
-    final List<dynamic> soundsList = jsonDecode(soundsJson);
-    _customSounds = soundsList.map((sound) => Map<String, String>.from(sound)).toList();
-    notifyListeners();
+  Future<void> _loadCustomSounds() async {
+    try {
+      final soundsJson = MiniBox().read('custom_sounds') ?? '[]';
+      final List<dynamic> soundsList = jsonDecode(soundsJson);
+      _customSounds = soundsList.map((sound) => Map<String, String>.from(sound)).toList();
+      notifyListeners();
+    } catch (e) {
+      MiniLogger.dp('Error loading custom sounds: $e');
+    }
   }
 
   // Save custom sounds to SharedPreferences
   void _saveCustomSounds() {
-    final soundsJson = jsonEncode(_customSounds);
-    MiniBox().write('custom_sounds', soundsJson);
-  }
-
-  // Add custom sound to the list
-  void addCustomSound(String path, String name) {
-    // Check if sound already exists
-    bool exists = _customSounds.any((sound) => sound['path'] == path);
-    if (!exists) {
-      _customSounds.add({'path': path, 'name': name});
-      _saveCustomSounds();
-      notifyListeners();
+    try {
+      final soundsJson = jsonEncode(_customSounds);
+      MiniBox().write('custom_sounds', soundsJson);
+    } catch (e) {
+      MiniLogger.dp('Error saving custom sounds: $e');
     }
   }
 
+  // Add custom sound to the playlist
+  Future<void> addCustomSound(String path, String name) async {
+    try {
+      // Check if sound already exists
+      bool exists = _customSounds.any((sound) => sound['path'] == path);
+      if (!exists) {
+        _customSounds.add({'path': path, 'name': name});
+        _saveCustomSounds();
+
+        // Add to playlist
+        await _playlist.add(AudioSource.file(path));
+        notifyListeners();
+      }
+    } catch (e) {
+      MiniLogger.dp('Error adding custom sound: $e');
+    }
+  }
+
+  // Play audio by sound path
   Future<void> playAudio(String? soundPath) async {
     try {
-      // Always stop current audio first
-      await _audioPlayer.stop();
-
       if (soundPath == null) {
-        // If null is passed, we want to stop and clear current sound
-        _currentSound = null;
-        _isPlaying = false;
-        await _audioHandler?.stop();
-        notifyListeners();
+        await stopAudio();
         return;
       }
 
-      // Set current sound and play
-      _currentSound = soundPath;
-
-      AudioSource audioSource;
-      if (soundPath.startsWith('assets/')) {
-        audioSource = AudioSource.asset(soundPath);
-      } else {
-        audioSource = AudioSource.file(soundPath);
+      final index = _getIndexBySoundPath(soundPath);
+      if (index != null) {
+        await _audioPlayer.seek(Duration.zero, index: index);
+        await _audioPlayer.play();
+        await _audioHandler?.play();
       }
-
-      await _audioPlayer.setAudioSource(audioSource);
-
-      // Update media item for audio service
-      final displayName = getDisplayName(soundPath);
-      await _audioHandler?.updateMediaItem(
-        MediaItem(
-          id: soundPath,
-          title: displayName,
-          artist: 'Darrt',
-          duration: const Duration(hours: 24),
-        ),
-      );
-
-      await _audioPlayer.play();
-      await _audioHandler?.play();
-
-      // Note: _isPlaying will be updated by the state listener
-      notifyListeners();
     } catch (e) {
       MiniLogger.dp('Error playing sound: $e');
       _isPlaying = false;
@@ -166,6 +220,20 @@ class SoundController extends ChangeNotifier {
     }
   }
 
+  // Play sound by index
+  Future<void> playByIndex(int index) async {
+    try {
+      if (index >= 0 && index < _playlist.children.length) {
+        await _audioPlayer.seek(Duration.zero, index: index);
+        await _audioPlayer.play();
+        await _audioHandler?.play();
+      }
+    } catch (e) {
+      MiniLogger.dp('Error playing sound by index: $e');
+    }
+  }
+
+  // Play sound only (one-time play without affecting main playlist)
   Future<void> playSoundOnly(String assetPath) async {
     AudioPlayer player = AudioPlayer();
     try {
@@ -187,13 +255,11 @@ class SoundController extends ChangeNotifier {
     }
   }
 
-  // Toggle sound - New method for better UX
+  // Toggle sound
   Future<void> toggleSound(String? soundPath) async {
-    if (_currentSound == soundPath && _isPlaying) {
-      // If the same sound is playing, stop it
+    if (currentSound == soundPath && _isPlaying) {
       await stopAudio();
     } else {
-      // Play the new sound or restart current sound
       await playAudio(soundPath);
     }
   }
@@ -214,24 +280,73 @@ class SoundController extends ChangeNotifier {
     }
   }
 
-  // Stop audio - Enhanced version
+  // Stop audio
   Future<void> stopAudio() async {
-    if (isPlaying) {
-      try {
-        await _audioPlayer.stop();
-        await _audioHandler?.stop();
-        _currentSound = null;
-        _isPlaying = false;
-        notifyListeners();
-      } catch (e) {
-        MiniLogger.dp('Error stopping audio: $e');
-      }
+    try {
+      await _audioPlayer.stop();
+      await _audioHandler?.stop();
+      _currentIndex = null;
+      _isPlaying = false;
+      notifyListeners();
+    } catch (e) {
+      MiniLogger.dp('Error stopping audio: $e');
     }
+  }
+
+  // Seek to next sound (built-in functionality)
+  Future<void> seekToNext() async {
+    try {
+      await _audioPlayer.seekToNext();
+    } catch (e) {
+      MiniLogger.dp('Error seeking to next: $e');
+    }
+  }
+
+  // Seek to previous sound (built-in functionality)
+  Future<void> seekToPrevious() async {
+    try {
+      await _audioPlayer.seekToPrevious();
+    } catch (e) {
+      MiniLogger.dp('Error seeking to previous: $e');
+    }
+  }
+
+  // Set loop mode
+  Future<void> setLoopMode(LoopMode mode) async {
+    try {
+      await _audioPlayer.setLoopMode(mode);
+    } catch (e) {
+      MiniLogger.dp('Error setting loop mode: $e');
+    }
+  }
+
+  // Set shuffle mode
+  Future<void> setShuffleModeEnabled(bool enabled) async {
+    try {
+      await _audioPlayer.setShuffleModeEnabled(enabled);
+    } catch (e) {
+      MiniLogger.dp('Error setting shuffle mode: $e');
+    }
+  }
+
+  // Seek to position
+  Future<void> seek(Duration seekDuration) async {
+    try {
+      await _audioPlayer.seek(seekDuration);
+    } catch (e) {
+      MiniLogger.dp('Error seeking: $e');
+    }
+  }
+
+  // Set position (for UI updates)
+  void setPosition(double value) {
+    _position = Duration(milliseconds: value.toInt());
+    notifyListeners();
   }
 
   // Check if a specific sound is currently playing
   bool isSoundPlaying(String? soundPath) {
-    return _currentSound == soundPath && _isPlaying;
+    return currentSound == soundPath && _isPlaying;
   }
 
   // Set selected sound in dialog
@@ -241,33 +356,21 @@ class SoundController extends ChangeNotifier {
 
   // Initialize dialog with current sound
   void initializeDialog() {
-    _selectedSoundInDialog.value = _currentSound;
+    _selectedSoundInDialog.value = currentSound;
   }
 
   // Get display name for a sound
   String getDisplayName(String? soundPath) {
     if (soundPath == null) return 'No Sound';
 
-    final Map<String, String> builtInSounds = {
-      'assets/sounds/brown_noise.mp3': 'Brown Noise',
-      'assets/sounds/clock_ticking.mp3': 'Clock Ticking',
-      'assets/sounds/fire.mp3': 'Crackling Fire',
-      'assets/sounds/forest_1.mp3': 'Forest Ambience',
-      'assets/sounds/forest_2.mp3': 'Deep Forest',
-      'assets/sounds/mountain_winds.mp3': 'Mountain Winds',
-      'assets/sounds/rain.mp3': 'Rain Sounds',
-      'assets/sounds/silent_room.mp3': 'Silent Room',
-      'assets/sounds/waterfall.mp3': 'Waterfall',
-      'assets/sounds/birds_near_river.mp3': 'Birds + River',
-    };
-
-    if (builtInSounds.containsKey(soundPath)) {
-      return builtInSounds[soundPath]!;
+    // Check built-in sounds
+    if (_builtInSounds.containsKey(soundPath)) {
+      return _builtInSounds[soundPath]!;
     }
 
     // Check custom sounds
     final customSound = _customSounds.firstWhere(
-      (sound) => sound['path'] == soundPath,
+          (sound) => sound['path'] == soundPath,
       orElse: () => {},
     );
 
@@ -279,30 +382,65 @@ class SoundController extends ChangeNotifier {
     return soundPath.split('/').last.split('.').first;
   }
 
-  // Dispose resources
+  // Get all sounds (single source of truth)
+  List<Map<String, String>> getAllSounds() {
+    final List<Map<String, String>> allSounds = [];
+
+    // Add built-in sounds
+    _builtInSounds.forEach((path, name) {
+      allSounds.add({'path': path, 'name': name});
+    });
+
+    // Add custom sounds
+    allSounds.addAll(_customSounds);
+
+    return allSounds;
+  }
+
+  // Helper methods
+  int? _getIndexBySoundPath(String soundPath) {
+    final allSounds = getAllSounds();
+    for (int i = 0; i < allSounds.length; i++) {
+      if (allSounds[i]['path'] == soundPath) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  String? _getSoundPathByIndex(int index) {
+    final allSounds = getAllSounds();
+    if (index >= 0 && index < allSounds.length) {
+      return allSounds[index]['path'];
+    }
+    return null;
+  }
+
+  void _updateMediaItem() {
+    if (_currentIndex != null && _audioHandler != null) {
+      final soundPath = _getSoundPathByIndex(_currentIndex!);
+      if (soundPath != null) {
+        final displayName = getDisplayName(soundPath);
+        _audioHandler?.updateMediaItem(
+          MediaItem(
+            id: soundPath,
+            title: displayName,
+            artist: 'Darrt',
+            duration: _duration,
+          ),
+        );
+      }
+    }
+  }
+
+  // Legacy methods for backward compatibility
+  void playNextSound() => seekToNext();
+  void playPreviousSound() => seekToPrevious();
+
   @override
   void dispose() {
     _audioPlayer.dispose();
     _selectedSoundInDialog.dispose();
     super.dispose();
-  }
-
-  List<Map<String, String>> getAllSounds() {
-    // Built-in sounds
-    final builtInSounds = [
-      {'path': 'assets/sounds/brown_noise.mp3', 'name': 'Brown Noise'},
-      {'path': 'assets/sounds/clock_ticking.mp3', 'name': 'Clock Ticking'},
-      {'path': 'assets/sounds/fire.mp3', 'name': 'Crackling Fire'},
-      {'path': 'assets/sounds/forest_1.mp3', 'name': 'Forest Ambience'},
-      {'path': 'assets/sounds/forest_2.mp3', 'name': 'Deep Forest'},
-      {'path': 'assets/sounds/mountain_winds.mp3', 'name': 'Mountain Winds'},
-      {'path': 'assets/sounds/rain.mp3', 'name': 'Rain Sounds'},
-      {'path': 'assets/sounds/silent_room.mp3', 'name': 'Silent Room'},
-      {'path': 'assets/sounds/waterfall.mp3', 'name': 'Waterfall'},
-      {'path': 'assets/sounds/birds_near_river.mp3', 'name': 'Birds + River'},
-    ];
-
-    // Combine with custom sounds
-    return [...builtInSounds, ...customSounds];
   }
 }

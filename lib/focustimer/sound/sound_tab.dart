@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:darrt/focustimer/sound/sound_picker_dialog.dart';
+import 'package:just_audio/just_audio.dart';
 
 import '../../helpers/globals.dart' as g show audioController;
 
@@ -119,39 +120,6 @@ class AudioControls extends StatefulWidget {
 }
 
 class _AudioControlsState extends State<AudioControls> {
-  void _playNextSound() {
-    final currentSound = g.audioController.currentSound;
-    final allSounds = g.audioController.getAllSounds();
-
-    if (allSounds.isEmpty) return;
-
-    int currentIndex = -1;
-    if (currentSound != null) {
-      currentIndex = allSounds.indexWhere((sound) => sound['path'] == currentSound);
-    }
-
-    // Get next sound (loop to beginning if at end)
-    int nextIndex = (currentIndex + 1) % allSounds.length;
-    g.audioController.playAudio(allSounds[nextIndex]['path']);
-  }
-
-  void _playPreviousSound() {
-    // Get current sound index
-    final currentSound = g.audioController.currentSound;
-    final allSounds = g.audioController.getAllSounds();
-
-    if (allSounds.isEmpty) return;
-
-    int currentIndex = -1;
-    if (currentSound != null) {
-      currentIndex = allSounds.indexWhere((sound) => sound['path'] == currentSound);
-    }
-
-    // Get previous sound (loop to end if at beginning)
-    int previousIndex = currentIndex <= 0 ? allSounds.length - 1 : currentIndex - 1;
-    g.audioController.playAudio(allSounds[previousIndex]['path']);
-  }
-
   @override
   Widget build(BuildContext context) {
     final scheme = ColorScheme.of(context);
@@ -160,82 +128,15 @@ class _AudioControlsState extends State<AudioControls> {
       padding: const EdgeInsets.only(top: 10, bottom: 5),
       child: Column(
         children: [
-          // Control buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // Previous Button
-              IconButton(
-                onPressed: _playPreviousSound,
-                icon: const Icon(Icons.skip_previous),
-                iconSize: 20,
-                color: scheme.primary,
-                style: IconButton.styleFrom(
-                  backgroundColor: scheme.primary.withAlpha(20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-
-              // Play/Pause Button
-              ListenableBuilder(
-                listenable: g.audioController,
-                builder: (context, child) {
-                  final isPlaying = g.audioController.isPlaying;
-                  final isPaused = g.audioController.isPaused;
-
-                  return IconButton(
-                    onPressed: () {
-                      if (isPlaying) {
-                        g.audioController.pauseAudio();
-                      } else if (isPaused) {
-                        g.audioController.resumeAudio();
-                      } else {
-                        // If stopped, play the current sound or first available
-                        final currentSound = g.audioController.currentSound;
-                        if (currentSound != null) {
-                          g.audioController.playAudio(currentSound);
-                        } else {
-                          final allSounds = g.audioController.getAllSounds();
-                          if (allSounds.isNotEmpty) {
-                            g.audioController.playAudio(allSounds[0]['path']);
-                          }
-                        }
-                      }
-                    },
-                    icon: Icon(
-                      isPlaying ? Icons.pause : Icons.play_arrow,
-                    ),
-                    iconSize: 25,
-                    color: scheme.onPrimary,
-                    style: IconButton.styleFrom(
-                      backgroundColor: scheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
-                },
-              ),
-
-              // Next Button
-              IconButton(
-                onPressed: _playNextSound,
-                icon: const Icon(Icons.skip_next),
-                iconSize: 20,
-                color: scheme.primary,
-                style: IconButton.styleFrom(
-                  backgroundColor: scheme.primary.withAlpha(20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
+              _PreviousSoundButton(),
+              _PlayPauseButton(),
+              _NextSoundButton(),
+              _ToggleLoopModeButton(),
             ],
           ),
-
-          // Audio progress slider
           ListenableBuilder(
             listenable: g.audioController,
             builder: (context, child) {
@@ -279,4 +180,131 @@ class _AudioControlsState extends State<AudioControls> {
       ),
     );
   }
+}
+
+class _PlayPauseButton extends StatelessWidget {
+  const _PlayPauseButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: g.audioController,
+      builder: (context, child) {
+        final scheme = ColorScheme.of(context);
+        final isPlaying = g.audioController.isPlaying;
+        final isPaused = g.audioController.isPaused;
+
+        return IconButton(
+          onPressed: () {
+            if (isPlaying) {
+              g.audioController.pauseAudio();
+            } else if (isPaused) {
+              g.audioController.resumeAudio();
+            } else {
+              // If stopped, play the current sound or first available
+              final currentSound = g.audioController.currentSound;
+              if (currentSound != null) {
+                g.audioController.playAudio(currentSound);
+              } else {
+                final allSounds = g.audioController.getAllSounds();
+                if (allSounds.isNotEmpty) {
+                  g.audioController.playAudio(allSounds[0]['path']);
+                }
+              }
+            }
+          },
+          icon: Icon(
+            isPlaying ? Icons.pause : Icons.play_arrow,
+          ),
+          iconSize: 25,
+          color: scheme.onPrimary,
+          style: IconButton.styleFrom(
+            backgroundColor: scheme.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _PreviousSoundButton extends StatelessWidget {
+  const _PreviousSoundButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = ColorScheme.of(context);
+    return IconButton(
+      onPressed: g.audioController.playPreviousSound,
+      icon: const Icon(Icons.skip_previous),
+      iconSize: 20,
+      color: scheme.primary,
+      style: IconButton.styleFrom(
+        backgroundColor: scheme.primary.withAlpha(20),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+
+}
+
+class _NextSoundButton extends StatelessWidget {
+  const _NextSoundButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = ColorScheme.of(context);
+    return IconButton(
+      onPressed: g.audioController.playNextSound,
+      icon: const Icon(Icons.skip_next),
+      iconSize: 20,
+      color: scheme.primary,
+      style: IconButton.styleFrom(
+        backgroundColor: scheme.primary.withAlpha(20),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+}
+
+class _ToggleLoopModeButton extends StatelessWidget {
+  const _ToggleLoopModeButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: g.audioController,
+      builder: (context, child) {
+        final scheme = ColorScheme.of(context);
+        final mode = g.audioController.loopMode;
+        final icon = mode == LoopMode.all ? Icons.repeat : Icons.repeat_one;
+        return IconButton(
+          onPressed: () async {
+            await g.audioController.audioPlayer.setLoopMode(
+              mode == LoopMode.all ? LoopMode.one : LoopMode.all,
+            );
+          },
+          icon: Icon(icon),
+          iconSize: 20,
+          color: scheme.primary,
+          style: IconButton.styleFrom(
+            backgroundColor: scheme.primary.withAlpha(20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _toggleLoopMode() {}
 }

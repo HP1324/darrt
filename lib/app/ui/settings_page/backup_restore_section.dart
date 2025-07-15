@@ -1,7 +1,6 @@
 //ignore_for_file: curly_braces_in_flow_control_structures
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:googleapis/cloudsearch/v1.dart';
 import 'package:darrt/app/exceptions.dart';
 import 'package:darrt/app/services/backup_service.dart';
 import 'package:darrt/app/services/google_sign_in_service.dart';
