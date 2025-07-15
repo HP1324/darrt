@@ -24,10 +24,11 @@ class MiniLogger {
     _logger.w(message);
   }
 
-  /// Just [MiniLogger.dp] guarded with [kDebugMode]
+  /// Just a [debugPrint] guarded with [kDebugMode]
   static void dp(String message){
     if(kDebugMode){
-      MiniLogger.dp(message);
+      // Ridiculously, I was using [MiniLogger.dp] here instead of [debugPrint], resulting in a recursive stack overflow
+      debugPrint(message);
     }
   }
 }

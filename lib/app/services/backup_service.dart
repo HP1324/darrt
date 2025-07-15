@@ -216,40 +216,6 @@ class BackupService {
 
     g.noteVm.putManyForRestore(notes);
   }
-  Future<void> restoreDataFromBackupFile(dart.File backupFile) async {
-    //Decompress zip file back to JSON file
-    final jsonBackupFile = _decompressToJsonFile(backupFile);
-
-    //Parse the json file as map to work on it
-    Map<String, dynamic> driveData = await _parseBackupJsonFileAsMap(jsonBackupFile);
-    Map<String, dynamic> localData = ObjectBox().getLocalData();
-    Map<String, dynamic> mergedData = BackupMergeService.mergeData(
-      localData,
-      driveData,
-      mergeType: MergeType.restore,
-    );
-
-    final tasks = (mergedData['tasks'] as List).map((e) => Task.fromJson(e)).toList();
-
-    final categories = (mergedData['categories'] as List)
-        .map((e) => TaskCategory.fromJson(e))
-        .toList();
-    g.catVm.putManyForRestore(categories, tasks: tasks);
-
-    final completions = (mergedData['completions'] as List)
-        .map((e) => TaskCompletion.fromJson(e))
-        .toList();
-
-    g.taskVm.putManyForRestore(tasks, completions: completions);
-
-    final notes = (mergedData['notes'] as List).map((e) => Note.fromJson(e)).toList();
-    final folders = (mergedData['folders'] as List).map((e) => Folder.fromJson(e)).toList();
-    g.folderVm.putManyForRestore(folders, notes: notes);
-
-    g.noteVm.putManyForRestore(notes);
-
-    MiniLogger.d('Data restored from google drive');
-  }
 
   Future<Map<String, dynamic>> _parseBackupJsonFileAsMap(dart.File jsonFile) async {
     try {
