@@ -11,21 +11,8 @@ class SoundController extends ChangeNotifier {
   final AudioPlayer _audioPlayer = AudioPlayer();
   AudioHandler? _audioHandler;
 
-  // Single source of truth for playlist
-  final ConcatenatingAudioSource _playlist = ConcatenatingAudioSource(
-    children: [
-      AudioSource.asset('assets/sounds/brown_noise.mp3'),
-      AudioSource.asset('assets/sounds/clock_ticking.mp3'),
-      AudioSource.asset('assets/sounds/fire.mp3'),
-      AudioSource.asset('assets/sounds/forest_1.mp3'),
-      AudioSource.asset('assets/sounds/forest_2.mp3'),
-      AudioSource.asset('assets/sounds/mountain_winds.mp3'),
-      AudioSource.asset('assets/sounds/rain.mp3'),
-      AudioSource.asset('assets/sounds/silent_room.mp3'),
-      AudioSource.asset('assets/sounds/waterfall.mp3'),
-      AudioSource.asset('assets/sounds/birds_near_river.mp3'),
-    ],
-  );
+  // Audio sources list instead of ConcatenatingAudioSource
+  List<AudioSource> _audioSources = [];
 
   List<Map<String, String>> _customSounds = [];
   bool _isPlaying = false;
@@ -83,8 +70,8 @@ class SoundController extends ChangeNotifier {
     // Load custom sounds first
     await _loadCustomSounds();
 
-    // Set up the playlist with both built-in and custom sounds
-    await _setupPlaylist();
+    // Set up the audio sources with both built-in and custom sounds
+    await _setupAudioSources();
 
     // Set initial loop mode
     await _audioPlayer.setLoopMode(_loopMode);
@@ -131,31 +118,35 @@ class SoundController extends ChangeNotifier {
     });
   }
 
-  // Setup playlist with built-in and custom sounds
-  Future<void> _setupPlaylist() async {
+  // Setup audio sources with built-in and custom sounds
+  Future<void> _setupAudioSources() async {
     try {
-      // Create playlist with built-in sounds
-      final List<AudioSource> allSources = [
-        ..._playlist.children,
+      // Create audio sources list with built-in sounds
+      _audioSources = [
+        AudioSource.asset('assets/sounds/brown_noise.mp3'),
+        AudioSource.asset('assets/sounds/clock_ticking.mp3'),
+        AudioSource.asset('assets/sounds/fire.mp3'),
+        AudioSource.asset('assets/sounds/forest_1.mp3'),
+        AudioSource.asset('assets/sounds/forest_2.mp3'),
+        AudioSource.asset('assets/sounds/mountain_winds.mp3'),
+        AudioSource.asset('assets/sounds/rain.mp3'),
+        AudioSource.asset('assets/sounds/silent_room.mp3'),
+        AudioSource.asset('assets/sounds/waterfall.mp3'),
+        AudioSource.asset('assets/sounds/birds_near_river.mp3'),
       ];
 
-      // Add custom sounds to playlist
+      // Add custom sounds to audio sources
       for (final customSound in _customSounds) {
-        allSources.add(AudioSource.file(customSound['path']!));
+        _audioSources.add(AudioSource.file(customSound['path']!));
       }
 
-      // Clear and rebuild playlist
-      await _playlist.clear();
-      await _playlist.addAll(allSources);
-
-      // Set the playlist to the player
-      await _audioPlayer.setAudioSource(
-        _playlist,
+      // Set the audio sources to the player
+      await _audioPlayer.setAudioSources(
+        _audioSources,
         initialIndex: 0,
-        initialPosition: Duration.zero,
       );
     } catch (e) {
-      MiniLogger.dp('Error setting up playlist: $e');
+      MiniLogger.dp('Error setting up audio sources: $e');
     }
   }
 
@@ -181,7 +172,7 @@ class SoundController extends ChangeNotifier {
     }
   }
 
-  // Add custom sound to the playlist
+  // Add custom sound to the audio sources
   Future<void> addCustomSound(String path, String name) async {
     try {
       // Check if sound already exists
@@ -190,8 +181,9 @@ class SoundController extends ChangeNotifier {
         _customSounds.add({'path': path, 'name': name});
         _saveCustomSounds();
 
-        // Add to playlist
-        await _playlist.add(AudioSource.file(path));
+        // Add to audio sources and refresh
+        _audioSources.add(AudioSource.file(path));
+        await _audioPlayer.setAudioSources(_audioSources);
         notifyListeners();
       }
     } catch (e) {
@@ -201,29 +193,30 @@ class SoundController extends ChangeNotifier {
 
   // Play audio by sound path
   Future<void> playAudio(String? soundPath) async {
-    try {
-      if (soundPath == null) {
-        await stopAudio();
-        return;
-      }
+    if (!isPlaying) {
+      try {
+        if (soundPath == null) {
+          await stopAudio();
+          return;
+        }
 
-      final index = _getIndexBySoundPath(soundPath);
-      if (index != null) {
-        await _audioPlayer.seek(Duration.zero, index: index);
-        await _audioPlayer.play();
-        await _audioHandler?.play();
+        final index = _getIndexBySoundPath(soundPath);
+        if (index != null) {
+          await _audioPlayer.seek(Duration.zero, index: index);
+          await _audioPlayer.play();
+          await _audioHandler?.play();
+        }
+      } catch (e) {
+        MiniLogger.dp('Error playing sound: $e');
+        _isPlaying = false;
+        notifyListeners();
       }
-    } catch (e) {
-      MiniLogger.dp('Error playing sound: $e');
-      _isPlaying = false;
-      notifyListeners();
     }
   }
-
   // Play sound by index
   Future<void> playByIndex(int index) async {
     try {
-      if (index >= 0 && index < _playlist.children.length) {
+      if (index >= 0 && index < _audioSources.length) {
         await _audioPlayer.seek(Duration.zero, index: index);
         await _audioPlayer.play();
         await _audioHandler?.play();
@@ -282,14 +275,16 @@ class SoundController extends ChangeNotifier {
 
   // Stop audio
   Future<void> stopAudio() async {
-    try {
-      await _audioPlayer.stop();
-      await _audioHandler?.stop();
-      _currentIndex = null;
-      _isPlaying = false;
-      notifyListeners();
-    } catch (e) {
-      MiniLogger.dp('Error stopping audio: $e');
+    if (isPlaying) {
+      try {
+        await _audioPlayer.stop();
+        await _audioHandler?.stop();
+        _currentIndex = null;
+        _isPlaying = false;
+        notifyListeners();
+      } catch (e) {
+        MiniLogger.dp('Error stopping audio: $e');
+      }
     }
   }
 
