@@ -78,8 +78,7 @@ class SoundController extends ChangeNotifier {
     }
   }
 
-  // Play sound - Fixed version
-  Future<void> playSound(String? soundPath) async {
+  Future<void> playAudio(String? soundPath) async {
     try {
       // Always stop current audio first
       await _audioPlayer.stop();
@@ -125,7 +124,7 @@ class SoundController extends ChangeNotifier {
       await stopAudio();
     } else {
       // Play the new sound or restart current sound
-      await playSound(soundPath);
+      await playAudio(soundPath);
     }
   }
 

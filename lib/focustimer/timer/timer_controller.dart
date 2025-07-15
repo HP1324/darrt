@@ -93,7 +93,7 @@ class TimerController extends ChangeNotifier {
 
           if (_remainingSeconds <= 0) {
             stopTimer();
-            g.soundController.pauseAudio();
+            g.audioController.pauseAudio();
           } else {
             _startTicker();
           }
@@ -169,7 +169,7 @@ class TimerController extends ChangeNotifier {
 
         if (_remainingSeconds <= 0) {
           stopTimer();
-          g.soundController.pauseAudio();
+          g.audioController.pauseAudio();
         } else {
           notifyListeners();
         }
@@ -223,7 +223,7 @@ class TimerController extends ChangeNotifier {
     _startTime = null;
     _pausedSeconds = 0;
     _saveToStorage();
-    g.soundController.stopAudio();
+    g.audioController.stopAudio();
     notifyListeners();
   }
 

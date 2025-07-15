@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/task/models/task.dart';
 import 'package:minimaltodo/task/ui/task_note_bottom_sheet.dart';
 
-import '../../helpers/globals.dart' as g show timerController, taskVm,soundController, taskSc;
+import '../../helpers/globals.dart' as g show timerController, taskVm,audioController, taskSc;
 
 class TimerTaskItem extends StatefulWidget {
   const TimerTaskItem({super.key, required this.task});

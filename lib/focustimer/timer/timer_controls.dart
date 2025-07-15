@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../helpers/globals.dart' as g show timerController,soundController;
+import '../../helpers/globals.dart' as g show timerController,audioController;
 
 class TimerControls extends StatelessWidget {
 
@@ -69,15 +69,15 @@ class TimerControls extends StatelessWidget {
   void _handlePlayPause() {
     if (g.timerController.isRunning) {
       g.timerController.pauseTimer();
-      if (g.soundController.isPlaying) {
-        g.soundController.pauseAudio();
+      if (g.audioController.isPlaying) {
+        g.audioController.pauseAudio();
       }
     } else {
       g.timerController.startTimer();
-      if (g.soundController.isPaused) {
-        g.soundController.resumeAudio();
-      } else if (g.soundController.isStopped) {
-        g.soundController.playSound(g.soundController.currentSound);
+      if (g.audioController.isPaused) {
+        g.audioController.resumeAudio();
+      } else if (g.audioController.isStopped) {
+        g.audioController.playAudio(g.audioController.currentSound);
       }
     }
   }

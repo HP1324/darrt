@@ -53,7 +53,7 @@ final completionVm = CompletionViewModel();
 
 final quickVm = QuickReminderViewModel();
 
-final soundController = SoundController();
+final audioController = SoundController();
 
 final timerController = TimerController();
 

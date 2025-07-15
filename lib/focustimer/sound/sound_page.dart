@@ -2,7 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:minimaltodo/focustimer/sound/sound_picker_dialog.dart';
 
-import '../../helpers/globals.dart' as g show soundController;
+import '../../helpers/globals.dart' as g show audioController;
 
 class SoundPage extends StatefulWidget {
   const SoundPage({super.key});
@@ -12,10 +12,7 @@ class SoundPage extends StatefulWidget {
 }
 
 class _SoundPageState extends State<SoundPage> {
-  @override
-  void initState() {
-    super.initState();
-  }
+
 
   void _showSoundPicker() {
     showDialog(
@@ -25,8 +22,7 @@ class _SoundPageState extends State<SoundPage> {
   }
 
   void _playNextSound() {
-    // Get current sound index
-    final currentSound = g.soundController.currentSound;
+    final currentSound = g.audioController.currentSound;
     final allSounds = _getAllSounds();
 
     if (allSounds.isEmpty) return;
@@ -38,12 +34,12 @@ class _SoundPageState extends State<SoundPage> {
 
     // Get next sound (loop to beginning if at end)
     int nextIndex = (currentIndex + 1) % allSounds.length;
-    g.soundController.playSound(allSounds[nextIndex]['path']);
+    g.audioController.playAudio(allSounds[nextIndex]['path']);
   }
 
   void _playPreviousSound() {
     // Get current sound index
-    final currentSound = g.soundController.currentSound;
+    final currentSound = g.audioController.currentSound;
     final allSounds = _getAllSounds();
 
     if (allSounds.isEmpty) return;
@@ -55,7 +51,7 @@ class _SoundPageState extends State<SoundPage> {
 
     // Get previous sound (loop to end if at beginning)
     int previousIndex = currentIndex <= 0 ? allSounds.length - 1 : currentIndex - 1;
-    g.soundController.playSound(allSounds[previousIndex]['path']);
+    g.audioController.playAudio(allSounds[previousIndex]['path']);
   }
 
   List<Map<String, String>> _getAllSounds() {
@@ -74,7 +70,7 @@ class _SoundPageState extends State<SoundPage> {
     ];
 
     // Combine with custom sounds
-    return [...builtInSounds, ...g.soundController.customSounds];
+    return [...builtInSounds, ...g.audioController.customSounds];
   }
 
   @override
@@ -126,26 +122,26 @@ class _SoundPageState extends State<SoundPage> {
 
                 // Play/Pause Button
                 ListenableBuilder(
-                  listenable: g.soundController,
+                  listenable: g.audioController,
                   builder: (context, child) {
-                    final isPlaying = g.soundController.isPlaying;
-                    final isPaused = g.soundController.isPaused;
+                    final isPlaying = g.audioController.isPlaying;
+                    final isPaused = g.audioController.isPaused;
 
                     return IconButton(
                       onPressed: () {
                         if (isPlaying) {
-                          g.soundController.pauseAudio();
+                          g.audioController.pauseAudio();
                         } else if (isPaused) {
-                          g.soundController.resumeAudio();
+                          g.audioController.resumeAudio();
                         } else {
                           // If stopped, play the current sound or first available
-                          final currentSound = g.soundController.currentSound;
+                          final currentSound = g.audioController.currentSound;
                           if (currentSound != null) {
-                            g.soundController.playSound(currentSound);
+                            g.audioController.playAudio(currentSound);
                           } else {
                             final allSounds = _getAllSounds();
                             if (allSounds.isNotEmpty) {
-                              g.soundController.playSound(allSounds[0]['path']);
+                              g.audioController.playAudio(allSounds[0]['path']);
                             }
                           }
                         }
@@ -169,14 +165,14 @@ class _SoundPageState extends State<SoundPage> {
 
                 // Stop Button
                 ListenableBuilder(
-                  listenable: g.soundController,
+                  listenable: g.audioController,
                   builder: (context, child) {
-                    final isPlaying = g.soundController.isPlaying;
-                    final isPaused = g.soundController.isPaused;
+                    final isPlaying = g.audioController.isPlaying;
+                    final isPaused = g.audioController.isPaused;
 
                     return IconButton(
                       onPressed: (isPlaying || isPaused)
-                          ? () => g.soundController.stopAudio()
+                          ? () => g.audioController.stopAudio()
                           : null,
                       icon: const Icon(Icons.stop),
                       iconSize: 25,
@@ -219,7 +215,7 @@ class _SoundPageState extends State<SoundPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   StreamBuilder<PlayerState>(
-                    stream: g.soundController.audioPlayer.onPlayerStateChanged,
+                    stream: g.audioController.audioPlayer.onPlayerStateChanged,
                     builder: (context, snapshot) {
                       final isPlaying = snapshot.data == PlayerState.playing;
                       return Icon(
@@ -247,12 +243,12 @@ class _SoundPageState extends State<SoundPage> {
                     ),
                     child: Center(
                       child: ListenableBuilder(
-                        listenable: g.soundController,
+                        listenable: g.audioController,
                         builder: (context, child) {
-                          final current = g.soundController.currentSound;
+                          final current = g.audioController.currentSound;
                           return Text(
                             current != null
-                                ? g.soundController.getDisplayName(current)
+                                ? g.audioController.getDisplayName(current)
                                 : 'No Sound',
                             style: textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w600,
