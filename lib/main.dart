@@ -19,7 +19,6 @@ import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/home.dart';
 import 'package:workmanager/workmanager.dart';
 
-
 /// Initializes app services and state
 Future<void> initApp() async {
   try {
@@ -37,10 +36,10 @@ Future<void> initApp() async {
     // Initialize notifications
     await NotificationService.init();
 
-    Workmanager().initialize(callBackDispatcher,isInDebugMode: kDebugMode);
+    Workmanager().initialize(callBackDispatcher, isInDebugMode: kDebugMode);
 
     FlutterNativeSplash.remove();
-  } catch (e,t) {
+  } catch (e, t) {
     MiniLogger.e('Failed to initialize app: ${e.toString()}, Error type: ${e.runtimeType}');
     MiniLogger.t(t.toString());
   }
@@ -70,34 +69,33 @@ class _DarrtState extends State<Darrt> {
 
   @override
   Widget build(BuildContext context) {
-    return  ListenableBuilder(
-        listenable: g.themeMan,
-        builder: (context, widget) {
-          final lightTheme = g.themeMan.lightTheme;
-          final darkTheme = g.themeMan.darkTheme;
-          final themeMode = g.themeMan.themeMode;
+    return ListenableBuilder(
+      listenable: g.themeMan,
+      builder: (context, widget) {
+        final lightTheme = g.themeMan.lightTheme;
+        final darkTheme = g.themeMan.darkTheme;
+        final themeMode = g.themeMan.themeMode;
 
-          return MaterialApp(
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              FlutterQuillLocalizations.delegate,
-            ],
-            navigatorKey: Darrt.navigatorKey,
-            theme: lightTheme.copyWith(
-              textTheme: GoogleFonts.gabaritoTextTheme(lightTheme.textTheme),
-            ),
-            darkTheme: darkTheme.copyWith(
-              textTheme: GoogleFonts.gabaritoTextTheme(darkTheme.textTheme),
-
-            ),
-            themeMode: themeMode,
-            debugShowCheckedModeBanner: false,
-            title: 'Darrt',
-            home: const Home(),
-          );
-        }
+        return MaterialApp(
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            FlutterQuillLocalizations.delegate,
+          ],
+          navigatorKey: Darrt.navigatorKey,
+          theme: lightTheme.copyWith(
+            textTheme: GoogleFonts.gabaritoTextTheme(lightTheme.textTheme),
+          ),
+          darkTheme: darkTheme.copyWith(
+            textTheme: GoogleFonts.gabaritoTextTheme(darkTheme.textTheme),
+          ),
+          themeMode: themeMode,
+          debugShowCheckedModeBanner: false,
+          title: 'Darrt',
+          home: Home(),
+        );
+      },
     );
   }
 }

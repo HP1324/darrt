@@ -286,4 +286,23 @@ class SoundController extends ChangeNotifier {
     _selectedSoundInDialog.dispose();
     super.dispose();
   }
+
+  List<Map<String, String>> getAllSounds() {
+    // Built-in sounds
+    final builtInSounds = [
+      {'path': 'assets/sounds/brown_noise.mp3', 'name': 'Brown Noise'},
+      {'path': 'assets/sounds/clock_ticking.mp3', 'name': 'Clock Ticking'},
+      {'path': 'assets/sounds/fire.mp3', 'name': 'Crackling Fire'},
+      {'path': 'assets/sounds/forest_1.mp3', 'name': 'Forest Ambience'},
+      {'path': 'assets/sounds/forest_2.mp3', 'name': 'Deep Forest'},
+      {'path': 'assets/sounds/mountain_winds.mp3', 'name': 'Mountain Winds'},
+      {'path': 'assets/sounds/rain.mp3', 'name': 'Rain Sounds'},
+      {'path': 'assets/sounds/silent_room.mp3', 'name': 'Silent Room'},
+      {'path': 'assets/sounds/waterfall.mp3', 'name': 'Waterfall'},
+      {'path': 'assets/sounds/birds_near_river.mp3', 'name': 'Birds + River'},
+    ];
+
+    // Combine with custom sounds
+    return [...builtInSounds, ...customSounds];
+  }
 }
