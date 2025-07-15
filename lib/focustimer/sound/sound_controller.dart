@@ -1,12 +1,15 @@
 import 'dart:convert';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
+import 'package:minimaltodo/focustimer/sound/my_audio_handler.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 
 class SoundController extends ChangeNotifier {
   final AudioPlayer _audioPlayer = AudioPlayer();
+  AudioHandler? _audioHandler;
   String? _currentSound;
   List<Map<String, String>> _customSounds = [];
   bool _isPlaying = false;
@@ -28,6 +31,17 @@ class SoundController extends ChangeNotifier {
 
   // Initialize the service
   void initialize() async {
+    // Initialize audio service
+    _audioHandler = await AudioService.init(
+      builder: () => MyAudioHandler(_audioPlayer, this),
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'com.stellarmotion.darrt.audio',
+        androidNotificationChannelName: 'Audio Service',
+        androidNotificationOngoing: true,
+        androidStopForegroundOnPause: true,
+      ),
+    );
+
     // Set loop mode for continuous playback
     _audioPlayer.setLoopMode(LoopMode.one);
 
@@ -53,9 +67,6 @@ class SoundController extends ChangeNotifier {
       }
     });
 
-    _audioPlayer.loopModeStream.listen((LoopMode mode){
-
-    });
     _loadCustomSounds();
   }
 
@@ -93,6 +104,7 @@ class SoundController extends ChangeNotifier {
         // If null is passed, we want to stop and clear current sound
         _currentSound = null;
         _isPlaying = false;
+        await _audioHandler?.stop();
         notifyListeners();
         return;
       }
@@ -108,7 +120,19 @@ class SoundController extends ChangeNotifier {
       }
 
       await _audioPlayer.setAudioSource(audioSource);
+
+      // Update media item for audio service
+      final displayName = getDisplayName(soundPath);
+      await _audioHandler?.updateMediaItem(MediaItem(
+        id: soundPath,
+        title: displayName,
+        artist: 'Minimal Todo',
+        duration: const Duration(hours: 24), // Set a very long duration for ambient sounds
+        artUri: Uri.parse('android.resource://com.minimaltodo/drawable/ic_notification'),
+      ));
+
       await _audioPlayer.play();
+      await _audioHandler?.play();
 
       // Note: _isPlaying will be updated by the state listener
       notifyListeners();
@@ -154,17 +178,20 @@ class SoundController extends ChangeNotifier {
   // Pause audio
   Future<void> pauseAudio() async {
     await _audioPlayer.pause();
+    await _audioHandler?.pause();
   }
 
   // Resume audio
   Future<void> resumeAudio() async {
     await _audioPlayer.play();
+    await _audioHandler?.play();
   }
 
   // Stop audio - Enhanced version
   Future<void> stopAudio() async {
     try {
       await _audioPlayer.stop();
+      await _audioHandler?.stop();
       _currentSound = null;
       _isPlaying = false;
       notifyListeners();

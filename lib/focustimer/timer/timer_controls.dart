@@ -66,18 +66,18 @@ class TimerControls extends StatelessWidget {
     );
   }
 
-  void _handlePlayPause() {
+  void _handlePlayPause() async {
     if (g.timerController.isRunning) {
       g.timerController.pauseTimer();
       if (g.audioController.isPlaying) {
-        g.audioController.pauseAudio();
+        await g.audioController.pauseAudio();
       }
     } else {
       g.timerController.startTimer();
       if (g.audioController.isPaused) {
-        g.audioController.resumeAudio();
+        await g.audioController.resumeAudio();
       } else if (g.audioController.isStopped) {
-        g.audioController.playAudio(g.audioController.currentSound);
+        await g.audioController.playAudio(g.audioController.currentSound);
       }
     }
   }
