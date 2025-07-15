@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:darrt/focustimer/sound/sound_page.dart';
+import 'package:darrt/focustimer/sound/sound_tab.dart';
 import 'package:darrt/focustimer/timer/focus_timer_tab.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 
@@ -39,7 +39,7 @@ class _FocusTimerPageState extends State<FocusTimerPage> with SingleTickerProvid
               controller: tabController,
               children: [
                 FocusTimerTab(),
-                SoundPage()
+                SoundTab()
               ],
             ),
           ),
