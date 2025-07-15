@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:minimaltodo/app/services/mini_box.dart';
 import 'package:minimaltodo/helpers/mini_logger.dart';
 
-import '../../helpers/globals.dart' as g show soundController, adsController;
+import '../../helpers/globals.dart' as g show audioController, adsController;
 
 class SoundPickerDialog extends StatefulWidget {
   const SoundPickerDialog({super.key});
@@ -30,7 +30,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
   @override
   void initState() {
     super.initState();
-    g.soundController.initializeDialog();
+    g.audioController.initializeDialog();
     g.adsController.initializeFullPageAdOnCustomSoundPick();
   }
 
@@ -55,11 +55,11 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
         String customSoundName = result.files.single.name.split('.').first;
 
         // Add to custom sounds list
-        g.soundController.addCustomSound(customSoundPath, customSoundName);
+        g.audioController.addCustomSound(customSoundPath, customSoundName);
 
-        g.soundController.setSelectedSoundInDialog(customSoundPath);
+        g.audioController.setSelectedSoundInDialog(customSoundPath);
 
-        await g.soundController.playSound(customSoundPath);
+        await g.audioController.playAudio(customSoundPath);
       }
     } catch (e) {
       MiniLogger.dp('Error picking custom sound: $e');
@@ -99,10 +99,10 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
       ),
       elevation: 8,
       content: ListenableBuilder(
-        listenable: g.soundController,
+        listenable: g.audioController,
         builder: (context, child) {
           return ValueListenableBuilder<String?>(
-            valueListenable: g.soundController.selectedSoundInDialog,
+            valueListenable: g.audioController.selectedSoundInDialog,
             builder: (context, selectedSound, child) {
               return SizedBox(
                 width: double.maxFinite,
@@ -127,7 +127,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                         isSelected: selectedSound == entry.key,
                       ),
                     ),
-                    ...g.soundController.customSounds.map(
+                    ...g.audioController.customSounds.map(
                           (sound) => _buildSoundTile(
                         title: sound['name']!,
                         subtitle: 'Custom sound',
@@ -221,12 +221,12 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () async {
-          g.soundController.setSelectedSoundInDialog(value);
+          g.audioController.setSelectedSoundInDialog(value);
           // Preview the sound but don't set it as current until Apply is pressed
           if (value != null) {
-            await g.soundController.playSound(value);
+            await g.audioController.playAudio(value);
           } else {
-            await g.soundController.stopAudio();
+            await g.audioController.stopAudio();
           }
         },
         child: Padding(

@@ -95,7 +95,7 @@ class TaskViewModel extends ViewModel<Task> {
 
   void toggleStatus(Task task, bool value, DateTime d) async {
     if (value) {
-      g.soundController.playSoundOnly('assets/sounds/bell_sound.mp3');
+      g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
     }
     if (task.isRepeating) {
       final date = DateUtils.dateOnly(d).millisecondsSinceEpoch;
