@@ -201,7 +201,7 @@ class _SoundPageState extends State<SoundPage> {
               ],
             ),
           ),
-
+          Slider(value: 0.5, onChanged: (value){}),
           // Rest of the content - Centered
           Expanded(
             child: Center(
