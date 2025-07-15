@@ -14,8 +14,6 @@ class FocusTimerTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = ColorScheme.of(context);
-    final mediaQuery = MediaQuery.of(context);
-
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
