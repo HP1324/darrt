@@ -92,6 +92,7 @@ class DefaultReminderTypeSection extends StatefulWidget {
 
 class _DefaultReminderTypeSectionState extends State<DefaultReminderTypeSection> {
   String defaultReminderType = MiniBox().read(mDefaultReminderType) ?? notifReminderType;
+  
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
