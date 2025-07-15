@@ -53,6 +53,9 @@ class SoundController extends ChangeNotifier {
       }
     });
 
+    _audioPlayer.loopModeStream.listen((LoopMode mode){
+
+    });
     _loadCustomSounds();
   }
 
