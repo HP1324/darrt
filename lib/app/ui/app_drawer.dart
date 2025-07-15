@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
-import 'package:darrt/app/ads/my_banner_ad_widget.dart';
 import 'package:darrt/app/ui/settings_page/settings_page.dart';
 import 'package:darrt/app/ui/theme_settings_page.dart';
 import 'package:darrt/helpers/mini_router.dart';
