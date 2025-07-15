@@ -1,16 +1,16 @@
 import 'package:audioplayers/audioplayers.dart' show ReleaseMode;
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app/notification/notification_service.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/messages.dart';
-import 'package:minimaltodo/app/services/mini_box.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/app/services/object_box.dart';
-import 'package:minimaltodo/helpers/typedefs.dart';
-import 'package:minimaltodo/objectbox.g.dart';
-import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
-import 'package:minimaltodo/task/models/task.dart';
-import 'package:minimaltodo/task/models/task_completion.dart';
+import 'package:darrt/app/notification/notification_service.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/messages.dart';
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/helpers/typedefs.dart';
+import 'package:darrt/objectbox.g.dart';
+import 'package:darrt/app/state/viewmodels/view_model.dart';
+import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/models/task_completion.dart';
 
 import '../../note/models/note.dart' show Note;
 

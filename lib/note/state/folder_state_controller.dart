@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:minimaltodo/app/state/controllers/state_controller.dart';
-import 'package:minimaltodo/note/models/folder.dart';
+import 'package:darrt/app/state/controllers/state_controller.dart';
+import 'package:darrt/note/models/folder.dart';
 part 'folder_state_controller.freezed.dart';
 
 @freezed

@@ -2,8 +2,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:minimaltodo/app/services/mini_box.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/helpers/mini_logger.dart';
 
 import '../../helpers/globals.dart' as g;
 import '../../task/models/task.dart' show Task;
@@ -223,7 +223,6 @@ class TimerController extends ChangeNotifier {
     _startTime = null;
     _pausedSeconds = 0;
     _saveToStorage();
-    g.audioController.stopAudio();
     notifyListeners();
   }
 

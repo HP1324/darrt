@@ -1,6 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:minimaltodo/focustimer/sound/sound_controller.dart';
+import 'package:darrt/focustimer/sound/sound_controller.dart';
 
 class MyAudioHandler extends BaseAudioHandler {
   final AudioPlayer _player;

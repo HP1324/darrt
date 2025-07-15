@@ -1,6 +1,6 @@
-// import 'package:minimaltodo/objectbox.g.dart';
+// import 'package:darrt/objectbox.g.dart';
 import 'package:objectbox/objectbox.dart';
-import 'package:minimaltodo/helpers/consts.dart';
+import 'package:darrt/helpers/consts.dart';
 
 @Entity()
 class QuickReminder {

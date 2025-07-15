@@ -1,7 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/task/models/task.dart';
-import 'package:minimaltodo/task/ui/task_note_bottom_sheet.dart';
+import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/ui/task_note_bottom_sheet.dart';
 
 import '../../helpers/globals.dart' as g show timerController, taskVm,audioController, taskSc;
 

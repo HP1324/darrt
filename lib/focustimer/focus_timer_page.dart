@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/focustimer/sound/sound_page.dart';
-import 'package:minimaltodo/focustimer/timer/focus_timer_tab.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:darrt/focustimer/sound/sound_page.dart';
+import 'package:darrt/focustimer/timer/focus_timer_tab.dart';
+import 'package:darrt/helpers/globals.dart' as g;
 
 class FocusTimerPage extends StatefulWidget {
   const FocusTimerPage({super.key});

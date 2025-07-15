@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:darrt/helpers/mini_logger.dart';
 
 class AdsController extends ChangeNotifier {
   // final String _homePageBannerUnitId = "ca-app-pub-4229818111096005/5755031111";

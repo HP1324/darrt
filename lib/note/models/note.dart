@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart' show TextSelection;
 import 'package:flutter_quill/flutter_quill.dart' show Document, QuillController;
 import 'package:flutter_quill/quill_delta.dart' show Delta;
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/app/services/object_box.dart';
-import 'package:minimaltodo/note/models/folder.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/note/models/folder.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/task/models/task.dart';
-import 'package:minimaltodo/task/ui/add_task_page.dart';
+import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/helpers/utils.dart';
+import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/ui/add_task_page.dart';
 
 import '../../helpers/globals.dart' as g show taskVm, timerController;
 

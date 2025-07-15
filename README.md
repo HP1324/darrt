@@ -1,4 +1,4 @@
-# minimaltodo
+# darrt
 
 A simple yet powerful todo and notes app
 

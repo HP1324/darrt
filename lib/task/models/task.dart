@@ -1,13 +1,13 @@
 import 'dart:convert';
 
-import 'package:minimaltodo/category/models/task_category.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/app/services/object_box.dart';
-import 'package:minimaltodo/objectbox.g.dart';
-import 'package:minimaltodo/task/models/reminder.dart';
-import 'package:minimaltodo/task/models/repeat_config.dart';
-import 'package:minimaltodo/task/models/task_completion.dart';
+import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/objectbox.g.dart';
+import 'package:darrt/task/models/reminder.dart';
+import 'package:darrt/task/models/repeat_config.dart';
+import 'package:darrt/task/models/task_completion.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()

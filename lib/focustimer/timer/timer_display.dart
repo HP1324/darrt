@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/focustimer/timer/timer_controller.dart';
+import 'package:darrt/focustimer/timer/timer_controller.dart';
 
 import '../../helpers/globals.dart' as g show timerController;
 

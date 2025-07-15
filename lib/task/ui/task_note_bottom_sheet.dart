@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/note/ui/add_note_page.dart';
-import 'package:minimaltodo/task/state/task_state_controller.dart';
-import 'package:minimaltodo/task/state/task_view_model.dart';
-import 'package:minimaltodo/task/ui/task_note_item.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/note/ui/add_note_page.dart';
+import 'package:darrt/task/state/task_state_controller.dart';
+import 'package:darrt/task/state/task_view_model.dart';
+import 'package:darrt/task/ui/task_note_item.dart';
 
 import '../models/task.dart';
 

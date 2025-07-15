@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_quill/flutter_quill.dart' show QuillController;
-import 'package:minimaltodo/app/state/controllers/state_controller.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/app/services/object_box.dart';
-import 'package:minimaltodo/note/models/folder.dart';
-import 'package:minimaltodo/note/models/note.dart';
+import 'package:darrt/app/state/controllers/state_controller.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/note/models/folder.dart';
+import 'package:darrt/note/models/note.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'note_state_controller.freezed.dart';

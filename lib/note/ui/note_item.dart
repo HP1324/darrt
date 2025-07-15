@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/helpers/utils.dart' show formatDateAndTime, formatTime;
-import 'package:minimaltodo/note/models/note.dart';
-import 'package:minimaltodo/note/ui/add_note_page.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/helpers/utils.dart' show formatDateAndTime, formatTime;
+import 'package:darrt/note/models/note.dart';
+import 'package:darrt/note/ui/add_note_page.dart';
 
 class NoteItem extends StatefulWidget {
   final Note note;

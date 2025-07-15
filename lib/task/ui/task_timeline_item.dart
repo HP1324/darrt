@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:minimaltodo/category/ui/category_chip.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/task/models/task.dart';
-import 'package:minimaltodo/task/ui/add_task_page.dart';
+import 'package:darrt/category/ui/category_chip.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/ui/add_task_page.dart';
 
 class TaskTimelineItem extends StatefulWidget {
   const TaskTimelineItem({

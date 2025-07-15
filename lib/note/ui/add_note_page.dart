@@ -4,24 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:minimaltodo/app/ads/my_banner_ad_widget.dart';
-import 'package:minimaltodo/app/ads/timed_banner_ad_widget.dart';
-import 'package:minimaltodo/helpers/icon_color_storage.dart';
-import 'package:minimaltodo/helpers/messages.dart' show Messages;
-import 'package:minimaltodo/app/services/mini_box.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/helpers/utils.dart'
+import 'package:darrt/app/ads/my_banner_ad_widget.dart';
+import 'package:darrt/app/ads/timed_banner_ad_widget.dart';
+import 'package:darrt/helpers/icon_color_storage.dart';
+import 'package:darrt/helpers/messages.dart' show Messages;
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/helpers/utils.dart'
     show generateNotePdf, savePdfToDownloads, showToast, showSettingsDialog;
-import 'package:minimaltodo/note/models/folder.dart';
-import 'package:minimaltodo/note/models/note.dart';
-import 'package:minimaltodo/note/state/note_state_controller.dart';
-import 'package:minimaltodo/note/ui/add_folder_page.dart';
+import 'package:darrt/note/models/folder.dart';
+import 'package:darrt/note/models/note.dart';
+import 'package:darrt/note/state/note_state_controller.dart';
+import 'package:darrt/note/ui/add_folder_page.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:toastification/toastification.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:darrt/helpers/globals.dart' as g;
 
 import '../../helpers/consts.dart';
 import '../../task/models/task.dart';

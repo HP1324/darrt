@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app/services/mini_box.dart';
-import 'package:minimaltodo/app/ui/icon_color_picker.dart';
-import 'package:minimaltodo/helpers/icon_color_storage.dart';
-import 'package:minimaltodo/helpers/messages.dart';
-import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/note/models/folder.dart';
-import 'package:minimaltodo/note/state/folder_state_controller.dart';
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/app/ui/icon_color_picker.dart';
+import 'package:darrt/helpers/icon_color_storage.dart';
+import 'package:darrt/helpers/messages.dart';
+import 'package:darrt/helpers/utils.dart';
+import 'package:darrt/note/models/folder.dart';
+import 'package:darrt/note/state/folder_state_controller.dart';
 import 'package:toastification/toastification.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:darrt/helpers/globals.dart' as g;
 
 class AddFolderPage extends StatefulWidget {
   const AddFolderPage({super.key, required this.edit, this.folder})

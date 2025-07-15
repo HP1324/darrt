@@ -1,7 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app/services/mini_box.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/helpers/mini_logger.dart';
 
 import '../../helpers/globals.dart' as g show audioController, adsController;
 

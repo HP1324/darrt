@@ -7,7 +7,7 @@
 //part of the actual code, but rather used as a test                                 //
 ///////////////////////////////////////////////////////////////////////////////////////
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/task/models/task.dart';
+import 'package:darrt/task/models/task.dart';
 
 
 

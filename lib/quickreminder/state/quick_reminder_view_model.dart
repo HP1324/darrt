@@ -1,5 +1,5 @@
-import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
-import 'package:minimaltodo/quickreminder/model/quick_reminder.dart';
+import 'package:darrt/app/state/viewmodels/view_model.dart';
+import 'package:darrt/quickreminder/model/quick_reminder.dart';
 
 class QuickReminderViewModel extends ViewModel<QuickReminder> {
 

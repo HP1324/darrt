@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/note/models/note.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/note/models/note.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()

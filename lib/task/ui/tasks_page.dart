@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:minimaltodo/app/ui/empty_tasks_indicator.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/messages.dart';
-import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/task/models/task.dart';
-import 'package:minimaltodo/task/ui/task_item.dart';
-import 'package:minimaltodo/task/ui/task_timeline_item.dart';
+import 'package:darrt/app/ui/empty_tasks_indicator.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/messages.dart';
+import 'package:darrt/helpers/utils.dart';
+import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/ui/task_item.dart';
+import 'package:darrt/task/ui/task_timeline_item.dart';
 import 'package:toastification/toastification.dart';
 
 class TasksPage extends StatefulWidget {

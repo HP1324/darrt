@@ -1,13 +1,12 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
-import 'package:minimaltodo/app/services/boxpref.dart';
-import 'package:minimaltodo/category/models/task_category.dart';
-import 'package:minimaltodo/note/models/folder.dart';
-import 'package:minimaltodo/note/models/note.dart';
-import 'package:minimaltodo/objectbox.g.dart';
-import 'package:minimaltodo/task/models/task.dart';
-import 'package:minimaltodo/task/models/task_completion.dart';
+import 'package:darrt/app/services/boxpref.dart';
+import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/note/models/folder.dart';
+import 'package:darrt/note/models/note.dart';
+import 'package:darrt/objectbox.g.dart';
+import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/models/task_completion.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
-
 late final Admin admin;
 
 class ObjectBox {

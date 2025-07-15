@@ -8,15 +8,15 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:minimaltodo/app/notification/notification_action_controller.dart';
-import 'package:minimaltodo/app/notification/notification_service.dart';
-import 'package:minimaltodo/app/services/auto_backup_service.dart';
-import 'package:minimaltodo/app/services/google_sign_in_service.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/app/services/mini_box.dart';
-import 'package:minimaltodo/app/services/object_box.dart';
-import 'package:minimaltodo/home.dart';
+import 'package:darrt/app/notification/notification_action_controller.dart';
+import 'package:darrt/app/notification/notification_service.dart';
+import 'package:darrt/app/services/auto_backup_service.dart';
+import 'package:darrt/app/services/google_sign_in_service.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/home.dart';
 import 'package:workmanager/workmanager.dart';
 
 

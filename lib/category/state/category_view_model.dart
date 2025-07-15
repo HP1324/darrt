@@ -1,10 +1,10 @@
-import 'package:minimaltodo/category/models/task_category.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/messages.dart';
-import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
+import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/messages.dart';
+import 'package:darrt/app/state/viewmodels/view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/task/models/task.dart';
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/task/models/task.dart';
 
 class CategoryViewModel extends ViewModel<TaskCategory> {
   final ScrollController scrollController = ScrollController();

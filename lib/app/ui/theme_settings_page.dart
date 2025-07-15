@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:minimaltodo/app/ads/my_banner_ad_widget.dart';
-import 'package:minimaltodo/app/ads/timed_banner_ad_widget.dart';
-import 'package:minimaltodo/app/state/managers/theme_manager.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:darrt/app/ads/my_banner_ad_widget.dart';
+import 'package:darrt/app/ads/timed_banner_ad_widget.dart';
+import 'package:darrt/app/state/managers/theme_manager.dart';
+import 'package:darrt/helpers/globals.dart' as g;
 
 class ThemeSettingsPage extends StatefulWidget {
   const ThemeSettingsPage({super.key});

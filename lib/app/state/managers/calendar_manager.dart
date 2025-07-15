@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/helpers/consts.dart';
+import 'package:darrt/helpers/consts.dart';
 
 class CalendarManager extends ChangeNotifier {
   DateTime selectedDate = DateTime.now();

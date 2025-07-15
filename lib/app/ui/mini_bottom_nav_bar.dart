@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:darrt/helpers/globals.dart' as g;
 
 class MiniBottomNavBar extends StatefulWidget {
   const MiniBottomNavBar({super.key, required this.children});
