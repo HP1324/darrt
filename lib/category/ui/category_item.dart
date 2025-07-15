@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/category/models/task_category.dart';
-import 'package:minimaltodo/category/ui/add_category_page.dart';
-import 'package:minimaltodo/category/ui/tasks_for_category_page.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/icon_color_storage.dart';
-import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/helpers/utils.dart';
+import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/category/ui/add_category_page.dart';
+import 'package:darrt/category/ui/tasks_for_category_page.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/icon_color_storage.dart';
+import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/helpers/utils.dart';
 import 'package:toastification/toastification.dart';
 
 class CategoryItem extends StatefulWidget {

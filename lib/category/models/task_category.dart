@@ -1,5 +1,5 @@
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/task/models/task.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/task/models/task.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()

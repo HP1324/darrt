@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/focustimer/sound/sound_picker_dialog.dart';
+import 'package:darrt/focustimer/sound/sound_picker_dialog.dart';
 
 import '../../helpers/globals.dart' as g show audioController;
 

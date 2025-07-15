@@ -1,8 +1,8 @@
-import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/messages.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/note/models/folder.dart';
+import 'package:darrt/app/state/viewmodels/view_model.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/messages.dart';
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/note/models/folder.dart';
 
 import '../models/note.dart';
 

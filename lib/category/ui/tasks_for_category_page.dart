@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/category/models/task_category.dart';
-import 'package:minimaltodo/helpers/icon_color_storage.dart';
-import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/task/ui/add_task_page.dart';
-import 'package:minimaltodo/task/ui/task_item.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/helpers/icon_color_storage.dart';
+import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/task/ui/add_task_page.dart';
+import 'package:darrt/task/ui/task_item.dart';
+import 'package:darrt/helpers/globals.dart' as g;
 
 class TasksForCategoryPage extends StatefulWidget {
   const TasksForCategoryPage({super.key, required this.category});

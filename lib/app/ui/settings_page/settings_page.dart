@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app/services/mini_box.dart';
+import 'package:darrt/app/services/mini_box.dart';
 import '../../../helpers/consts.dart';
-import 'package:minimaltodo/app/ui/settings_page/backup_restore_section.dart';
+import 'package:darrt/app/ui/settings_page/backup_restore_section.dart';
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 

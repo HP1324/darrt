@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:minimaltodo/app/notification/notification_service.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/messages.dart' show Messages;
-import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/quickreminder/model/quick_reminder.dart';
+import 'package:darrt/app/notification/notification_service.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/messages.dart' show Messages;
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/helpers/utils.dart';
+import 'package:darrt/quickreminder/model/quick_reminder.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../helpers/consts.dart' show notifReminderType, alarmReminderType;

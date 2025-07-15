@@ -1,6 +1,6 @@
 // completion_actions.dart
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/focustimer/timer/timer_controller.dart';
+import 'package:darrt/focustimer/timer/timer_controller.dart';
 
 class CompletionActions extends StatelessWidget {
   final TimerController controller;

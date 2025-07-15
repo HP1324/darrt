@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:minimaltodo/note/models/folder.dart';
-import 'package:minimaltodo/helpers/icon_color_storage.dart';
-import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/note/ui/add_note_page.dart';
-import 'package:minimaltodo/note/ui/note_item.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:darrt/note/models/folder.dart';
+import 'package:darrt/helpers/icon_color_storage.dart';
+import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/note/ui/add_note_page.dart';
+import 'package:darrt/note/ui/note_item.dart';
+import 'package:darrt/helpers/globals.dart' as g;
 
 class NotesForFolderPage extends StatefulWidget {
   const NotesForFolderPage({super.key, required this.folder});

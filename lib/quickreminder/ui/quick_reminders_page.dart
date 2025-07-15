@@ -1,8 +1,8 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/helpers/consts.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/quickreminder/ui/quick_reminder_dialog.dart';
+import 'package:darrt/helpers/consts.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/quickreminder/ui/quick_reminder_dialog.dart';
 
 class QuickRemindersPage extends StatefulWidget {
   const QuickRemindersPage({super.key});

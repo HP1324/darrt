@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:minimaltodo/app/ads/my_banner_ad_widget.dart';
-import 'package:minimaltodo/app/ads/timed_banner_ad_widget.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/note/ui/add_note_page.dart';
-import 'package:minimaltodo/note/ui/folders_page.dart';
-import 'package:minimaltodo/note/ui/note_item.dart';
+import 'package:darrt/app/ads/my_banner_ad_widget.dart';
+import 'package:darrt/app/ads/timed_banner_ad_widget.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/helpers/utils.dart';
+import 'package:darrt/note/ui/add_note_page.dart';
+import 'package:darrt/note/ui/folders_page.dart';
+import 'package:darrt/note/ui/note_item.dart';
 import 'package:toastification/toastification.dart' show ToastificationType;
 import 'dart:convert';
 

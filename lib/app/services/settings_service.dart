@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:darrt/helpers/mini_logger.dart';
 
 class SettingsService {
-  static const _batteryChannel = MethodChannel('com.hp.minimaltodo/battery_settings');
+  static const _batteryChannel = MethodChannel('com.hp.darrt/battery_settings');
 
   static Future<void> openBatterySettings() async {
     try {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/helpers/icon_color_storage.dart';
+import 'package:darrt/helpers/icon_color_storage.dart';
 
 class SelectionTile extends StatelessWidget {
   final String title;

@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app/services/boxpref.dart';
-import 'package:minimaltodo/app/services/object_box.dart';
-import 'package:minimaltodo/helpers/consts.dart';
-import 'package:minimaltodo/objectbox.g.dart';
+import 'package:darrt/app/services/boxpref.dart';
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/helpers/consts.dart';
+import 'package:darrt/objectbox.g.dart';
 
 class MiniBox {
   static final _instance = MiniBox._internal();

@@ -3,16 +3,16 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:minimaltodo/category/models/task_category.dart';
-import 'package:minimaltodo/helpers/messages.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/app/services/object_box.dart';
-import 'package:minimaltodo/app/state/controllers/state_controller.dart';
-import 'package:minimaltodo/note/models/note.dart';
-import 'package:minimaltodo/task/models/reminder.dart';
-import 'package:minimaltodo/task/models/repeat_config.dart';
-import 'package:minimaltodo/task/models/task.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/helpers/messages.dart';
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/app/state/controllers/state_controller.dart';
+import 'package:darrt/note/models/note.dart';
+import 'package:darrt/task/models/reminder.dart';
+import 'package:darrt/task/models/repeat_config.dart';
+import 'package:darrt/task/models/task.dart';
+import 'package:darrt/helpers/globals.dart' as g;
 part 'task_state_controller.freezed.dart';
 
 ///Immutable data-class to store the temporary state of the task add page

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:minimaltodo/app/ads/my_banner_ad_widget.dart';
-import 'package:minimaltodo/app/ads/timed_banner_ad_widget.dart';
-import 'package:minimaltodo/app/ui/app_drawer.dart';
-import 'package:minimaltodo/app/ui/mini_app_bar.dart';
-import 'package:minimaltodo/app/ui/mini_bottom_nav_bar.dart';
-import 'package:minimaltodo/category/ui/categories_page.dart';
-import 'package:minimaltodo/focustimer/focus_timer_page.dart';
-import 'package:minimaltodo/helpers/mini_router.dart';
-import 'package:minimaltodo/helpers/utils.dart';
-import 'package:minimaltodo/note/ui/notes_page.dart';
-import 'package:minimaltodo/task/ui/add_task_page.dart';
-import 'package:minimaltodo/task/ui/task_search_page.dart';
-import 'package:minimaltodo/task/ui/tasks_page.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
+import 'package:darrt/app/ads/my_banner_ad_widget.dart';
+import 'package:darrt/app/ads/timed_banner_ad_widget.dart';
+import 'package:darrt/app/ui/app_drawer.dart';
+import 'package:darrt/app/ui/mini_app_bar.dart';
+import 'package:darrt/app/ui/mini_bottom_nav_bar.dart';
+import 'package:darrt/category/ui/categories_page.dart';
+import 'package:darrt/focustimer/focus_timer_page.dart';
+import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/helpers/utils.dart';
+import 'package:darrt/note/ui/notes_page.dart';
+import 'package:darrt/task/ui/add_task_page.dart';
+import 'package:darrt/task/ui/task_search_page.dart';
+import 'package:darrt/task/ui/tasks_page.dart';
+import 'package:darrt/helpers/globals.dart' as g;
 
 class Home extends StatefulWidget {
   const Home({super.key});

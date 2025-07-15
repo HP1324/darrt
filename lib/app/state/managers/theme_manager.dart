@@ -1,8 +1,8 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/app/services/mini_box.dart';
-import 'package:minimaltodo/helpers/consts.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/helpers/consts.dart';
+import 'package:darrt/helpers/mini_logger.dart';
 
 class ThemeManager extends ChangeNotifier {
 

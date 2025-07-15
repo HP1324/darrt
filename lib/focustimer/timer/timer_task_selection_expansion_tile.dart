@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/focustimer/timer/task_selection_dialog.dart';
-import 'package:minimaltodo/focustimer/timer/timer_task_item.dart';
+import 'package:darrt/focustimer/timer/task_selection_dialog.dart';
+import 'package:darrt/focustimer/timer/timer_task_item.dart';
 
 import '../../helpers/globals.dart' as g show taskVm, timerController;
 

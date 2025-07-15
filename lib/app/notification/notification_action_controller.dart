@@ -1,17 +1,17 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:minimaltodo/app/notification/notification_service.dart';
-import 'package:minimaltodo/app/ui/settings_page/settings_page.dart';
-import 'package:minimaltodo/helpers/consts.dart';
-import 'package:minimaltodo/helpers/globals.dart' as g;
-import 'package:minimaltodo/app/services/mini_box.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/app/services/object_box.dart';
-import 'package:minimaltodo/main.dart';
-import 'package:minimaltodo/task/models/task.dart';
-import 'package:minimaltodo/task/ui/add_task_page.dart';
-import 'package:minimaltodo/helpers/utils.dart';
+import 'package:darrt/app/notification/notification_service.dart';
+import 'package:darrt/app/ui/settings_page/settings_page.dart';
+import 'package:darrt/helpers/consts.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/main.dart';
+import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/ui/add_task_page.dart';
+import 'package:darrt/helpers/utils.dart';
 
 @pragma("vm:entry-point")
 Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {

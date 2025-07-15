@@ -1,6 +1,6 @@
 // timer_type_selector.dart
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/focustimer/timer/timer_controller.dart';
+import 'package:darrt/focustimer/timer/timer_controller.dart';
 
 import '../../helpers/globals.dart' as g show timerController;
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:minimaltodo/helpers/consts.dart';
-import 'package:minimaltodo/app/services/mini_box.dart';
+import 'package:darrt/helpers/consts.dart';
+import 'package:darrt/app/services/mini_box.dart';
 
 class SettingsStateController {
 

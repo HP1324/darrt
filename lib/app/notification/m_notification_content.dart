@@ -1,7 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart' show TimeOfDay;
-import 'package:minimaltodo/task/models/reminder.dart';
-import 'package:minimaltodo/task/models/task.dart';
+import 'package:darrt/task/models/reminder.dart';
+import 'package:darrt/task/models/task.dart';
 
 class MSingleNotificationContent extends NotificationContent{
   MSingleNotificationContent({

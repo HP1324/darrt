@@ -1,12 +1,12 @@
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:minimaltodo/app/services/backup_service.dart' show MergeType, BackupMergeService;
-import 'package:minimaltodo/category/models/task_category.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
-import 'package:minimaltodo/app/services/object_box.dart';
-import 'package:minimaltodo/objectbox.g.dart' show Box;
-import 'package:minimaltodo/task/models/task_completion.dart';
+import 'package:darrt/app/services/backup_service.dart' show MergeType, BackupMergeService;
+import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/objectbox.g.dart' show Box;
+import 'package:darrt/task/models/task_completion.dart';
 
 import '../../../note/models/folder.dart';
 import '../../../note/models/note.dart';

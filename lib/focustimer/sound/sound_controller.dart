@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:minimaltodo/app/services/mini_box.dart';
-import 'package:minimaltodo/focustimer/sound/my_audio_handler.dart';
-import 'package:minimaltodo/helpers/mini_logger.dart';
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/focustimer/sound/my_audio_handler.dart';
+import 'package:darrt/helpers/mini_logger.dart';
 
 class SoundController extends ChangeNotifier {
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -126,9 +126,8 @@ class SoundController extends ChangeNotifier {
       await _audioHandler?.updateMediaItem(MediaItem(
         id: soundPath,
         title: displayName,
-        artist: 'Minimal Todo',
-        duration: const Duration(hours: 24), // Set a very long duration for ambient sounds
-        artUri: Uri.parse('android.resource://com.minimaltodo/drawable/ic_notification'),
+        artist: 'Darrt',
+        duration: const Duration(hours: 24),
       ));
 
       await _audioPlayer.play();

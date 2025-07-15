@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' show QuillController;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 import 'package:intl/intl.dart';
-import 'package:minimaltodo/app/ui/icon_color_picker.dart';
+import 'package:darrt/app/ui/icon_color_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:toastification/toastification.dart';
 import 'consts.dart';
@@ -317,7 +317,7 @@ Future<Uint8List> generateNotePdf(QuillController controller) async {
 
 Future<void> savePdfToDownloads(Uint8List pdfBytes, String fileName) async {
   if (Platform.isAndroid) {
-    const platform = MethodChannel('com.hp.minimaltodo/pdf_saver');
+    const platform = MethodChannel('com.hp.darrt/pdf_saver');
     await platform.invokeMethod('savePdfToDownloads', {
       'filename': fileName,
       'bytes': pdfBytes,

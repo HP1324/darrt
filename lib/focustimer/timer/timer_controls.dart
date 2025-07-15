@@ -1,9 +1,9 @@
+import 'package:darrt/helpers/mini_logger.dart';
 import 'package:flutter/material.dart';
 
-import '../../helpers/globals.dart' as g show timerController,audioController;
+import '../../helpers/globals.dart' as g show timerController, audioController;
 
 class TimerControls extends StatelessWidget {
-
   const TimerControls({super.key});
 
   @override
@@ -16,21 +16,28 @@ class TimerControls extends StatelessWidget {
         _buildControlButton(
           context,
           icon: g.timerController.isRunning ? Icons.pause : Icons.play_arrow,
-          onPressed: g.timerController.isCompleted ? null : _handlePlayPause,
+          onPressed: g.timerController.isCompleted ? null : () async => await _handlePlayPause(),
           isPrimary: true,
           scheme: scheme,
         ),
         _buildControlButton(
           context,
           icon: Icons.stop,
-          onPressed: g.timerController.isIdle ? null : g.timerController.stopTimer,
+          onPressed: g.timerController.isIdle
+              ? null
+              : ()async {
+                  await _handleStop();
+                },
           isPrimary: false,
           scheme: scheme,
         ),
         _buildControlButton(
           context,
           icon: Icons.refresh,
-          onPressed: g.timerController.resetTimer,
+          onPressed: ()async{
+            g.timerController.resetTimer();
+            await g.audioController.pauseAudio();
+          },
           isPrimary: false,
           scheme: scheme,
         ),
@@ -66,7 +73,7 @@ class TimerControls extends StatelessWidget {
     );
   }
 
-  void _handlePlayPause() async {
+  Future<void> _handlePlayPause() async {
     if (g.timerController.isRunning) {
       g.timerController.pauseTimer();
       if (g.audioController.isPlaying) {
@@ -74,10 +81,23 @@ class TimerControls extends StatelessWidget {
       }
     } else {
       g.timerController.startTimer();
-      if (g.audioController.isPaused) {
+      MiniLogger.dp("Timer has started");
+
+      // Check if audio was previously playing (not stopped completely)
+      if (g.audioController.currentSound != null && !g.audioController.isPlaying) {
+        MiniLogger.dp('Resuming audio');
         await g.audioController.resumeAudio();
-      } else if (g.audioController.isStopped) {
+      } else if (g.audioController.currentSound != null && g.audioController.isStopped) {
         await g.audioController.playAudio(g.audioController.currentSound);
+      }
+    }
+  }
+
+  Future<void> _handleStop()async{
+    if(g.timerController.isRunning){
+      g.timerController.stopTimer();
+      if(g.audioController.isPlaying){
+        g.audioController.pauseAudio();
       }
     }
   }

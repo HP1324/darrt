@@ -1,6 +1,6 @@
-import 'package:minimaltodo/app/state/viewmodels/view_model.dart';
-import 'package:minimaltodo/helpers/messages.dart';
-import 'package:minimaltodo/note/models/note.dart';
+import 'package:darrt/app/state/viewmodels/view_model.dart';
+import 'package:darrt/helpers/messages.dart';
+import 'package:darrt/note/models/note.dart';
 
 class NoteViewModel extends ViewModel<Note> {
   NoteViewModel() {
