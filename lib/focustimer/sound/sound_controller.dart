@@ -193,10 +193,12 @@ class SoundController extends ChangeNotifier {
 
   // Play audio by sound path
   Future<void> playAudio(String? soundPath) async {
-    if (!isPlaying) {
+    // if (!isPlaying) {
       try {
         if (soundPath == null) {
-          await stopAudio();
+          if(isPlaying) {
+            await stopAudio();
+          }
           return;
         }
 
@@ -211,7 +213,7 @@ class SoundController extends ChangeNotifier {
         _isPlaying = false;
         notifyListeners();
       }
-    }
+    // }
   }
   // Play sound by index
   Future<void> playByIndex(int index) async {

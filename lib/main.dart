@@ -18,7 +18,7 @@ import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/home.dart';
 import 'package:workmanager/workmanager.dart';
-
+import 'package:flutter/services.dart';
 /// Initializes app services and state
 Future<void> initApp() async {
   try {
@@ -47,6 +47,9 @@ Future<void> initApp() async {
 
 void main() async {
   await initApp();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   runApp(Darrt());
 }
 
