@@ -98,12 +98,13 @@ class TaskViewModel extends ViewModel<Task> {
       g.soundController.playSoundOnly('assets/sounds/bell_sound.mp3');
     }
     if (task.isRepeating) {
-      MiniLogger.dp("Task is repeating");
       final date = DateUtils.dateOnly(d).millisecondsSinceEpoch;
       if (value) {
         final completion = TaskCompletion(date: DateUtils.dateOnly(d), isDone: value);
         completion.task.target = task;
         completion.taskUuid = completion.task.target!.uuid;
+        // here we need to merge completion uuid with its task's uuid, because, only giving date as uuid causes problem, that problem is that more than one completions can have same date, hence same uuid, so they will be considered duplicate in backup and restore, while in reality they are not duplicate.
+        completion.uuid = '${completion.uuid}${completion.taskUuid}';
         MiniLogger.dp('Completion uuid: ${completion.uuid!}');
         MiniLogger.dp('Completion task uuid: ${completion.taskUuid!}');
         _completionBox.put(completion);
@@ -145,10 +146,34 @@ class TaskViewModel extends ViewModel<Task> {
     item.id = id;
   }
 
+  // @override
+  // void putManyForRestore(List<Task> restoredItems, {List<TaskCompletion>? completions}) {
+  //   box.putMany(restoredItems);
+  //   restoreCompletionRelations(tasks: restoredItems, completions: completions!);
+  //   for (var task in restoredItems) {
+  //     NotificationService.removeAllTaskNotifications(task).then((_) async {
+  //       if (task.isRepeating) {
+  //         await NotificationService.createRepeatingTaskNotifications(task);
+  //       } else {
+  //         await NotificationService.createTaskNotification(task);
+  //       }
+  //     });
+  //   }
+  //   _completionBox.putMany(completions);
+  //   initializeItems();
+  //   notifyListeners();
+  // }
+
   @override
   void putManyForRestore(List<Task> restoredItems, {List<TaskCompletion>? completions}) {
+    // First, restore the relations before persisting
+    restoreCompletionRelations(tasks: restoredItems, completions: completions!);
+
+    // Now persist the objects with their relations set up
+    _completionBox.putMany(completions);
     box.putMany(restoredItems);
-    reassignTaskRelations(tasks: restoredItems, completions: completions!);
+
+    // Handle notifications after persistence
     for (var task in restoredItems) {
       NotificationService.removeAllTaskNotifications(task).then((_) async {
         if (task.isRepeating) {
@@ -158,18 +183,19 @@ class TaskViewModel extends ViewModel<Task> {
         }
       });
     }
-    _completionBox.putMany(completions);
+
     initializeItems();
     notifyListeners();
   }
 
-  void reassignTaskRelations({
+  void restoreCompletionRelations({
     required List<Task> tasks,
     required List<TaskCompletion> completions,
   }) {
     // Build UUID → Task map
     final taskByUuid = {for (var task in tasks) task.uuid: task};
 
+    // Restore Task ↔ TaskCompletion relations
     for (var completion in completions) {
       final matchingTask = taskByUuid[completion.taskUuid];
       if (matchingTask != null) {
