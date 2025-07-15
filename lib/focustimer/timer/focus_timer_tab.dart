@@ -16,7 +16,6 @@ class FocusTimerTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = ColorScheme.of(context);
     final mediaQuery = MediaQuery.of(context);
-    final availableHeight = mediaQuery.size.height * 0.6; // 60% of screen height
 
     return Container(
       decoration: BoxDecoration(
