@@ -176,26 +176,32 @@ class SoundController extends ChangeNotifier {
 
   // Pause audio
   Future<void> pauseAudio() async {
-    await _audioPlayer.pause();
-    await _audioHandler?.pause();
+    if(isPlaying) {
+      await _audioPlayer.pause();
+      await _audioHandler?.pause();
+    }
   }
 
   // Resume audio
   Future<void> resumeAudio() async {
-    await _audioPlayer.play();
-    await _audioHandler?.play();
+    if(isPaused) {
+      await _audioPlayer.play();
+      await _audioHandler?.play();
+    }
   }
 
   // Stop audio - Enhanced version
   Future<void> stopAudio() async {
-    try {
-      await _audioPlayer.stop();
-      await _audioHandler?.stop();
-      _currentSound = null;
-      _isPlaying = false;
-      notifyListeners();
-    } catch (e) {
-      MiniLogger.dp('Error stopping audio: $e');
+    if (isPlaying) {
+      try {
+        await _audioPlayer.stop();
+        await _audioHandler?.stop();
+        _currentSound = null;
+        _isPlaying = false;
+        notifyListeners();
+      } catch (e) {
+        MiniLogger.dp('Error stopping audio: $e');
+      }
     }
   }
 

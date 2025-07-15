@@ -159,30 +159,30 @@ class _SoundPageState extends State<SoundPage> {
                 ),
 
                 // Stop Button
-                ListenableBuilder(
-                  listenable: g.audioController,
-                  builder: (context, child) {
-                    final isPlaying = g.audioController.isPlaying;
-                    final isPaused = g.audioController.isPaused;
-
-                    return IconButton(
-                      onPressed: (isPlaying || isPaused)
-                          ? () => g.audioController.stopAudio()
-                          : null,
-                      icon: const Icon(Icons.stop),
-                      iconSize: 25,
-                      color: (isPlaying || isPaused) ? scheme.error : scheme.outline,
-                      style: IconButton.styleFrom(
-                        backgroundColor: (isPlaying || isPaused)
-                            ? scheme.error.withAlpha(20)
-                            : scheme.outline.withAlpha(10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                // ListenableBuilder(
+                //   listenable: g.audioController,
+                //   builder: (context, child) {
+                //     final isPlaying = g.audioController.isPlaying;
+                //     final isPaused = g.audioController.isPaused;
+                //
+                //     return IconButton(
+                //       onPressed: (isPlaying || isPaused)
+                //           ? () => g.audioController.stopAudio()
+                //           : null,
+                //       icon: const Icon(Icons.stop),
+                //       iconSize: 25,
+                //       color: (isPlaying || isPaused) ? scheme.error : scheme.outline,
+                //       style: IconButton.styleFrom(
+                //         backgroundColor: (isPlaying || isPaused)
+                //             ? scheme.error.withAlpha(20)
+                //             : scheme.outline.withAlpha(10),
+                //         shape: RoundedRectangleBorder(
+                //           borderRadius: BorderRadius.circular(12),
+                //         ),
+                //       ),
+                //     );
+                //   },
+                // ),
 
                 // Next Button
                 IconButton(
