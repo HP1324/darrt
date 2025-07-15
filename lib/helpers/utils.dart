@@ -391,7 +391,7 @@ Color getScaffoldBackgroundColor(BuildContext context) {
   final isDark = theme.brightness == Brightness.dark;
   final scheme = theme.colorScheme;
   Color backgroundColorHSV = isDark
-      ? HSVColor.fromColor(Color.lerp(scheme.surface, scheme.primary, 0.05)!).toColor()
-      : HSVColor.fromColor(Color.lerp(Colors.white, scheme.primary, 0.03)!).toColor();
+      ? HSVColor.fromColor(Color.lerp(scheme.surface, scheme.primary, 0.07)!).toColor()
+      : HSVColor.fromColor(Color.lerp(Colors.white, scheme.primary, 0.05)!).toColor();
   return backgroundColorHSV;
 }
