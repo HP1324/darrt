@@ -25,7 +25,7 @@ class TaskTimelineItem extends StatefulWidget {
 class _TaskTimelineItemState extends State<TaskTimelineItem> {
   @override
   Widget build(BuildContext context) {
-    MiniLogger.dp('Timeline Task: title: ${widget.task.title}, id: ${widget.task.id}');
+    // MiniLogger.dp('Timeline Task: title: ${widget.task.title}, id: ${widget.task.id}');
     return ListenableBuilder(
       listenable: g.taskVm,
       builder: (context, child) {
