@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:darrt/task/statistics/achievements.dart';
+
 class TaskStats {
   List<DateTime> completions;
   DateTime? currentStreakStart;
@@ -59,5 +61,18 @@ class TaskStats {
       ) ??
           {},
     );
+  }
+}
+extension AchievementMapper on TaskStats {
+  List<Achievement> get achievements {
+    final templates = Achievement.getAchievementTemplates();
+
+    return templates.map((template) {
+      final unlockedDate = achievementUnlocks[template.id];
+      return template.copyWith(
+        isUnlocked: unlockedDate != null,
+        unlockedDate: unlockedDate,
+      );
+    }).toList();
   }
 }
