@@ -112,6 +112,8 @@ class TaskViewModel extends ViewModel<Task> {
           _completionBox.put(completion);
           repeatingTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
           g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
+
+          performTaskStatsLogicAfterTaskFinish(task, dateOnly);
         } else {
           final query = _completionBox
               .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
@@ -120,26 +122,7 @@ class TaskViewModel extends ViewModel<Task> {
           query.close();
           MiniLogger.d('removed $removed completions for task ${task.id}');
           repeatingTaskCompletions[task.id]?.remove(date);
-          final stats = TaskStats.fromJsonString(task.stats);
-          if (stats != null) {
-            if (!stats.completions.contains(dateOnly)) {
-              stats.completions.add(dateOnly);
-            }
-            stats.completions.sort((a, b) => a.compareTo(b));
-
-            stats.currentStreakLength = 1;
-            stats.currentStreakStart = dateOnly;
-
-            for (int i = stats.completions.length - 2; i >= 0; i--) {
-              final prev = stats.completions[i];
-              final curr = stats.completions[i + 1];
-              if (prev.difference(curr).inDays == -1) {
-                stats.currentStreakLength += 1;
-                stats.currentStreakStart = prev;
-              } else
-                break;
-            }
-          }
+          performTaskStatsLogicAfterTaskUnfinish(task, dateOnly);
         }
       }
     } else {
@@ -303,11 +286,7 @@ class TaskViewModel extends ViewModel<Task> {
 
     // Update taskTimerNotes with a new list (to trigger UI updates)
     taskTimerNotes = List<Note>.from(updatedNotes);
-    final id = box.put(task);
-    int taskIndex = tasks.indexWhere((i) => getItemId(i) == id);
-    if (taskIndex != -1) {
-      tasks[taskIndex] = task;
-    }
+    updateTaskFromAppWideStateChanges(task);
     notifyListeners();
   }
 
@@ -321,11 +300,7 @@ class TaskViewModel extends ViewModel<Task> {
     task.notes = Note.notesToJsonString(updatedNotes);
 
     // Step 3: Update this task in the global tasks list
-    final id = box.put(task);
-    int index = tasks.indexWhere((i) => getItemId(i) == id);
-    if (index != -1) {
-      tasks[index] = task;
-    }
+    updateTaskFromAppWideStateChanges(task);
     // Step 4: Notify listeners to update UI
     notifyListeners();
   }
@@ -338,5 +313,69 @@ class TaskViewModel extends ViewModel<Task> {
 
   void initTaskStats(Task task) {
     currentTaskStats = TaskStats.fromJsonString(task.stats);
+  }
+
+  void updateTaskFromAppWideStateChanges(Task task) {
+    final id = box.put(task);
+    int index = tasks.indexWhere((i) => getItemId(i) == id);
+    if (index != -1) {
+      tasks[index] = task;
+    }
+  }
+
+  void performTaskStatsLogicAfterTaskFinish(Task task, DateTime dateOnly) {
+    final stats = TaskStats.fromJsonString(task.stats);
+    if (stats != null) {
+      if (!stats.completions.contains(dateOnly)) {
+        stats.completions.add(dateOnly);
+      }
+      stats.completions.sort((a, b) => a.compareTo(b));
+
+      stats.currentStreakLength = 1;
+      stats.currentStreakStart = dateOnly;
+
+      for (int i = stats.completions.length - 2; i >= 0; i--) {
+        final prev = stats.completions[i];
+        final curr = stats.completions[i + 1];
+        if (prev.difference(curr).inDays == -1) {
+          stats.currentStreakLength += 1;
+          stats.currentStreakStart = prev;
+        } else
+          break;
+      }
+      task.stats = stats.toJsonString();
+      updateTaskFromAppWideStateChanges(task);
+    }
+  }
+
+  void performTaskStatsLogicAfterTaskUnfinish(Task task, DateTime dateOnly) {
+    final stats = TaskStats.fromJsonString(task.stats);
+    if (stats != null) {
+      stats.completions.removeWhere((d) => DateUtils.isSameDay(d, dateOnly));
+      stats.completions.sort((a, b) => a.compareTo(b));
+
+      stats.currentStreakLength = 0;
+      stats.currentStreakStart = null;
+
+      for (int i = stats.completions.length - 1; i >= 0; i--) {
+        final d = stats.completions[i];
+        if (i == stats.completions.length - 1) {
+          if (DateUtils.isSameDay(d, DateTime.now()) || d.isBefore(DateTime.now())) {
+            stats.currentStreakLength = 1;
+            stats.currentStreakStart = d;
+          } else
+            break;
+        } else {
+          final prev = stats.completions[i + 1];
+          if (prev.difference(d).inDays == -1) {
+            stats.currentStreakLength += 1;
+            stats.currentStreakStart = prev;
+          } else
+            break;
+        }
+      }
+      task.stats = stats.toJsonString();
+      updateTaskFromAppWideStateChanges(task);
+    }
   }
 }
