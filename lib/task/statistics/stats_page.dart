@@ -1,6 +1,7 @@
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/statistics/achievements.dart';
 import 'package:darrt/task/statistics/stats_calendar_widget.dart';
 import 'package:darrt/task/statistics/task_stats.dart';
 import 'package:darrt/task/ui/add_task_page.dart';
@@ -59,6 +60,26 @@ class _StatsPageState extends State<StatsPage> {
                 );
               },
             ),
+            ListenableBuilder(
+              listenable: g.taskVm,
+              builder: (context, child) {
+                final achievements = g.taskVm.currentTaskStats!.achievements;
+
+                return SizedBox(
+                  height: 140,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: achievements.length,
+                    padding: const EdgeInsets.only(left: 16),
+                    itemBuilder: (context, index) {
+                      final achievement = achievements[index];
+                      return AchievementItem(achievement: achievement);
+                    },
+                  ),
+                );
+              },
+            ),
+
           ],
         ),
       ),
@@ -753,5 +774,86 @@ class YearlyChart extends StatelessWidget {
     }
 
     return years;
+  }
+}
+
+class AchievementItem extends StatelessWidget {
+  final Achievement achievement;
+
+  const AchievementItem({
+    super.key,
+    required this.achievement,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    final isUnlocked = achievement.isUnlocked;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.all(12),
+      width: 120,
+      decoration: BoxDecoration(
+        color: isUnlocked
+            ? achievement.color.withOpacity(0.08)
+            : colorScheme.surfaceVariant,
+        border: Border.all(
+          color: isUnlocked
+              ? achievement.color
+              : colorScheme.outline.withOpacity(0.4),
+          width: 1.5,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: isUnlocked
+            ? [
+          BoxShadow(
+            color: achievement.color.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ]
+            : [],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            achievement.icon,
+            size: 32,
+            color: isUnlocked
+                ? achievement.color
+                : colorScheme.onSurfaceVariant.withOpacity(0.5),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            achievement.title,
+            style: textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: isUnlocked
+                  ? colorScheme.onSurface
+                  : colorScheme.onSurfaceVariant.withOpacity(0.5),
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            achievement.description,
+            style: textTheme.labelSmall?.copyWith(
+              fontSize: 10,
+              color: isUnlocked
+                  ? colorScheme.onSurface.withOpacity(0.6)
+                  : colorScheme.onSurfaceVariant.withOpacity(0.5),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 }
