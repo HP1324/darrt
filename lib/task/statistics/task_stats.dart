@@ -4,22 +4,26 @@ class TaskStats {
   List<DateTime> completions;
   DateTime? currentStreakStart;
   int currentStreakLength;
+  Map<String, DateTime> achievementUnlocks;
 
   TaskStats({
     this.completions = const [],
     this.currentStreakLength = 0,
     this.currentStreakStart,
+    this.achievementUnlocks = const {},
   });
 
   TaskStats copyWith({
     List<DateTime>? completions,
     DateTime? currentStreakStart,
     int? currentStreakLength,
+    Map<String, DateTime>? achievementUnlocks,
   }) {
     return TaskStats(
       completions: completions ?? this.completions,
       currentStreakStart: currentStreakStart ?? this.currentStreakStart,
       currentStreakLength: currentStreakLength ?? this.currentStreakLength,
+      achievementUnlocks: achievementUnlocks ?? this.achievementUnlocks,
     );
   }
 
@@ -29,6 +33,7 @@ class TaskStats {
       'completions': completions.map((d) => d.millisecondsSinceEpoch).toList(),
       'currentStreakStart': currentStreakStart?.millisecondsSinceEpoch,
       'currentStreakLength': currentStreakLength,
+      'achievementUnlocks': achievementUnlocks.map((k, v) => MapEntry(k, v.millisecondsSinceEpoch)),
     };
     return jsonEncode(map);
   }
@@ -49,6 +54,10 @@ class TaskStats {
           ? DateTime.fromMillisecondsSinceEpoch(map['currentStreakStart'])
           : null,
       currentStreakLength: map['currentStreakLength'] ?? 0,
+      achievementUnlocks: (map['achievementUnlocks'] as Map?)?.map(
+            (key, value) => MapEntry(key as String, DateTime.fromMillisecondsSinceEpoch(value)),
+      ) ??
+          {},
     );
   }
 }

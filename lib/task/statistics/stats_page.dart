@@ -30,6 +30,7 @@ class _StatsPageState extends State<StatsPage> {
     return Scaffold(
       backgroundColor: getScaffoldBackgroundColor(context),
       appBar: AppBar(
+        backgroundColor: getScaffoldBackgroundColor(context),
         title: Text(widget.task.title.replaceAll('\n', ' ')),
         actions: [
           IconButton(
