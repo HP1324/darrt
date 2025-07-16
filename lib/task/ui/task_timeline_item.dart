@@ -1,3 +1,4 @@
+import 'package:darrt/task/statistics/stats_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -180,15 +181,17 @@ class TimelineTaskTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return ListenableBuilder(
       listenable: Listenable.merge([g.calMan, g.taskVm]),
       builder: (context, child) {
+        final textTheme  = Theme.of(context).textTheme;
+        final scheme = Theme.of(context).colorScheme;
         final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
         final repeat = task.isRepeating;
         final stc = g.taskVm.onetimeTaskCompletions;
         final rtc = g.taskVm.repeatingTaskCompletions;
         final isFinished = repeat ? rtc[task.id]?.contains(date) ?? false : stc[task.id] ?? false;
-        final theme = Theme.of(context);
         return Row(
           children: [
             Expanded(
@@ -197,12 +200,12 @@ class TimelineTaskTitle extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: theme.textTheme.titleSmall!.fontSize,
+                  fontSize: textTheme.titleSmall!.fontSize,
                   fontWeight: FontWeight.w600,
-                  decorationColor: theme.colorScheme.outline,
+                  decorationColor: scheme.outline,
                   decorationThickness: 2,
                   decoration: isFinished ? TextDecoration.lineThrough : null,
-                  color: isFinished ? theme.colorScheme.outline : theme.colorScheme.onSurface,
+                  color: isFinished ? scheme.outline : scheme.onSurface,
                 ),
               ),
             ),
@@ -211,7 +214,15 @@ class TimelineTaskTitle extends StatelessWidget {
               Icon(
                 FontAwesomeIcons.repeat,
                 size: 13,
-                color: Theme.of(context).colorScheme.primary.withAlpha(200),
+                color: scheme.primary.withAlpha(200),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => MiniRouter.to(context, StatsPage(task: task)),
+                  child: Icon(Icons.calendar_month_outlined, size: 21, color: scheme.primaryContainer),
+                ),
               ),
             ],
           ],
