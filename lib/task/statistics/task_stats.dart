@@ -33,20 +33,23 @@ class TaskStats {
   }
 
   /// Create an object from a JSON string
-  static TaskStats? fromJsonString(String jsonString) {
+  static TaskStats? fromJsonString(String? jsonString) {
+    if (jsonString == null || jsonString.trim().isEmpty) return null;
+
     try {
       final map = jsonDecode(jsonString);
       return TaskStats(
-        completions: (map['completions'] as List<int>)
-            .map((d) => DateTime.fromMillisecondsSinceEpoch(d))
-            .toList(),
+        completions: (map['completions'] as List<dynamic>?)
+            ?.map((d) => DateTime.fromMillisecondsSinceEpoch(d as int))
+            .toList() ??
+            [],
         currentStreakStart: map['currentStreakStart'] != null
             ? DateTime.fromMillisecondsSinceEpoch(map['currentStreakStart'])
             : null,
         currentStreakLength: map['currentStreakLength'] ?? 0,
       );
     } catch (e) {
-      // handle malformed or corrupt json safely
+      // Optional: log error
       return null;
     }
   }

@@ -12,6 +12,7 @@ import 'package:darrt/objectbox.g.dart';
 import 'package:darrt/app/state/viewmodels/view_model.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/models/task_completion.dart';
+import 'package:path/path.dart';
 
 import '../../note/models/note.dart' show Note;
 
@@ -95,11 +96,10 @@ class TaskViewModel extends ViewModel<Task> {
   }
 
   void toggleStatus(Task task, bool value, DateTime d) async {
-
     if (task.isRepeating) {
       final dateOnly = DateUtils.dateOnly(d);
       //Can't mark finished if it's tomorrow or later
-      if(!dateOnly.isAfter(DateUtils.dateOnly(DateTime.now()))) {
+      if (!dateOnly.isAfter(DateUtils.dateOnly(DateTime.now()))) {
         final date = dateOnly.millisecondsSinceEpoch;
         if (value) {
           final completion = TaskCompletion(date: DateUtils.dateOnly(d), isDone: value);
@@ -111,7 +111,7 @@ class TaskViewModel extends ViewModel<Task> {
           MiniLogger.dp('Completion task uuid: ${completion.taskUuid!}');
           _completionBox.put(completion);
           repeatingTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
-            g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
+          g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
         } else {
           final query = _completionBox
               .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
@@ -120,6 +120,26 @@ class TaskViewModel extends ViewModel<Task> {
           query.close();
           MiniLogger.d('removed $removed completions for task ${task.id}');
           repeatingTaskCompletions[task.id]?.remove(date);
+          final stats = TaskStats.fromJsonString(task.stats);
+          if (stats != null) {
+            if (!stats.completions.contains(dateOnly)) {
+              stats.completions.add(dateOnly);
+            }
+            stats.completions.sort((a, b) => a.compareTo(b));
+
+            stats.currentStreakLength = 1;
+            stats.currentStreakStart = dateOnly;
+
+            for (int i = stats.completions.length - 2; i >= 0; i--) {
+              final prev = stats.completions[i];
+              final curr = stats.completions[i + 1];
+              if (prev.difference(curr).inDays == -1) {
+                stats.currentStreakLength += 1;
+                stats.currentStreakStart = prev;
+              } else
+                break;
+            }
+          }
         }
       }
     } else {
@@ -316,5 +336,7 @@ class TaskViewModel extends ViewModel<Task> {
 
   TaskStats? currentTaskStats;
 
-
+  void initTaskStats(Task task) {
+    currentTaskStats = TaskStats.fromJsonString(task.stats);
+  }
 }
