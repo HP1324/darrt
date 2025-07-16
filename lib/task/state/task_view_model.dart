@@ -343,14 +343,16 @@ class TaskViewModel extends ViewModel<Task> {
       int streak = 0;
       DateTime? streakStart;
 
-      for (int i = updatedCompletions.length - 1; i >= 0; i--) {
-        final d = updatedCompletions[i];
-        final expected = today.subtract(Duration(days: streak));
-        if (DateUtils.isSameDay(d, expected)) {
+      for (int i = 0; i < 365; i++) { // Max look-back range (e.g., 1 year)
+        final date = today.subtract(Duration(days: i));
+
+        if (!task.isActiveOn(date)) continue; // skip if task wasn't supposed to run
+
+        if (updatedCompletions.any((d) => DateUtils.isSameDay(d, date))) {
           streak += 1;
-          streakStart = d;
+          streakStart = date;
         } else {
-          break;
+          break; // streak broken
         }
       }
 
@@ -384,19 +386,25 @@ class TaskViewModel extends ViewModel<Task> {
       int streak = 0;
       DateTime? streakStart;
 
-      for (int i = updatedCompletions.length - 1; i >= 0; i--) {
-        final d = updatedCompletions[i];
-        final expected = today.subtract(Duration(days: streak));
-        if (DateUtils.isSameDay(d, expected)) {
+      for (int i = 0; i < 365; i++) { // Max look-back range (e.g., 1 year)
+        final date = today.subtract(Duration(days: i));
+
+        if (!task.isActiveOn(date)) continue; // skip if task wasn't supposed to run
+
+        if (updatedCompletions.any((d) => DateUtils.isSameDay(d, date))) {
           streak += 1;
-          streakStart = d;
+          streakStart = date;
         } else {
-          break;
+          break; // streak broken
         }
       }
 
+
       stats.currentStreakLength = streak;
       stats.currentStreakStart = streakStart;
+      // 🧹 Revoke any achievements that are no longer valid
+      removeInvalidAchievements(stats);
+
     }
 
     stats.completions = updatedCompletions;
@@ -405,6 +413,16 @@ class TaskViewModel extends ViewModel<Task> {
     task.stats = stats.toJsonString();
     currentTaskStats = stats.copyWith();
     updateTaskFromAppWideStateChanges(task);
+  }
+  void removeInvalidAchievements(TaskStats stats) {
+    for (final milestone in streakMilestones) {
+      final key = 'streak_$milestone';
+      if (stats.achievementUnlocks.containsKey(key) &&
+          stats.currentStreakLength < milestone) {
+        stats.achievementUnlocks.remove(key);
+        MiniLogger.dp('Revoked achievement: $key');
+      }
+    }
   }
 
   final List<int> streakMilestones = [3, 7, 14, 30, 90, 180, 365, 730, 1095,1825,3650];

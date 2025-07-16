@@ -20,7 +20,10 @@ class AchievementDialog extends StatefulWidget {
 
 class _AchievementDialogState extends State<AchievementDialog>
     with TickerProviderStateMixin {
-  late ConfettiController _confettiController;
+  late ConfettiController _confettiControllerLeft;
+  late ConfettiController _confettiControllerRight;
+  late ConfettiController _confettiControllerTop;
+  late ConfettiController _confettiControllerBottom;
   late AnimationController _scaleController;
   late AnimationController _rotationController;
   late Animation<double> _scaleAnimation;
@@ -29,7 +32,13 @@ class _AchievementDialogState extends State<AchievementDialog>
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+
+    // Initialize multiple confetti controllers for different directions
+    _confettiControllerLeft = ConfettiController(duration: const Duration(seconds: 3));
+    _confettiControllerRight = ConfettiController(duration: const Duration(seconds: 3));
+    _confettiControllerTop = ConfettiController(duration: const Duration(seconds: 3));
+    _confettiControllerBottom = ConfettiController(duration: const Duration(seconds: 3));
+
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -59,14 +68,22 @@ class _AchievementDialogState extends State<AchievementDialog>
   }
 
   void _startAnimations() {
-    _confettiController.play();
+    // Start all confetti controllers
+    _confettiControllerLeft.play();
+    _confettiControllerRight.play();
+    _confettiControllerTop.play();
+    _confettiControllerBottom.play();
+
     _scaleController.forward();
     _rotationController.forward();
   }
 
   @override
   void dispose() {
-    _confettiController.dispose();
+    _confettiControllerLeft.dispose();
+    _confettiControllerRight.dispose();
+    _confettiControllerTop.dispose();
+    _confettiControllerBottom.dispose();
     _scaleController.dispose();
     _rotationController.dispose();
     super.dispose();
@@ -221,7 +238,7 @@ class _AchievementDialogState extends State<AchievementDialog>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    TextButton(
+                    FilledButton(
                       onPressed: () => Navigator.of(context).pop(),
                       child: Text(
                         'Continue',
@@ -252,18 +269,93 @@ class _AchievementDialogState extends State<AchievementDialog>
             ),
           ),
         ),
+
+        // Confetti from left side
         Positioned(
-          top: 0,
+          top: MediaQuery.of(context).size.height * 0.3,
           left: 0,
+          child: ConfettiWidget(
+            confettiController: _confettiControllerLeft,
+            blastDirection: 0, // Blast to the right
+            emissionFrequency: 0.05,
+            numberOfParticles: 50,
+            maxBlastForce: 80,
+            minBlastForce: 60,
+            gravity: 0.1,
+            colors: [
+              widget.achievement.color,
+              colorScheme.primary,
+              colorScheme.secondary,
+              colorScheme.tertiary,
+              Colors.yellow,
+              Colors.orange,
+              Colors.pink,
+            ],
+          ),
+        ),
+
+        // Confetti from right side
+        Positioned(
+          top: MediaQuery.of(context).size.height * 0.3,
           right: 0,
           child: ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirection: math.pi / 2,
+            confettiController: _confettiControllerRight,
+            blastDirection: math.pi, // Blast to the left
             emissionFrequency: 0.05,
-            numberOfParticles: 100,
-            maxBlastForce: 100,
-            minBlastForce: 80,
+            numberOfParticles: 50,
+            maxBlastForce: 80,
+            minBlastForce: 60,
             gravity: 0.1,
+            colors: [
+              widget.achievement.color,
+              colorScheme.primary,
+              colorScheme.secondary,
+              colorScheme.tertiary,
+              Colors.yellow,
+              Colors.orange,
+              Colors.pink,
+            ],
+          ),
+        ),
+
+        // Confetti from top center
+        Positioned(
+          top: 0,
+          left: MediaQuery.of(context).size.width * 0.5,
+          child: ConfettiWidget(
+            confettiController: _confettiControllerTop,
+            blastDirection: math.pi / 2, // Blast downward
+            blastDirectionality: BlastDirectionality.explosive, // Spread in multiple directions
+            emissionFrequency: 0.03,
+            numberOfParticles: 80,
+            maxBlastForce: 120,
+            minBlastForce: 100,
+            gravity: 0.08,
+            colors: [
+              widget.achievement.color,
+              colorScheme.primary,
+              colorScheme.secondary,
+              colorScheme.tertiary,
+              Colors.yellow,
+              Colors.orange,
+              Colors.pink,
+            ],
+          ),
+        ),
+
+        // Confetti from bottom center (for extra effect)
+        Positioned(
+          bottom: 0,
+          left: MediaQuery.of(context).size.width * 0.5,
+          child: ConfettiWidget(
+            confettiController: _confettiControllerBottom,
+            blastDirection: -math.pi / 2, // Blast upward
+            blastDirectionality: BlastDirectionality.explosive, // Spread in multiple directions
+            emissionFrequency: 0.02,
+            numberOfParticles: 30,
+            maxBlastForce: 60,
+            minBlastForce: 40,
+            gravity: 0.5, // Negative gravity to make it fall back down
             colors: [
               widget.achievement.color,
               colorScheme.primary,
@@ -279,6 +371,7 @@ class _AchievementDialogState extends State<AchievementDialog>
     );
   }
 }
+
 // Helper function to show achievement dialog
 Future<void> showAchievementDialog(
     BuildContext context,
