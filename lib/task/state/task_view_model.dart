@@ -98,25 +98,29 @@ class TaskViewModel extends ViewModel<Task> {
       g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
     }
     if (task.isRepeating) {
-      final date = DateUtils.dateOnly(d).millisecondsSinceEpoch;
-      if (value) {
-        final completion = TaskCompletion(date: DateUtils.dateOnly(d), isDone: value);
-        completion.task.target = task;
-        completion.taskUuid = completion.task.target!.uuid;
-        // here we need to merge completion uuid with its task's uuid, because, only giving date as uuid causes problem, that problem is that more than one completions can have same date, hence same uuid, so they will be considered duplicate in backup and restore, while in reality they are not duplicate.
-        completion.uuid = '${completion.uuid}${completion.taskUuid}';
-        MiniLogger.dp('Completion uuid: ${completion.uuid!}');
-        MiniLogger.dp('Completion task uuid: ${completion.taskUuid!}');
-        _completionBox.put(completion);
-        repeatingTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
-      } else {
-        final query = _completionBox
-            .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
-            .build();
-        final removed = query.remove();
-        query.close();
-        MiniLogger.d('removed $removed completions for task ${task.id}');
-        repeatingTaskCompletions[task.id]?.remove(date);
+      final dateOnly = DateUtils.dateOnly(d);
+      //Can't mark finished if it's tomorrow or later
+      if(!dateOnly.isAfter(DateUtils.dateOnly(DateTime.now()))) {
+        final date = dateOnly.millisecondsSinceEpoch;
+        if (value) {
+          final completion = TaskCompletion(date: DateUtils.dateOnly(d), isDone: value);
+          completion.task.target = task;
+          completion.taskUuid = completion.task.target!.uuid;
+          // here we need to merge completion uuid with its task's uuid, because, only giving date as uuid causes problem, that problem is that more than one completions can have same date, hence same uuid, so they will be considered duplicate in backup and restore, while in reality they are not duplicate.
+          completion.uuid = '${completion.uuid}${completion.taskUuid}';
+          MiniLogger.dp('Completion uuid: ${completion.uuid!}');
+          MiniLogger.dp('Completion task uuid: ${completion.taskUuid!}');
+          _completionBox.put(completion);
+          repeatingTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
+        } else {
+          final query = _completionBox
+              .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
+              .build();
+          final removed = query.remove();
+          query.close();
+          MiniLogger.d('removed $removed completions for task ${task.id}');
+          repeatingTaskCompletions[task.id]?.remove(date);
+        }
       }
     } else {
       task.isDone = value;
