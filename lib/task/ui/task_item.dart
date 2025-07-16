@@ -409,7 +409,7 @@ class TaskFinishCheckbox extends StatelessWidget {
                     ? repeatingCompletions[task.id]?.contains(date) ?? false
                     : oneTimeCompletions[task.id] ?? false,
                 onChanged: (value) {
-                  g.taskVm.toggleStatus(task, value ?? false, g.calMan.selectedDate);
+                  g.taskVm.toggleStatus(task, value ?? false, g.calMan.selectedDate,context);
                 },
               ),
             );

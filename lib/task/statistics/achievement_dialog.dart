@@ -279,3 +279,18 @@ class _AchievementDialogState extends State<AchievementDialog>
     );
   }
 }
+// Helper function to show achievement dialog
+Future<void> showAchievementDialog(
+    BuildContext context,
+    Achievement achievement,
+    int currentStreak,
+    ) async{
+  return await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => AchievementDialog(
+      achievement: achievement,
+      currentStreak: currentStreak,
+    ),
+  );
+}

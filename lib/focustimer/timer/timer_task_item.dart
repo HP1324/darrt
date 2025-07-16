@@ -35,7 +35,7 @@ class _TimerTaskItemState extends State<TimerTaskItem> {
                     : oneTimeCompletions[task.id] ?? false,
                 onChanged: (newValue) async {
                   if (newValue != null) {
-                    g.taskVm.toggleStatus(task, newValue, DateTime.now());
+                    g.taskVm.toggleStatus(task, newValue, DateTime.now(),context);
                   }
                 },
               ),

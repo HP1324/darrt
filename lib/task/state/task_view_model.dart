@@ -1,4 +1,6 @@
 import 'package:audioplayers/audioplayers.dart' show ReleaseMode;
+import 'package:darrt/task/statistics/achievement_dialog.dart';
+import 'package:darrt/task/statistics/achievements.dart';
 import 'package:darrt/task/statistics/task_stats.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/app/notification/notification_service.dart';
@@ -95,7 +97,7 @@ class TaskViewModel extends ViewModel<Task> {
     notifyListeners();
   }
 
-  void toggleStatus(Task task, bool value, DateTime d) async {
+  void toggleStatus(Task task, bool value, DateTime d,[BuildContext? context]) async {
     if (task.isRepeating) {
       final dateOnly = DateUtils.dateOnly(d);
       //Can't mark finished if it's tomorrow or later
@@ -111,7 +113,7 @@ class TaskViewModel extends ViewModel<Task> {
           MiniLogger.dp('Completion task uuid: ${completion.taskUuid!}');
           _completionBox.put(completion);
           repeatingTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
-          performTaskStatsLogicAfterTaskFinish(task, dateOnly);
+          performTaskStatsLogicAfterTaskFinish(task, dateOnly, context);
           g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
         } else {
           final query = _completionBox
@@ -322,7 +324,7 @@ class TaskViewModel extends ViewModel<Task> {
     }
   }
 
-  void performTaskStatsLogicAfterTaskFinish(Task task, DateTime dateOnly) {
+  void performTaskStatsLogicAfterTaskFinish(Task task, DateTime dateOnly,[BuildContext? context]) {
     MiniLogger.dp('finish stats function called');
     var stats = TaskStats.fromJsonString(task.stats);
     final List<DateTime> updatedCompletions = List<DateTime>.from(stats.completions);
@@ -359,7 +361,7 @@ class TaskViewModel extends ViewModel<Task> {
     stats.completions = updatedCompletions;
     MiniLogger.dp('Current streak length: ${stats.currentStreakLength}');
     MiniLogger.dp('Current streak start: ${stats.currentStreakStart}');
-    checkAndUnlockStreakAchievements(task, stats);
+    checkAndHandleAchievements( task, stats,context);
     task.stats = stats.toJsonString();
     currentTaskStats = stats.copyWith();
     updateTaskFromAppWideStateChanges(task);
@@ -407,17 +409,39 @@ class TaskViewModel extends ViewModel<Task> {
 
   final List<int> streakMilestones = [3, 7, 14, 30, 90, 180, 365, 730, 1095,1825,3650];
 
-  void checkAndUnlockStreakAchievements(Task task, TaskStats stats) {
-    for (final days in streakMilestones) {
-      final key = 'streak_$days';
-      MiniLogger.dp('days: $days, Current streak length: ${stats.currentStreakLength}');
-      if (stats.currentStreakLength >= days && !stats.achievementUnlocks.containsKey(key)) {
-        // 🎉 Unlock achievement
-        stats.achievementUnlocks[key] = DateTime.now();
-        MiniLogger.dp('Achievement unlocked: $key');
-        // showAchievementDialog(task, days); // Your custom dialog
+  Future<void> checkAndHandleAchievements(
+      Task task,
+      TaskStats stats,
+      [BuildContext? context]
+      ) async {
+    final unlocked = stats.achievementUnlocks;
+    final templates = Achievement.getAchievementTemplates();
+
+    for (final template in templates) {
+      final key = template.id;
+
+      if (stats.currentStreakLength >= template.daysRequired &&
+          !unlocked.containsKey(key)) {
+        // 🎉 Mark as unlocked
+        unlocked[key] = DateTime.now();
+
+        // Save stats back into task
+        task.stats = stats.toJsonString();
+        currentTaskStats = stats;
+        updateTaskFromAppWideStateChanges(task);
+        notifyListeners();
+
+        // 🎉 Show achievement dialog
+        final achieved = template.copyWith(
+          isUnlocked: true,
+          unlockedDate: unlocked[key],
+        );
+        if(context != null) {
+          await showAchievementDialog(context, achieved, stats.currentStreakLength);
+        }
       }
     }
   }
+
 
 }
