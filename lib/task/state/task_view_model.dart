@@ -359,6 +359,7 @@ class TaskViewModel extends ViewModel<Task> {
     stats.completions = updatedCompletions;
     MiniLogger.dp('Current streak length: ${stats.currentStreakLength}');
     MiniLogger.dp('Current streak start: ${stats.currentStreakStart}');
+    checkAndUnlockStreakAchievements(task, stats);
     task.stats = stats.toJsonString();
     currentTaskStats = stats.copyWith();
     updateTaskFromAppWideStateChanges(task);
@@ -403,4 +404,20 @@ class TaskViewModel extends ViewModel<Task> {
     currentTaskStats = stats.copyWith();
     updateTaskFromAppWideStateChanges(task);
   }
+
+  final List<int> streakMilestones = [3, 7, 14, 30, 90, 180, 365, 730, 1095,1825,3650];
+
+  void checkAndUnlockStreakAchievements(Task task, TaskStats stats) {
+    for (final days in streakMilestones) {
+      final key = 'streak_$days';
+      MiniLogger.dp('days: $days, Current streak length: ${stats.currentStreakLength}');
+      if (stats.currentStreakLength >= days && !stats.achievementUnlocks.containsKey(key)) {
+        // 🎉 Unlock achievement
+        stats.achievementUnlocks[key] = DateTime.now();
+        MiniLogger.dp('Achievement unlocked: $key');
+        // showAchievementDialog(task, days); // Your custom dialog
+      }
+    }
+  }
+
 }
