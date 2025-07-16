@@ -94,9 +94,7 @@ class TaskViewModel extends ViewModel<Task> {
   }
 
   void toggleStatus(Task task, bool value, DateTime d) async {
-    if (value) {
-      g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
-    }
+
     if (task.isRepeating) {
       final dateOnly = DateUtils.dateOnly(d);
       //Can't mark finished if it's tomorrow or later
@@ -112,6 +110,7 @@ class TaskViewModel extends ViewModel<Task> {
           MiniLogger.dp('Completion task uuid: ${completion.taskUuid!}');
           _completionBox.put(completion);
           repeatingTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
+            g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
         } else {
           final query = _completionBox
               .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
@@ -126,6 +125,7 @@ class TaskViewModel extends ViewModel<Task> {
       task.isDone = value;
       box.put(task);
       onetimeTaskCompletions[task.id] = value;
+      g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
     }
 
     notifyListeners();

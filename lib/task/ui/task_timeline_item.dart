@@ -216,13 +216,11 @@ class TimelineTaskTitle extends StatelessWidget {
                 size: 13,
                 color: scheme.primary.withAlpha(200),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () => MiniRouter.to(context, StatsPage(task: task)),
-                  child: Icon(Icons.calendar_month_outlined, size: 21, color: scheme.primaryContainer),
-                ),
+              const SizedBox(width: 7),
+              InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () => MiniRouter.to(context, StatsPage(task: task)),
+                child: Icon(Icons.calendar_month_outlined, size: 21, color: scheme.secondary),
               ),
             ],
           ],

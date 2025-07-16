@@ -1,3 +1,4 @@
+import 'package:darrt/task/statistics/stats_page.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -166,6 +167,7 @@ class TaskTitleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = ColorScheme.of(context);
     return Row(
       spacing: 8.0,
       children: [
@@ -175,7 +177,12 @@ class TaskTitleRow extends StatelessWidget {
           Icon(
             FontAwesomeIcons.repeat,
             size: 13,
-            color: Theme.of(context).colorScheme.primary.withAlpha(200),
+            color: scheme.primary.withAlpha(200),
+          ),
+          InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: () => MiniRouter.to(context, StatsPage(task: task)),
+            child: Icon(Icons.calendar_month_outlined, size: 21, color: scheme.secondary),
           ),
         ],
         // TaskPrioritySection(task: task, isUrgent: isUrgent, context: context),
