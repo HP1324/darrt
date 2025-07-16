@@ -74,6 +74,7 @@ dependencies:
   just_audio: ^0.10.4
   audio_service: ^0.18.18
   fl_chart: ^1.0.0
+  confetti: ^0.8.0
 
 dev_dependencies:
   flutter_test:
