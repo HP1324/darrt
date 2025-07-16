@@ -53,7 +53,7 @@ class TimerController extends ChangeNotifier {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  String get timerTypeLabel => _currentType == TimerType.focus ? 'Focus Mode' : 'Break Mode';
+  String get timerTypeLabel => _currentType == TimerType.focus ? 'Focus Mode' : 'Break';
 
   TimerController() {
     _initializeFromStorage();
