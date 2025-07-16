@@ -28,7 +28,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 8058497308889952526),
     name: 'Task',
-    lastPropertyId: const obx_int.IdUid(15, 6053700481326688970),
+    lastPropertyId: const obx_int.IdUid(16, 7565050176549288089),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -118,6 +118,12 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(15, 6053700481326688970),
         name: 'notes',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(16, 7565050176549288089),
+        name: 'stats',
         type: 9,
         flags: 0,
       ),
@@ -509,7 +515,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final notesOffset = object.notes == null
             ? null
             : fbb.writeString(object.notes!);
-        fbb.startTable(16);
+        final statsOffset = object.stats == null
+            ? null
+            : fbb.writeString(object.stats!);
+        fbb.startTable(17);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, titleOffset);
         fbb.addInt64(2, object.createdAt?.millisecondsSinceEpoch);
@@ -525,6 +534,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(12, categoryUuidsOffset);
         fbb.addInt64(13, object.time?.millisecondsSinceEpoch);
         fbb.addOffset(14, notesOffset);
+        fbb.addOffset(15, statsOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -594,6 +604,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final notesParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 32);
+        final statsParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 34);
         final uuidParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 26, '');
@@ -615,6 +628,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           repeatConfig: repeatConfigParam,
           reminders: remindersParam,
           notes: notesParam,
+          stats: statsParam,
           uuid: uuidParam,
           categoryUuids: categoryUuidsParam,
         );
@@ -1077,6 +1091,11 @@ class Task_ {
   /// See [Task.notes].
   static final notes = obx.QueryStringProperty<Task>(
     _entities[0].properties[14],
+  );
+
+  /// See [Task.stats].
+  static final stats = obx.QueryStringProperty<Task>(
+    _entities[0].properties[15],
   );
 
   /// see [Task.categories]
