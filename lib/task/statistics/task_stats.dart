@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 class TaskStats {
   List<DateTime> completions;
   DateTime? currentStreakStart;
@@ -33,24 +34,21 @@ class TaskStats {
   }
 
   /// Create an object from a JSON string
-  static TaskStats? fromJsonString(String? jsonString) {
-    if (jsonString == null || jsonString.trim().isEmpty) return null;
+  static TaskStats fromJsonString(String? jsonString) {
+    if (jsonString == null || jsonString.trim().isEmpty) return TaskStats();
 
-    try {
-      final map = jsonDecode(jsonString);
-      return TaskStats(
-        completions: (map['completions'] as List<dynamic>?)
-            ?.map((d) => DateTime.fromMillisecondsSinceEpoch(d as int))
-            .toList() ??
-            [],
-        currentStreakStart: map['currentStreakStart'] != null
-            ? DateTime.fromMillisecondsSinceEpoch(map['currentStreakStart'])
-            : null,
-        currentStreakLength: map['currentStreakLength'] ?? 0,
-      );
-    } catch (e) {
-      // Optional: log error
-      return null;
-    }
+    final map = jsonDecode(jsonString);
+
+    return TaskStats(
+      completions:
+          (map['completions'] as List<dynamic>?)
+              ?.map((d) => DateTime.fromMillisecondsSinceEpoch(d as int))
+              .toList() ??
+          [],
+      currentStreakStart: map['currentStreakStart'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['currentStreakStart'])
+          : null,
+      currentStreakLength: map['currentStreakLength'] ?? 0,
+    );
   }
 }

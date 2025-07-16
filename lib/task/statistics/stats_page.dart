@@ -23,6 +23,12 @@ class _StatsPageState extends State<StatsPage> {
       body: Column(
         children: [
           StatsCalendarWidget(task: widget.task),
+          ListenableBuilder(
+            listenable: g.taskVm,
+            builder: (context, child) {
+              return Text('${g.taskVm.currentTaskStats?.currentStreakLength}');
+            }
+          ),
         ],
       ),
     );

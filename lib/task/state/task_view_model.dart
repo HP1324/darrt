@@ -111,9 +111,8 @@ class TaskViewModel extends ViewModel<Task> {
           MiniLogger.dp('Completion task uuid: ${completion.taskUuid!}');
           _completionBox.put(completion);
           repeatingTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
-          g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
-
           performTaskStatsLogicAfterTaskFinish(task, dateOnly);
+          g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
         } else {
           final query = _completionBox
               .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
@@ -309,7 +308,7 @@ class TaskViewModel extends ViewModel<Task> {
     taskTimerNotes = Note.notesFromJsonString(task.notes);
   }
 
-  TaskStats? currentTaskStats;
+  TaskStats? currentTaskStats = TaskStats();
 
   void initTaskStats(Task task) {
     currentTaskStats = TaskStats.fromJsonString(task.stats);
@@ -324,58 +323,84 @@ class TaskViewModel extends ViewModel<Task> {
   }
 
   void performTaskStatsLogicAfterTaskFinish(Task task, DateTime dateOnly) {
-    final stats = TaskStats.fromJsonString(task.stats);
-    if (stats != null) {
-      if (!stats.completions.contains(dateOnly)) {
-        stats.completions.add(dateOnly);
-      }
-      stats.completions.sort((a, b) => a.compareTo(b));
-
-      stats.currentStreakLength = 1;
-      stats.currentStreakStart = dateOnly;
-
-      for (int i = stats.completions.length - 2; i >= 0; i--) {
-        final prev = stats.completions[i];
-        final curr = stats.completions[i + 1];
-        if (prev.difference(curr).inDays == -1) {
-          stats.currentStreakLength += 1;
-          stats.currentStreakStart = prev;
-        } else
-          break;
-      }
-      task.stats = stats.toJsonString();
-      updateTaskFromAppWideStateChanges(task);
+    MiniLogger.dp('finish stats function called');
+    var stats = TaskStats.fromJsonString(task.stats);
+    final List<DateTime> updatedCompletions = List<DateTime>.from(stats.completions);
+    final today = DateUtils.dateOnly(DateTime.now());
+    if (!updatedCompletions.contains(dateOnly)) {
+      updatedCompletions.add(dateOnly);
     }
+    updatedCompletions.sort((a, b) => a.compareTo(b));
+
+// Reset streak
+    stats.currentStreakLength = 0;
+    stats.currentStreakStart = null;
+
+// ✅ Only calculate streak if today is completed
+    if (updatedCompletions.contains(today)) {
+      int streak = 0;
+      DateTime? streakStart;
+
+      for (int i = updatedCompletions.length - 1; i >= 0; i--) {
+        final d = updatedCompletions[i];
+        final expected = today.subtract(Duration(days: streak));
+        if (DateUtils.isSameDay(d, expected)) {
+          streak += 1;
+          streakStart = d;
+        } else {
+          break;
+        }
+      }
+
+      stats.currentStreakLength = streak;
+      stats.currentStreakStart = streakStart;
+    }
+
+    stats.completions = updatedCompletions;
+    MiniLogger.dp('Current streak length: ${stats.currentStreakLength}');
+    MiniLogger.dp('Current streak start: ${stats.currentStreakStart}');
+    task.stats = stats.toJsonString();
+    currentTaskStats = stats.copyWith();
+    updateTaskFromAppWideStateChanges(task);
   }
 
   void performTaskStatsLogicAfterTaskUnfinish(Task task, DateTime dateOnly) {
     final stats = TaskStats.fromJsonString(task.stats);
-    if (stats != null) {
-      stats.completions.removeWhere((d) => DateUtils.isSameDay(d, dateOnly));
-      stats.completions.sort((a, b) => a.compareTo(b));
+    final List<DateTime> updatedCompletions = List<DateTime>.from(stats.completions);
 
-      stats.currentStreakLength = 0;
-      stats.currentStreakStart = null;
+    final today = DateUtils.dateOnly(DateTime.now());
+    updatedCompletions.removeWhere((d) => DateUtils.isSameDay(d, dateOnly));
+    updatedCompletions.sort((a, b) => a.compareTo(b));
 
-      for (int i = stats.completions.length - 1; i >= 0; i--) {
-        final d = stats.completions[i];
-        if (i == stats.completions.length - 1) {
-          if (DateUtils.isSameDay(d, DateTime.now()) || d.isBefore(DateTime.now())) {
-            stats.currentStreakLength = 1;
-            stats.currentStreakStart = d;
-          } else
-            break;
+// Reset streak
+    stats.currentStreakLength = 0;
+    stats.currentStreakStart = null;
+
+// ✅ Only calculate streak if today is still completed
+    if (updatedCompletions.contains(today)) {
+      int streak = 0;
+      DateTime? streakStart;
+
+      for (int i = updatedCompletions.length - 1; i >= 0; i--) {
+        final d = updatedCompletions[i];
+        final expected = today.subtract(Duration(days: streak));
+        if (DateUtils.isSameDay(d, expected)) {
+          streak += 1;
+          streakStart = d;
         } else {
-          final prev = stats.completions[i + 1];
-          if (prev.difference(d).inDays == -1) {
-            stats.currentStreakLength += 1;
-            stats.currentStreakStart = prev;
-          } else
-            break;
+          break;
         }
       }
-      task.stats = stats.toJsonString();
-      updateTaskFromAppWideStateChanges(task);
+
+      stats.currentStreakLength = streak;
+      stats.currentStreakStart = streakStart;
     }
+
+    stats.completions = updatedCompletions;
+    MiniLogger.dp('Current streak length: ${stats.currentStreakLength}');
+    MiniLogger.dp('Current streak start: ${stats.currentStreakStart}');
+    task.stats = stats.toJsonString();
+    currentTaskStats = stats.copyWith();
+    updateTaskFromAppWideStateChanges(task);
   }
 }
