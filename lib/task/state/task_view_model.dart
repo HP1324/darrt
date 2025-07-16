@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart' show ReleaseMode;
+import 'package:darrt/task/statistics/task_stats.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/app/notification/notification_service.dart';
 import 'package:darrt/helpers/globals.dart' as g;
@@ -312,4 +313,8 @@ class TaskViewModel extends ViewModel<Task> {
   void initTaskNotesState(Task task) {
     taskTimerNotes = Note.notesFromJsonString(task.notes);
   }
+
+  TaskStats? currentTaskStats;
+
+
 }
