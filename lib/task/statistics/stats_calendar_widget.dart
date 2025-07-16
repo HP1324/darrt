@@ -90,7 +90,7 @@ class _StatsCalendarWidgetState extends State<StatsCalendarWidget> {
           _WeekdayHeader(),
           const SizedBox(height: 16),
           SizedBox(
-            height: 320,
+            height: 220,
             child: PageView.builder(
               controller: _pageController,
               onPageChanged: (page) {
@@ -321,10 +321,10 @@ class _DateItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isToday
-                  ? scheme.primary.withValues(alpha: 0.5)
+                  ? scheme.primary.withValues(alpha: 0.6)
                   : isFinished
                   ? const Color(0xFF10B981).withValues(alpha: 0.4)
-                  : scheme.outline.withValues(alpha: 0.3),
+                  : scheme.outline.withValues(alpha: 0.45),
               width: isToday ? 2 : 1,
             ),
           ),
