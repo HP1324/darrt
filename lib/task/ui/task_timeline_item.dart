@@ -357,7 +357,7 @@ class TimelineCheckbox extends StatelessWidget {
             child: Checkbox(
               value: isCompleted,
               onChanged: (value) {
-                g.taskVm.toggleStatus(task, value ?? false, g.calMan.selectedDate);
+                g.taskVm.toggleStatus(task, value ?? false, g.calMan.selectedDate,context);
               },
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),

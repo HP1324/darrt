@@ -261,7 +261,7 @@ class _MonthView extends StatelessWidget {
               value: isFinished,
               onChanged: (newValue) {
                 if (task.isActiveOn(date)) {
-                  g.taskVm.toggleStatus(task, newValue ?? false, date);
+                  g.taskVm.toggleStatus(task, newValue ?? false, date,context);
                 } else {
                   showWarningToast(context, 'Task not active on this date');
                 }
