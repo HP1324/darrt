@@ -1,3 +1,5 @@
+import 'package:darrt/helpers/utils.dart';
+import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/app/services/object_box.dart';
@@ -113,7 +115,9 @@ class _SearchPageContentState extends State<_SearchPageContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: getScaffoldBackgroundColor(context),
       appBar: AppBar(
+        backgroundColor: getScaffoldBackgroundColor(context),
         leading: BackButton(),
         title: ListenableBuilder(
           listenable: _controller,

@@ -366,6 +366,7 @@ class _NotesPageState extends State<NotesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: getScaffoldBackgroundColor(context),
       body: ListenableBuilder(
         listenable: g.noteVm,
         builder: (context, child) {
@@ -377,6 +378,7 @@ class _NotesPageState extends State<NotesPage> {
           return CustomScrollView(
             slivers: [
               SliverAppBar(
+                backgroundColor: getScaffoldBackgroundColor(context),
                 leading: BackButton(),
                 title: _buildAppBarTitle(),
                 pinned: true,

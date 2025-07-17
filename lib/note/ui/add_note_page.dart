@@ -1,4 +1,5 @@
 
+import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -116,7 +117,9 @@ class _AddNotePageState extends State<AddNotePage> {
       }
     },
       child: Scaffold(
+        backgroundColor: getScaffoldBackgroundColor(context),
         appBar: AppBar(
+          backgroundColor: getScaffoldBackgroundColor(context),
           leading: const BackButton(),
           actions: [
             // const SaveNotePdfButton(),

@@ -69,3 +69,11 @@ Uint8List noteEmptyErrorBytes = Uint8List(0);
 final mInitialDate = DateTime(2000, 1, 1);
 
 const maxExtentDateDays = 7305;
+
+
+// Timer Settings Constants
+const String mAutoSwitchToBreak = 'auto_switch_to_break';
+const String mAutoSwitchToFocus = 'auto_switch_to_focus';
+const String mMarkTasksFinished = 'mark_tasks_finished';
+const String mShowTimerNotification = 'show_timer_notification';
+const String mPauseResumeSound = 'pause_resume_sound';
