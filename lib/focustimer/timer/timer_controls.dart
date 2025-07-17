@@ -1,3 +1,5 @@
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/helpers/consts.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +18,12 @@ class TimerControls extends StatelessWidget {
         _buildControlButton(
           context,
           icon: g.timerController.isRunning ? Icons.pause : Icons.play_arrow,
-          onPressed: g.timerController.isCompleted ? null : () async => await _handlePlayPause(),
+          onPressed: g.timerController.isCompleted
+              ? null
+              : () async {
+                  await _handleTimerPlayPause();
+
+                },
           isPrimary: true,
           scheme: scheme,
         ),
@@ -25,7 +32,7 @@ class TimerControls extends StatelessWidget {
           icon: Icons.stop,
           onPressed: g.timerController.isIdle
               ? null
-              : ()async {
+              : () async {
                   await _handleStop();
                 },
           isPrimary: false,
@@ -34,7 +41,7 @@ class TimerControls extends StatelessWidget {
         _buildControlButton(
           context,
           icon: Icons.refresh,
-          onPressed: ()async{
+          onPressed: () async {
             g.timerController.resetTimer();
             await g.audioController.pauseAudio();
           },
@@ -73,6 +80,33 @@ class TimerControls extends StatelessWidget {
     );
   }
 
+  Future<void> _handleTimerPlayPause()async{
+    final handleSound = MiniBox().read(mPauseResumeSoundWithTimer);
+    if (g.timerController.isRunning) {
+      g.timerController.pauseTimer();
+      if (handleSound && g.audioController.isPlaying) {
+        await g.audioController.pauseAudio();
+      }
+    }else{
+      g.timerController.startTimer();
+      if(handleSound && !g.audioController.isPlaying){
+        await g.audioController.resumeAudio();
+      }
+    }
+  }
+
+  Future<void> _handleSoundPlayPause()async{
+    if (g.audioController.isPlaying && g.timerController.isPaused) {
+      g.audioController.pauseAudio();
+    }else{
+      if (g.audioController.currentSound != null && !g.audioController.isPlaying) {
+        MiniLogger.dp('Resuming audio');
+        await g.audioController.resumeAudio();
+      } else if (g.audioController.currentSound != null && g.audioController.isStopped) {
+        await g.audioController.playAudio(g.audioController.currentSound);
+      }
+    }
+  }
   Future<void> _handlePlayPause() async {
     if (g.timerController.isRunning) {
       g.timerController.pauseTimer();
@@ -93,10 +127,10 @@ class TimerControls extends StatelessWidget {
     }
   }
 
-  Future<void> _handleStop()async{
-    if(g.timerController.isRunning || g.timerController.isPaused){
+  Future<void> _handleStop() async {
+    if (g.timerController.isRunning || g.timerController.isPaused) {
       g.timerController.stopTimer();
-      if(g.audioController.isPlaying){
+      if (g.audioController.isPlaying) {
         g.audioController.pauseAudio();
       }
     }

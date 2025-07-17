@@ -1,4 +1,3 @@
-
 import 'package:darrt/app/services/boxpref.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/app/services/object_box.dart';
@@ -12,8 +11,8 @@ class TimerSettingsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
-      title:    Text('Timer settings'),
-      children: [
+      title: const Text('Timer settings'),
+      children: const [
         AutoSwitchToBreakTile(),
         AutoSwitchToFocusTile(),
         MarkTasksFinishedTile(),
@@ -29,19 +28,19 @@ class AutoSwitchToBreakTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Query<BoxPref>>(
-      stream: ObjectBox().prefsBox.query(BoxPref_.key.equals(mAutoSwitchToBreak)).watch(),
+    return StreamBuilder<List<BoxPref>>(
+      stream: ObjectBox()
+          .prefsBox
+          .query(BoxPref_.key.equals(mAutoSwitchToBreak))
+          .watch(triggerImmediately: true)
+          .map((query) => query.find()),
       builder: (context, snapshot) {
-        bool isEnabled = false;
-        if (snapshot.hasData) {
-          final result = snapshot.data!.find();
-          if (result.isNotEmpty) {
-            isEnabled = result.first.value == 'true';
-          }
-        }
+        final prefs = snapshot.data;
+        final isEnabled = prefs?.isNotEmpty == true && prefs!.first.value == 'true';
 
         return CheckboxListTile(
-          title: Text('Automatically switch to break after focus timer ends'),
+          key: const ValueKey(mAutoSwitchToBreak),
+          title: const Text('Automatically switch to break after focus timer ends'),
           value: isEnabled,
           onChanged: (value) {
             MiniBox().write(mAutoSwitchToBreak, value ?? false);
@@ -57,19 +56,19 @@ class AutoSwitchToFocusTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Query<BoxPref>>(
-      stream: ObjectBox().prefsBox.query(BoxPref_.key.equals(mAutoSwitchToFocus)).watch(),
+    return StreamBuilder<List<BoxPref>>(
+      stream: ObjectBox()
+          .prefsBox
+          .query(BoxPref_.key.equals(mAutoSwitchToFocus))
+          .watch(triggerImmediately: true)
+          .map((query) => query.find()),
       builder: (context, snapshot) {
-        bool isEnabled = false;
-        if (snapshot.hasData) {
-          final result = snapshot.data!.find();
-          if (result.isNotEmpty) {
-            isEnabled = result.first.value == 'true';
-          }
-        }
+        final prefs = snapshot.data;
+        final isEnabled = prefs?.isNotEmpty == true && prefs!.first.value == 'true';
 
         return CheckboxListTile(
-          title: Text('Automatically switch to focus timer after break ends'),
+          key: const ValueKey(mAutoSwitchToFocus),
+          title: const Text('Automatically switch to focus timer after break ends'),
           value: isEnabled,
           onChanged: (value) {
             MiniBox().write(mAutoSwitchToFocus, value ?? false);
@@ -85,19 +84,19 @@ class MarkTasksFinishedTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Query<BoxPref>>(
-      stream: ObjectBox().prefsBox.query(BoxPref_.key.equals(mMarkTasksFinished)).watch(),
+    return StreamBuilder<List<BoxPref>>(
+      stream: ObjectBox()
+          .prefsBox
+          .query(BoxPref_.key.equals(mMarkTasksFinished))
+          .watch(triggerImmediately: true)
+          .map((query) => query.find()),
       builder: (context, snapshot) {
-        bool isEnabled = false;
-        if (snapshot.hasData) {
-          final result = snapshot.data!.find();
-          if (result.isNotEmpty) {
-            isEnabled = result.first.value == 'true';
-          }
-        }
+        final prefs = snapshot.data;
+        final isEnabled = prefs?.isNotEmpty == true && prefs!.first.value == 'true';
 
         return CheckboxListTile(
-          title: Text('Mark all selected tasks as finished after timer end'),
+          key: const ValueKey(mMarkTasksFinished),
+          title: const Text('Mark all selected tasks as finished after timer end'),
           value: isEnabled,
           onChanged: (value) {
             MiniBox().write(mMarkTasksFinished, value ?? false);
@@ -113,19 +112,19 @@ class ShowTimerNotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Query<BoxPref>>(
-      stream: ObjectBox().prefsBox.query(BoxPref_.key.equals(mShowTimerNotification)).watch(),
+    return StreamBuilder<List<BoxPref>>(
+      stream: ObjectBox()
+          .prefsBox
+          .query(BoxPref_.key.equals(mShowTimerNotification))
+          .watch(triggerImmediately: true)
+          .map((query) => query.find()),
       builder: (context, snapshot) {
-        bool isEnabled = false;
-        if (snapshot.hasData) {
-          final result = snapshot.data!.find();
-          if (result.isNotEmpty) {
-            isEnabled = result.first.value == 'true';
-          }
-        }
+        final prefs = snapshot.data;
+        final isEnabled = prefs?.isNotEmpty == true && prefs!.first.value == 'true';
 
         return CheckboxListTile(
-          title: Text('Show timer as notification in notification bar until it ends'),
+          key: const ValueKey(mShowTimerNotification),
+          title: const Text('Show timer as notification in notification bar until it ends'),
           value: isEnabled,
           onChanged: (value) {
             MiniBox().write(mShowTimerNotification, value ?? false);
@@ -141,22 +140,22 @@ class PauseResumeSoundTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Query<BoxPref>>(
-      stream: ObjectBox().prefsBox.query(BoxPref_.key.equals(mPauseResumeSound)).watch(),
+    return StreamBuilder<List<BoxPref>>(
+      stream: ObjectBox()
+          .prefsBox
+          .query(BoxPref_.key.equals(mPauseResumeSoundWithTimer))
+          .watch(triggerImmediately: true)
+          .map((query) => query.find()),
       builder: (context, snapshot) {
-        bool isEnabled = false;
-        if (snapshot.hasData) {
-          final result = snapshot.data!.find();
-          if (result.isNotEmpty) {
-            isEnabled = result.first.value == 'true';
-          }
-        }
+        final prefs = snapshot.data;
+        final isEnabled = prefs?.isNotEmpty == true && prefs!.first.value == 'true';
 
         return CheckboxListTile(
-          title: Text('Pause and resume sound with timer'),
+          key: const ValueKey(mPauseResumeSoundWithTimer),
+          title: const Text('Pause and resume sound with timer'),
           value: isEnabled,
           onChanged: (value) {
-            MiniBox().write(mPauseResumeSound, value ?? false);
+            MiniBox().write(mPauseResumeSoundWithTimer, value ?? false);
           },
         );
       },
