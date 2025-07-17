@@ -37,8 +37,8 @@ class MyAudioHandler extends BaseAudioHandler {
 
     // Set initial playback state
     playbackState.add(PlaybackState(
-      controls: [MediaControl.play, MediaControl.stop],
-      systemActions: const {MediaAction.play, MediaAction.stop},
+      controls: [MediaControl.play, MediaControl.stop,MediaControl.skipToNext,MediaControl.skipToPrevious],
+      systemActions: const {MediaAction.play, MediaAction.stop, MediaAction.skipToNext,MediaAction.skipToPrevious},
       processingState: AudioProcessingState.idle,
     ));
   }
@@ -85,6 +85,7 @@ class MyAudioHandler extends BaseAudioHandler {
   }
 
   // Update the current media item
+  @override
   Future<void> updateMediaItem(MediaItem mediaItem) async {
     this.mediaItem.add(mediaItem);
   }

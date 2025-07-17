@@ -85,11 +85,7 @@ class _AchievementsSection extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [scheme.primary, scheme.primaryContainer],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      color: scheme.primary,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -103,20 +99,13 @@ class _AchievementsSection extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ShaderMask(
-                          shaderCallback: (bounds) => LinearGradient(
-                            colors: [scheme.primary, scheme.tertiary],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ).createShader(bounds),
-                          child: Text(
-                            'Achievements',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: 0.5,
-                            ),
+                        Text(
+                          'Achievements',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: scheme.primary,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ],

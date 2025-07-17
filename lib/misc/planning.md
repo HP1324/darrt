@@ -165,6 +165,8 @@ Backup & restore
 ### Today's checklist (17-07-2025)
 
 - [x] Fix stats calendar not showing correct days for some months
-- [ ] Improve achievement adding and removing logic
+- [x] Improve achievement adding and removing logic
+
+### TODOS in future
 - [ ] Check if we can record time spent on a task by timer too.
    
