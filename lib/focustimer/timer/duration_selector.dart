@@ -94,7 +94,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            '${_selectedMinutes} minutes',
+            '$_selectedMinutes minutes',
             style: textTheme.headlineMedium?.copyWith(
               color: scheme.primary,
               fontWeight: FontWeight.w500,

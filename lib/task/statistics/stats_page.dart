@@ -851,16 +851,16 @@ class AchievementItem extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       width: 120,
       decoration: BoxDecoration(
-        color: isUnlocked ? achievement.color.withOpacity(0.08) : colorScheme.surfaceVariant,
+        color: isUnlocked ? achievement.color.withValues(alpha:0.08) : colorScheme.surfaceContainerHighest,
         border: Border.all(
-          color: isUnlocked ? achievement.color : colorScheme.outline.withOpacity(0.4),
+          color: isUnlocked ? achievement.color : colorScheme.outline.withValues(alpha:0.4),
           width: 1.5,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: isUnlocked
             ? [
                 BoxShadow(
-                  color: achievement.color.withOpacity(0.3),
+                  color: achievement.color.withValues(alpha:0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -873,7 +873,7 @@ class AchievementItem extends StatelessWidget {
           Icon(
             achievement.icon,
             size: 32,
-            color: isUnlocked ? achievement.color : colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: isUnlocked ? achievement.color : colorScheme.onSurfaceVariant.withValues(alpha:0.5),
           ),
           const SizedBox(height: 8),
           Text(
@@ -882,7 +882,7 @@ class AchievementItem extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: isUnlocked
                   ? colorScheme.onSurface
-                  : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  : colorScheme.onSurfaceVariant.withValues(alpha:0.5),
             ),
             textAlign: TextAlign.center,
             maxLines: 2,
@@ -894,8 +894,8 @@ class AchievementItem extends StatelessWidget {
             style: textTheme.labelSmall?.copyWith(
               fontSize: 10,
               color: isUnlocked
-                  ? colorScheme.onSurface.withOpacity(0.6)
-                  : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  ? colorScheme.onSurface.withValues(alpha:0.6)
+                  : colorScheme.onSurfaceVariant.withValues(alpha:0.5),
             ),
             textAlign: TextAlign.center,
           ),

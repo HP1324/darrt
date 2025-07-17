@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -266,11 +265,13 @@ class _AddNotePageState extends State<AddNotePage> {
           if (initResult) {
             g.noteSttController.startListening();
           } else {
-            showToast(
-              context,
-              type: ToastificationType.error,
-              description: 'All requested permissions are necessary for speech recognition',
-            );
+            if(context.mounted) {
+              showToast(
+                context,
+                type: ToastificationType.error,
+                description: 'All requested permissions are necessary for speech recognition',
+              );
+            }
           }
         } else {
           MiniLogger.d('Some permissions denied on first request');

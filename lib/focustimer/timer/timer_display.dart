@@ -1,7 +1,5 @@
 // timer_controller.dart
-import 'dart:async';
 import 'dart:math' as math;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/focustimer/timer/timer_controller.dart';
 
