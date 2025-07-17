@@ -1,7 +1,12 @@
+import 'package:darrt/app/services/boxpref.dart';
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/app/ui/settings_page/timer_settings_section.dart';
+import 'package:darrt/objectbox.g.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import '../../../helpers/consts.dart';
 import 'package:darrt/app/ui/settings_page/backup_restore_section.dart';
+
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -24,6 +29,8 @@ class _SettingsPageState extends State<SettingsPage> {
               DefaultReminderTypeSection(),
               Divider(),
               SnoozeSection(),
+              Divider(),
+              TimerSettingsSection(),
               Divider(),
               BackupRestoreSection(),
             ],
@@ -92,7 +99,7 @@ class DefaultReminderTypeSection extends StatefulWidget {
 
 class _DefaultReminderTypeSectionState extends State<DefaultReminderTypeSection> {
   String defaultReminderType = MiniBox().read(mDefaultReminderType) ?? notifReminderType;
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -126,6 +133,3 @@ class _DefaultReminderTypeSectionState extends State<DefaultReminderTypeSection>
     );
   }
 }
-
-
-

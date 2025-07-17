@@ -50,13 +50,14 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   Future<void> _showFullPageAd() async {
     final int popCount = MiniBox().read('add_task_pop_count') ?? 1;
-      MiniLogger.d('add task pop count: $popCount');
+    MiniLogger.d('add task pop count: $popCount');
     if (popCount % 4 == 0) {
       //print popcount and if condition result
       await g.adsController.fullPageAdOnAddTaskPagePop.show();
     }
     MiniBox().write('add_task_pop_count', popCount + 1);
   }
+
   bool _isHandlingPop = false;
 
   @override
@@ -64,49 +65,51 @@ class _AddTaskPageState extends State<AddTaskPage> {
     return PopScope(
       canPop: false,
 
-        onPopInvokedWithResult: (didPop, result) async {
-      if (_isHandlingPop) return;
+      onPopInvokedWithResult: (didPop, result) async {
+        if (_isHandlingPop) return;
 
-      if (!didPop) {
-        final navigator = Navigator.of(context);
-        final shouldPop = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Quit without saving?'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('Are you sure you want to quit without saving?'),
+        if (!didPop) {
+          final navigator = Navigator.of(context);
+          final shouldPop = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Quit without saving?'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Are you sure you want to quit without saving?'),
+                ],
+              ),
+              actions: [
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text('Yes'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text('No'),
+                ),
               ],
             ),
-            actions: [
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text('Yes'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text('No'),
-              ),
-            ],
-          ),
-        );
+          );
 
-        if (shouldPop == true) {
-          _isHandlingPop = true;
-          navigator.pop();
-          await _showFullPageAd();
-          _isHandlingPop = false;
+          if (shouldPop == true) {
+            _isHandlingPop = true;
+            navigator.pop();
+            await _showFullPageAd();
+            _isHandlingPop = false;
+          }
+        } else {
+          // Only show ad if we haven't already handled this pop
+          if (!_isHandlingPop) {
+            await _showFullPageAd();
+          }
         }
-      } else {
-        // Only show ad if we haven't already handled this pop
-        if (!_isHandlingPop) {
-          await _showFullPageAd();
-        }
-      }
-    },
+      },
       child: Scaffold(
+        backgroundColor: getScaffoldBackgroundColor(context),
         appBar: AppBar(
+          backgroundColor: getScaffoldBackgroundColor(context),
           title: Text(widget.edit ? widget.task!.title.replaceAll('\n', ' ') : 'Add New Task'),
         ),
         body: Padding(
@@ -375,7 +378,7 @@ class TitleTextField extends StatelessWidget {
           if (initResult) {
             g.taskSttController.startListening();
           } else {
-            if(context.mounted) {
+            if (context.mounted) {
               showToast(
                 context,
                 type: ToastificationType.error,
