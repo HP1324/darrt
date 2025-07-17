@@ -160,4 +160,11 @@ Backup & restore
 - [x] In add category page, hints are for folders, fix it
 - [x] Fix new added folder not showing in folder bottom sheet in add note page
 - [x] Also fix bottom overflow error in folder bottom sheet
+
+
+### Today's checklist (17-07-2025)
+
+- [ ] Fix stats calendar not showing correct days for some months
+- [ ] Improve achievement adding and removing logic
+- [ ] Check if we can record time spent on a task by timer too.
    
