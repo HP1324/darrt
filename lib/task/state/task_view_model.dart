@@ -128,7 +128,9 @@ class TaskViewModel extends ViewModel<Task> {
       task.isDone = value;
       box.put(task);
       onetimeTaskCompletions[task.id] = value;
-      g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
+      if(value) {
+        g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
+      }
     }
 
     notifyListeners();
