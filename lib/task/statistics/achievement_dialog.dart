@@ -18,8 +18,7 @@ class AchievementDialog extends StatefulWidget {
   State<AchievementDialog> createState() => _AchievementDialogState();
 }
 
-class _AchievementDialogState extends State<AchievementDialog>
-    with TickerProviderStateMixin {
+class _AchievementDialogState extends State<AchievementDialog> with TickerProviderStateMixin {
   late ConfettiController _confettiControllerLeft;
   late ConfettiController _confettiControllerRight;
   late ConfettiController _confettiControllerTop;
@@ -48,21 +47,27 @@ class _AchievementDialogState extends State<AchievementDialog>
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.elasticOut,
-    ));
+    _scaleAnimation =
+        Tween<double>(
+          begin: 0.0,
+          end: 1.0,
+        ).animate(
+          CurvedAnimation(
+            parent: _scaleController,
+            curve: Curves.elasticOut,
+          ),
+        );
 
-    _rotationAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _rotationController,
-      curve: Curves.easeInOut,
-    ));
+    _rotationAnimation =
+        Tween<double>(
+          begin: 0.0,
+          end: 1.0,
+        ).animate(
+          CurvedAnimation(
+            parent: _rotationController,
+            curve: Curves.easeInOut,
+          ),
+        );
 
     _startAnimations();
   }
@@ -212,17 +217,12 @@ class _AchievementDialogState extends State<AchievementDialog>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
+                    color: widget.achievement.color,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
                     children: [
-                      Text(
-                        'Current Streak',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onPrimaryContainer,
-                        ),
-                      ),
+                      Text('Current Streak'),
                       const SizedBox(height: 4),
                       Text(
                         '${widget.currentStreak} days',
@@ -240,28 +240,8 @@ class _AchievementDialogState extends State<AchievementDialog>
                   children: [
                     FilledButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: Text(
-                        'Continue',
-                        style: TextStyle(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        // You can add share functionality here
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: widget.achievement.color,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text('Share'),
+                      style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(widget.achievement.color)),
+                      child: Text('Continue',style: TextStyle(color: colorScheme.onPrimaryContainer)),
                     ),
                   ],
                 ),
@@ -374,10 +354,10 @@ class _AchievementDialogState extends State<AchievementDialog>
 
 // Helper function to show achievement dialog
 Future<void> showAchievementDialog(
-    BuildContext context,
-    Achievement achievement,
-    int currentStreak,
-    ) async{
+  BuildContext context,
+  Achievement achievement,
+  int currentStreak,
+) async {
   return await showDialog(
     context: context,
     barrierDismissible: false,
