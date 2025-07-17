@@ -97,7 +97,7 @@ class TaskViewModel extends ViewModel<Task> {
     notifyListeners();
   }
 
-  void toggleStatus(Task task, bool value, DateTime d,[BuildContext? context]) async {
+  void toggleStatus(Task task, bool value, DateTime d, [BuildContext? context]) async {
     if (task.isRepeating) {
       final dateOnly = DateUtils.dateOnly(d);
       //Can't mark finished if it's tomorrow or later
@@ -324,7 +324,7 @@ class TaskViewModel extends ViewModel<Task> {
     }
   }
 
-  void performTaskStatsLogicAfterTaskFinish(Task task, DateTime dateOnly,[BuildContext? context]) {
+  void performTaskStatsLogicAfterTaskFinish(Task task, DateTime dateOnly, [BuildContext? context]) {
     MiniLogger.dp('finish stats function called');
     var stats = TaskStats.fromJsonString(task.stats);
     final List<DateTime> updatedCompletions = List<DateTime>.from(stats.completions);
@@ -334,16 +334,17 @@ class TaskViewModel extends ViewModel<Task> {
     }
     updatedCompletions.sort((a, b) => a.compareTo(b));
 
-// Reset streak
+    // Reset streak
     stats.currentStreakLength = 0;
     stats.currentStreakStart = null;
 
-// ✅ Only calculate streak if today is completed
+    // ✅ Only calculate streak if today is completed
     if (updatedCompletions.contains(today)) {
       int streak = 0;
       DateTime? streakStart;
 
-      for (int i = 0; i < 365; i++) { // Max look-back range (e.g., 1 year)
+      for (int i = 0; i < 365; i++) {
+        // Max look-back range (e.g., 1 year)
         final date = today.subtract(Duration(days: i));
 
         if (!task.isActiveOn(date)) continue; // skip if task wasn't supposed to run
@@ -363,7 +364,7 @@ class TaskViewModel extends ViewModel<Task> {
     stats.completions = updatedCompletions;
     MiniLogger.dp('Current streak length: ${stats.currentStreakLength}');
     MiniLogger.dp('Current streak start: ${stats.currentStreakStart}');
-    checkAndHandleAchievements( task, stats,context);
+    checkAndHandleAchievements(task, stats, context);
     task.stats = stats.toJsonString();
     currentTaskStats = stats.copyWith();
     updateTaskFromAppWideStateChanges(task);
@@ -377,16 +378,17 @@ class TaskViewModel extends ViewModel<Task> {
     updatedCompletions.removeWhere((d) => DateUtils.isSameDay(d, dateOnly));
     updatedCompletions.sort((a, b) => a.compareTo(b));
 
-// Reset streak
+    // Reset streak
     stats.currentStreakLength = 0;
     stats.currentStreakStart = null;
 
-// ✅ Only calculate streak if today is still completed
+    // ✅ Only calculate streak if today is still completed
     if (updatedCompletions.contains(today)) {
       int streak = 0;
       DateTime? streakStart;
 
-      for (int i = 0; i < 365; i++) { // Max look-back range (e.g., 1 year)
+      for (int i = 0; i < 365; i++) {
+        // Max look-back range (e.g., 1 year)
         final date = today.subtract(Duration(days: i));
 
         if (!task.isActiveOn(date)) continue; // skip if task wasn't supposed to run
@@ -399,67 +401,137 @@ class TaskViewModel extends ViewModel<Task> {
         }
       }
 
-
       stats.currentStreakLength = streak;
       stats.currentStreakStart = streakStart;
-      // 🧹 Revoke any achievements that are no longer valid
-      removeInvalidAchievements(stats);
-
     }
 
     stats.completions = updatedCompletions;
+    removeInvalidAchievements(task, stats);
     MiniLogger.dp('Current streak length: ${stats.currentStreakLength}');
     MiniLogger.dp('Current streak start: ${stats.currentStreakStart}');
     task.stats = stats.toJsonString();
     currentTaskStats = stats.copyWith();
     updateTaskFromAppWideStateChanges(task);
   }
-  void removeInvalidAchievements(TaskStats stats) {
-    for (final milestone in streakMilestones) {
-      final key = 'streak_$milestone';
-      if (stats.achievementUnlocks.containsKey(key) &&
-          stats.currentStreakLength < milestone) {
-        stats.achievementUnlocks.remove(key);
-        MiniLogger.dp('Revoked achievement: $key');
+
+  void removeInvalidAchievements(Task task, TaskStats stats) {
+    MiniLogger.dp('remove invalid achievements called');
+    final completions = List<DateTime>.from(stats.completions)..sort();
+    final unlocked = stats.achievementUnlocks;
+    final validKeys = <String>{};
+
+    List<List<DateTime>> streakSegments = [];
+    List<DateTime> currentSegment = [];
+
+    for (final date in completions) {
+      final d = DateUtils.dateOnly(date);
+      if (!task.isActiveOn(d)) continue;
+
+      if (currentSegment.isEmpty) {
+        currentSegment.add(d);
+      } else {
+        DateTime last = currentSegment.last;
+        DateTime expected = last;
+        do {
+          expected = expected.add(const Duration(days: 1));
+        } while (!task.isActiveOn(expected));
+
+        if (DateUtils.isSameDay(d, expected)) {
+          currentSegment.add(d);
+        } else {
+          if (currentSegment.length > 1) streakSegments.add(currentSegment);
+          currentSegment = [d];
+        }
       }
+    }
+
+    if (currentSegment.length > 1) {
+      streakSegments.add(currentSegment);
+    }
+
+    MiniLogger.dp(" All streak segments:");
+    for (final s in streakSegments) {
+      MiniLogger.dp(" - ${s.first} to ${s.last} (${s.length} days)");
+    }
+
+    for (final segment in streakSegments) {
+      for (final milestone in streakMilestones) {
+        if (segment.length >= milestone) {
+          final key = 'streak_$milestone';
+          validKeys.add(key);
+          MiniLogger.dp("✅ Valid streak: $key in segment ${segment.first} → ${segment.last}");
+        }
+      }
+    }
+
+    final toRemove = unlocked.keys.where((key) => !validKeys.contains(key)).toList();
+    for (final key in toRemove) {
+      unlocked.remove(key);
+      MiniLogger.dp('🧹 Revoked achievement: $key');
     }
   }
 
-  final List<int> streakMilestones = [3, 7, 14, 30, 90, 180, 365, 730, 1095,1825,3650];
+  final List<int> streakMilestones = [3, 7, 14, 30, 90, 180, 365, 730, 1095, 1825, 3650];
 
   Future<void> checkAndHandleAchievements(
-      Task task,
-      TaskStats stats,
-      [BuildContext? context]
-      ) async {
+    Task task,
+    TaskStats stats, [
+    BuildContext? context,
+  ]) async {
     final unlocked = stats.achievementUnlocks;
     final templates = Achievement.getAchievementTemplates();
 
-    for (final template in templates) {
-      final key = template.id;
+    final sortedCompletions = List<DateTime>.from(stats.completions)..sort();
 
-      if (stats.currentStreakLength >= template.daysRequired &&
-          !unlocked.containsKey(key)) {
-        // 🎉 Mark as unlocked
-        unlocked[key] = DateTime.now();
+    List<List<DateTime>> streakSegments = [];
+    List<DateTime> currentSegment = [];
 
-        // Save stats back into task
-        task.stats = stats.toJsonString();
-        currentTaskStats = stats;
-        updateTaskFromAppWideStateChanges(task);
-        notifyListeners();
+    for (final date in sortedCompletions) {
+      final d = DateUtils.dateOnly(date);
+      if (!task.isActiveOn(d)) continue;
 
-        // 🎉 Show achievement dialog
-        final achieved = template.copyWith(
-          isUnlocked: true,
-          unlockedDate: unlocked[key],
-        );
-        if(context != null) {
-          await showAchievementDialog(context, achieved, stats.currentStreakLength);
+      if (currentSegment.isEmpty) {
+        currentSegment.add(d);
+      } else {
+        DateTime last = currentSegment.last;
+        DateTime expected = last;
+        do {
+          expected = expected.add(const Duration(days: 1));
+        } while (!task.isActiveOn(expected));
+
+        if (DateUtils.isSameDay(d, expected)) {
+          currentSegment.add(d);
+        } else {
+          if (currentSegment.length > 1) streakSegments.add(currentSegment);
+          currentSegment = [d];
+        }
+      }
+    }
+
+    if (currentSegment.length > 1) {
+      streakSegments.add(currentSegment);
+    }
+
+    for (final segment in streakSegments) {
+      final len = segment.length;
+      for (final template in templates) {
+        final key = template.id;
+        if (len >= template.daysRequired && !unlocked.containsKey(key)) {
+          unlocked[key] = DateTime.now();
+          task.stats = stats.toJsonString();
+          currentTaskStats = stats;
+          updateTaskFromAppWideStateChanges(task);
+          notifyListeners();
+
+          final achieved = template.copyWith(
+            isUnlocked: true,
+            unlockedDate: unlocked[key],
+          );
+          if (context != null) {
+            await showAchievementDialog(context, achieved, stats.currentStreakLength);
+          }
         }
       }
     }
   }
-
-
 }
