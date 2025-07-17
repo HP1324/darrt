@@ -35,7 +35,7 @@ class _StatsPageState extends State<StatsPage> {
         title: Text(widget.task.title.replaceAll('\n', ' ')),
         actions: [
           IconButton(
-            onPressed: () => MiniRouter.to(context, AddTaskPage(edit: true,task: widget.task)),
+            onPressed: () => MiniRouter.to(context, AddTaskPage(edit: true, task: widget.task)),
             icon: const Icon(Iconsax.edit),
           ),
         ],
@@ -60,29 +60,93 @@ class _StatsPageState extends State<StatsPage> {
                 );
               },
             ),
-            ListenableBuilder(
-              listenable: g.taskVm,
-              builder: (context, child) {
-                final achievements = g.taskVm.currentTaskStats!.achievements;
-
-                return SizedBox(
-                  height: 140,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: achievements.length,
-                    padding: const EdgeInsets.only(left: 16),
-                    itemBuilder: (context, index) {
-                      final achievement = achievements[index];
-                      return AchievementItem(achievement: achievement);
-                    },
-                  ),
-                );
-              },
-            ),
-
+            _AchievementsSection(),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _AchievementsSection extends StatelessWidget {
+  const _AchievementsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Builder(
+          builder: (innerContext) {
+            final scheme = ColorScheme.of(innerContext);
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [scheme.primary, scheme.primaryContainer],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.emoji_events,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ShaderMask(
+                          shaderCallback: (bounds) => LinearGradient(
+                            colors: [scheme.primary, scheme.tertiary],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ).createShader(bounds),
+                          child: Text(
+                            'Achievements',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+        ListenableBuilder(
+          listenable: g.taskVm,
+          builder: (context, child) {
+            final achievements = g.taskVm.currentTaskStats!.achievements;
+
+            return SizedBox(
+              height: 140,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: achievements.length,
+                padding: const EdgeInsets.only(left: 16),
+                itemBuilder: (context, index) {
+                  final achievement = achievements[index];
+                  return AchievementItem(achievement: achievement);
+                },
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }
@@ -798,24 +862,20 @@ class AchievementItem extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       width: 120,
       decoration: BoxDecoration(
-        color: isUnlocked
-            ? achievement.color.withOpacity(0.08)
-            : colorScheme.surfaceVariant,
+        color: isUnlocked ? achievement.color.withOpacity(0.08) : colorScheme.surfaceVariant,
         border: Border.all(
-          color: isUnlocked
-              ? achievement.color
-              : colorScheme.outline.withOpacity(0.4),
+          color: isUnlocked ? achievement.color : colorScheme.outline.withOpacity(0.4),
           width: 1.5,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: isUnlocked
             ? [
-          BoxShadow(
-            color: achievement.color.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ]
+                BoxShadow(
+                  color: achievement.color.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ]
             : [],
       ),
       child: Column(
@@ -824,9 +884,7 @@ class AchievementItem extends StatelessWidget {
           Icon(
             achievement.icon,
             size: 32,
-            color: isUnlocked
-                ? achievement.color
-                : colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: isUnlocked ? achievement.color : colorScheme.onSurfaceVariant.withOpacity(0.5),
           ),
           const SizedBox(height: 8),
           Text(
