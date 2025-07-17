@@ -1,9 +1,8 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/ui/task_note_bottom_sheet.dart';
 
-import '../../helpers/globals.dart' as g show timerController, taskVm,audioController, taskSc;
+import '../../helpers/globals.dart' as g show timerController, taskVm;
 
 class TimerTaskItem extends StatefulWidget {
   const TimerTaskItem({super.key, required this.task});

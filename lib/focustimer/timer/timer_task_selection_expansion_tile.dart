@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:darrt/focustimer/timer/task_selection_dialog.dart';
 import 'package:darrt/focustimer/timer/timer_task_item.dart';
 
-import '../../helpers/globals.dart' as g show taskVm, timerController;
+import '../../helpers/globals.dart' as g show timerController;
 
 class TimerTaskSelectionExpansionTile extends StatefulWidget {
   const TimerTaskSelectionExpansionTile({super.key});

@@ -1,4 +1,3 @@
-import 'package:audioplayers/audioplayers.dart' show ReleaseMode;
 import 'package:darrt/task/statistics/achievement_dialog.dart';
 import 'package:darrt/task/statistics/achievements.dart';
 import 'package:darrt/task/statistics/task_stats.dart';
@@ -14,7 +13,6 @@ import 'package:darrt/objectbox.g.dart';
 import 'package:darrt/app/state/viewmodels/view_model.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/models/task_completion.dart';
-import 'package:path/path.dart';
 
 import '../../note/models/note.dart' show Note;
 

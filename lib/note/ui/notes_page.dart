@@ -258,7 +258,7 @@ class _NotesPageState extends State<NotesPage> {
             var message = '';
             await showDialog(
               context: context,
-              builder: (context) => AlertDialog(
+              builder: (innerContext) => AlertDialog(
                 title: const Text('Delete Notes'),
                 content: Text(
                   'Delete ${ids.length > 1 ? '${ids.length} notes' : '1 note'}?',
@@ -278,7 +278,7 @@ class _NotesPageState extends State<NotesPage> {
                 ],
               ),
             );
-            if (context.mounted) {
+            if (mounted) {
               showToast(
                 context,
                 type: ToastificationType.success,

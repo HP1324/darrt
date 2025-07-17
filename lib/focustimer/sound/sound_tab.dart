@@ -306,5 +306,5 @@ class _ToggleLoopModeButton extends StatelessWidget {
     );
   }
 
-  void _toggleLoopMode() {}
+
 }

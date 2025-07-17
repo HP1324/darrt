@@ -41,7 +41,7 @@ class BackupService {
   Future<void> initForAnotherIsolate()async{
     if (!await InternetConnection().hasInternetAccess) throw InternetOffError();
 
-;
+
   }
   Future<void> performBackup({bool? isAutoBackup}) async {
     //1. Init the service
