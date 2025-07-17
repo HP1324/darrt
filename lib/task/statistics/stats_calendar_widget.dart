@@ -79,7 +79,7 @@ class _StatsCalendarWidgetState extends State<StatsCalendarWidget> {
           _WeekdayHeader(),
           const SizedBox(height: 16),
           SizedBox(
-            height: 220,
+            height: 280,
             child: PageView.builder(
               controller: _pageController,
               onPageChanged: (page) {
@@ -178,8 +178,6 @@ class _CalendarHeader extends StatelessWidget {
 }
 
 class _WeekdayHeader extends StatelessWidget {
-
-
   const _WeekdayHeader();
 
   @override
@@ -223,53 +221,59 @@ class _MonthView extends StatelessWidget {
 
     final maxDate = getMaxDate();
 
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 7,
-        childAspectRatio: 1.0,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      itemCount: 42,
-      itemBuilder: (context, index) {
-        final dayNumber = index - firstWeekday + 1;
+    List<Widget> dayWidgets = [];
 
-        if (dayNumber <= 0 || dayNumber > daysInMonth) {
-          return const SizedBox();
-        }
+    for (int index = 0; index < 42; index++) {
+      final dayNumber = index - firstWeekday + 1;
 
-        final date = DateTime(month.year, month.month, dayNumber);
-        final isBeforeMinDate = date.isBefore(mInitialDate);
-        final isAfterMaxDate = date.isAfter(maxDate);
+      if (dayNumber <= 0 || dayNumber > daysInMonth) {
+        dayWidgets.add(const SizedBox());
+        continue;
+      }
 
-        if (isBeforeMinDate || isAfterMaxDate) {
-          return const SizedBox();
-        }
+      final date = DateTime(month.year, month.month, dayNumber);
+      final isBeforeMinDate = date.isBefore(mInitialDate);
+      final isAfterMaxDate = date.isAfter(maxDate);
 
-        return ListenableBuilder(
+      if (isBeforeMinDate || isAfterMaxDate) {
+        dayWidgets.add(const SizedBox());
+        continue;
+      }
+
+      dayWidgets.add(
+        ListenableBuilder(
           listenable: g.taskVm,
           builder: (context, child) {
             final dateMs = DateUtils.dateOnly(date).millisecondsSinceEpoch;
-
             final rtc = g.taskVm.repeatingTaskCompletions;
             final isFinished = rtc[task.id]?.contains(dateMs) ?? false;
+
             return _DateItem(
               date: date,
               task: task,
               value: isFinished,
               onChanged: (newValue) {
                 if (task.isActiveOn(date)) {
-                  g.taskVm.toggleStatus(task, newValue ?? false, date,context);
+                  g.taskVm.toggleStatus(task, newValue ?? false, date, context);
                 } else {
                   showWarningToast(context, 'Task not active on this date');
                 }
               },
             );
           },
-        );
-      },
+        ),
+      );
+    }
+
+    return GridView(
+      // physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 7,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+      ),
+      children: dayWidgets,
     );
   }
 }
