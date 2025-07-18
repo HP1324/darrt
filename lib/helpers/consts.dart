@@ -42,6 +42,8 @@ const alarmChannelKey = 'task_alarm';
 
 const notifChannelKey = 'task_notif';
 
+const timerChannelKey = 'task_timer';
+
 const notifReminderType = 'notif';
 
 const alarmReminderType = 'alarm';

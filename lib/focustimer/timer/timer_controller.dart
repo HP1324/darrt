@@ -1,6 +1,7 @@
 // timer_controller.dart
 import 'dart:async';
 import 'dart:convert';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:darrt/helpers/consts.dart';
 import 'package:flutter/foundation.dart';
 import 'package:darrt/app/services/mini_box.dart';
@@ -368,33 +369,48 @@ class TimerController extends ChangeNotifier {
   void _handleTimerCompletion() {
     if (currentType == TimerType.focus) {
       final autoSwitchToBreak = MiniBox().read(mAutoSwitchToBreak);
-      if(autoSwitchToBreak ?? false) {
+      if (autoSwitchToBreak ?? false) {
         Future.delayed(const Duration(milliseconds: 700), () {
           switchToBreak();
           startTimer();
         });
-      }else {
+      } else {
         stopTimer();
         if (MiniBox().read(mPauseResumeSoundWithTimer) ?? true) {
           g.audioController.pauseAudio();
         }
       }
       g.audioController.playSoundOnly('assets/sounds/focus_timer_end.mp3');
-    }else{
+      AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: DateTime.now().millisecondsSinceEpoch.remainder(1000000),
+          channelKey: timerChannelKey,
+          title: "⏳ Focus Session Complete!",
+          body: "Great job! Time to relax and recharge 🌿",
+        ),
+      );
+    } else {
       final autoSwitchToFocus = MiniBox().read(mAutoSwitchToFocus);
-      if(autoSwitchToFocus ?? false) {
+      if (autoSwitchToFocus ?? false) {
         Future.delayed(const Duration(milliseconds: 700), () {
           switchToFocus();
           startTimer();
         });
-      }else{
+      } else {
         stopTimer();
         if (MiniBox().read(mPauseResumeSoundWithTimer) ?? true) {
           g.audioController.pauseAudio();
         }
       }
       g.audioController.playSoundOnly('assets/sounds/break_timer_end.mp3');
-
+      AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: DateTime.now().millisecondsSinceEpoch.remainder(1000000),
+          channelKey: timerChannelKey,
+          title: "🚨 Break’s Over!",
+          body: "Let’s get moving and refocus your energy! 💪",
+        ),
+      );
     }
   }
 
