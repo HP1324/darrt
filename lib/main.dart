@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -50,7 +51,10 @@ void main() async {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
-  runApp(Darrt());
+  runApp(DevicePreview(
+    enabled: !kReleaseMode,
+    builder: (context) => const Darrt(),
+  ));
 }
 
 class Darrt extends StatefulWidget {
@@ -80,6 +84,8 @@ class _DarrtState extends State<Darrt> {
         final themeMode = g.themeMan.themeMode;
 
         return MaterialApp(
+          builder: DevicePreview.appBuilder,
+          locale: DevicePreview.locale(context),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
