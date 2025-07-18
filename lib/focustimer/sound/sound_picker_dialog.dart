@@ -34,15 +34,16 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
     g.adsController.initializeFullPageAdOnCustomSoundPick();
   }
 
-  Future<void> showFullPageAd()async{
+  Future<void> showFullPageAd() async {
     final pickCount = MiniBox().read('sound_pick_count') ?? 1;
-    if(pickCount % 3 == 0){
-      if(g.adsController.isFullPageOnCustomSoundPickAdLoaded){
+    if (pickCount % 3 == 0) {
+      if (g.adsController.isFullPageOnCustomSoundPickAdLoaded) {
         g.adsController.fullPageOnCustomSoundPickAd.show();
       }
     }
     MiniBox().write('sound_pick_count', pickCount + 1);
   }
+
   Future<void> _pickCustomSound() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -57,9 +58,9 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
         // Add to custom sounds list
         g.audioController.addCustomSound(customSoundPath, customSoundName);
 
-        g.audioController.setSelectedSoundInDialog(customSoundPath);
-
-        await g.audioController.playAudio(customSoundPath);
+        // Don't select the picked sound directly and play it, leave it to the user
+        // g.audioController.setSelectedSoundInDialog(customSoundPath);
+        // await g.audioController.playAudio(customSoundPath);
       }
     } catch (e) {
       MiniLogger.dp('Error picking custom sound: $e');
@@ -119,7 +120,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                     ),
                     const SizedBox(height: 8),
                     ..._builtInSounds.entries.map(
-                          (entry) => _buildSoundTile(
+                      (entry) => _buildSoundTile(
                         title: entry.value,
                         subtitle: 'Built-in sound',
                         icon: _getSoundIcon(entry.key),
@@ -128,7 +129,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                       ),
                     ),
                     ...g.audioController.customSounds.map(
-                          (sound) => _buildSoundTile(
+                      (sound) => _buildSoundTile(
                         title: sound['name']!,
                         subtitle: 'Custom sound',
                         icon: Icons.audiotrack,
@@ -144,7 +145,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                       ),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(12),
-                        onTap: _pickCustomSound,
+                        onTap: () async => await _pickCustomSound(),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Row(
@@ -152,7 +153,9 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.secondary.withValues(alpha:0.1),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Icon(
@@ -213,16 +216,15 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
         borderRadius: BorderRadius.circular(12),
         side: isSelected
             ? BorderSide(
-          color: scheme.primary,
-          width: 2,
-        )
+                color: scheme.primary,
+                width: 2,
+              )
             : BorderSide.none,
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () async {
           g.audioController.setSelectedSoundInDialog(value);
-          // Preview the sound but don't set it as current until Apply is pressed
           if (value != null) {
             await g.audioController.playAudio(value);
           } else {
@@ -243,9 +245,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
                 ),
                 child: Icon(
                   icon,
-                  color: isSelected
-                      ? scheme.primary
-                      : scheme.onSurfaceVariant,
+                  color: isSelected ? scheme.primary : scheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(width: 12),
