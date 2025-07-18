@@ -1,3 +1,5 @@
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/helpers/consts.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/focustimer/sound/sound_picker_dialog.dart';
 import 'package:just_audio/just_audio.dart';
@@ -291,6 +293,7 @@ class _ToggleLoopModeButton extends StatelessWidget {
             await g.audioController.audioPlayer.setLoopMode(
               mode == LoopMode.all ? LoopMode.one : LoopMode.all,
             );
+            MiniBox().write(mSoundLoopMode, mode == LoopMode.all ? 'one' : 'all');
           },
           icon: Icon(icon),
           iconSize: 20,

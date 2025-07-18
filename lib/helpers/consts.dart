@@ -77,3 +77,4 @@ const String mAutoSwitchToFocus = 'auto_switch_to_focus';
 const String mMarkTasksFinished = 'mark_tasks_finished';
 const String mShowTimerNotification = 'show_timer_notification';
 const String mPauseResumeSoundWithTimer = 'pause_resume_sound_with_timer';
+const String mSoundLoopMode = 'sound_loop_mode';
