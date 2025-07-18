@@ -167,6 +167,11 @@ Backup & restore
 - [x] Fix stats calendar not showing correct days for some months
 - [x] Improve achievement adding and removing logic
 
+### Today's checklist (18-07-2025)
+
+- [ ] Fix bar chart not showing from current date
+- [ ] Write code to implement all timer settings 
+
 ### TODOS in future
 - [ ] Check if we can record time spent on a task by timer too.
    
