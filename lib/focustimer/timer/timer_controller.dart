@@ -394,6 +394,9 @@ class TimerController extends ChangeNotifier {
           channelKey: timerChannelKey,
           title: "⏳ Focus Session Complete!",
           body: "Great job! Time to relax and recharge 🌿",
+          criticalAlert: true,
+          wakeUpScreen: true,
+
         ),
       );
     } else {
@@ -416,6 +419,8 @@ class TimerController extends ChangeNotifier {
           channelKey: timerChannelKey,
           title: "🚨 Break’s Over!",
           body: "Let’s get moving and refocus your energy! 💪",
+          criticalAlert: true,
+          wakeUpScreen: true,
         ),
       );
     }

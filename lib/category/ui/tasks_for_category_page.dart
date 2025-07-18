@@ -1,3 +1,4 @@
+import 'package:darrt/task/ui/task_delete_confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/helpers/icon_color_storage.dart';
@@ -64,9 +65,7 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
                           icon: Icon(Icons.cancel),
                         ),
                         IconButton(
-                          onPressed: () {
-                            g.taskVm.deleteMultipleItems();
-                          },
+                          onPressed: () => _showTaskDeleteConfirmationDialog(context),
                           icon: Icon(Icons.delete),
                         ),
                       ],
@@ -97,7 +96,14 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
       },
     );
   }
-
+  Future<void> _showTaskDeleteConfirmationDialog(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return TaskDeleteConfirmationDialog();
+      },
+    );
+  }
   double getIconSize(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     double iconSize = screenWidth * 0.2;

@@ -1,4 +1,7 @@
 //ignore_for_file: curly_braces_in_flow_control_structures
+import 'package:darrt/app/services/boxpref.dart';
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/objectbox.g.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:darrt/app/exceptions.dart';
@@ -11,16 +14,9 @@ import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/helpers/utils.dart' show formatDate;
 import 'package:workmanager/workmanager.dart';
 
-class BackupRestoreSection extends StatefulWidget {
-  const BackupRestoreSection({super.key});
+class BackupSettingsSection extends StatelessWidget {
+  const BackupSettingsSection({super.key});
 
-  @override
-  State<BackupRestoreSection> createState() => _BackupRestoreSectionState();
-}
-
-class _BackupRestoreSectionState extends State<BackupRestoreSection> {
-  final ValueNotifier<DateTime?> lastBackupDate = ValueNotifier(MiniBox().read(mLastBackupDate));
-  final ValueNotifier<bool> autoBackup = ValueNotifier(MiniBox().read(mAutoBackup) ?? false);
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -35,200 +31,185 @@ class _BackupRestoreSectionState extends State<BackupRestoreSection> {
         children: [
           Text('Backup & Restore', style: theme.textTheme.titleMedium),
           Divider(height: 0),
-          SignInOutBackupRow(lastBackupDate: lastBackupDate, autoBackup: autoBackup),
-          AutoBackupSection(lastBackupDate: lastBackupDate, autoBackup: autoBackup),
-          _RestoreDeleteBackupRow(),
+          SignInSection(),
+          AutoBackupSection(),
+          RestoreSection(),
+          DeleteBackupSection(),
         ],
       ),
     );
   }
 }
 
-class _RestoreDeleteBackupRow extends StatefulWidget {
-  const _RestoreDeleteBackupRow();
-
-  @override
-  State<_RestoreDeleteBackupRow> createState() => _RestoreDeleteBackupRowState();
-}
-
-class _RestoreDeleteBackupRowState extends State<_RestoreDeleteBackupRow> {
-  ValueNotifier<bool> isRestoring = ValueNotifier(false);
-  final ValueNotifier<bool> isDeleting = ValueNotifier(false);
-  @override
-  void dispose() {
-    isRestoring.dispose();
-    isDeleting.dispose();
-    super.dispose();
-  }
+class SignInSection extends StatelessWidget {
+  const SignInSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: ValueListenableBuilder<bool>(
-            valueListenable: isRestoring,
-            builder: (context, restoring, _) {
-              return OutlinedButton.icon(
-                onPressed: restoring
-                    ? null
-                    : () async {
-                        isRestoring.value = true;
-                        try {
-                          await BackupService().performRestore();
-                          if (context.mounted) {
-                            await _showRestartDialog(context);
-                          }
-                        } on BackupFileNotFoundError catch (e) {
-                          if (context.mounted) showErrorToast(context, e.userMessage!);
-                        } on GoogleClientNotAuthenticatedError catch (e) {
-                          if (context.mounted) showErrorToast(context, e.userMessage!);
-                        } on InternetOffError catch (e) {
-                          if (context.mounted) showErrorToast(context, e.userMessage!);
-                        } finally {
-                          isRestoring.value = false;
-                        }
-                      },
-                icon: const Icon(Icons.settings_backup_restore_sharp),
-                label: restoring
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : FittedBox(child: const Text('Restore data')),
-              );
-            },
+    return StreamBuilder<List<BoxPref>>(
+      stream: ObjectBox()
+          .prefsBox
+          .query(BoxPref_.key.equals(mGoogleEmail))
+          .watch(triggerImmediately: true)
+          .map((query) => query.find()),
+      builder: (context, snapshot) {
+        final prefs = snapshot.data;
+        final currentEmail = prefs?.isNotEmpty == true ? prefs!.first.value : null;
+
+        if (currentEmail == null) {
+          return ListTile(
+            title: Text('Sign in to continue'),
+            trailing: OutlinedButton.icon(
+              onPressed: () => _handleGoogleSignIn(context),
+              label: Text('Sign in'),
+              icon: Icon(Icons.login),
+            ),
+            contentPadding: EdgeInsets.zero,
+          );
+        }
+
+        return ListTile(
+          visualDensity: VisualDensity.compact,
+          onTap: () => _handleGoogleSignIn(context),
+          contentPadding: EdgeInsets.zero,
+          title: Text('Google Account'),
+          subtitle: Text(currentEmail),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              BackupButton(),
+              Tooltip(
+                message: 'Sign out',
+                child: IconButton(
+                  onPressed: () async {
+                    MiniBox().write(mAutoBackup, false);
+                    await Workmanager().cancelByUniqueName(mAutoBackup);
+                    await GoogleSignInService().signOut();
+                    MiniBox().remove(mGoogleEmail);
+                    if (context.mounted) showWarningToast(context, 'Signed out');
+                  },
+                  icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
+                ),
+              ),
+            ],
           ),
-        ),
-        SizedBox(width: 10),
-        Expanded(
-          child: ValueListenableBuilder(
-            valueListenable: isDeleting,
-            builder: (context, deleting, child) {
-              return OutlinedButton.icon(
-                onPressed: deleting
-                    ? null
-                    : () async {
-                        // Disable button while deleting
-                        final shouldDelete = await _showDeleteConfirmationDialog(context);
-                        if (shouldDelete) {
-                          isDeleting.value = true;
-                          try {
-                            await BackupService().deleteBackupFromGoogleDrive();
-                            if (context.mounted)
-                              showSuccessToast(context, 'Backup deleted successfully');
-                          } on BackupFileNotFoundError catch (e) {
-                            if (context.mounted) showErrorToast(context, e.userMessage!);
-                          } on GoogleClientNotAuthenticatedError catch (e) {
-                            if (context.mounted) showErrorToast(context, e.userMessage!);
-                          } on InternetOffError catch (e) {
-                            if (context.mounted) showErrorToast(context, e.userMessage!);
-                          } finally {
-                            isDeleting.value = false; // Use finally to ensure it's always reset
-                          }
-                        }
-                      },
-                icon: deleting
-                    ? const SizedBox(
-                        height: 16,
-                        width: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Icon(
-                        Icons.delete,
-                        color: Theme.of(context).colorScheme.error,
-                        size: 20,
-                      ),
-                label: FittedBox(child: Text('Delete backup')),
-              );
-            },
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 
-  Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
-    return await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: Row(
-                children: [
-                  Icon(
-                    Icons.warning_amber_rounded,
-                    color: Theme.of(context).colorScheme.error,
-                    size: 28,
-                  ),
-                  const SizedBox(width: 12),
-                  const Text('Delete Backup?'),
-                ],
-              ),
-              content: const Text(
-                'This will permanently delete your backup from Google Drive. This action cannot be undone.',
-              ),
+  Future<void> _handleGoogleSignIn(BuildContext context) async {
+    try {
+      if (await GoogleSignInService().getCurrentUserEmail() != null) {
+        if (context.mounted) {
+          final shouldContinue = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              content: Text('Sign out and sign in with another account?'),
               actions: [
-                FilledButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.error,
-                  ),
-                  child: const Text('Delete'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ),
+                TextButton(onPressed: () => Navigator.pop(context, false), child: Text('No')),
+                FilledButton(onPressed: () => Navigator.pop(context, true), child: Text('Yes')),
               ],
-            );
-          },
-        ) ??
-        false;
-  }
+            ),
+          );
 
-  Future<void> _showRestartDialog(BuildContext context) async {
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Restart app'),
-        content: Text(
-          "Restore completed. Don't forget to restart the app to see restored data correctly.",
-        ),
-        actions: [
-          FilledButton.icon(
-            onPressed: () => Navigator.pop(context),
-            label: Text('Got it'),
-            icon: Icon(Icons.restart_alt),
+          if (shouldContinue != true) return;
+          await GoogleSignInService().signOut();
+          MiniBox().remove(mGoogleEmail);
+          if (context.mounted) showWarningToast(context, 'Signed out');
+          await Future.delayed(Duration(milliseconds: 500));
+        }
+      }
+
+      GoogleSignInAccount? account = await GoogleSignInService().signIn();
+
+      if (account != null) {
+        final email = account.email;
+        if (context.mounted) showSuccessToast(context, 'Signed in to $email');
+        MiniBox().write(mGoogleEmail, email);
+
+        final authentication = await account.authentication;
+        MiniBox().write(mGoogleAuthToken, authentication.accessToken);
+      } else {
+        MiniBox().write(mAutoBackup, false);
+      }
+    } catch (e, t) {
+      MiniLogger.e('Sign in error: ${e.toString()}');
+      MiniLogger.t('Stacktrace: $t');
+    }
+  }
+}
+
+class BackupButton extends StatelessWidget {
+  const BackupButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<BoxPref>>(
+      stream: ObjectBox()
+          .prefsBox
+          .query(BoxPref_.key.equals(mIsBackingUp))
+          .watch(triggerImmediately: true)
+          .map((query) => query.find()),
+      builder: (context, snapshot) {
+        final prefs = snapshot.data;
+        final isBackingUp = prefs?.isNotEmpty == true && prefs!.first.value == 'true';
+
+        return Tooltip(
+          message: 'Backup',
+          child: IconButton(
+            onPressed: isBackingUp
+                ? null
+                : () async {
+              MiniBox().write(mIsBackingUp, true);
+              try {
+                await BackupService().performBackup();
+                if (context.mounted)
+                  showSuccessToast(context, 'Backup completed successfully');
+                final now = DateTime.now();
+                MiniBox().write(mLastBackupDate, now);
+              } on GoogleClientNotAuthenticatedError catch (e) {
+                if (context.mounted) showErrorToast(context, e.userMessage!);
+              } on InternetOffError catch (e) {
+                if (context.mounted) showSuccessToast(context, e.userMessage!);
+              } catch (e) {
+                MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
+                if (context.mounted)
+                  showErrorToast(context, 'Unknown error occurred, try after sometime!');
+              } finally {
+                if (context.mounted) {
+                  MiniBox().write(mIsBackingUp, false);
+                }
+              }
+            },
+            icon: isBackingUp
+                ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator())
+                : Icon(
+              Icons.backup,
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
 
-class AutoBackupSection extends StatefulWidget {
-  const AutoBackupSection({super.key, required this.lastBackupDate, required this.autoBackup});
-  final ValueNotifier<DateTime?> lastBackupDate;
-  final ValueNotifier<bool> autoBackup;
-  @override
-  State<AutoBackupSection> createState() => _AutoBackupSectionState();
-}
+class AutoBackupSection extends StatelessWidget {
+  const AutoBackupSection({super.key});
 
-class _AutoBackupSectionState extends State<AutoBackupSection> {
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: widget.autoBackup,
-      builder: (context, autoBackup, child) {
+    return StreamBuilder<List<BoxPref>>(
+      stream: ObjectBox()
+          .prefsBox
+          .query(BoxPref_.key.equals(mAutoBackup))
+          .watch(triggerImmediately: true)
+          .map((query) => query.find()),
+      builder: (context, snapshot) {
+        final prefs = snapshot.data;
+        final autoBackup = prefs?.isNotEmpty == true && prefs!.first.value == 'true';
+
         return Column(
           children: [
             CheckboxListTile(
@@ -240,7 +221,6 @@ class _AutoBackupSectionState extends State<AutoBackupSection> {
                   if (GoogleSignInService().currentUser == null)
                     throw GoogleClientNotAuthenticatedError();
                   if (value != null) {
-                    widget.autoBackup.value = value;
                     MiniBox().write(mAutoBackup, value);
                     if (value) {
                       final frequency = MiniBox().read(mAutoBackupFrequency) ?? 'daily';
@@ -268,18 +248,31 @@ class _AutoBackupSectionState extends State<AutoBackupSection> {
                 }
               },
               title: Text('Auto backup'),
-              subtitle: ValueListenableBuilder(
-                valueListenable: widget.lastBackupDate,
-                builder: (context, value, child) {
+              subtitle: StreamBuilder<List<BoxPref>>(
+                stream: ObjectBox()
+                    .prefsBox
+                    .query(BoxPref_.key.equals(mLastBackupDate))
+                    .watch(triggerImmediately: true)
+                    .map((query) => query.find()),
+                builder: (context, snapshot) {
+                  final prefs = snapshot.data;
+                  final lastBackupDateMs = prefs?.isNotEmpty == true
+                      ? prefs!.first.value
+                      : null;
+                  DateTime? lastBackupDate;
+                  if(lastBackupDateMs != null) {
+                     lastBackupDate = DateTime.fromMillisecondsSinceEpoch(
+                        int.parse(lastBackupDateMs));
+                  }
                   return Text(
-                    value != null
-                        ? 'Last backup: ${formatDate(value, 'dd/MM/yyyy')}'
+                    lastBackupDate != null
+                        ? 'Last backup: ${formatDate(lastBackupDate, 'dd/MM/yyyy')}'
                         : 'Backup has not been done yet',
                   );
                 },
               ),
             ),
-            if (autoBackup) AutobackupFrequencySelector(),
+            if (autoBackup) AutoBackupFrequencySelector(),
           ],
         );
       },
@@ -287,40 +280,58 @@ class _AutoBackupSectionState extends State<AutoBackupSection> {
   }
 }
 
-class AutobackupFrequencySelector extends StatefulWidget {
-  const AutobackupFrequencySelector({super.key});
+class AutoBackupFrequencySelector extends StatelessWidget {
+  const AutoBackupFrequencySelector({super.key});
 
   @override
-  State<AutobackupFrequencySelector> createState() => _AutobackupFrequencySelectorState();
-}
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<BoxPref>>(
+      stream: ObjectBox()
+          .prefsBox
+          .query(BoxPref_.key.equals(mAutoBackupFrequency))
+          .watch(triggerImmediately: true)
+          .map((query) => query.find()),
+      builder: (context, snapshot) {
+        final prefs = snapshot.data;
+        final currentFrequency = prefs?.isNotEmpty == true ? prefs!.first.value : 'daily';
 
-class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelector> {
-  String currentFrequency = MiniBox().read(mAutoBackupFrequency) ?? 'daily';
-
-  void changeFrequency(String? newFrequency) async {
-    if (newFrequency != null) {
-      currentFrequency = newFrequency;
-      setState(() {});
-
-      final duration = newFrequency == 'daily'
-          ? Duration(days: 1)
-          : newFrequency == 'weekly'
-          ? Duration(days: 7)
-          : Duration(days: 30);
-      await Workmanager().cancelByUniqueName(mAutoBackup);
-      await Workmanager().registerPeriodicTask(
-        mAutoBackup,
-        mAutoBackup,
-        frequency: duration,
-      );
-      MiniBox().write(mAutoBackupFrequency, newFrequency);
-    }
+        final theme = Theme.of(context);
+        return Container(
+          margin: const EdgeInsets.all(5),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: IntrinsicHeight(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildRadioButton(context, 'Daily', currentFrequency),
+                Container(
+                  width: 1,
+                  color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                ),
+                _buildRadioButton(context, 'Weekly', currentFrequency),
+                Container(
+                  width: 1,
+                  color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                ),
+                _buildRadioButton(context, 'Monthly', currentFrequency),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
-  Widget buildRadioButton(String label) {
+  Widget _buildRadioButton(BuildContext context, String label, String? currentFrequency) {
     return Flexible(
       child: InkWell(
-        onTap: () => changeFrequency(label.toLowerCase()),
+        onTap: () => _changeFrequency(label.toLowerCase()),
         borderRadius: BorderRadius.circular(6),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -328,12 +339,11 @@ class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelecto
           children: [
             Radio<String>(
               value: label.toLowerCase(),
-              onChanged: changeFrequency,
+              onChanged: _changeFrequency,
               groupValue: currentFrequency,
               visualDensity: VisualDensity.compact,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            // const SizedBox(width: 4),
             Flexible(
               child: Text(
                 label,
@@ -350,217 +360,201 @@ class _AutobackupFrequencySelectorState extends State<AutobackupFrequencySelecto
     );
   }
 
+  void _changeFrequency(String? newFrequency) async {
+    if (newFrequency != null) {
+      final duration = newFrequency == 'daily'
+          ? Duration(days: 1)
+          : newFrequency == 'weekly'
+          ? Duration(days: 7)
+          : Duration(days: 30);
+      await Workmanager().cancelByUniqueName(mAutoBackup);
+      await Workmanager().registerPeriodicTask(
+        mAutoBackup,
+        mAutoBackup,
+        frequency: duration,
+      );
+      MiniBox().write(mAutoBackupFrequency, newFrequency);
+    }
+  }
+}
+
+class RestoreSection extends StatelessWidget {
+  const RestoreSection({super.key});
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      margin: const EdgeInsets.all(5),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: IntrinsicHeight(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            buildRadioButton('Daily'),
-            Container(
-              width: 1,
-              color: theme.colorScheme.outline.withValues(alpha: 0.2),
-              margin: const EdgeInsets.symmetric(vertical: 4),
+    return StreamBuilder<List<BoxPref>>(
+      stream: ObjectBox()
+          .prefsBox
+          .query(BoxPref_.key.equals(mIsRestoring))
+          .watch(triggerImmediately: true)
+          .map((query) => query.find()),
+      builder: (context, snapshot) {
+        final prefs = snapshot.data;
+        final isRestoring = prefs?.isNotEmpty == true && prefs!.first.value == 'true';
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: isRestoring
+                  ? null
+                  : () async {
+                MiniBox().write(mIsRestoring, true);
+                try {
+                  await BackupService().performRestore();
+                  if (context.mounted) {
+                    await _showRestartDialog(context);
+                  }
+                } on BackupFileNotFoundError catch (e) {
+                  if (context.mounted) showErrorToast(context, e.userMessage!);
+                } on GoogleClientNotAuthenticatedError catch (e) {
+                  if (context.mounted) showErrorToast(context, e.userMessage!);
+                } on InternetOffError catch (e) {
+                  if (context.mounted) showErrorToast(context, e.userMessage!);
+                } finally {
+                  MiniBox().write(mIsRestoring, false);
+                }
+              },
+              icon: const Icon(Icons.settings_backup_restore_sharp),
+              label: isRestoring
+                  ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+                  : FittedBox(child: const Text('Restore data')),
             ),
-            buildRadioButton('Weekly'),
-            Container(
-              width: 1,
-              color: theme.colorScheme.outline.withValues(alpha: 0.2),
-              margin: const EdgeInsets.symmetric(vertical: 4),
-            ),
-            buildRadioButton('Monthly'),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
-}
 
-class SignInOutBackupRow extends StatefulWidget {
-  const SignInOutBackupRow({super.key, required this.lastBackupDate, required this.autoBackup});
-  final ValueNotifier<DateTime?> lastBackupDate;
-  final ValueNotifier<bool> autoBackup;
-  @override
-  State<SignInOutBackupRow> createState() => _SignInOutBackupRowState();
-}
-
-class _SignInOutBackupRowState extends State<SignInOutBackupRow> {
-  String? currentEmail;
-
-  @override
-  void initState() {
-    super.initState();
-    final account = GoogleSignInService().currentUser;
-    if (account != null) {
-      currentEmail = account.email;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (currentEmail == null) {
-      return ListTile(
-        title: Text('Sign in to continue'),
-        trailing: OutlinedButton.icon(
-          onPressed: () => _handleGoogleSignIn(context),
-          label: Text('Sign in'),
-          icon: Icon(Icons.login),
+  Future<void> _showRestartDialog(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Restart app'),
+        content: Text(
+          "Restore completed. Don't forget to restart the app to see restored data correctly.",
         ),
-        contentPadding: EdgeInsets.zero,
-      );
-    }
-    return ListTile(
-      visualDensity: VisualDensity.compact,
-      onTap: () => _handleGoogleSignIn(context),
-      contentPadding: EdgeInsets.zero,
-      title: Text('Google Account'),
-      subtitle: Text(currentEmail!),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _BackupButton(lastBackupDate: widget.lastBackupDate),
-          Tooltip(
-            message: 'Sign out',
-            child: IconButton(
-              onPressed: () async {
-                setState(() {
-                  currentEmail = null;
-                });
-                widget.autoBackup.value = false;
-                MiniBox().write(mAutoBackup, false);
-                await Workmanager().cancelByUniqueName(mAutoBackup);
-                await GoogleSignInService().signOut();
-                MiniBox().remove(mGoogleEmail);
-                if (context.mounted) showWarningToast(context, 'Signed out');
-              },
-              icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
-            ),
+        actions: [
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(context),
+            label: Text('Got it'),
+            icon: Icon(Icons.restart_alt),
           ),
         ],
       ),
     );
   }
-
-  Future<void> _handleGoogleSignIn(BuildContext context) async {
-    try {
-      if (await GoogleSignInService().getCurrentUserEmail() != null) {
-        if (context.mounted) {
-          final shouldContinue = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              content: Text('Sign out and sign in with another account?'),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(context, false), child: Text('No')),
-                FilledButton(onPressed: () => Navigator.pop(context, true), child: Text('Yes')),
-              ],
-            ),
-          );
-
-          if (shouldContinue != true) return;
-          setState(() {
-            currentEmail = null;
-          });
-          await GoogleSignInService().signOut();
-
-          MiniBox().remove(mGoogleEmail);
-          if (context.mounted) showWarningToast(context, 'Signed out');
-
-          await Future.delayed(Duration(milliseconds: 500));
-        }
-      }
-
-      GoogleSignInAccount? account = await GoogleSignInService().signIn();
-
-      if (account != null) {
-        final email = account.email;
-        setState(() {
-          currentEmail = email;
-        });
-        if (context.mounted) showSuccessToast(context, 'Signed in to $email');
-        MiniBox().write(mGoogleEmail, email);
-
-        final authentication = await account.authentication;
-        MiniBox().write(mGoogleAuthToken, authentication.accessToken);
-      } else {
-        MiniBox().write(mAutoBackup, false);
-        setState(() {
-          currentEmail = null;
-          widget.autoBackup.value = false;
-        });
-      }
-    } catch (e, t) {
-      MiniLogger.e('Sign in error: ${e.toString()}');
-      MiniLogger.t('Stacktrace: $t');
-    }
-  }
 }
 
-class _BackupButton extends StatefulWidget {
-  const _BackupButton({required this.lastBackupDate});
-  final ValueNotifier<DateTime?> lastBackupDate;
-
-  @override
-  State<_BackupButton> createState() => _BackupButtonState();
-}
-
-class _BackupButtonState extends State<_BackupButton> {
-  final ValueNotifier<bool> isBackingUp = ValueNotifier(false);
-  @override
-  void dispose() {
-    isBackingUp.dispose();
-    super.dispose();
-  }
+class DeleteBackupSection extends StatelessWidget {
+  const DeleteBackupSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: isBackingUp,
-      builder: (context, backingUp, _) {
-        return Tooltip(
-          message: 'Backup',
-          child: IconButton(
-            onPressed: backingUp
-                ? null // optional: disable button while backing up
-                : () async {
-                    isBackingUp.value = true;
-                    try {
-                      await BackupService().performBackup();
-                      if (context.mounted)
-                        showSuccessToast(context, 'Backup completed successfully');
-                      final now = DateTime.now();
-                      widget.lastBackupDate.value = now;
-                      MiniBox().write(mLastBackupDate, now);
-                    } on GoogleClientNotAuthenticatedError catch (e) {
-                      if (context.mounted) showErrorToast(context, e.userMessage!);
-                    } on InternetOffError catch (e) {
-                      if (context.mounted) showSuccessToast(context, e.userMessage!);
-                    } catch (e) {
-                      MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
-                      if (context.mounted)
-                        showErrorToast(context, 'Unknown error occurred, try after sometime!');
-                    } finally {
-                      if (context.mounted) {
-                        isBackingUp.value = false;
-                      }
-                    }
-                  },
-            icon: backingUp
-                ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator())
-                : Icon(
-                    Icons.backup,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+    return StreamBuilder<List<BoxPref>>(
+      stream: ObjectBox()
+          .prefsBox
+          .query(BoxPref_.key.equals(mIsDeleting))
+          .watch(triggerImmediately: true)
+          .map((query) => query.find()),
+      builder: (context, snapshot) {
+        final prefs = snapshot.data;
+        final isDeleting = prefs?.isNotEmpty == true && prefs!.first.value == 'true';
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: isDeleting
+                  ? null
+                  : () async {
+                final shouldDelete = await _showDeleteConfirmationDialog(context);
+                if (shouldDelete) {
+                  MiniBox().write(mIsDeleting, true);
+                  try {
+                    await BackupService().deleteBackupFromGoogleDrive();
+                    if (context.mounted)
+                      showSuccessToast(context, 'Backup deleted successfully');
+                  } on BackupFileNotFoundError catch (e) {
+                    if (context.mounted) showErrorToast(context, e.userMessage!);
+                  } on GoogleClientNotAuthenticatedError catch (e) {
+                    if (context.mounted) showErrorToast(context, e.userMessage!);
+                  } on InternetOffError catch (e) {
+                    if (context.mounted) showErrorToast(context, e.userMessage!);
+                  } finally {
+                    MiniBox().write(mIsDeleting, false);
+                  }
+                }
+              },
+              icon: isDeleting
+                  ? const SizedBox(
+                height: 16,
+                width: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+                  : Icon(
+                Icons.delete,
+                color: Theme.of(context).colorScheme.error,
+                size: 20,
+              ),
+              label: FittedBox(child: Text('Delete backup')),
+            ),
           ),
         );
       },
     );
+  }
+
+  Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: Theme.of(context).colorScheme.error,
+                size: 28,
+              ),
+              const SizedBox(width: 12),
+              const Text('Delete Backup?'),
+            ],
+          ),
+          content: const Text(
+            'This will permanently delete your backup from Google Drive. This action cannot be undone.',
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: const Text('Delete'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    ) ??
+        false;
   }
 }

@@ -72,6 +72,9 @@ final mInitialDate = DateTime(2000, 1, 1);
 
 const maxExtentDateDays = 7305;
 
+const String mIsBackingUp = 'isBackingUp';
+const String mIsRestoring = 'isRestoring';
+const String mIsDeleting = 'isDeleting';
 
 // Timer Settings Constants
 const String mAutoSwitchToBreak = 'auto_switch_to_break';
