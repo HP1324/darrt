@@ -170,6 +170,7 @@ Backup & restore
 ### Today's checklist (18-07-2025)
 
 - [x] Fix bar chart not showing from current date
+- [x] Add more frequent achievement, also improve achievement names
 - [ ] Write code to implement all timer settings 
 
 ### TODOS in future
