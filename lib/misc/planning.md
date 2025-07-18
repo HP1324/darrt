@@ -169,7 +169,7 @@ Backup & restore
 
 ### Today's checklist (18-07-2025)
 
-- [ ] Fix bar chart not showing from current date
+- [x] Fix bar chart not showing from current date
 - [ ] Write code to implement all timer settings 
 
 ### TODOS in future

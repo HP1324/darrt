@@ -390,89 +390,10 @@ class WeeklyChart extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: data.length * 50.0,
-                child: BarChart(
-                  BarChartData(
-                    barTouchData: BarTouchData(enabled: false),
-                    barGroups: data.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final item = entry.value;
-                      final count = item['count'] as int;
-
-                      return BarChartGroupData(
-                        x: index,
-                        barRods: [
-                          BarChartRodData(
-                            toY: count > 0 ? count.toDouble() : 0.1,
-                            color: count > 0
-                                ? scheme.primary
-                                : scheme.outline.withValues(alpha: 0.3),
-                            width: count > 0 ? 16 : 3,
-                            borderRadius: BorderRadius.circular(count > 0 ? 6 : 1.5),
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                    gridData: FlGridData(show: false),
-                    borderData: FlBorderData(show: false),
-                    titlesData: FlTitlesData(
-                      topTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            final index = value.toInt();
-                            if (index >= 0 && index < data.length) {
-                              final count = data[index]['count'] as int;
-                              if (count > 0) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 4),
-                                  child: Text(
-                                    count.toString(),
-                                    style: textTheme.labelSmall?.copyWith(
-                                      color: scheme.primary,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                );
-                              }
-                            }
-                            return const SizedBox();
-                          },
-                        ),
-                      ),
-                      rightTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            final index = value.toInt();
-                            if (index >= 0 && index < data.length) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  data[index]['label'],
-                                  style: textTheme.labelSmall?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              );
-                            }
-                            return const SizedBox();
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+            child: _WeeklyChartScrollView(
+              data: data,
+              scheme: scheme,
+              textTheme: textTheme,
             ),
           ),
         ],
@@ -508,6 +429,160 @@ class WeeklyChart extends StatelessWidget {
   DateTime _getStartOfWeek(DateTime date) {
     final daysFromMonday = date.weekday - 1;
     return DateTime(date.year, date.month, date.day - daysFromMonday);
+  }
+}
+
+class _WeeklyChartScrollView extends StatefulWidget {
+  const _WeeklyChartScrollView({
+    required this.data,
+    required this.scheme,
+    required this.textTheme,
+  });
+
+  final List<Map<String, dynamic>> data;
+  final ColorScheme scheme;
+  final TextTheme textTheme;
+
+  @override
+  State<_WeeklyChartScrollView> createState() => _WeeklyChartScrollViewState();
+}
+
+class _WeeklyChartScrollViewState extends State<_WeeklyChartScrollView> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentWeek();
+    });
+  }
+
+  void _scrollToCurrentWeek() {
+    final now = DateTime.now();
+    final currentWeekStart = _getStartOfWeek(now);
+
+    // Find the index of the current week
+    int currentWeekIndex = -1;
+    for (int i = 0; i < widget.data.length; i++) {
+      final weekData = widget.data[i];
+      final weekStart = weekData['week'] as DateTime;
+      if (weekStart.isAtSameMomentAs(currentWeekStart) ||
+          (weekStart.isBefore(currentWeekStart) &&
+              weekStart.add(const Duration(days: 6)).isAfter(currentWeekStart))) {
+        currentWeekIndex = i;
+        break;
+      }
+    }
+
+    if (currentWeekIndex != -1 && _scrollController.hasClients) {
+      final scrollPosition = (currentWeekIndex * 50.0) - (MediaQuery.of(context).size.width / 2) + 25;
+      _scrollController.animateTo(
+        scrollPosition.clamp(0.0, _scrollController.position.maxScrollExtent),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  DateTime _getStartOfWeek(DateTime date) {
+    final daysFromMonday = date.weekday - 1;
+    return DateTime(date.year, date.month, date.day - daysFromMonday);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      controller: _scrollController,
+      scrollDirection: Axis.horizontal,
+      child: SizedBox(
+        width: widget.data.length * 50.0,
+        child: BarChart(
+          BarChartData(
+            barTouchData: BarTouchData(enabled: false),
+            barGroups: widget.data.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              final count = item['count'] as int;
+
+              return BarChartGroupData(
+                x: index,
+                barRods: [
+                  BarChartRodData(
+                    toY: count > 0 ? count.toDouble() : 0.1,
+                    color: count > 0
+                        ? widget.scheme.primary
+                        : widget.scheme.outline.withValues(alpha: 0.3),
+                    width: count > 0 ? 16 : 3,
+                    borderRadius: BorderRadius.circular(count > 0 ? 6 : 1.5),
+                  ),
+                ],
+              );
+            }).toList(),
+            gridData: FlGridData(show: false),
+            borderData: FlBorderData(show: false),
+            titlesData: FlTitlesData(
+              topTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    final index = value.toInt();
+                    if (index >= 0 && index < widget.data.length) {
+                      final count = widget.data[index]['count'] as int;
+                      if (count > 0) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Text(
+                            count.toString(),
+                            style: widget.textTheme.labelSmall?.copyWith(
+                              color: widget.scheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                    return const SizedBox();
+                  },
+                ),
+              ),
+              rightTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    final index = value.toInt();
+                    if (index >= 0 && index < widget.data.length) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          widget.data[index]['label'],
+                          style: widget.textTheme.labelSmall?.copyWith(
+                            color: widget.scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox();
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -556,90 +631,10 @@ class MonthlyChart extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: data.length * 60.0,
-                child: BarChart(
-                  BarChartData(
-                    barTouchData: BarTouchData(enabled: false),
-                    barGroups: data.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final item = entry.value;
-                      final count = item['count'] as int;
-
-                      return BarChartGroupData(
-                        x: index,
-                        barRods: [
-                          BarChartRodData(
-                            toY: count > 0 ? count.toDouble() : 0.1,
-                            color: count > 0
-                                ? scheme.primary
-                                : scheme.outline.withValues(alpha: 0.3),
-                            width: count > 0 ? 20 : 3,
-                            borderRadius: BorderRadius.circular(count > 0 ? 8 : 1.5),
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                    gridData: FlGridData(show: false),
-
-                    borderData: FlBorderData(show: false),
-                    titlesData: FlTitlesData(
-                      topTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            final index = value.toInt();
-                            if (index >= 0 && index < data.length) {
-                              final count = data[index]['count'] as int;
-                              if (count > 0) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 4),
-                                  child: Text(
-                                    count.toString(),
-                                    style: textTheme.labelSmall?.copyWith(
-                                      color: scheme.primary,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                );
-                              }
-                            }
-                            return const SizedBox();
-                          },
-                        ),
-                      ),
-                      rightTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            final index = value.toInt();
-                            if (index >= 0 && index < data.length) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  data[index]['label'],
-                                  style: textTheme.labelSmall?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              );
-                            }
-                            return const SizedBox();
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+            child: _MonthlyChartScrollView(
+              data: data,
+              scheme: scheme,
+              textTheme: textTheme,
             ),
           ),
         ],
@@ -668,6 +663,153 @@ class MonthlyChart extends StatelessWidget {
     }
 
     return months;
+  }
+}
+
+class _MonthlyChartScrollView extends StatefulWidget {
+  const _MonthlyChartScrollView({
+    required this.data,
+    required this.scheme,
+    required this.textTheme,
+  });
+
+  final List<Map<String, dynamic>> data;
+  final ColorScheme scheme;
+  final TextTheme textTheme;
+
+  @override
+  State<_MonthlyChartScrollView> createState() => _MonthlyChartScrollViewState();
+}
+
+class _MonthlyChartScrollViewState extends State<_MonthlyChartScrollView> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentMonth();
+    });
+  }
+
+  void _scrollToCurrentMonth() {
+    final now = DateTime.now();
+    final currentMonth = DateTime(now.year, now.month, 1);
+
+    // Find the index of the current month
+    int currentMonthIndex = -1;
+    for (int i = 0; i < widget.data.length; i++) {
+      final monthData = widget.data[i];
+      final month = monthData['month'] as DateTime;
+      if (month.year == currentMonth.year && month.month == currentMonth.month) {
+        currentMonthIndex = i;
+        break;
+      }
+    }
+
+    if (currentMonthIndex != -1 && _scrollController.hasClients) {
+      final scrollPosition = (currentMonthIndex * 60.0) - (MediaQuery.of(context).size.width / 2) + 30;
+      _scrollController.animateTo(
+        scrollPosition.clamp(0.0, _scrollController.position.maxScrollExtent),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      controller: _scrollController,
+      scrollDirection: Axis.horizontal,
+      child: SizedBox(
+        width: widget.data.length * 60.0,
+        child: BarChart(
+          BarChartData(
+            barTouchData: BarTouchData(enabled: false),
+            barGroups: widget.data.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              final count = item['count'] as int;
+
+              return BarChartGroupData(
+                x: index,
+                barRods: [
+                  BarChartRodData(
+                    toY: count > 0 ? count.toDouble() : 0.1,
+                    color: count > 0
+                        ? widget.scheme.primary
+                        : widget.scheme.outline.withValues(alpha: 0.3),
+                    width: count > 0 ? 20 : 3,
+                    borderRadius: BorderRadius.circular(count > 0 ? 8 : 1.5),
+                  ),
+                ],
+              );
+            }).toList(),
+            gridData: FlGridData(show: false),
+            borderData: FlBorderData(show: false),
+            titlesData: FlTitlesData(
+              topTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    final index = value.toInt();
+                    if (index >= 0 && index < widget.data.length) {
+                      final count = widget.data[index]['count'] as int;
+                      if (count > 0) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Text(
+                            count.toString(),
+                            style: widget.textTheme.labelSmall?.copyWith(
+                              color: widget.scheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                    return const SizedBox();
+                  },
+                ),
+              ),
+              rightTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    final index = value.toInt();
+                    if (index >= 0 && index < widget.data.length) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          widget.data[index]['label'],
+                          style: widget.textTheme.labelSmall?.copyWith(
+                            color: widget.scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox();
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -716,89 +858,10 @@ class YearlyChart extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: data.length * 80.0,
-                child: BarChart(
-                  BarChartData(
-                    barTouchData: BarTouchData(enabled: false),
-                    barGroups: data.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final item = entry.value;
-                      final count = item['count'] as int;
-
-                      return BarChartGroupData(
-                        x: index,
-                        barRods: [
-                          BarChartRodData(
-                            toY: count > 0 ? count.toDouble() : 0.1,
-                            color: count > 0
-                                ? scheme.primary
-                                : scheme.outline.withValues(alpha: 0.3),
-                            width: count > 0 ? 28 : 4,
-                            borderRadius: BorderRadius.circular(count > 0 ? 10 : 2),
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                    gridData: FlGridData(show: false),
-                    borderData: FlBorderData(show: false),
-                    titlesData: FlTitlesData(
-                      topTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            final index = value.toInt();
-                            if (index >= 0 && index < data.length) {
-                              final count = data[index]['count'] as int;
-                              if (count > 0) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 4),
-                                  child: Text(
-                                    count.toString(),
-                                    style: textTheme.labelSmall?.copyWith(
-                                      color: scheme.primary,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                );
-                              }
-                            }
-                            return const SizedBox();
-                          },
-                        ),
-                      ),
-                      rightTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            final index = value.toInt();
-                            if (index >= 0 && index < data.length) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  data[index]['label'],
-                                  style: textTheme.labelSmall?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              );
-                            }
-                            return const SizedBox();
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+            child: _YearlyChartScrollView(
+              data: data,
+              scheme: scheme,
+              textTheme: textTheme,
             ),
           ),
         ],
@@ -827,6 +890,153 @@ class YearlyChart extends StatelessWidget {
     }
 
     return years;
+  }
+}
+
+class _YearlyChartScrollView extends StatefulWidget {
+  const _YearlyChartScrollView({
+    required this.data,
+    required this.scheme,
+    required this.textTheme,
+  });
+
+  final List<Map<String, dynamic>> data;
+  final ColorScheme scheme;
+  final TextTheme textTheme;
+
+  @override
+  State<_YearlyChartScrollView> createState() => _YearlyChartScrollViewState();
+}
+
+class _YearlyChartScrollViewState extends State<_YearlyChartScrollView> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentYear();
+    });
+  }
+
+  void _scrollToCurrentYear() {
+    final now = DateTime.now();
+    final currentYear = now.year;
+
+    // Find the index of the current year
+    int currentYearIndex = -1;
+    for (int i = 0; i < widget.data.length; i++) {
+      final yearData = widget.data[i];
+      final year = yearData['year'] as int;
+      if (year == currentYear) {
+        currentYearIndex = i;
+        break;
+      }
+    }
+
+    if (currentYearIndex != -1 && _scrollController.hasClients) {
+      final scrollPosition = (currentYearIndex * 80.0) - (MediaQuery.of(context).size.width / 2) + 40;
+      _scrollController.animateTo(
+        scrollPosition.clamp(0.0, _scrollController.position.maxScrollExtent),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      controller: _scrollController,
+      scrollDirection: Axis.horizontal,
+      child: SizedBox(
+        width: widget.data.length * 80.0,
+        child: BarChart(
+          BarChartData(
+            barTouchData: BarTouchData(enabled: false),
+            barGroups: widget.data.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              final count = item['count'] as int;
+
+              return BarChartGroupData(
+                x: index,
+                barRods: [
+                  BarChartRodData(
+                    toY: count > 0 ? count.toDouble() : 0.1,
+                    color: count > 0
+                        ? widget.scheme.primary
+                        : widget.scheme.outline.withValues(alpha: 0.3),
+                    width: count > 0 ? 28 : 4,
+                    borderRadius: BorderRadius.circular(count > 0 ? 10 : 2),
+                  ),
+                ],
+              );
+            }).toList(),
+            gridData: FlGridData(show: false),
+            borderData: FlBorderData(show: false),
+            titlesData: FlTitlesData(
+              topTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    final index = value.toInt();
+                    if (index >= 0 && index < widget.data.length) {
+                      final count = widget.data[index]['count'] as int;
+                      if (count > 0) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Text(
+                            count.toString(),
+                            style: widget.textTheme.labelSmall?.copyWith(
+                              color: widget.scheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                    return const SizedBox();
+                  },
+                ),
+              ),
+              rightTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    final index = value.toInt();
+                    if (index >= 0 && index < widget.data.length) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          widget.data[index]['label'],
+                          style: widget.textTheme.labelSmall?.copyWith(
+                            color: widget.scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox();
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
