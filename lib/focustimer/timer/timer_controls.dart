@@ -22,7 +22,6 @@ class TimerControls extends StatelessWidget {
               ? null
               : () async {
                   await _handleTimerPlayPause();
-
                 },
           isPrimary: true,
           scheme: scheme,
@@ -84,7 +83,7 @@ class TimerControls extends StatelessWidget {
     final handleSound = MiniBox().read(mPauseResumeSoundWithTimer);
     if (g.timerController.isRunning) {
       g.timerController.pauseTimer();
-      if (handleSound && g.audioController.isPlaying) {
+      if (handleSound) {
         await g.audioController.pauseAudio();
       }
     }else{
@@ -94,44 +93,12 @@ class TimerControls extends StatelessWidget {
       }
     }
   }
-
-  Future<void> _handleSoundPlayPause()async{
-    if (g.audioController.isPlaying && g.timerController.isPaused) {
-      g.audioController.pauseAudio();
-    }else{
-      if (g.audioController.currentSound != null && !g.audioController.isPlaying) {
-        MiniLogger.dp('Resuming audio');
-        await g.audioController.resumeAudio();
-      } else if (g.audioController.currentSound != null && g.audioController.isStopped) {
-        await g.audioController.playAudio(g.audioController.currentSound);
-      }
-    }
-  }
-  Future<void> _handlePlayPause() async {
-    if (g.timerController.isRunning) {
-      g.timerController.pauseTimer();
-      if (g.audioController.isPlaying) {
-        await g.audioController.pauseAudio();
-      }
-    } else {
-      g.timerController.startTimer();
-      MiniLogger.dp("Timer has started");
-
-      // Check if audio was previously playing (not stopped completely)
-      if (g.audioController.currentSound != null && !g.audioController.isPlaying) {
-        MiniLogger.dp('Resuming audio');
-        await g.audioController.resumeAudio();
-      } else if (g.audioController.currentSound != null && g.audioController.isStopped) {
-        await g.audioController.playAudio(g.audioController.currentSound);
-      }
-    }
-  }
-
   Future<void> _handleStop() async {
+    final handleSound = MiniBox().read(mPauseResumeSoundWithTimer);
     if (g.timerController.isRunning || g.timerController.isPaused) {
       g.timerController.stopTimer();
-      if (g.audioController.isPlaying) {
-        g.audioController.pauseAudio();
+      if (handleSound) {
+        await g.audioController.pauseAudio();
       }
     }
   }

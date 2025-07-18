@@ -1,6 +1,7 @@
 // timer_controller.dart
 import 'dart:async';
 import 'dart:convert';
+import 'package:darrt/helpers/consts.dart';
 import 'package:flutter/foundation.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/helpers/mini_logger.dart';
@@ -93,7 +94,9 @@ class TimerController extends ChangeNotifier {
 
           if (_remainingSeconds <= 0) {
             stopTimer();
-            g.audioController.pauseAudio();
+            if (MiniBox().read(mPauseResumeSoundWithTimer)) {
+              g.audioController.pauseAudio();
+            }
           } else {
             _startTicker();
           }
@@ -116,7 +119,7 @@ class TimerController extends ChangeNotifier {
     notifyListeners();
   }
 
-// Modify your existing _resetToDefaults method:
+  // Modify your existing _resetToDefaults method:
   void _resetToDefaults() {
     _state = TimerState.idle;
     _currentType = TimerType.focus;
@@ -127,7 +130,7 @@ class TimerController extends ChangeNotifier {
     _clearStorage();
   }
 
-// Modify your existing _clearStorage method:
+  // Modify your existing _clearStorage method:
   void _clearStorage() {
     try {
       MiniBox().remove(_timerStateKey);
@@ -159,7 +162,6 @@ class TimerController extends ChangeNotifier {
     }
   }
 
-
   void _startTicker() {
     _ticker?.cancel();
     _ticker = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -168,8 +170,7 @@ class TimerController extends ChangeNotifier {
         _remainingSeconds = currentDuration - elapsed;
 
         if (_remainingSeconds <= 0) {
-          stopTimer();
-          g.audioController.pauseAudio();
+          _handleTimerCompletion();
         } else {
           notifyListeners();
         }
@@ -289,10 +290,9 @@ class TimerController extends ChangeNotifier {
     }
   }
 
-
   static const String _selectedTasksKey = 'selected_tasks';
 
-// Modify the existing task selection code:
+  // Modify the existing task selection code:
   final List<Task> _selectedTasks = [];
 
   List<Task> get selectedTasks => _selectedTasks;
@@ -331,7 +331,7 @@ class TimerController extends ChangeNotifier {
     }
   }
 
-// Add these new methods for persistent storage:
+  // Add these new methods for persistent storage:
 
   void _saveSelectedTasksToStorage() {
     try {
@@ -365,19 +365,39 @@ class TimerController extends ChangeNotifier {
     }
   }
 
-  // Optional: Method to automatically start break timer after focus timer completes
   void _handleTimerCompletion() {
-    // Your existing completion logic...
-
-    // Add automatic break start functionality
     if (currentType == TimerType.focus) {
-      // Wait a brief moment, then automatically switch to break
-      Future.delayed(const Duration(seconds: 1), () {
-        switchToBreak();
-        startTimer();
-      });
+      final autoSwitchToBreak = MiniBox().read(mAutoSwitchToBreak);
+      if(autoSwitchToBreak ?? false) {
+        Future.delayed(const Duration(milliseconds: 700), () {
+          switchToBreak();
+          startTimer();
+        });
+      }else {
+        stopTimer();
+        if (MiniBox().read(mPauseResumeSoundWithTimer) ?? true) {
+          g.audioController.pauseAudio();
+        }
+      }
+      g.audioController.playSoundOnly('assets/sounds/focus_timer_end.mp3');
+    }else{
+      final autoSwitchToFocus = MiniBox().read(mAutoSwitchToFocus);
+      if(autoSwitchToFocus ?? false) {
+        Future.delayed(const Duration(milliseconds: 700), () {
+          switchToFocus();
+          startTimer();
+        });
+      }else{
+        stopTimer();
+        if (MiniBox().read(mPauseResumeSoundWithTimer) ?? true) {
+          g.audioController.pauseAudio();
+        }
+      }
+      g.audioController.playSoundOnly('assets/sounds/break_timer_end.mp3');
+
     }
   }
+
   @override
   void dispose() {
     _stopTicker();

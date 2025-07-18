@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:darrt/helpers/consts.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:darrt/app/services/mini_box.dart';
@@ -21,7 +22,7 @@ class SoundController extends ChangeNotifier {
   bool _isDisposed = false;
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
-  LoopMode _loopMode = LoopMode.all;
+  LoopMode _loopMode = MiniBox().read(mSoundLoopMode) != null && MiniBox().read(mSoundLoopMode) == 'one' ? LoopMode.one : LoopMode.all;
   int? _currentIndex;
 
   // ValueNotifier for dialog-specific state
