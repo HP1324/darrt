@@ -184,7 +184,9 @@ class SoundController extends ChangeNotifier {
 
         // Add to audio sources and refresh
         _audioSources.add(AudioSource.file(path));
-        await _audioPlayer.setAudioSources(_audioSources);
+        // await _audioPlayer.setAudioSources(_audioSources);
+        //Use [addAudioSources] method instead of [setAudioSources] so that the player does not start playing from start when a new custom sound is selected.
+        await _audioPlayer.addAudioSource(AudioSource.file(path));
         notifyListeners();
       }
     } catch (e) {
