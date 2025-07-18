@@ -128,7 +128,7 @@ class TaskViewModel extends ViewModel<Task> {
       task.isDone = value;
       box.put(task);
       onetimeTaskCompletions[task.id] = value;
-      if(value) {
+      if (value) {
         g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
       }
     }
@@ -453,7 +453,24 @@ class TaskViewModel extends ViewModel<Task> {
     }
   }
 
-  final List<int> streakMilestones = [3, 7, 14, 30, 90, 180, 365, 730, 1095, 1825, 3650];
+  final List<int> streakMilestones = [
+    1,
+    3,
+    5,
+    7,
+    10,
+    14,
+    21,
+    30,
+    60,
+    90,
+    180,
+    365,
+    730,
+    1095,
+    1825,
+    3650,
+  ];
 
   Future<void> checkAndHandleAchievements(
     Task task,
