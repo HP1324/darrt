@@ -180,7 +180,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
         } else if (value == 1)
           return AppBar(
             backgroundColor: backgroundColor,
-            title: Text('Focus Sessions'),
+            title: Text('Focus'),
           );
         return AppBar(
           backgroundColor: backgroundColor,
