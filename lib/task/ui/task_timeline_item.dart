@@ -70,7 +70,7 @@ class TimelineTaskContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final hasTime = task.time != null;
+    final hasTime = task.startTime != null;
 
     return Container(
       margin: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
@@ -246,7 +246,7 @@ class TimelineTaskInfo extends StatelessWidget {
           child: TimelineTaskCategories(task: task),
         ),
         // Time display
-        if (task.time != null) ...[
+        if (task.startTime != null) ...[
           const SizedBox(width: 8),
           TimelineTaskTime(task: task),
         ],
@@ -303,10 +303,10 @@ class TimelineTaskTime extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (task.time == null) return const SizedBox.shrink();
+    if (task.startTime == null) return const SizedBox.shrink();
 
     final timeFormat = DateFormat.jm(); // This will format based on locale (12/24 hour)
-    final timeString = timeFormat.format(task.time!);
+    final timeString = timeFormat.format(task.startTime!);
     final theme = Theme.of(context);
 
     return Container(
@@ -368,7 +368,7 @@ class TimelineCheckbox extends StatelessWidget {
 
   CheckboxThemeData _buildTimelineCheckboxTheme(BuildContext context, bool isCompleted) {
     final colorScheme = Theme.of(context).colorScheme;
-    final hasTime = task.time != null;
+    final hasTime = task.startTime != null;
 
     return CheckboxThemeData(
       shape: const CircleBorder(),

@@ -217,10 +217,10 @@ class TaskTime extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (task.time == null) return const SizedBox.shrink();
+    if (task.startTime == null) return const SizedBox.shrink();
 
     final timeFormat = DateFormat.jm(); // This will format based on locale (12/24 hour)
-    final timeString = timeFormat.format(task.time!);
+    final timeString = timeFormat.format(task.startTime!);
     final theme = Theme.of(context);
 
     return Container(

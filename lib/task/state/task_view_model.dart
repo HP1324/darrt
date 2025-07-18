@@ -233,13 +233,13 @@ class TaskViewModel extends ViewModel<Task> {
 
   // Get tasks sorted by time for timeline view
   List<Task> getTasksSortedByTime(List<Task> tasks) {
-    final tasksWithTime = tasks.where((task) => task.time != null).toList();
-    final tasksWithoutTime = tasks.where((task) => task.time == null).toList();
+    final tasksWithTime = tasks.where((task) => task.startTime != null).toList();
+    final tasksWithoutTime = tasks.where((task) => task.startTime == null).toList();
 
     // Sort tasks with time by their time
     tasksWithTime.sort((a, b) {
-      final timeA = a.time!;
-      final timeB = b.time!;
+      final timeA = a.startTime!;
+      final timeB = b.startTime!;
       return timeA.compareTo(timeB);
     });
 

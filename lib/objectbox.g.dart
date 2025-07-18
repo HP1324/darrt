@@ -28,7 +28,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 8058497308889952526),
     name: 'Task',
-    lastPropertyId: const obx_int.IdUid(16, 7565050176549288089),
+    lastPropertyId: const obx_int.IdUid(17, 7029089935523781103),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -111,7 +111,7 @@ final _entities = <obx_int.ModelEntity>[
       ),
       obx_int.ModelProperty(
         id: const obx_int.IdUid(14, 9114797388521663395),
-        name: 'time',
+        name: 'startTime',
         type: 10,
         flags: 0,
       ),
@@ -125,6 +125,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(16, 7565050176549288089),
         name: 'stats',
         type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(17, 7029089935523781103),
+        name: 'endTime',
+        type: 10,
         flags: 0,
       ),
     ],
@@ -518,7 +524,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final statsOffset = object.stats == null
             ? null
             : fbb.writeString(object.stats!);
-        fbb.startTable(17);
+        fbb.startTable(18);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, titleOffset);
         fbb.addInt64(2, object.createdAt?.millisecondsSinceEpoch);
@@ -532,9 +538,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(10, repeatConfigOffset);
         fbb.addOffset(11, uuidOffset);
         fbb.addOffset(12, categoryUuidsOffset);
-        fbb.addInt64(13, object.time?.millisecondsSinceEpoch);
+        fbb.addInt64(13, object.startTime?.millisecondsSinceEpoch);
         fbb.addOffset(14, notesOffset);
         fbb.addOffset(15, statsOffset);
+        fbb.addInt64(16, object.endTime?.millisecondsSinceEpoch);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -551,10 +558,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
           rootOffset,
           20,
         );
-        final timeValue = const fb.Int64Reader().vTableGetNullable(
+        final startTimeValue = const fb.Int64Reader().vTableGetNullable(
           buffer,
           rootOffset,
           30,
+        );
+        final endTimeValue = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          36,
         );
         final idParam = const fb.Int64Reader().vTableGet(
           buffer,
@@ -577,9 +589,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final endDateParam = endDateValue == null
             ? null
             : DateTime.fromMillisecondsSinceEpoch(endDateValue);
-        final timeParam = timeValue == null
+        final startTimeParam = startTimeValue == null
             ? null
-            : DateTime.fromMillisecondsSinceEpoch(timeValue);
+            : DateTime.fromMillisecondsSinceEpoch(startTimeValue);
         final isRepeatingParam = const fb.BoolReader().vTableGet(
           buffer,
           rootOffset,
@@ -614,24 +626,28 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fb.StringReader(asciiOptimization: true),
           lazy: false,
         ).vTableGet(buffer, rootOffset, 28, []);
-        final object = Task(
-          id: idParam,
-          title: titleParam,
-          createdAt: createdAtParam,
-          dueDate: dueDateParam,
-          startDate: startDateParam,
-          endDate: endDateParam,
-          time: timeParam,
-          isRepeating: isRepeatingParam,
-          isDone: isDoneParam,
-          priority: priorityParam,
-          repeatConfig: repeatConfigParam,
-          reminders: remindersParam,
-          notes: notesParam,
-          stats: statsParam,
-          uuid: uuidParam,
-          categoryUuids: categoryUuidsParam,
-        );
+        final object =
+            Task(
+                id: idParam,
+                title: titleParam,
+                createdAt: createdAtParam,
+                dueDate: dueDateParam,
+                startDate: startDateParam,
+                endDate: endDateParam,
+                startTime: startTimeParam,
+                isRepeating: isRepeatingParam,
+                isDone: isDoneParam,
+                priority: priorityParam,
+                repeatConfig: repeatConfigParam,
+                reminders: remindersParam,
+                notes: notesParam,
+                stats: statsParam,
+                uuid: uuidParam,
+                categoryUuids: categoryUuidsParam,
+              )
+              ..endTime = endTimeValue == null
+                  ? null
+                  : DateTime.fromMillisecondsSinceEpoch(endTimeValue);
         obx_int.InternalToManyAccess.setRelInfo<Task>(
           object.categories,
           store,
@@ -1085,8 +1101,10 @@ class Task_ {
     _entities[0].properties[12],
   );
 
-  /// See [Task.time].
-  static final time = obx.QueryDateProperty<Task>(_entities[0].properties[13]);
+  /// See [Task.startTime].
+  static final startTime = obx.QueryDateProperty<Task>(
+    _entities[0].properties[13],
+  );
 
   /// See [Task.notes].
   static final notes = obx.QueryStringProperty<Task>(
@@ -1096,6 +1114,11 @@ class Task_ {
   /// See [Task.stats].
   static final stats = obx.QueryStringProperty<Task>(
     _entities[0].properties[15],
+  );
+
+  /// See [Task.endTime].
+  static final endTime = obx.QueryDateProperty<Task>(
+    _entities[0].properties[16],
   );
 
   /// see [Task.categories]

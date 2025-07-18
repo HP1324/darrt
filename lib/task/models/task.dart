@@ -19,7 +19,8 @@ class Task {
     DateTime? dueDate,
     DateTime? startDate,
     this.endDate,
-    this.time,
+    this.startTime,
+    this.endTime,
     this.isRepeating = false,
     this.isDone = false,
     this.priority = 'Low',
@@ -36,7 +37,10 @@ class Task {
   @Id()
   int id;
   String title, priority;
-  DateTime? createdAt, endDate, time;
+  DateTime? createdAt, endDate,startTime, endTime;
+
+  // @Property(uid:9114797388521663395)
+  // DateTime? ;
   DateTime dueDate, startDate;
   bool isDone, isRepeating;
   String? reminders, repeatConfig,notes,stats;
@@ -97,7 +101,8 @@ class Task {
     'isRepeating': isRepeating ? 1 : 0,
     'startDate': startDate.millisecondsSinceEpoch,
     'endDate': endDate?.millisecondsSinceEpoch,
-    'time' : time?.millisecondsSinceEpoch,
+    'startTime' : startTime?.millisecondsSinceEpoch,
+    'endTime' : endTime?.millisecondsSinceEpoch,
     'repeatConfig': repeatConfig,
     'reminders': reminders,
     'priority': priority,
@@ -122,8 +127,11 @@ class Task {
         endDate: json['endDate'] != null
             ? DateTime.fromMillisecondsSinceEpoch(json['endDate'])
             : null,
-        time: json['time'] != null
-            ? DateTime.fromMillisecondsSinceEpoch(json['time'])
+        startTime: json['startTime'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(json['startTime'])
+            : null,
+        endTime: json['endTime'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(json['endTime'])
             : null,
         repeatConfig: json['repeatConfig'],
         reminders: json['reminders'],
@@ -170,13 +178,15 @@ class Task {
     String? priority,
     DateTime? createdAt,
     DateTime? endDate,
-    DateTime? time,
+    DateTime? startTime,
+    DateTime? endTime,
     DateTime? dueDate,
     DateTime? startDate,
     bool? isDone,
     bool? isRepeating,
     String? reminders,
     String? repeatConfig,
+
   }) {
     return Task(
       id: id ?? this.id,
@@ -184,7 +194,8 @@ class Task {
       priority: priority ?? this.priority,
       createdAt: createdAt ?? this.createdAt,
       endDate: endDate ?? this.endDate,
-      time: time ?? this.time,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
       dueDate: dueDate ?? this.dueDate,
       startDate: startDate ?? this.startDate,
       isDone: isDone ?? this.isDone,

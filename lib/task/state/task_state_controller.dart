@@ -23,7 +23,8 @@ abstract class TaskState with _$TaskState {
     required bool isRepeating,
     required DateTime startDate,
     DateTime? endDate,
-    DateTime? time,
+    DateTime? startTime,
+    DateTime? endTime,
     required RepeatConfig repeatConfig,
     required List<Reminder> reminders,
     List<Note>? notes,
@@ -55,7 +56,8 @@ class TaskStateController extends StateController<TaskState, Task> {
           : false,
       startDate: edit ? task!.startDate : g.calMan.selectedDate,
       endDate: edit ? task!.endDate : null,
-      time: edit ? task!.time : null,
+      startTime: edit ? task!.startTime : null,
+      endTime: edit ? task!.endTime : null,
       repeatConfig: edit && task!.isRepeating
           ? RepeatConfig.fromJsonString(task.repeatConfig!)
           : RepeatConfig(),
@@ -73,7 +75,8 @@ class TaskStateController extends StateController<TaskState, Task> {
       isRepeating: false,
       startDate: DateTime.now(),
       endDate: null,
-      time: null,
+      startTime: null,
+      endTime: null,
       repeatConfig: RepeatConfig(),
       reminders: [],
       priority: priorities[3],
@@ -95,7 +98,8 @@ class TaskStateController extends StateController<TaskState, Task> {
       task.priority = priority;
       task.startDate = startDate;
       task.endDate = endDate;
-      task.time = time;
+      task.startTime = startTime;
+      task.endTime = endTime;
       task.isRepeating = isRepeating;
       task.repeatConfig = isRepeating ? repeatConfig.toJsonString() : null;
       task.reminders = Reminder.remindersToJsonString(reminders);
@@ -109,7 +113,8 @@ class TaskStateController extends StateController<TaskState, Task> {
         priority: priority,
         startDate: startDate,
         endDate: endDate,
-        time: time,
+        startTime: startTime,
+        endTime: endTime,
         isRepeating: isRepeating,
         repeatConfig: isRepeating ? repeatConfig.toJsonString() : null,
         reminders: Reminder.remindersToJsonString(reminders),
@@ -269,14 +274,23 @@ class TaskStateController extends StateController<TaskState, Task> {
     notifyListeners();
   }
 
-  void setTime(TimeOfDay selectedTime) {
+  void setStartTime(TimeOfDay selectedTime) {
     final dateTime = DateTime(1970, 1, 1, selectedTime.hour, selectedTime.minute);
-    state = state.copyWith(time: dateTime);
+    state = state.copyWith(startTime: dateTime);
     notifyListeners();
   }
 
-  void resetTime() {
-    state = state.copyWith(time: null);
+  void resetStartTime() {
+    state = state.copyWith(startTime: null);
+    notifyListeners();
+  }
+  void setEndTime(TimeOfDay selectedTime) {
+    final dateTime = DateTime(1970, 1, 1, selectedTime.hour, selectedTime.minute);
+    state = state.copyWith(endTime: dateTime);
+    notifyListeners();
+  }
+  void resetEndTime() {
+    state = state.copyWith(endTime: null);
     notifyListeners();
   }
 
@@ -344,7 +358,8 @@ extension AccessState on TaskStateController {
   DateTime get dueDate => state.dueDate;
   DateTime get startDate => state.startDate;
   DateTime? get endDate => state.endDate;
-  DateTime? get time => state.time;
+  DateTime? get startTime => state.startTime;
+  DateTime? get endTime => state.endTime;
   RepeatConfig get repeatConfig => state.repeatConfig;
   List<Reminder> get reminders => state.reminders;
   String get priority => state.priority;

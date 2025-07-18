@@ -224,7 +224,7 @@ class TimeSelector extends StatelessWidget {
       listenable: g.taskSc,
       builder: (context, child) {
         final textTheme = TextTheme.of(context);
-        final time = g.taskSc.time;
+        final time = g.taskSc.startTime;
         return InkWell(
           onTap: () async {
             final selectedTime = await showTimePicker(
@@ -232,7 +232,7 @@ class TimeSelector extends StatelessWidget {
               initialTime: time != null ? TimeOfDay.fromDateTime(time) : TimeOfDay.now(),
             );
             if (selectedTime != null) {
-              g.taskSc.setTime(selectedTime);
+              g.taskSc.setStartTime(selectedTime);
             }
           },
           child: StructuredRow(
@@ -256,7 +256,7 @@ class TimeSelector extends StatelessWidget {
                       size: 20,
                       color: ColorScheme.of(context).error,
                     ),
-                    onPressed: () => g.taskSc.resetTime(),
+                    onPressed: () => g.taskSc.resetStartTime(),
                   );
                 }
                 return SizedBox.shrink();
@@ -543,7 +543,7 @@ class AddRemindersSection extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  if (g.taskSc.time != null) Flexible(child: EasyReminderActions()),
+                  if (g.taskSc.startTime != null) Flexible(child: EasyReminderActions()),
                   Flexible(
                     child: reminders.isEmpty
                         ? Center(
@@ -580,7 +580,7 @@ class AddRemindersSection extends StatelessWidget {
                     child: FilledButton.icon(
                       onPressed: () => showReminderDialog(context),
                       icon: const Icon(Icons.add),
-                      label: Text(g.taskSc.time == null ? 'Add Reminder' : 'Add Custom Reminder'),
+                      label: Text(g.taskSc.startTime == null ? 'Add Reminder' : 'Add Custom Reminder'),
                     ),
                   ),
                 ],
@@ -646,9 +646,9 @@ class EasyReminderActions extends StatelessWidget {
     Reminder? reminder;
     TimeOfDay reminderTime = TimeOfDay.now();
     if (minutes == null) {
-      reminderTime = TimeOfDay.fromDateTime(g.taskSc.time!);
+      reminderTime = TimeOfDay.fromDateTime(g.taskSc.startTime!);
     } else {
-      reminderTime = TimeOfDay.fromDateTime(g.taskSc.time!.subtract(Duration(minutes: minutes)));
+      reminderTime = TimeOfDay.fromDateTime(g.taskSc.startTime!.subtract(Duration(minutes: minutes)));
     }
     reminder = Reminder(time: reminderTime);
     return reminder;
