@@ -154,24 +154,6 @@ class TaskViewModel extends ViewModel<Task> {
     item.id = id;
   }
 
-  // @override
-  // void putManyForRestore(List<Task> restoredItems, {List<TaskCompletion>? completions}) {
-  //   box.putMany(restoredItems);
-  //   restoreCompletionRelations(tasks: restoredItems, completions: completions!);
-  //   for (var task in restoredItems) {
-  //     NotificationService.removeAllTaskNotifications(task).then((_) async {
-  //       if (task.isRepeating) {
-  //         await NotificationService.createRepeatingTaskNotifications(task);
-  //       } else {
-  //         await NotificationService.createTaskNotification(task);
-  //       }
-  //     });
-  //   }
-  //   _completionBox.putMany(completions);
-  //   initializeItems();
-  //   notifyListeners();
-  // }
-
   @override
   void putManyForRestore(List<Task> restoredItems, {List<TaskCompletion>? completions}) {
     // First, restore the relations before persisting
