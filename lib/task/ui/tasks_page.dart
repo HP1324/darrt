@@ -1,3 +1,4 @@
+import 'package:darrt/task/ui/task_delete_confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:darrt/app/ui/empty_tasks_indicator.dart';
@@ -287,45 +288,13 @@ class TasksSelectedActions extends StatelessWidget {
     await showDialog(
       context: context,
       builder: (context) {
-        return _TaskDeleteConfirmationDialog();
+        return TaskDeleteConfirmationDialog();
       },
     );
   }
 }
 
-class _TaskDeleteConfirmationDialog extends StatelessWidget {
-  const _TaskDeleteConfirmationDialog();
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
-      title: const Text('Delete Tasks'),
-      content: const Text('Are you sure you want to delete these tasks?'),
-      actions: [
-        FilledButton(
-          onPressed: () {
-            final message = g.taskVm.deleteMultipleItems();
-            Navigator.pop(context);
-            if (context.mounted) {
-              showToast(context, type: ToastificationType.success, description: message);
-            }
-          },
-          style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(theme.colorScheme.error)),
-          child: const Text('Delete'),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-            g.taskVm.clearSelection();
-          },
-          child: const Text('Cancel'),
-        ),
-      ],
-    );
-  }
-}
 
 class ScrollableDateBar extends StatelessWidget {
   const ScrollableDateBar({super.key});
