@@ -95,6 +95,7 @@ class MiniBox {
   }
 
   void initStorage() {
+    writeIfNull(mShowTimerNotification, true);
     writeIfNull(mDefaultTaskList, 0);
     writeIfNull(mFirstInstallDate, DateUtils.dateOnly(DateTime.now()).millisecondsSinceEpoch);
     writeIfNull(firstTimeMicTap, true);

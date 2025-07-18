@@ -5,10 +5,6 @@ import 'package:darrt/focustimer/timer/timer_controller.dart';
 
 import '../../helpers/globals.dart' as g show timerController;
 
-
-
-
-
 class TimerDisplay extends StatelessWidget {
 
   const TimerDisplay({super.key});

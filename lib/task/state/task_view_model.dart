@@ -507,7 +507,7 @@ class TaskViewModel extends ViewModel<Task> {
       }
     }
 
-    if (currentSegment.length > 1) {
+    if (currentSegment.isNotEmpty) {
       streakSegments.add(currentSegment);
     }
 

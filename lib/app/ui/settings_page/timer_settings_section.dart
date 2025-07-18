@@ -15,7 +15,8 @@ class TimerSettingsSection extends StatelessWidget {
       children: const [
         AutoSwitchToBreakTile(),
         AutoSwitchToFocusTile(),
-        MarkTasksFinishedTile(),
+        //TODO: Temporarily exclude "mark tasks as finished after timer finish" setting, think thoroughly about it to implement in future
+        // MarkTasksFinishedTile(),
         ShowTimerNotificationTile(),
         PauseResumeSoundTile(),
       ],
