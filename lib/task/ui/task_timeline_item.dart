@@ -180,11 +180,10 @@ class TimelineTaskTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return ListenableBuilder(
       listenable: Listenable.merge([g.calMan, g.taskVm]),
       builder: (context, child) {
-        final textTheme  = Theme.of(context).textTheme;
+        final textTheme = Theme.of(context).textTheme;
         final scheme = Theme.of(context).colorScheme;
         final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
         final repeat = task.isRepeating;
@@ -328,10 +327,7 @@ class TimelineTaskTime extends StatelessWidget {
 }
 
 class TimelineCheckbox extends StatelessWidget {
-  const TimelineCheckbox({
-    super.key,
-    required this.task,
-  });
+  const TimelineCheckbox({super.key, required this.task});
 
   final Task task;
 
@@ -356,7 +352,7 @@ class TimelineCheckbox extends StatelessWidget {
             child: Checkbox(
               value: isCompleted,
               onChanged: (value) {
-                g.taskVm.toggleStatus(task, value ?? false, g.calMan.selectedDate,context);
+                g.taskVm.toggleStatus(task, value ?? false, g.calMan.selectedDate, context);
               },
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),

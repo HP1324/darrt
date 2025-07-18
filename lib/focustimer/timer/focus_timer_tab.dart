@@ -8,7 +8,6 @@ import 'package:darrt/focustimer/timer/timer_type_selector.dart';
 import '../../helpers/globals.dart' as g show timerController;
 
 class FocusTimerTab extends StatelessWidget {
-
   const FocusTimerTab({super.key});
 
   @override
@@ -28,36 +27,45 @@ class FocusTimerTab extends StatelessWidget {
       child: ListenableBuilder(
         listenable: g.timerController,
         builder: (context, child) {
-          return SingleChildScrollView(
-            child: Column(
-              spacing: 10,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      spacing: 10,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Button to add tasks for this timer
+                        TimerTaskSelectionExpansionTile(),
 
-                // Button to add tasks for this timer
-                TimerTaskSelectionExpansionTile(),
+                        // Timer type selector
+                        TimerTypeSelector(),
 
-                // Timer type selector
-                TimerTypeSelector(),
+                        // Timer display
+                        TimerDisplay(),
 
-                // Timer display
-                TimerDisplay(),
+                        // Duration selector
+                        DurationSelector(),
 
-                // Duration selector
-                DurationSelector(),
-
-                // Controls
-                TimerControls(),
-                SizedBox(height: 20),
-                // // Completion actions (if completed)
-                // if (controller.isCompleted)
-                //   CompletionActions(controller: controller),
-              ],
-            ),
+                        // Controls
+                        TimerControls(),
+                        SizedBox(height: 20),
+                        // // Completion actions (if completed)
+                        // if (controller.isCompleted)
+                        //   CompletionActions(controller: controller),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
           );
         },
       ),
     );
   }
 }
-

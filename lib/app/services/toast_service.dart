@@ -23,11 +23,11 @@ void showToast(
   );
 }
 
-void showErrorToast(BuildContext context, String description) =>
-    showToast(context, errorType, description);
+void showErrorToast(BuildContext context, String message) =>
+    showToast(context, errorType, message);
 
-void showSuccessToast(BuildContext context, String description) =>
-    showToast(context, successType, description);
+void showSuccessToast(BuildContext context, String message) =>
+    showToast(context, successType, message);
 
-void showWarningToast(BuildContext context, String description) =>
-    showToast(context, warningType, description);
+void showWarningToast(BuildContext context, String message) =>
+    showToast(context, warningType, message);
