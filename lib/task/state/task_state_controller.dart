@@ -281,7 +281,7 @@ class TaskStateController extends StateController<TaskState, Task> {
   }
 
   void resetStartTime() {
-    state = state.copyWith(startTime: null);
+    state = state.copyWith(startTime: null, endTime: null);
     notifyListeners();
   }
   void setEndTime(TimeOfDay selectedTime) {

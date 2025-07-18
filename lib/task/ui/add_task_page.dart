@@ -1,5 +1,6 @@
 import 'package:app_settings/app_settings.dart';
 import 'package:awesome_notifications/awesome_notifications.dart' show AwesomeNotifications;
+import 'package:darrt/app/services/toast_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:darrt/app/notification/notification_service.dart';
@@ -119,13 +120,14 @@ class _AddTaskPageState extends State<AddTaskPage> {
               spacing: 20,
               children: [
                 const TitleTextField(),
+                const TaskNoteSection(),
                 const CategorySelector(),
                 // const PrioritySelector(),
                 const TaskTypeSelector(),
                 const DueDateOrRepeatConfigSection(),
-                const TimeSelector(),
+                const StartTimeSelector(),
+                const EndTimeSelector(),
                 const AddRemindersSection(),
-                const TaskNoteSection(),
                 const SizedBox(height: 100),
               ],
             ),
@@ -147,13 +149,12 @@ class _AddTaskPageState extends State<AddTaskPage> {
   void _putTask(BuildContext context) {
     Task newTask = g.taskSc.buildModel(edit: widget.edit, model: widget.task);
     final message = g.taskVm.putItem(newTask, edit: widget.edit);
-    var type = ToastificationType.success;
     if (message == Messages.mTaskAdded || message == Messages.mTaskEdited) {
+      showSuccessToast(context, message);
       Navigator.pop(context);
     } else {
-      type = ToastificationType.error;
+      showErrorToast(context, message);
     }
-    showToast(context, type: type, description: message);
   }
 }
 
@@ -215,8 +216,8 @@ class TaskNoteSection extends StatelessWidget {
   }
 }
 
-class TimeSelector extends StatelessWidget {
-  const TimeSelector({super.key});
+class StartTimeSelector extends StatelessWidget {
+  const StartTimeSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +241,7 @@ class TimeSelector extends StatelessWidget {
             expanded: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Time (Optional)', style: textTheme.titleSmall),
+                Text('Start Time (Optional)', style: textTheme.titleSmall),
                 Text(
                   time != null ? TimeOfDay.fromDateTime(time).format(context) : 'No time set',
                   style: textTheme.bodySmall,
@@ -257,6 +258,64 @@ class TimeSelector extends StatelessWidget {
                       color: ColorScheme.of(context).error,
                     ),
                     onPressed: () => g.taskSc.resetStartTime(),
+                  );
+                }
+                return SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class EndTimeSelector extends StatelessWidget {
+  const EndTimeSelector({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: g.taskSc,
+      builder: (context, child) {
+        final textTheme = TextTheme.of(context);
+        final time = g.taskSc.endTime;
+        return InkWell(
+          onTap: () async {
+            if (g.taskSc.startTime == null) {
+              showErrorToast(context, 'Set start time first!');
+              return;
+            }
+            final selectedTime = await showTimePicker(
+              context: context,
+              initialTime: time != null ? TimeOfDay.fromDateTime(time) : TimeOfDay.now(),
+            );
+            if (selectedTime != null) {
+              g.taskSc.setEndTime(selectedTime);
+            }
+          },
+          child: StructuredRow(
+            leadingIcon: Icons.timer_off_outlined,
+            expanded: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('End Time (Optional)', style: textTheme.titleSmall),
+                Text(
+                  time != null ? TimeOfDay.fromDateTime(time).format(context) : 'No time set',
+                  style: textTheme.bodySmall,
+                ),
+              ],
+            ),
+            trailing: Builder(
+              builder: (context) {
+                if (time != null) {
+                  return IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      size: 20,
+                      color: ColorScheme.of(context).error,
+                    ),
+                    onPressed: () => g.taskSc.resetEndTime(),
                   );
                 }
                 return SizedBox.shrink();
@@ -326,11 +385,7 @@ class TitleTextField extends StatelessWidget {
 
   Future<void> _handleSpeechToText(BuildContext context) async {
     showPermissionDeniedToast() {
-      showToast(
-        context,
-        type: ToastificationType.error,
-        description: 'Microphone permission denied',
-      );
+      showErrorToast(context, 'All requested permissions are required');
     }
 
     // Check permission status first using permission_handler
@@ -379,11 +434,7 @@ class TitleTextField extends StatelessWidget {
             g.taskSttController.startListening();
           } else {
             if (context.mounted) {
-              showToast(
-                context,
-                type: ToastificationType.error,
-                description: 'Microphone permission denied',
-              );
+              showPermissionDeniedToast();
             }
           }
         } else {
@@ -580,7 +631,9 @@ class AddRemindersSection extends StatelessWidget {
                     child: FilledButton.icon(
                       onPressed: () => showReminderDialog(context),
                       icon: const Icon(Icons.add),
-                      label: Text(g.taskSc.startTime == null ? 'Add Reminder' : 'Add Custom Reminder'),
+                      label: Text(
+                        g.taskSc.startTime == null ? 'Add Reminder' : 'Add Custom Reminder',
+                      ),
                     ),
                   ),
                 ],
@@ -631,10 +684,11 @@ class EasyReminderActions extends StatelessWidget {
               edit: false,
               reminder: reminder,
             );
-            final type = message == Messages.mReminderAdded
-                ? ToastificationType.success
-                : ToastificationType.error;
-            showToast(context, type: type, description: message);
+            if (message == Messages.mReminderAdded) {
+              showSuccessToast(context, message);
+            } else {
+              showErrorToast(context, message);
+            }
           },
           child: Text(minutes != null ? '- $minutes min' : 'On time'),
         ),
@@ -648,7 +702,9 @@ class EasyReminderActions extends StatelessWidget {
     if (minutes == null) {
       reminderTime = TimeOfDay.fromDateTime(g.taskSc.startTime!);
     } else {
-      reminderTime = TimeOfDay.fromDateTime(g.taskSc.startTime!.subtract(Duration(minutes: minutes)));
+      reminderTime = TimeOfDay.fromDateTime(
+        g.taskSc.startTime!.subtract(Duration(minutes: minutes)),
+      );
     }
     reminder = Reminder(time: reminderTime);
     return reminder;
@@ -1091,10 +1147,9 @@ Future<void> showReminderDialog(
           reminder: newReminder,
           oldReminder: reminder,
         );
-        final type = message == Messages.mReminderAdded
-            ? ToastificationType.success
-            : ToastificationType.error;
-        showToast(context, type: type, description: message);
+        if(message == Messages.mReminderAdded){
+          showSuccessToast(context, message);
+        }else showErrorToast(context, message);
       },
     ),
   );
