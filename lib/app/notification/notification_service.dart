@@ -38,7 +38,8 @@ class NotificationService {
           NotificationChannel(
             channelKey: notifChannelKey,
             channelName: 'Task Notifications',
-            channelDescription:'Channel used to notify users about their tasks with simple notification',
+            channelDescription:
+                'Channel used to notify users about their tasks with simple notification',
             importance: NotificationImportance.Max,
             playSound: true,
             defaultRingtoneType: DefaultRingtoneType.Notification,
@@ -56,6 +57,14 @@ class NotificationService {
             enableLights: true,
             channelShowBadge: true,
             criticalAlerts: true,
+          ),
+          NotificationChannel(
+            channelKey: timerChannelKey,
+            channelName: 'Task Timers',
+            channelDescription: 'Show timer notifications',
+            playSound: false,
+            importance: NotificationImportance.High,
+            enableLights: true,
           ),
         ],
       );
@@ -453,7 +462,12 @@ class NotificationService {
     );
   }
 
-  static Future<void> scheduleQuickReminder(String? title, int minutes, {String? type,int? id}) async {
+  static Future<void> scheduleQuickReminder(
+    String? title,
+    int minutes, {
+    String? type,
+    int? id,
+  }) async {
     final now = DateTime.now();
     final channelKey = type == alarmReminderType ? alarmChannelKey : notifChannelKey;
     final category = type == alarmReminderType
@@ -465,8 +479,10 @@ class NotificationService {
       content: NotificationContent(
         id: id ?? now.millisecondsSinceEpoch.remainder(1000000),
         channelKey: channelKey,
-        title: title == null || title.isEmpty ? 'Quick Reminder' : 'Task due at ${formatTime(nextTime)}',
-        body: title == null || title.isEmpty? 'No title was set' : title,
+        title: title == null || title.isEmpty
+            ? 'Quick Reminder'
+            : 'Task due at ${formatTime(nextTime)}',
+        body: title == null || title.isEmpty ? 'No title was set' : title,
         category: category,
         criticalAlert: true,
       ),

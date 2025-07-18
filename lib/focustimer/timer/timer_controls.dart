@@ -80,7 +80,7 @@ class TimerControls extends StatelessWidget {
   }
 
   Future<void> _handleTimerPlayPause()async{
-    final handleSound = MiniBox().read(mPauseResumeSoundWithTimer);
+    final handleSound = MiniBox().read(mPauseResumeSoundWithTimer) ?? true;
     if (g.timerController.isRunning) {
       g.timerController.pauseTimer();
       if (handleSound) {
@@ -94,7 +94,7 @@ class TimerControls extends StatelessWidget {
     }
   }
   Future<void> _handleStop() async {
-    final handleSound = MiniBox().read(mPauseResumeSoundWithTimer);
+    final handleSound = MiniBox().read(mPauseResumeSoundWithTimer) ??true;
     if (g.timerController.isRunning || g.timerController.isPaused) {
       g.timerController.stopTimer();
       if (handleSound) {
