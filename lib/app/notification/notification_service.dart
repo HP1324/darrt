@@ -63,8 +63,12 @@ class NotificationService {
             channelName: 'Task Timers',
             channelDescription: 'Show timer notifications',
             playSound: false,
-            importance: NotificationImportance.High,
+            importance: NotificationImportance.Max,
             enableLights: true,
+            onlyAlertOnce: true,
+            criticalAlerts: true,
+            locked: true,
+            enableVibration: false,
           ),
         ],
       );

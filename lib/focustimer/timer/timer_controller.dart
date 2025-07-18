@@ -173,6 +173,7 @@ class TimerController extends ChangeNotifier {
         if (_remainingSeconds <= 0) {
           _handleTimerCompletion();
         } else {
+          _updatePersistentNotification();
           notifyListeners();
         }
       }
@@ -200,6 +201,7 @@ class TimerController extends ChangeNotifier {
       _pausedSeconds = _remainingSeconds;
       _startTime = null;
       _saveToStorage();
+      _updatePersistentNotification();
       notifyListeners();
     }
   }
@@ -215,6 +217,7 @@ class TimerController extends ChangeNotifier {
     _state = TimerState.running;
     _startTicker();
     _saveToStorage();
+    _updatePersistentNotification();
     notifyListeners();
   }
 
@@ -225,6 +228,7 @@ class TimerController extends ChangeNotifier {
     _startTime = null;
     _pausedSeconds = 0;
     _saveToStorage();
+    _updatePersistentNotification();
     notifyListeners();
   }
 
@@ -235,6 +239,7 @@ class TimerController extends ChangeNotifier {
     _startTime = null;
     _pausedSeconds = 0;
     _saveToStorage();
+    _updatePersistentNotification();
     notifyListeners();
   }
 
@@ -247,6 +252,7 @@ class TimerController extends ChangeNotifier {
       _startTime = null;
       _pausedSeconds = 0;
       _saveToStorage();
+      _updatePersistentNotification();
       notifyListeners();
     }
   }
@@ -260,6 +266,7 @@ class TimerController extends ChangeNotifier {
       _startTime = null;
       _pausedSeconds = 0;
       _saveToStorage();
+      _updatePersistentNotification();
       notifyListeners();
     }
   }
@@ -412,6 +419,31 @@ class TimerController extends ChangeNotifier {
         ),
       );
     }
+  }
+  Future<void> _updatePersistentNotification() async {
+    if(!MiniBox().read(mShowTimerNotification)) return;
+    if (_state == TimerState.idle || _state == TimerState.completed) {
+      await AwesomeNotifications().cancel(999); // 999: fixed ID for persistent
+      return;
+    }
+
+    final typeLabel = _currentType == TimerType.focus ? 'Focus' : 'Break';
+    final stateLabel = _state == TimerState.paused ? '⏸️ Paused' : '▶️ Running';
+
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 999, // Use a fixed ID for updating
+        channelKey: timerChannelKey,
+        title: '$typeLabel Timer – $stateLabel',
+        body: 'Time left: $formattedTime',
+        category: NotificationCategory.Status,
+        notificationLayout: NotificationLayout.Default,
+        wakeUpScreen: true,
+        criticalAlert: true,
+        autoDismissible: false,
+        locked: true,
+      ),
+    );
   }
 
   @override
