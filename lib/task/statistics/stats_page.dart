@@ -121,8 +121,9 @@ class _AchievementsSection extends StatelessWidget {
           builder: (context, child) {
             final achievements = g.taskVm.currentTaskStats!.achievements;
 
-            return SizedBox(
-              height: 140,
+            return Container(
+              padding: const EdgeInsets.all(10),
+              height:150,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: achievements.length,
@@ -1099,15 +1100,17 @@ class AchievementItem extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
-          Text(
-            achievement.description,
-            style: textTheme.labelSmall?.copyWith(
-              fontSize: 10,
-              color: isUnlocked
-                  ? colorScheme.onSurface.withValues(alpha:0.6)
-                  : colorScheme.onSurfaceVariant.withValues(alpha:0.5),
+          Expanded(
+            child: Text(
+              achievement.description,
+              style: textTheme.labelSmall?.copyWith(
+                fontSize: 10,
+                color: isUnlocked
+                    ? colorScheme.onSurface.withValues(alpha:0.6)
+                    : colorScheme.onSurfaceVariant.withValues(alpha:0.5),
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
