@@ -185,7 +185,7 @@ class _TaskNoteBottomSheetState extends State<TaskNoteBottomSheet> {
                 ),
                 icon: const Icon(Icons.add),
                 label: const Text(
-                  'Add Note',
+                  'Write a note',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

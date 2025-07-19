@@ -78,6 +78,7 @@ dependencies:
   device_preview: ^1.3.1
   url_launcher: ^6.3.2
   share_plus: ^11.0.0
+  fluentui_system_icons: ^1.1.273
 
 dev_dependencies:
   flutter_test:
@@ -142,6 +143,7 @@ flutter_launcher_icons:
   image_path: "assets/icon/play_store_512.png"  # Path to your icon image
   min_sdk_android: 21 # android min sdk min:16, default 21
   adaptive_icon_background: "#9966CC"
+  adaptive_icon_foreground: "assets/icon/play_store_512.png"
 
 flutter_native_splash:
   android: true
