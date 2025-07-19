@@ -13,7 +13,7 @@ class _MiniBottomNavBarState extends State<MiniBottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.sizeOf(context).height * 0.075,
+      height: MediaQuery.sizeOf(context).height * 0.09,
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -71,25 +71,30 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                AnimatedScale(
-                  duration: const Duration(milliseconds: 200),
-                  scale: isSelected ? 1.15 : 1.0,
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    child: Icon(
-                      widget.icon,
-                      size: 22,
-                      color: isSelected ? primary : onSurface.withAlpha(150),
+                Flexible(
+                  child: AnimatedScale(
+                    duration: const Duration(milliseconds: 200),
+                    scale: isSelected ? 1.15 : 1.0,
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      child: Icon(
+                        widget.icon,
+                        size: 22,
+                        color: isSelected ? primary : onSurface.withAlpha(150),
+                      ),
                     ),
                   ),
                 ),
                 if (widget.label != null)
-                  Text(
-                    widget.label!,
-                    style: TextStyle(
-                      fontSize: Theme.of(context).textTheme.labelSmall!.fontSize! + 1,
-                      color: isSelected ? primary : onSurface.withAlpha(150),
-                      fontWeight: FontWeight.bold,
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: Text(
+                      widget.label!,
+                      style: TextStyle(
+                        fontSize: Theme.of(context).textTheme.labelSmall!.fontSize! + 1,
+                        color: isSelected ? primary : onSurface.withAlpha(150),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
               ],

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:darrt/app/ui/motivation_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/app/notification/notification_service.dart';
@@ -104,6 +105,17 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
             actions: [
+              _MiniAppBarAction(
+                icon: Icon(Icons.lightbulb_outline),
+                onTap: ()async {
+                  await showDialog(
+                    context:context,
+                    builder:(context){
+                      return MotivationDialog();
+                    },
+                  );
+                },
+              ),
               if (kDebugMode)
                 _MiniAppBarAction(
                   icon: Icon(Icons.handyman),
