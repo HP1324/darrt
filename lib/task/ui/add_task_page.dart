@@ -182,7 +182,7 @@ class TaskNoteSection extends StatelessWidget {
         expanded: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Notes', style: textTheme.titleSmall),
+            Text('Take Notes', style: textTheme.titleSmall),
             ListenableBuilder(
               listenable: g.taskSc,
               builder: (context, child) {
@@ -1205,53 +1205,59 @@ class CategorySelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return StructuredRow(
-      leadingIcon: Icons.category_outlined,
-      expanded: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'Categories',
-                    style: TextStyle(fontSize: textTheme.labelLarge!.fontSize),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(
-            height: MediaQuery.sizeOf(context).height * 0.03,
-            child: ListenableBuilder(
-              listenable: g.taskSc,
-              builder: (context, child) {
-                final map = g.taskSc.categorySelection;
-                final categories = map.entries.where((e) => e.value).map((e) => e.key).toList();
-                return ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  physics: BouncingScrollPhysics(),
-                  separatorBuilder: (context, index) => const SizedBox(width: 2),
-                  itemCount: categories.length,
-                  itemBuilder: (context, index) {
-                    final category = categories[index];
-                    return CategoryChip(category: category);
-                  },
-                );
-              },
+    return InkWell(
+      onTap: () {
+        g.taskSc.textFieldNode.unfocus();
+        _showCategorySelectionBottomSheet(context);
+      },
+      child: StructuredRow(
+        leadingIcon: Icons.category_outlined,
+        expanded: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'Categories',
+                      style: TextStyle(fontSize: textTheme.labelLarge!.fontSize),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-      trailing: IconButton(
-        onPressed: () {
-          g.taskSc.textFieldNode.unfocus();
-          _showCategorySelectionBottomSheet(context);
-        },
-        icon: Icon(Icons.add),
+            SizedBox(
+              height: MediaQuery.sizeOf(context).height * 0.03,
+              child: ListenableBuilder(
+                listenable: g.taskSc,
+                builder: (context, child) {
+                  final map = g.taskSc.categorySelection;
+                  final categories = map.entries.where((e) => e.value).map((e) => e.key).toList();
+                  return ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    separatorBuilder: (context, index) => const SizedBox(width: 2),
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      final category = categories[index];
+                      return CategoryChip(category: category);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        trailing: IconButton(
+          onPressed: () {
+            g.taskSc.textFieldNode.unfocus();
+            _showCategorySelectionBottomSheet(context);
+          },
+          icon: Icon(Icons.add),
+        ),
       ),
     );
   }
