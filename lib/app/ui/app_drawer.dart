@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:googleapis/docs/v1.dart' hide TextStyle;
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:darrt/app/ui/settings_page/settings_page.dart';
 import 'package:darrt/app/ui/theme_settings_page.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/quickreminder/ui/quick_reminders_page.dart';
+import 'package:url_launcher/link.dart';
+import 'package:url_launcher/url_launcher.dart';
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
@@ -58,34 +61,56 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           const Spacer(),
-          const AppVersionLabel(),
+          const FooterSection(),
         ],
       ),
     );
   }
 }
 
-class AppVersionLabel extends StatelessWidget {
-  const AppVersionLabel({
-    super.key,
-  });
+class FooterSection extends StatelessWidget {
+  const FooterSection({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Builder(
-        builder: (context) {
-
-          // PackageInfo packageInfo = PackageInfo.fromPlatform();
-          return Text(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
             'Version 1.0.0',
-            style: TextStyle(
-              fontSize: 12,
+            style: TextStyle(fontSize: 12),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '•',
+            style: TextStyle(fontSize: 12),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () async {
+              final Uri url = Uri.parse('https://hp1324.github.io/darrt-privacy-policy/');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Could not launch URL')),
+                );
+              }
+            },
+            child: Text(
+              'Privacy Policy',
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.primary,
+                decoration: TextDecoration.underline,
+              ),
             ),
-          );
-        }
+          ),
+        ],
       ),
     );
   }
 }
+
