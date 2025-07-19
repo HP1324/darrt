@@ -120,6 +120,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
               spacing: 20,
               children: [
                 const TitleTextField(),
+                const CategorySelector(),
+                const TaskTypeSelector(),
                 const DueDateOrRepeatConfigSection(),
                 Row(
                   children: [
@@ -127,11 +129,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
                     Expanded(child: const EndTimeSelector()),
                   ],
                 ),
-                const TaskTypeSelector(),
                 const TaskNoteSection(),
-                const CategorySelector(),
                 // const PrioritySelector(),
-
                 const AddRemindersSection(),
                 const SizedBox(height: 100),
               ],

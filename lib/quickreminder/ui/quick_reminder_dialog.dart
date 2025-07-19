@@ -10,7 +10,6 @@ import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/quickreminder/model/quick_reminder.dart';
 import 'package:toastification/toastification.dart';
 
-import '../../helpers/consts.dart' show notifReminderType, alarmReminderType;
 
 class QuickReminderDialog extends StatefulWidget {
   const QuickReminderDialog({super.key, required this.edit, this.reminder})
