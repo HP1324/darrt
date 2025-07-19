@@ -26,41 +26,46 @@ class SnoozeSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Snooze reminder for (in minutes)',
+          'Snooze reminder (in minutes)',
           style: theme.textTheme.titleSmall,
         ),
-        SizedBox(height: 8),
-        StreamBuilder<Query<BoxPref>>(
-          stream: ObjectBox().prefsBox.query(BoxPref_.key.equals(mSnoozeMinutes)).watch(),
+        const SizedBox(height: 12),
+        StreamBuilder<List<BoxPref>>(
+          stream: ObjectBox()
+              .prefsBox
+              .query(BoxPref_.key.equals(mSnoozeMinutes))
+              .watch(triggerImmediately: true)
+              .map((q) => q.find()),
           builder: (context, snapshot) {
-            int snoozeMinutes = 5; // default value
-            if (snapshot.hasData) {
-              final result = snapshot.data!.find();
-              if (result.isNotEmpty) {
-                snoozeMinutes = int.tryParse(result.first.value) ?? 5;
-              }
+            int snoozeMinutes = 5; // Default fallback
+            final value = snapshot.data?.firstOrNull?.value;
+            if (value != null) {
+              snoozeMinutes = int.tryParse(value) ?? 5;
             }
 
-            return Wrap(
-              spacing: 8,
-              runSpacing: 4,
-              children: [1, 5, 10, 15, 20, 25, 30, 45, 50, 60].map((minutes) {
-                return ChoiceChip(
-                  showCheckmark: false,
-                  shape: StadiumBorder(),
-                  label: Text('$minutes'),
-                  selected: snoozeMinutes == minutes,
-                  onSelected: (selected) async {
-                    if (selected) {
-                      MiniBox().write(mSnoozeMinutes, minutes);
-                    }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$snoozeMinutes minutes',
+                  style: theme.textTheme.bodyMedium,
+                ),
+                Slider(
+                  value: snoozeMinutes.toDouble(),
+                  min: 1,
+                  max: 120,
+                  divisions: 119,
+                  label: '$snoozeMinutes',
+                  onChanged: (newValue) {
+                    MiniBox().write(mSnoozeMinutes, newValue.round());
                   },
-                );
-              }).toList(),
+                ),
+              ],
             );
           },
         ),
@@ -75,21 +80,22 @@ class DefaultReminderTypeSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Column(
-      spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Default reminder type', style: theme.textTheme.titleSmall),
-        StreamBuilder<Query<BoxPref>>(
-          stream: ObjectBox().prefsBox.query(BoxPref_.key.equals(mDefaultReminderType)).watch(),
+        const SizedBox(height: 8),
+        StreamBuilder<List<BoxPref>>(
+          stream: ObjectBox()
+              .prefsBox
+              .query(BoxPref_.key.equals(mDefaultReminderType))
+              .watch(triggerImmediately: true)
+              .map((q) => q.find()),
           builder: (context, snapshot) {
-            String defaultReminderType = notifReminderType; // default value
-            if (snapshot.hasData) {
-              final result = snapshot.data!.find();
-              if (result.isNotEmpty) {
-                defaultReminderType = result.first.value;
-              }
-            }
+            String selectedType = notifReminderType; // default
+            final value = snapshot.data?.firstOrNull?.value;
+            if (value != null) selectedType = value;
 
             return SegmentedButton<String>(
               segments: const [
@@ -104,8 +110,8 @@ class DefaultReminderTypeSection extends StatelessWidget {
                   icon: Icon(Icons.alarm),
                 ),
               ],
-              selected: {defaultReminderType},
-              onSelectionChanged: (Set<String> selection) async{
+              selected: {selectedType},
+              onSelectionChanged: (Set<String> selection) {
                 MiniBox().write(mDefaultReminderType, selection.first);
               },
             );
@@ -115,3 +121,4 @@ class DefaultReminderTypeSection extends StatelessWidget {
     );
   }
 }
+
