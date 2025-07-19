@@ -93,6 +93,7 @@ class AdsController extends ChangeNotifier {
         onAdFailedToLoad: (ad, error) {
           MiniLogger.dp('Notes page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}');
           isNotesPageBannerAdLoaded = false;
+          notifyListeners();
           ad.dispose();
         },
       ),
@@ -113,6 +114,7 @@ class AdsController extends ChangeNotifier {
         onAdFailedToLoad: (ad, error) {
           MiniLogger.dp('Add note page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}');
           isAddNotePageBannerAdLoaded = false;
+          notifyListeners();
           ad.dispose();
         },
       ),
@@ -133,12 +135,14 @@ class AdsController extends ChangeNotifier {
         onAdFailedToLoad: (ad, error) {
           MiniLogger.dp('Theme page banner app failed to load: ${error.code}, domain: ${error.domain}, message: ${error.message}');
           isThemePageBannerAdLoaded = false;
+          notifyListeners();
           ad.dispose();
         },
       ),
     );
     _themePageBannerAd.load();
   }
+
   void initializeFullPageAdOnAddTaskPagePop() async {
     await InterstitialAd.load(
       adUnitId: _fullPageOnAddTaskPagePopUnitId,
