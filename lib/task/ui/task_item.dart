@@ -217,24 +217,30 @@ class TaskTime extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (task.startTime == null) return const SizedBox.shrink();
+    final start = task.startTime;
+    final end = task.endTime;
 
-    final timeFormat = DateFormat.jm(); // This will format based on locale (12/24 hour)
-    final timeString = timeFormat.format(task.startTime!);
+    if (start == null) return const SizedBox.shrink();
+
+    final timeFormat = DateFormat.jm(); // Locale-aware time formatting
+    final startStr = timeFormat.format(start);
+    final endStr = end != null ? timeFormat.format(end) : null;
+    final timeDisplay = endStr != null ? "$startStr - $endStr" : startStr;
+
     final theme = Theme.of(context);
 
     return Container(
+      margin: const EdgeInsets.only(left: 8),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: theme.colorScheme.outline),
       ),
       child: Text(
-        timeString,
+        timeDisplay,
         style: TextStyle(
-          fontSize: theme.textTheme.labelSmall!.fontSize,
+          fontSize: theme.textTheme.labelSmall?.fontSize,
           fontWeight: FontWeight.w500,
-          color: theme.colorScheme.onPrimaryContainer,
         ),
       ),
     );
@@ -409,7 +415,7 @@ class TaskFinishCheckbox extends StatelessWidget {
                     ? repeatingCompletions[task.id]?.contains(date) ?? false
                     : oneTimeCompletions[task.id] ?? false,
                 onChanged: (value) {
-                  g.taskVm.toggleStatus(task, value ?? false, g.calMan.selectedDate,context);
+                  g.taskVm.toggleStatus(task, value ?? false, g.calMan.selectedDate, context);
                 },
               ),
             );

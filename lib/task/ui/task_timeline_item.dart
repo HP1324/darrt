@@ -78,8 +78,6 @@
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Timeline line and checkpoint
-              // TimelineTaskTime(task: task),
               SizedBox(
                 width: 32,
                 child: Column(
@@ -161,10 +159,8 @@
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // if (task.time != null) ...[
-          //   TimelineTaskTime(task: task),
-          //   const SizedBox(height: 8),
-          // ],
+          TimelineTaskTime(task: task),
+          const SizedBox(height: 8),
           TimelineTaskTitle(task: task),
           const SizedBox(height: 8),
           TimelineTaskInfo(task: task),
@@ -207,20 +203,6 @@
                   ),
                 ),
               ),
-              if (task.isRepeating) ...[
-                const SizedBox(width: 4),
-                Icon(
-                  FontAwesomeIcons.repeat,
-                  size: 13,
-                  color: scheme.primary.withAlpha(200),
-                ),
-                const SizedBox(width: 7),
-                InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () => MiniRouter.to(context, StatsPage(task: task)),
-                  child: Icon(Icons.calendar_month_outlined, size: 21, color: scheme.secondary),
-                ),
-              ],
             ],
           );
         },
@@ -238,17 +220,13 @@
 
     @override
     Widget build(BuildContext context) {
+      final scheme = Theme.of(context).colorScheme;
       return Row(
         children: [
           // Categories
           Expanded(
             child: TimelineTaskCategories(task: task),
           ),
-          // Time display
-          if (task.startTime != null) ...[
-            const SizedBox(width: 8),
-            TimelineTaskTime(task: task),
-          ],
         ],
       );
     }
@@ -280,7 +258,7 @@
             scrollDirection: Axis.horizontal,
             shrinkWrap: true,
             physics: const BouncingScrollPhysics(),
-            separatorBuilder: (context, index) => const SizedBox(width: 2),
+            separatorBuilder: (context, index) => const SizedBox(width: 5),
             itemCount: task.categories.length,
             itemBuilder: (context, index) {
               final category = task.categories[index];
@@ -302,29 +280,53 @@
 
     @override
     Widget build(BuildContext context) {
-      if (task.startTime == null) return const SizedBox.shrink();
+      final start = task.startTime;
+      final end = task.endTime;
 
-      final timeFormat = DateFormat.jm(); // This will format based on locale (12/24 hour)
-      final timeString = timeFormat.format(task.startTime!);
+      if (start == null) return const SizedBox.shrink();
+
+      final timeFormat = DateFormat.jm(); // 12/24 hr format by locale
+      final startStr = timeFormat.format(start);
+      final endStr = end != null ? timeFormat.format(end) : null;
+      final timeDisplay = endStr != null ? "$startStr - $endStr" : startStr;
+
       final theme = Theme.of(context);
 
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.8),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Text(
-          timeString,
-          style: TextStyle(
-            fontSize: theme.textTheme.labelSmall!.fontSize,
-            fontWeight: FontWeight.w500,
-            color: theme.colorScheme.onPrimaryContainer,
+      return Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 2),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: theme.colorScheme.primary.withValues(alpha:0.5))
+            ),
+            child: Text(
+              timeDisplay,
+              style: TextStyle(
+                fontSize: theme.textTheme.labelSmall!.fontSize,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
-        ),
+          Spacer(),
+          if (task.isRepeating) ...[
+            Icon(
+              FontAwesomeIcons.repeat,
+              size: 13,
+              color: theme.colorScheme.primary.withAlpha(200),
+            ),
+            const SizedBox(width: 8),
+            InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () => MiniRouter.to(context, StatsPage(task: task)),
+              child: Icon(Icons.calendar_month_outlined, size: 21, color: theme.colorScheme.secondary),
+            ),
+          ],
+        ],
       );
     }
   }
+
 
   class TimelineCheckbox extends StatelessWidget {
     const TimelineCheckbox({super.key, required this.task});

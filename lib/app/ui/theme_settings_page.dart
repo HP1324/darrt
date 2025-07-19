@@ -26,25 +26,27 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
         title: Text('Theme Colors'),
         elevation: 0,
       ),
-      body: Column(
-        spacing: 15,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _ThemeModeSelector(),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Select Your Theme Color',
-              style: Theme.of(context).textTheme.titleMedium,
+      body: SingleChildScrollView(
+        child: Column(
+          spacing: 15,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _ThemeModeSelector(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Select Your Theme Color',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
-          ),
-          _ColorGrid(),
-          TimedBannerAdWidget(
-            childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.themePageBannerAd,adSize: AdSize.fullBanner),
-            adInitializer: () => g.adsController.initializeThemePageBannerAd(),
-            showFor: Duration(seconds: 60),
-          ),
-        ],
+            _ColorGrid(),
+            TimedBannerAdWidget(
+              childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.themePageBannerAd,adSize: AdSize.fullBanner),
+              adInitializer: () => g.adsController.initializeThemePageBannerAd(),
+              showFor: Duration(seconds: 60),
+            ),
+          ],
+        ),
       ),
     );
   }
