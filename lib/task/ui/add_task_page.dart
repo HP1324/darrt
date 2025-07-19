@@ -120,13 +120,18 @@ class _AddTaskPageState extends State<AddTaskPage> {
               spacing: 20,
               children: [
                 const TitleTextField(),
+                const DueDateOrRepeatConfigSection(),
+                Row(
+                  children: [
+                    Expanded(child: const StartTimeSelector()),
+                    Expanded(child: const EndTimeSelector()),
+                  ],
+                ),
+                const TaskTypeSelector(),
                 const TaskNoteSection(),
                 const CategorySelector(),
                 // const PrioritySelector(),
-                const TaskTypeSelector(),
-                const DueDateOrRepeatConfigSection(),
-                const StartTimeSelector(),
-                const EndTimeSelector(),
+
                 const AddRemindersSection(),
                 const SizedBox(height: 100),
               ],
@@ -228,6 +233,7 @@ class StartTimeSelector extends StatelessWidget {
         final time = g.taskSc.startTime;
         return InkWell(
           onTap: () async {
+            g.taskSc.textFieldNode.unfocus();
             final selectedTime = await showTimePicker(
               context: context,
               initialTime: time != null ? TimeOfDay.fromDateTime(time) : TimeOfDay.now(),
@@ -241,7 +247,7 @@ class StartTimeSelector extends StatelessWidget {
             expanded: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Start Time (Optional)', style: textTheme.titleSmall),
+                Text('Start Time', style: textTheme.titleSmall),
                 Text(
                   time != null ? TimeOfDay.fromDateTime(time).format(context) : 'No time set',
                   style: textTheme.bodySmall,
@@ -282,6 +288,7 @@ class EndTimeSelector extends StatelessWidget {
         final time = g.taskSc.endTime;
         return InkWell(
           onTap: () async {
+            g.taskSc.textFieldNode.unfocus();
             if (g.taskSc.startTime == null) {
               showErrorToast(context, 'Set start time first!');
               return;
@@ -291,6 +298,12 @@ class EndTimeSelector extends StatelessWidget {
               initialTime: time != null ? TimeOfDay.fromDateTime(time) : TimeOfDay.now(),
             );
             if (selectedTime != null) {
+              if (!selectedTime.isAfter(TimeOfDay.fromDateTime(g.taskSc.startTime!))) {
+                if(context.mounted) {
+                  showErrorToast(context, 'End time must be after start time');
+                }
+                return;
+              }
               g.taskSc.setEndTime(selectedTime);
             }
           },
@@ -299,7 +312,7 @@ class EndTimeSelector extends StatelessWidget {
             expanded: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('End Time (Optional)', style: textTheme.titleSmall),
+                Text('End Time', style: textTheme.titleSmall),
                 Text(
                   time != null ? TimeOfDay.fromDateTime(time).format(context) : 'No time set',
                   style: textTheme.bodySmall,
@@ -900,48 +913,51 @@ class DateRangeSelector extends StatelessWidget {
     return ListenableBuilder(
       listenable: g.taskSc,
       builder: (context, child) {
-        return Column(
-          spacing: 10,
+        return Row(
           children: [
-            DateSelector(
-              icon: Icons.calendar_today_outlined,
-              title: 'Start Date',
-              date: g.taskSc.startDate,
-              onTap: () async {
-                g.taskSc.textFieldNode.unfocus();
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: g.taskSc.startDate,
-                  firstDate: getFirstDate(),
-                  lastDate: getMaxDate(),
-                );
-                if (date != null) {
-                  g.taskSc.setStartDate(date);
-                }
-              },
-              onClear: () {
-                g.taskSc.resetStartDate();
-              },
+            Expanded(
+              child: DateSelector(
+                icon: Icons.calendar_today_outlined,
+                title: 'Start Date',
+                date: g.taskSc.startDate,
+                onTap: () async {
+                  g.taskSc.textFieldNode.unfocus();
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: g.taskSc.startDate,
+                    firstDate: getFirstDate(),
+                    lastDate: getMaxDate(),
+                  );
+                  if (date != null) {
+                    g.taskSc.setStartDate(date);
+                  }
+                },
+                onClear: () {
+                  g.taskSc.resetStartDate();
+                },
+              ),
             ),
-            DateSelector(
-              icon: Icons.event_repeat,
-              title: 'End Date (Optional)',
-              date: g.taskSc.endDate,
-              onTap: () async {
-                g.taskSc.textFieldNode.unfocus();
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: g.taskSc.endDate,
-                  firstDate: g.taskSc.startDate.add(Duration(days: 1)),
-                  lastDate: getMaxDate(),
-                );
-                if (date != null) {
-                  g.taskSc.setEndDate(date);
-                }
-              },
-              onClear: () {
-                g.taskSc.resetEndDate();
-              },
+            Expanded(
+              child: DateSelector(
+                icon: Icons.event_repeat,
+                title: 'End Date',
+                date: g.taskSc.endDate,
+                onTap: () async {
+                  g.taskSc.textFieldNode.unfocus();
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: g.taskSc.endDate,
+                    firstDate: g.taskSc.startDate.add(Duration(days: 1)),
+                    lastDate: getMaxDate(),
+                  );
+                  if (date != null) {
+                    g.taskSc.setEndDate(date);
+                  }
+                },
+                onClear: () {
+                  g.taskSc.resetEndDate();
+                },
+              ),
             ),
           ],
         );
@@ -1147,9 +1163,10 @@ Future<void> showReminderDialog(
           reminder: newReminder,
           oldReminder: reminder,
         );
-        if(message == Messages.mReminderAdded){
+        if (message == Messages.mReminderAdded) {
           showSuccessToast(context, message);
-        }else showErrorToast(context, message);
+        } else
+          showErrorToast(context, message);
       },
     ),
   );
