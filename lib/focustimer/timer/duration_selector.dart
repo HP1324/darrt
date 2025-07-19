@@ -70,57 +70,141 @@ class DurationPickerDialog extends StatefulWidget {
 }
 
 class _DurationPickerDialogState extends State<DurationPickerDialog> {
+  late int _selectedHours;
   late int _selectedMinutes;
 
   @override
   void initState() {
     super.initState();
-    _selectedMinutes = widget.initialDuration ~/ 60;
+    // Convert initial duration from seconds to hours, minutes
+    final totalSeconds = widget.initialDuration;
+    _selectedHours = totalSeconds ~/ 3600;
+    _selectedMinutes = (totalSeconds % 3600) ~/ 60;
   }
 
   @override
   Widget build(BuildContext context) {
-    final scheme = ColorScheme.of(context);
-    final textTheme = Theme.of(context).textTheme;
-
     return AlertDialog(
-      title: Text(
-        'Set ${g.timerController.timerTypeLabel} Duration',
-        style: textTheme.headlineSmall?.copyWith(
-          color: scheme.onSurface,
-        ),
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '$_selectedMinutes minutes',
-            style: textTheme.headlineMedium?.copyWith(
-              color: scheme.primary,
-              fontWeight: FontWeight.w500,
+      title: const Text('Set Duration'),
+      content: SizedBox(
+        height: 200,
+        child: Row(
+          spacing: 10,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // Hours picker
+            Expanded(
+              child: Column(
+                children: [
+                  const Text('Hours', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: ListWheelScrollView.useDelegate(
+                      controller: FixedExtentScrollController(
+                        initialItem: _selectedHours,
+                      ),
+                      itemExtent: 40,
+                      perspective: 0.005,
+                      diameterRatio: 1.2,
+                      physics: const FixedExtentScrollPhysics(),
+                      childDelegate: ListWheelChildBuilderDelegate(
+                        childCount: 24, // 0-23 hours
+                        builder: (context, index) {
+                          final isSelected = index == _selectedHours;
+                          return Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? Theme.of(context).primaryColor.withOpacity(0.1)
+                                  : null,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              index.toString().padLeft(2, '0'),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                color: isSelected
+                                    ? Theme.of(context).primaryColor
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      onSelectedItemChanged: (index) {
+                        setState(() {
+                          _selectedHours = index;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Slider(
-            value: _selectedMinutes.toDouble(),
-            min: 1,
-            max: 120,
-            divisions: 119,
-            onChanged: (value) {
-              setState(() {
-                _selectedMinutes = value.round();
-              });
-            },
-          ),
-        ],
+            // Minutes picker
+            Expanded(
+              child: Column(
+                children: [
+                  const Text('Minutes', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: ListWheelScrollView.useDelegate(
+                      controller: FixedExtentScrollController(
+                        initialItem: _selectedMinutes,
+                      ),
+                      itemExtent: 40,
+                      perspective: 0.005,
+                      diameterRatio: 1.2,
+                      physics: const FixedExtentScrollPhysics(),
+                      childDelegate: ListWheelChildBuilderDelegate(
+                        childCount: 60, // 0-59 minutes
+                        builder: (context, index) {
+                          final isSelected = index == _selectedMinutes;
+                          return Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? Theme.of(context).primaryColor.withOpacity(0.1)
+                                  : null,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              index.toString().padLeft(2, '0'),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                color: isSelected
+                                    ? Theme.of(context).primaryColor
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      onSelectedItemChanged: (index) {
+                        setState(() {
+                          _selectedMinutes = index;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
         ),
-        FilledButton(
+        TextButton(
           onPressed: () {
+            final totalSeconds = (_selectedHours * 3600) + (_selectedMinutes * 60);
+             _selectedMinutes = totalSeconds ~/ 60;
+
             final seconds = _selectedMinutes * 60;
             if (g.timerController.currentType == TimerType.focus) {
               g.timerController.setFocusDuration(seconds);
@@ -129,7 +213,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
             }
             Navigator.pop(context);
           },
-          child: Text('Set'),
+          child: const Text('OK'),
         ),
       ],
     );

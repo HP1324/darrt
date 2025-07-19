@@ -49,11 +49,6 @@ class TimerController extends ChangeNotifier {
   bool get isCompleted => _state == TimerState.completed;
   bool get isIdle => _state == TimerState.idle;
 
-  String get formattedTime {
-    final minutes = _remainingSeconds ~/ 60;
-    final seconds = _remainingSeconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-  }
 
   String get timerTypeLabel => _currentType == TimerType.focus ? 'Focus Mode' : 'Break';
 
@@ -434,12 +429,12 @@ class TimerController extends ChangeNotifier {
 
     final typeLabel = _currentType == TimerType.focus ? 'Focus' : 'Break';
     final stateLabel = _state == TimerState.paused ? '⏸️ Paused' : '▶️ Running';
-
+    final title = typeLabel == 'Focus' ? 'Focus session - $stateLabel' : 'Taking a break';;
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: 999, // Use a fixed ID for updating
         channelKey: timerChannelKey,
-        title: '$typeLabel Timer – $stateLabel',
+        title: title,
         body: 'Time left: $formattedTime',
         category: NotificationCategory.Status,
         notificationLayout: NotificationLayout.Default,
@@ -449,6 +444,17 @@ class TimerController extends ChangeNotifier {
         locked: true,
       ),
     );
+  }
+  String get formattedTime {
+    final hours = _remainingSeconds ~/ 3600;
+    final minutes = (_remainingSeconds % 3600) ~/ 60;
+    final seconds = _remainingSeconds % 60;
+
+    if (hours > 0) {
+      return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    } else {
+      return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    }
   }
 
   @override

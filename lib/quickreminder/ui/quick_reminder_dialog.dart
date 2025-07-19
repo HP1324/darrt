@@ -1,3 +1,5 @@
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/helpers/consts.dart' show notifReminderType, alarmReminderType, mDefaultReminderType;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:darrt/app/notification/notification_service.dart';
@@ -30,7 +32,7 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
       type = widget.reminder!.type!;
       _titleController.text = widget.reminder!.title ?? '';
       _minutesController.text = widget.reminder!.durationMinutes.toString();
-    }
+    }else type = MiniBox().read(mDefaultReminderType);
   }
 
   @override

@@ -61,14 +61,7 @@ class TimerDisplay extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  g.timerController.formattedTime,
-                  style: textTheme.displayLarge?.copyWith(
-                    color: scheme.onSurface,
-                    fontWeight: FontWeight.w300,
-                    fontSize: 48,
-                  ),
-                ),
+                const FormattedTimerText(),
                 const SizedBox(height: 16),
                 TimerStateIndicator(),
               ],
@@ -207,3 +200,55 @@ class TimerStateIndicator extends StatelessWidget {
     }
   }
 }
+class FormattedTimerText extends StatelessWidget {
+  const FormattedTimerText({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+        listenable: g.timerController,
+        builder: (context, child) {
+          final remaining = g.timerController.remainingSeconds;
+
+          final hours = remaining ~/ 3600;
+          final minutes = (remaining % 3600) ~/ 60;
+          final seconds = remaining % 60;
+
+          final showHours = hours > 0;
+
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (showHours) ...[
+                _buildTimeSegment(context, hours.toString().padLeft(2, '0')),
+                _buildColon(context),
+              ],
+              _buildTimeSegment(context, minutes.toString().padLeft(2, '0')),
+              _buildColon(context),
+              _buildTimeSegment(context, seconds.toString().padLeft(2, '0')),
+            ],
+          );
+        }
+    );
+  }
+
+  Widget _buildTimeSegment(BuildContext context, String value) {
+    return Text(
+      value,
+      style: TextTheme.of(context).displayMedium
+    );
+  }
+
+  Widget _buildColon(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: Text(
+        ':',
+        style: TextTheme.of(context).displayMedium
+      ),
+    );
+  }
+}
+
