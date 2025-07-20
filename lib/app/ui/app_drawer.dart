@@ -1,3 +1,5 @@
+import 'package:darrt/app/services/toast_service.dart';
+import 'package:darrt/app/ui/common_issues_fix_page.dart';
 import 'package:flutter/material.dart';
 import 'package:googleapis/docs/v1.dart' hide TextStyle;
 import 'package:iconsax/iconsax.dart';
@@ -57,7 +59,14 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Iconsax.setting_2),
             title: const Text('Settings'),
             onTap: () {
-                MiniRouter.to(context, SettingsPage());
+              MiniRouter.to(context, SettingsPage());
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.report_problem),
+            title: const Text('Common Issues'),
+            onTap: () {
+              MiniRouter.to(context, CommonIssuesFixPage());
             },
           ),
           const Spacer(),
@@ -94,9 +103,9 @@ class FooterSection extends StatelessWidget {
               if (await canLaunchUrl(url)) {
                 await launchUrl(url, mode: LaunchMode.externalApplication);
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Could not launch URL')),
-                );
+                if(context.mounted){
+                  showErrorToast(context, 'Could not launch URL');
+                }
               }
             },
             child: Text(
