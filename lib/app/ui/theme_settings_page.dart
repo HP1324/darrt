@@ -40,11 +40,11 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
               ),
             ),
             _ColorGrid(),
-            // TimedBannerAdWidget(
-            //   childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.themePageBannerAd,adSize: AdSize.fullBanner),
-            //   adInitializer: () => g.adsController.initializeThemePageBannerAd(),
-            //   showFor: Duration(seconds: 60),
-            // ),
+            TimedBannerAdWidget(
+              childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.themePageBannerAd,adSize: AdSize.fullBanner),
+              adInitializer: () => g.adsController.initializeThemePageBannerAd(),
+              showFor: Duration(seconds: 60),
+            ),
           ],
         ),
       ),

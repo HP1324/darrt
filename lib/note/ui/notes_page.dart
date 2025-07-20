@@ -452,10 +452,10 @@ class _NotesPageState extends State<NotesPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
 
-      // bottomNavigationBar: TimedBannerAdWidget(
-      //   adInitializer: () => g.adsController.initializeNotesPageBannerAd(),
-      //   childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.notesPageBannerAd),
-      // ),
+      bottomNavigationBar: TimedBannerAdWidget(
+        adInitializer: () => g.adsController.initializeNotesPageBannerAd(),
+        childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.notesPageBannerAd),
+      ),
     );
   }
 }
