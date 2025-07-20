@@ -122,13 +122,13 @@ class _BottomNavBarWidget extends StatelessWidget {
             );
           },
         ),
-        // TimedBannerAdWidget(
-        //   adInitializer: () => g.adsController.initializeHomePageBannerAd(),
-        //   showFor: const Duration(seconds: 40),
-        //   hideFor: const Duration(seconds: 20),
-        //   showFirst: false,
-        //   childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.homePageBannerAd),
-        // ),
+        TimedBannerAdWidget(
+          adInitializer: () => g.adsController.initializeHomePageBannerAd(),
+          showFor: const Duration(seconds: 40),
+          hideFor: const Duration(seconds: 20),
+          showFirst: false,
+          childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.homePageBannerAd),
+        ),
       ],
     );
   }
