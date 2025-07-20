@@ -23,15 +23,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   @override
-  void initState(){
+  void initState() {
     super.initState();
     // g.adsController.initializeHomePageBannerAd();
   }
+
   @override
   Widget build(BuildContext context) {
-
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -122,12 +121,22 @@ class _BottomNavBarWidget extends StatelessWidget {
             );
           },
         ),
-        TimedBannerAdWidget(
-          adInitializer: () => g.adsController.initializeHomePageBannerAd(),
-          showFor: const Duration(seconds: 40),
-          hideFor: const Duration(seconds: 20),
-          showFirst: false,
-          childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.homePageBannerAd),
+        ListenableBuilder(
+          listenable: g.adsController,
+          builder: (context, child) {
+            return TimedBannerAdWidget(
+              adInitializer: () => g.adsController.initializeHomePageBannerAd(),
+              showFor: const Duration(seconds: 40),
+              hideFor: const Duration(seconds: 20),
+              showFirst: false,
+              childBuilder: () {
+                if (g.adsController.isHomePageBannerAdLoaded) {
+                  return MyBannerAdWidget(bannerAd: g.adsController.homePageBannerAd);
+                }
+                return const SizedBox.shrink();
+              },
+            );
+          },
         ),
       ],
     );

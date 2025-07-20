@@ -1,4 +1,3 @@
-
 import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -67,6 +66,7 @@ class _AddNotePageState extends State<AddNotePage> {
     }
     MiniBox().write('add_note_pop_count', popCount + 1);
   }
+
   bool _isHandlingPop = false;
 
   @override
@@ -74,48 +74,48 @@ class _AddNotePageState extends State<AddNotePage> {
     return PopScope(
       canPop: false,
 
-        onPopInvokedWithResult: (didPop, result) async {
-      if (_isHandlingPop) return;
+      onPopInvokedWithResult: (didPop, result) async {
+        if (_isHandlingPop) return;
 
-      if (!didPop) {
-        final navigator = Navigator.of(context);
-        final shouldPop = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Quit without saving?'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('Are you sure you want to quit without saving?'),
+        if (!didPop) {
+          final navigator = Navigator.of(context);
+          final shouldPop = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Quit without saving?'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Are you sure you want to quit without saving?'),
+                ],
+              ),
+              actions: [
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text('Yes'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text('No'),
+                ),
               ],
             ),
-            actions: [
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text('Yes'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text('No'),
-              ),
-            ],
-          ),
-        );
+          );
 
-        // If user confirmed, actually pop the page
-        if (shouldPop == true) {
-          _isHandlingPop = true;
-          navigator.pop();
-          await showFullPageAd();
-          _isHandlingPop = false;
+          // If user confirmed, actually pop the page
+          if (shouldPop == true) {
+            _isHandlingPop = true;
+            navigator.pop();
+            await showFullPageAd();
+            _isHandlingPop = false;
+          }
+        } else {
+          // Only show ad if we haven't already handled this pop
+          if (!_isHandlingPop) {
+            await showFullPageAd();
+          }
         }
-      } else {
-        // Only show ad if we haven't already handled this pop
-        if (!_isHandlingPop) {
-          await showFullPageAd();
-        }
-      }
-    },
+      },
       child: Scaffold(
         backgroundColor: getScaffoldBackgroundColor(context),
         appBar: AppBar(
@@ -128,10 +128,20 @@ class _AddNotePageState extends State<AddNotePage> {
         ),
         body: Column(
           children: [
-            TimedBannerAdWidget(
-              adInitializer: () => g.adsController.initializeAddNotePageBannerAd(),
-              childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.addNotePageBannerAd),
-              showFirst: false,
+            ListenableBuilder(
+              listenable: g.adsController,
+              builder: (context, child) {
+                return TimedBannerAdWidget(
+                  adInitializer: () => g.adsController.initializeAddNotePageBannerAd(),
+                  childBuilder: () {
+                    if (g.adsController.isAddNotePageBannerAdLoaded) {
+                      return MyBannerAdWidget(bannerAd: g.adsController.addNotePageBannerAd);
+                    }
+                    return const SizedBox.shrink();
+                  },
+                  showFirst: false,
+                );
+              },
             ),
             NotesQuillToolbar(),
             NotesQuillEditor(),
@@ -268,7 +278,7 @@ class _AddNotePageState extends State<AddNotePage> {
           if (initResult) {
             g.noteSttController.startListening();
           } else {
-            if(context.mounted) {
+            if (context.mounted) {
               showToast(
                 context,
                 type: ToastificationType.error,
