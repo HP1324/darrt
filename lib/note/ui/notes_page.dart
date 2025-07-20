@@ -362,7 +362,6 @@ class _NotesPageState extends State<NotesPage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -452,9 +451,19 @@ class _NotesPageState extends State<NotesPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
 
-      bottomNavigationBar: TimedBannerAdWidget(
-        adInitializer: () => g.adsController.initializeNotesPageBannerAd(),
-        childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.notesPageBannerAd),
+      bottomNavigationBar: ListenableBuilder(
+        listenable: g.adsController,
+        builder: (context, child) {
+          return TimedBannerAdWidget(
+            adInitializer: () => g.adsController.initializeNotesPageBannerAd(),
+            childBuilder: () {
+              if (g.adsController.isNotesPageBannerAdLoaded) {
+                return MyBannerAdWidget(bannerAd: g.adsController.notesPageBannerAd);
+              }
+              return const SizedBox.shrink();
+            },
+          );
+        },
       ),
     );
   }

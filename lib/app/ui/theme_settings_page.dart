@@ -40,10 +40,23 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
               ),
             ),
             _ColorGrid(),
-            TimedBannerAdWidget(
-              childBuilder: () => MyBannerAdWidget(bannerAd: g.adsController.themePageBannerAd,adSize: AdSize.fullBanner),
-              adInitializer: () => g.adsController.initializeThemePageBannerAd(),
-              showFor: Duration(seconds: 60),
+            ListenableBuilder(
+              listenable: g.adsController,
+              builder: (context, child) {
+                return TimedBannerAdWidget(
+                  adInitializer: () => g.adsController.initializeThemePageBannerAd(),
+                  childBuilder: () {
+                    if (g.adsController.isThemePageBannerAdLoaded) {
+                      return MyBannerAdWidget(
+                        bannerAd: g.adsController.themePageBannerAd,
+                        adSize: AdSize.banner,
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                  showFor: Duration(seconds: 100),
+                );
+              },
             ),
           ],
         ),
@@ -51,8 +64,6 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
     );
   }
 }
-
-
 
 class _ThemeModeSelector extends StatelessWidget {
   const _ThemeModeSelector();
