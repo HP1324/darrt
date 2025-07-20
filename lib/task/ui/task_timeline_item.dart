@@ -227,6 +227,23 @@
           Expanded(
             child: TimelineTaskCategories(task: task),
           ),
+          if (task.isRepeating) ...[
+            Icon(
+              FontAwesomeIcons.repeat,
+              size: 13,
+              color: scheme.primary.withAlpha(200),
+            ),
+            const SizedBox(width: 8),
+            InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () => MiniRouter.to(context, StatsPage(task: task)),
+              child: Icon(
+                Icons.calendar_month_outlined,
+                size: 21,
+                color: scheme.secondary,
+              ),
+            ),
+          ],
         ],
       );
     }
