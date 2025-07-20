@@ -227,7 +227,7 @@
           Expanded(
             child: TimelineTaskCategories(task: task),
           ),
-          if (task.isRepeating) ...[
+          if (task.isRepeating && (task.startTime == null && task.endTime == null)) ...[
             Icon(
               FontAwesomeIcons.repeat,
               size: 13,

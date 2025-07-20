@@ -1,4 +1,6 @@
+import 'package:darrt/app/ui/mini_app_bar.dart';
 import 'package:darrt/task/ui/task_delete_confirmation_dialog.dart';
+import 'package:darrt/task/ui/task_timeline_item.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/helpers/icon_color_storage.dart';
@@ -38,6 +40,7 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
           appBar: AppBar(
             title: Text(widget.category.name),
             backgroundColor: color.withAlpha(25),
+            actions: [TimelineFilterButton(),],
           ),
           body: Builder(
             builder: (context) {
@@ -76,11 +79,21 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
                       child: ListView.builder(
                         itemCount: tasks.length,
                         itemBuilder: (context, index) {
-                          return TaskItem(task: tasks[index]);
+                          final task = tasks[index];
+                          final isLast = index == tasks.length - 1;
+                          if (g.taskVm.isTimelineView) {
+                            return TaskTimelineItem(
+                              task: task,
+                              isLast: isLast,
+                            );
+                          } else {
+                            return TaskItem(task: task);
+                          }
                         },
                       ),
                     ),
                   ),
+
                 ],
               );
             },

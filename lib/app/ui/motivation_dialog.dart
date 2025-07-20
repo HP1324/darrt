@@ -109,7 +109,7 @@ class _MotivationDialogState extends State<MotivationDialog> {
             const SizedBox(width: 8),
             Flexible(
               child: Text(
-                'Quote',
+                'Random Quote',
                 style: textTheme.titleMedium?.copyWith(
                   color: scheme.onPrimary,
                   fontWeight: FontWeight.w600,

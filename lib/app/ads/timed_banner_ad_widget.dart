@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class TimedBannerAdWidget extends StatefulWidget {
   final Widget Function() childBuilder;
@@ -31,8 +32,11 @@ class _TimedBannerAdWidgetState extends State<TimedBannerAdWidget> {
     _initializeAd();
   }
 
-  void _initializeAd() {
+  void _initializeAd() async{
     // Initialize the ad
+    if (!await InternetConnection().hasInternetAccess) {
+      return;
+    }
     widget.adInitializer();
 
     // Use post frame callback to ensure initialization is complete

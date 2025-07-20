@@ -8,7 +8,6 @@ import 'package:darrt/app/ui/settings_page/settings_page.dart';
 import 'package:darrt/app/ui/theme_settings_page.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/quickreminder/ui/quick_reminders_page.dart';
-import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher.dart';
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -17,7 +16,6 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final dateFormat = DateFormat('EEEE, d MMMM yyyy');
-    //TODO: add random quote feature in DrawerHeader
     return Drawer(
       child: Column(
         children: [
