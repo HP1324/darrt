@@ -50,6 +50,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                 );
               },
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   ListenableBuilder(
                     listenable: g.calMan,
@@ -93,14 +94,14 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                         child: Text(
                           title,
                           key: ValueKey<DateTime>(selectedDate),
-                          style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          style: Theme.of(context).textTheme.labelMedium!.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       );
                     },
                   ),
-                  Expanded(child: Icon(Icons.arrow_drop_down_rounded)),
+                  Icon(Icons.arrow_drop_down_rounded),
                 ],
               ),
             ),
