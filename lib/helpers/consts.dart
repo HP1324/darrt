@@ -83,3 +83,5 @@ const String mMarkTasksFinished = 'mark_tasks_finished';
 const String mShowTimerNotification = 'show_timer_notification';
 const String mPauseResumeSoundWithTimer = 'pause_resume_sound_with_timer';
 const String mSoundLoopMode = 'sound_loop_mode';
+
+const String mCancelNotificationsWithTaskFinish = 'cancel_notifications_with_task_finish';

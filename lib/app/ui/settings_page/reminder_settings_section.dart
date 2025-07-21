@@ -16,6 +16,7 @@ class ReminderSettingsSection extends StatelessWidget {
         DefaultReminderTypeSection(),
         SizedBox(height: 8),
         SnoozeSection(),
+        CancelRemindersWithTaskFinishTile(),
       ],
     );
   }
@@ -121,4 +122,32 @@ class DefaultReminderTypeSection extends StatelessWidget {
     );
   }
 }
+
+class CancelRemindersWithTaskFinishTile extends StatelessWidget {
+  const CancelRemindersWithTaskFinishTile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<BoxPref>>(
+      stream: ObjectBox()
+          .prefsBox
+          .query(BoxPref_.key.equals(mCancelNotificationsWithTaskFinish))
+          .watch(triggerImmediately: true)
+          .map((query) => query.find()),
+        builder: (context, snapshot) {
+          final prefs = snapshot.data;
+          final isEnabled = prefs?.isNotEmpty == true && prefs!.first.value == 'true';
+          return CheckboxListTile(
+            key: const ValueKey(mCancelNotificationsWithTaskFinish),
+            title: const Text('Cancel reminders when task is finished'),
+            value: isEnabled,
+            onChanged: (value) {
+              MiniBox().write(mCancelNotificationsWithTaskFinish, value ?? false);
+            },
+          );
+        }
+    );
+  }
+}
+
 
