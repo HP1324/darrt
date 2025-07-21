@@ -245,6 +245,7 @@ class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin 
                 }
               },
             ),
+            SliverToBoxAdapter(child: const SizedBox(height: 85)),
           ],
         );
       },
