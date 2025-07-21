@@ -421,13 +421,13 @@ class TaskViewModel extends ViewModel<Task> {
         if (DateUtils.isSameDay(d, expected)) {
           currentSegment.add(d);
         } else {
-          if (currentSegment.length > 1) streakSegments.add(currentSegment);
+          if (currentSegment.isNotEmpty) streakSegments.add(currentSegment);
           currentSegment = [d];
         }
       }
     }
 
-    if (currentSegment.length > 1) {
+    if (currentSegment.isNotEmpty) {
       streakSegments.add(currentSegment);
     }
 
@@ -477,7 +477,7 @@ class TaskViewModel extends ViewModel<Task> {
     TaskStats stats, [
     BuildContext? context,
   ]) async {
-    final unlocked = stats.achievementUnlocks;
+    Map<String,DateTime> unlocked = Map.from(stats.achievementUnlocks);
     final templates = Achievement.getAchievementTemplates();
 
     final sortedCompletions = List<DateTime>.from(stats.completions)..sort();
@@ -501,7 +501,7 @@ class TaskViewModel extends ViewModel<Task> {
         if (DateUtils.isSameDay(d, expected)) {
           currentSegment.add(d);
         } else {
-          if (currentSegment.length > 1) streakSegments.add(currentSegment);
+          if (currentSegment.isNotEmpty) streakSegments.add(currentSegment);
           currentSegment = [d];
         }
       }
@@ -518,14 +518,17 @@ class TaskViewModel extends ViewModel<Task> {
         if (len >= template.daysRequired && !unlocked.containsKey(key)) {
           unlocked[key] = DateTime.now();
           task.stats = stats.toJsonString();
+          stats.achievementUnlocks = unlocked;
           currentTaskStats = stats;
           updateTaskFromAppWideStateChanges(task);
-          notifyListeners();
-
           final achieved = template.copyWith(
             isUnlocked: true,
             unlockedDate: unlocked[key],
           );
+          MiniLogger.dp('Checking segment of length $len');
+          if (len >= template.daysRequired && !unlocked.containsKey(key)) {
+            MiniLogger.dp('🔓 Unlocking $key for $len days');
+          }
           if (context != null) {
             await showAchievementDialog(context, achieved, stats.currentStreakLength);
           }

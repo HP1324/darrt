@@ -33,7 +33,7 @@ class Achievement {
         daysRequired: 1,
         icon: Icons.looks_one,
         isUnlocked: false,
-        color: Colors.grey,
+        color: Colors.blueGrey,
         rank: 'Newcomer',
       ),
       Achievement(
