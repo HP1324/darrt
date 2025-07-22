@@ -1,14 +1,15 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:darrt/app/services/google_sign_in_service.dart';
+import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/app/ui/motivation_dialog.dart';
+import 'package:darrt/helpers/mini_logger.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/app/notification/notification_service.dart';
-import 'package:darrt/app/services/google_sign_in_service.dart';
 import 'package:darrt/helpers/consts.dart';
-import 'package:darrt/helpers/mini_logger.dart';
-import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/quickreminder/ui/quick_reminder_dialog.dart';
@@ -16,8 +17,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:toastification/toastification.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const MiniAppBar({super.key});
-  // final GlobalKey _popupKey = GlobalKey();
+  MiniAppBar({super.key});
+  final GlobalKey _popupKey = GlobalKey();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -108,31 +109,16 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
             actions: [
               _MiniAppBarAction(
                 icon: Icon(Icons.lightbulb_outline),
-                onTap: ()async {
+                onTap: () async {
                   await showDialog(
-                    context:context,
-                    builder:(context){
+                    context: context,
+                    builder: (context) {
                       return MotivationDialog();
                     },
                   );
                 },
               ),
-              if (kDebugMode)
-                _MiniAppBarAction(
-                  icon: Icon(Icons.handyman),
-                  onTap: () async {
-                    if (kDebugMode) {
-                      final user = GoogleSignInService().currentUser;
-                      MiniLogger.dp(user?.email ?? 'No user is currently logged in');
-                    }
-                    final path = ObjectBox().store!.directoryPath;
-                    MiniLogger.dp('ObjectBox path: $path');
-                    final docsDir = await getApplicationDocumentsDirectory();
-                    MiniLogger.dp('App docs dir: ${docsDir.path}/objectbox');
 
-                    await createNotification();
-                  },
-                ),
               TimelineFilterButton(),
               _MiniAppBarAction(
                 onTap: () async {
@@ -168,26 +154,58 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Icon(Icons.alarm_add_sharp),
                 ),
               ),
-
-              // _MiniAppBarAction(
-              //   key: _popupKey,
-              //   icon: Icon(Icons.more_vert),
-              //   onTap: () {
-              //     final (offset, size) = getOffsetAndSize(_popupKey);
-              //     showMenu(
-              //       context: context,
-              //       elevation: 1,
-              //       popUpAnimationStyle: AnimationStyle(duration: Duration(milliseconds: 100)),
-              //       position: getRelativeRectFromOffsetAndSize(offset, size),
-              //       items: [
-              //         PopupMenuItem(child: Text('Notifications')),
-              //         PopupMenuItem(child: Text('Rate Us')),
-              //         PopupMenuItem(child: Text('Give Feedback')),
-              //         PopupMenuItem(child: Text('Settings')),
-              //       ],
-              //     );
-              //   },
-              // ),
+              if (kDebugMode)
+                _MiniAppBarAction(
+                  key: _popupKey,
+                  icon: Icon(Icons.more_vert),
+                  onTap: () {
+                    final (offset, size) = getOffsetAndSize(_popupKey);
+                    showMenu(
+                      context: context,
+                      elevation: 1,
+                      popUpAnimationStyle: AnimationStyle(duration: Duration(milliseconds: 100)),
+                      position: getRelativeRectFromOffsetAndSize(offset, size),
+                      items: [
+                        PopupMenuItem(
+                          child: _MiniAppBarAction(
+                            icon: Icon(Icons.handyman),
+                            onTap: () async {
+                              if (kDebugMode) {
+                                final user = GoogleSignInService().currentUser;
+                                MiniLogger.dp(user?.email ?? 'No user is currently logged in');
+                              }
+                              final path = ObjectBox().store!.directoryPath;
+                              MiniLogger.dp('ObjectBox path: $path');
+                              final docsDir = await getApplicationDocumentsDirectory();
+                              MiniLogger.dp('App docs dir: ${docsDir.path}/objectbox');
+                              await AwesomeNotifications().createNotification(
+                                content: NotificationContent(
+                                  id: 10,
+                                  channelKey: notifChannelKey,
+                                  title: 'Test notification',
+                                  body: 'Check what dismiss does',
+                                ),
+                                schedule: NotificationInterval(
+                                  interval: Duration(seconds: 60),
+                                  repeats: true,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        PopupMenuItem(
+                          child: IconButton(
+                            onPressed: () async {
+                              await AwesomeNotifications().cancelSchedule(10);
+                            },
+                            icon: Icon(Icons.abc),
+                          ),
+                        ),
+                        PopupMenuItem(child: Text('Settings')),
+                      ],
+                    );
+                  },
+                ),
             ],
           );
         } else if (value == 1)
@@ -322,7 +340,7 @@ class TimelineFilterButton extends StatelessWidget {
 }
 
 class _MiniAppBarAction extends StatelessWidget {
-  const _MiniAppBarAction({required this.icon, required this.onTap});
+  const _MiniAppBarAction({super.key, required this.icon, required this.onTap});
   final Widget icon;
   final VoidCallback onTap;
   @override
