@@ -208,7 +208,7 @@ class NotificationService {
       while (notifyDate.weekday != weekday) {
         notifyDate = notifyDate.add(const Duration(days: 1));
       }
-      final id = notificationId;
+      final id = int.parse('${task.id}$weekday');
       if (kDebugMode) {
         MiniLogger.dp('Weekday: $weekday');
         MiniLogger.dp('Reminder: $id ${reminder.time.hour}:${reminder.time.minute}');

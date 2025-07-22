@@ -35,7 +35,7 @@ class _HomeState extends State<Home> {
       top: false,
       child: Scaffold(
         backgroundColor: getScaffoldBackgroundColor(context),
-        appBar: const MiniAppBar(),
+        appBar: MiniAppBar(),
         drawer: const AppDrawer(),
         body: ValueListenableBuilder(
           valueListenable: g.navMan.currentDestination,
