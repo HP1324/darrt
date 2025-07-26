@@ -592,6 +592,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final startTimeParam = startTimeValue == null
             ? null
             : DateTime.fromMillisecondsSinceEpoch(startTimeValue);
+        final endTimeParam = endTimeValue == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(endTimeValue);
         final isRepeatingParam = const fb.BoolReader().vTableGet(
           buffer,
           rootOffset,
@@ -626,28 +629,25 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fb.StringReader(asciiOptimization: true),
           lazy: false,
         ).vTableGet(buffer, rootOffset, 28, []);
-        final object =
-            Task(
-                id: idParam,
-                title: titleParam,
-                createdAt: createdAtParam,
-                dueDate: dueDateParam,
-                startDate: startDateParam,
-                endDate: endDateParam,
-                startTime: startTimeParam,
-                isRepeating: isRepeatingParam,
-                isDone: isDoneParam,
-                priority: priorityParam,
-                repeatConfig: repeatConfigParam,
-                reminders: remindersParam,
-                notes: notesParam,
-                stats: statsParam,
-                uuid: uuidParam,
-                categoryUuids: categoryUuidsParam,
-              )
-              ..endTime = endTimeValue == null
-                  ? null
-                  : DateTime.fromMillisecondsSinceEpoch(endTimeValue);
+        final object = Task(
+          id: idParam,
+          title: titleParam,
+          createdAt: createdAtParam,
+          dueDate: dueDateParam,
+          startDate: startDateParam,
+          endDate: endDateParam,
+          startTime: startTimeParam,
+          endTime: endTimeParam,
+          isRepeating: isRepeatingParam,
+          isDone: isDoneParam,
+          priority: priorityParam,
+          repeatConfig: repeatConfigParam,
+          reminders: remindersParam,
+          notes: notesParam,
+          stats: statsParam,
+          uuid: uuidParam,
+          categoryUuids: categoryUuidsParam,
+        );
         obx_int.InternalToManyAccess.setRelInfo<Task>(
           object.categories,
           store,
