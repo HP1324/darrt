@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:darrt/app/services/google_sign_in_service.dart';
