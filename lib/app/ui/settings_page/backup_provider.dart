@@ -145,7 +145,7 @@ class BackupNotifier extends _$BackupNotifier {
           mAutoBackup,
           mAutoBackup,
           initialDelay: Duration(seconds: 5),
-          frequency: Duration(minutes: 15),
+          frequency: duration,
         );
       } else {
         MiniLogger.dp('Cancelling background task');
