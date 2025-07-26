@@ -1,11 +1,6 @@
-import 'package:darrt/app/services/boxpref.dart';
-import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/app/ui/settings_page/reminder_settings_section.dart';
 import 'package:darrt/app/ui/settings_page/timer_settings_section.dart';
-import 'package:darrt/objectbox.g.dart';
 import 'package:flutter/material.dart';
-import 'package:darrt/app/services/mini_box.dart';
-import '../../../helpers/consts.dart';
 import 'package:darrt/app/ui/settings_page/backup_settings_section.dart';
 
 class SettingsPage extends StatefulWidget {

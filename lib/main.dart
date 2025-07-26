@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:darrt/app/notification/notification_action_controller.dart';
@@ -53,7 +54,7 @@ void main() async {
   ]);
   runApp(DevicePreview(
     enabled: !kReleaseMode,
-    builder: (context) => const Darrt(),
+    builder: (context) => ProviderScope(child: const Darrt()),
   ));
 }
 
