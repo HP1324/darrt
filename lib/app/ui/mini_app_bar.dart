@@ -201,7 +201,17 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                             icon: Icon(Icons.abc),
                           ),
                         ),
-                        PopupMenuItem(child: Text('Settings')),
+                        PopupMenuItem(
+                          child: IconButton(
+                            onPressed: () async{
+                              final list = await AwesomeNotifications().listScheduledNotifications();
+                              for (final notif in list){
+                                MiniLogger.dp('${notif.content?.id} ${notif.content?.title} ${notif.content?.body}');
+                              }
+                            },
+                            icon: Icon(Icons.list),
+                          ),
+                        ),
                       ],
                     );
                   },
