@@ -84,14 +84,14 @@ class BackupNotifier extends _$BackupNotifier {
   }
 
   Future<void> _signOut(BuildContext context) async {
+    state = state.copyWith(autoBackup: false, currentEmail: null);
+    if (context.mounted) showWarningToast(context, 'Signed out');
     MiniBox().write(mAutoBackup, false);
     await Workmanager().cancelByUniqueName(mAutoBackup);
     await GoogleSignInService().signOut();
     MiniBox().remove(mGoogleEmail);
 
-    state = state.copyWith(autoBackup: false);
 
-    if (context.mounted) showWarningToast(context, 'Signed out');
   }
 
   Future<void> performBackup(BuildContext context) async {
