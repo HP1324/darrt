@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:darrt/helpers/utils.dart' show formatDate;
 
-
-
 // UI Components
 class BackupSettingsSection extends ConsumerWidget {
   const BackupSettingsSection({super.key});
@@ -25,18 +23,18 @@ class BackupSettingsSection extends ConsumerWidget {
         children: [
           Text('Backup & Restore', style: theme.textTheme.titleMedium),
           Divider(height: 0),
-          SignInSection(),
-          AutoBackupSection(),
-          RestoreSection(),
-          DeleteBackupSection(),
+          _SignInOutSection(),
+          _AutoBackupSection(),
+          _RestoreSection(),
+          _DeleteBackupSection(),
         ],
       ),
     );
   }
 }
 
-class SignInSection extends ConsumerWidget {
-  const SignInSection({super.key});
+class _SignInOutSection extends ConsumerWidget {
+  const _SignInOutSection();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -47,8 +45,8 @@ class SignInSection extends ConsumerWidget {
       return ListTile(
         title: Text('Sign in to continue'),
         trailing: OutlinedButton.icon(
-          onPressed: backupState.isAnyOperationInProgress 
-              ? null 
+          onPressed: backupState.isAnyOperationInProgress
+              ? null
               : () => backupNotifier.signIn(context),
           label: Text('Sign in'),
           icon: Icon(Icons.login),
@@ -59,8 +57,8 @@ class SignInSection extends ConsumerWidget {
 
     return ListTile(
       visualDensity: VisualDensity.compact,
-      onTap: backupState.isAnyOperationInProgress 
-          ? null 
+      onTap: backupState.isAnyOperationInProgress
+          ? null
           : () => backupNotifier.signIn(context),
       contentPadding: EdgeInsets.zero,
       title: Text('Google Account'),
@@ -68,29 +66,41 @@ class SignInSection extends ConsumerWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          BackupButton(),
-          Tooltip(
-            message: 'Sign out',
-            child: IconButton(
-              onPressed: backupState.isAnyOperationInProgress 
-                  ? null 
-                  : () => backupNotifier.signOut(context),
-              icon: Icon(
-                Icons.logout,
-                color: backupState.isAnyOperationInProgress
-                    ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)
-                    : Theme.of(context).colorScheme.error,
-              ),
-            ),
-          ),
+          _BackupButton(),
+          _SignoutButton(),
         ],
       ),
     );
   }
 }
 
-class BackupButton extends ConsumerWidget {
-  const BackupButton({super.key});
+class _SignoutButton extends ConsumerWidget {
+  const _SignoutButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final backupState = ref.watch(backupNotifierProvider);
+    final backupNotifier = ref.read(backupNotifierProvider.notifier);
+    final scheme = ColorScheme.of(context);
+    return Tooltip(
+      message: 'Sign out',
+      child: IconButton(
+        onPressed: backupState.isAnyOperationInProgress
+            ? null
+            : () => backupNotifier.signOut(context),
+        icon: Icon(
+          Icons.logout,
+          color: backupState.isAnyOperationInProgress
+              ? scheme.onSurface.withValues(alpha: 0.3)
+              : scheme.error,
+        ),
+      ),
+    );
+  }
+}
+
+class _BackupButton extends ConsumerWidget {
+  const _BackupButton();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -104,11 +114,17 @@ class BackupButton extends ConsumerWidget {
             ? null
             : () => backupNotifier.performBackup(context),
         icon: backupState.isBackingUp
-            ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator())
+            ? SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(),
+              )
             : Icon(
                 Icons.backup,
                 color: backupState.isAnyOperationInProgress
-                    ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)
+                    ? Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.3)
                     : Theme.of(context).colorScheme.primary,
               ),
       ),
@@ -116,8 +132,8 @@ class BackupButton extends ConsumerWidget {
   }
 }
 
-class AutoBackupSection extends ConsumerWidget {
-  const AutoBackupSection({super.key});
+class _AutoBackupSection extends ConsumerWidget {
+  const _AutoBackupSection();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -144,19 +160,18 @@ class AutoBackupSection extends ConsumerWidget {
                 : 'Backup has not been done yet',
           ),
         ),
-        if (backupState.autoBackup) AutoBackupFrequencySelector(),
+        if (backupState.autoBackup) _AutoBackupFrequencySelector(),
       ],
     );
   }
 }
 
-class AutoBackupFrequencySelector extends ConsumerWidget {
-  const AutoBackupFrequencySelector({super.key});
+class _AutoBackupFrequencySelector extends ConsumerWidget {
+  const _AutoBackupFrequencySelector();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final backupState = ref.watch(backupNotifierProvider);
-    final backupNotifier = ref.read(backupNotifierProvider.notifier);
     final theme = Theme.of(context);
 
     return Container(
@@ -170,26 +185,46 @@ class AutoBackupFrequencySelector extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildRadioButton(context, ref, 'Daily', backupState.autoBackupFrequency),
+            _buildRadioButton(
+              context,
+              ref,
+              'Daily',
+              backupState.autoBackupFrequency,
+            ),
             Container(
               width: 1,
               color: theme.colorScheme.outline.withValues(alpha: 0.2),
               margin: const EdgeInsets.symmetric(vertical: 4),
             ),
-            _buildRadioButton(context, ref, 'Weekly', backupState.autoBackupFrequency),
+            _buildRadioButton(
+              context,
+              ref,
+              'Weekly',
+              backupState.autoBackupFrequency,
+            ),
             Container(
               width: 1,
               color: theme.colorScheme.outline.withValues(alpha: 0.2),
               margin: const EdgeInsets.symmetric(vertical: 4),
             ),
-            _buildRadioButton(context, ref, 'Monthly', backupState.autoBackupFrequency),
+            _buildRadioButton(
+              context,
+              ref,
+              'Monthly',
+              backupState.autoBackupFrequency,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRadioButton(BuildContext context, WidgetRef ref, String label, String currentFrequency) {
+  Widget _buildRadioButton(
+    BuildContext context,
+    WidgetRef ref,
+    String label,
+    String currentFrequency,
+  ) {
     final backupState = ref.watch(backupNotifierProvider);
     final backupNotifier = ref.read(backupNotifierProvider.notifier);
 
@@ -197,7 +232,8 @@ class AutoBackupFrequencySelector extends ConsumerWidget {
       child: InkWell(
         onTap: backupState.isAnyOperationInProgress
             ? null
-            : () => backupNotifier.changeAutoBackupFrequency(label.toLowerCase()),
+            : () =>
+                  backupNotifier.changeAutoBackupFrequency(label.toLowerCase()),
         borderRadius: BorderRadius.circular(6),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -222,7 +258,9 @@ class AutoBackupFrequencySelector extends ConsumerWidget {
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: 13,
                   color: backupState.isAnyOperationInProgress
-                      ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.3)
                       : null,
                 ),
                 textAlign: TextAlign.center,
@@ -236,8 +274,8 @@ class AutoBackupFrequencySelector extends ConsumerWidget {
   }
 }
 
-class RestoreSection extends ConsumerWidget {
-  const RestoreSection({super.key});
+class _RestoreSection extends ConsumerWidget {
+  const _RestoreSection();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -266,8 +304,8 @@ class RestoreSection extends ConsumerWidget {
   }
 }
 
-class DeleteBackupSection extends ConsumerWidget {
-  const DeleteBackupSection({super.key});
+class _DeleteBackupSection extends ConsumerWidget {
+  const _DeleteBackupSection();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -291,7 +329,9 @@ class DeleteBackupSection extends ConsumerWidget {
               : Icon(
                   Icons.delete,
                   color: backupState.isAnyOperationInProgress
-                      ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.3)
                       : Theme.of(context).colorScheme.error,
                   size: 20,
                 ),
