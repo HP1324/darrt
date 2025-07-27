@@ -16,7 +16,8 @@ class ReminderSettingsSection extends StatelessWidget {
         DefaultReminderTypeSection(),
         SizedBox(height: 8),
         SnoozeSection(),
-        CancelRemindersWithTaskFinishTile(),
+        //TODO: Implement the following latter in the future
+        // CancelRemindersWithTaskFinishTile(),
       ],
     );
   }
