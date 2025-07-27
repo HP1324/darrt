@@ -144,7 +144,7 @@ class SoundController extends ChangeNotifier {
       // Set the audio sources to the player
       await _audioPlayer.setAudioSources(
         _audioSources,
-        initialIndex: 0,
+        initialIndex: null,
       );
     } catch (e) {
       MiniLogger.dp('Error setting up audio sources: $e');
