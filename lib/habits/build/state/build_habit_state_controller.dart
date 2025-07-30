@@ -1,8 +1,8 @@
-import 'package:darrt/habits/models/habit.dart';
-import 'package:darrt/habits/state/habit_state.dart';
+import 'package:darrt/habits/build/models/build_habit.dart';
+import 'package:darrt/habits/build/state/build_habit_state.dart';
 import 'package:darrt/app/state/controllers/state_controller.dart';
 
-class HabitStateController extends StateController<HabitState,BuildHabit>{
+class HabitStateController extends StateController<BuildHabitState,BuildHabit>{
   @override
   BuildHabit buildModel({required bool edit, BuildHabit? model}) {
     // TODO: implement buildModel

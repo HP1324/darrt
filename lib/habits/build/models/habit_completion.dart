@@ -1,4 +1,4 @@
-import 'package:darrt/habits/models/habit.dart';
+import 'package:darrt/habits/build/models/build_habit.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
