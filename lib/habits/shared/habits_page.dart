@@ -1,5 +1,5 @@
-import 'package:darrt/habits/ui/build_habit_tab.dart';
-import 'package:darrt/habits/ui/quit_habit_tab.dart';
+import 'package:darrt/habits/build/ui/build_habit_tab.dart';
+import 'package:darrt/habits/quit/ui/quit_habit_tab.dart';
 import 'package:darrt/task/ui/tasks_page.dart';
 import 'package:flutter/material.dart';
 
@@ -33,12 +33,12 @@ class _HabitsPageState extends State<HabitsPage> with SingleTickerProviderStateM
     return NestedScrollView(
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: MediaQuery.sizeOf(context).height * 0.085,
-              child: ScrollableDateBar(),
-            ),
-          ),
+          // SliverToBoxAdapter(
+          //   child: SizedBox(
+          //     height: MediaQuery.sizeOf(context).height * 0.085,
+          //     child: ScrollableDateBar(),
+          //   ),
+          // ),
           SliverPersistentHeader(
             pinned: true,
             delegate: _StickyTabBarDelegate(
@@ -127,6 +127,6 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-    return false;
+    return true;
   }
 }

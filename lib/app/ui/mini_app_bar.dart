@@ -217,15 +217,28 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
             ],
           );
-        } else if (value == 1)
+        } else if (value == 1) {
           return AppBar(
             backgroundColor: backgroundColor,
-            title: Text('Focus'),
+            title: Text('Habits', style: Theme.of(context).textTheme.titleMedium),
           );
-        return AppBar(
-          backgroundColor: backgroundColor,
-          title: Text('Categories', style: Theme.of(context).textTheme.titleMedium),
-        );
+        }else if(value == 2) {
+          return AppBar(
+            backgroundColor: backgroundColor,
+            title: Text('Focus', style: Theme
+                .of(context)
+                .textTheme
+                .titleMedium),
+          );
+        }else{
+          return AppBar(
+            backgroundColor: backgroundColor,
+            title: Text('Categories', style: Theme
+                .of(context)
+                .textTheme
+                .titleMedium),
+          );
+        }
       },
     );
   }

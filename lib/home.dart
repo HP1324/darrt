@@ -1,4 +1,6 @@
+import 'package:darrt/habits/shared/habits_page.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:darrt/app/ads/my_banner_ad_widget.dart';
 import 'package:darrt/app/ads/timed_banner_ad_widget.dart';
@@ -44,6 +46,7 @@ class _HomeState extends State<Home> {
               index: value,
               children: [
                 const TasksPage(),
+                const HabitsPage(),
                 const FocusTimerPage(),
                 const CategoriesPage(),
               ],
@@ -93,22 +96,22 @@ class _BottomNavBarWidget extends StatelessWidget {
                     i: 0,
                   ),
                   MiniBottomNavBarItem(
-                    icon: Icons.psychology_outlined,
-                    label: 'Focus',
+                    icon: FontAwesomeIcons.medal,
+                    label: 'Habits',
                     onTap: () => g.navMan.onDestinationChanged(1),
                     i: 1,
                   ),
                   MiniBottomNavBarItem(
-                    icon: Icons.search,
-                    label: 'Search',
-                    onTap: () => MiniRouter.to(context, const TaskSearchPage()),
-                    i: -2,
+                    icon: Icons.psychology_outlined,
+                    label: 'Focus',
+                    onTap: () => g.navMan.onDestinationChanged(2),
+                    i: 2,
                   ),
                   MiniBottomNavBarItem(
                     icon: Iconsax.category,
                     label: 'Categories',
-                    onTap: () => g.navMan.onDestinationChanged(2),
-                    i: 2,
+                    onTap: () => g.navMan.onDestinationChanged(3),
+                    i: 3,
                   ),
                   MiniBottomNavBarItem(
                     icon: Icons.assignment_outlined,
