@@ -420,107 +420,73 @@ final _entities = <obx_int.ModelEntity>[
     backlinks: <obx_int.ModelBacklink>[],
   ),
   obx_int.ModelEntity(
-    id: const obx_int.IdUid(15, 6926195304423774827),
-    name: 'QuitHabit',
-    lastPropertyId: const obx_int.IdUid(4, 7825162698733805813),
-    flags: 0,
-    properties: <obx_int.ModelProperty>[
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 6686596062892651199),
-        name: 'id',
-        type: 6,
-        flags: 1,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 4471496445410201184),
-        name: 'name',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 1070345930657924830),
-        name: 'relapses',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 7825162698733805813),
-        name: 'uuid',
-        type: 9,
-        flags: 0,
-      ),
-    ],
-    relations: <obx_int.ModelRelation>[],
-    backlinks: <obx_int.ModelBacklink>[],
-  ),
-  obx_int.ModelEntity(
-    id: const obx_int.IdUid(20, 5942726025178938996),
+    id: const obx_int.IdUid(22, 2963082835627357693),
     name: 'BuildHabit',
-    lastPropertyId: const obx_int.IdUid(11, 7638664074095729895),
+    lastPropertyId: const obx_int.IdUid(11, 7139556395201523611),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 2254095229311474399),
+        id: const obx_int.IdUid(1, 7616200903658144149),
         name: 'id',
         type: 6,
         flags: 1,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 227323701475972208),
+        id: const obx_int.IdUid(2, 9006092908758276790),
         name: 'name',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 8189946906651293110),
+        id: const obx_int.IdUid(3, 676927139817247478),
         name: 'measurementType',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 3381780172693510301),
+        id: const obx_int.IdUid(4, 3531159791832098665),
         name: 'description',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(5, 6916167040014742632),
+        id: const obx_int.IdUid(5, 2055273086937073885),
         name: 'color',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(6, 2655232841747707868),
+        id: const obx_int.IdUid(6, 3803362761229937097),
         name: 'reminders',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(7, 7300113840678570791),
+        id: const obx_int.IdUid(7, 4899466545310219337),
         name: 'startDate',
         type: 10,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(8, 2783503085494288076),
+        id: const obx_int.IdUid(8, 1783650244500752969),
         name: 'endDate',
         type: 10,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(9, 4156112934328238334),
+        id: const obx_int.IdUid(9, 8758629380775831655),
         name: 'startTime',
         type: 10,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(10, 2028928016529444623),
+        id: const obx_int.IdUid(10, 5521460829715549992),
         name: 'endTime',
         type: 10,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(11, 7638664074095729895),
+        id: const obx_int.IdUid(11, 7139556395201523611),
         name: 'uuid',
         type: 9,
         flags: 0,
@@ -536,42 +502,76 @@ final _entities = <obx_int.ModelEntity>[
     ],
   ),
   obx_int.ModelEntity(
-    id: const obx_int.IdUid(21, 6297732843899120821),
+    id: const obx_int.IdUid(23, 409088433803233745),
     name: 'HabitCompletion',
-    lastPropertyId: const obx_int.IdUid(5, 7263191118953218973),
+    lastPropertyId: const obx_int.IdUid(5, 6592232340286965425),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 461961216352999831),
+        id: const obx_int.IdUid(1, 7816589287744508640),
         name: 'id',
         type: 6,
         flags: 1,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 705288649375287344),
+        id: const obx_int.IdUid(2, 5052960918481256713),
         name: 'date',
         type: 10,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 9064079498469193183),
+        id: const obx_int.IdUid(3, 528941209114797211),
         name: 'habitUuid',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 1291502241583054140),
+        id: const obx_int.IdUid(4, 156440109889552996),
         name: 'uuid',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(5, 7263191118953218973),
+        id: const obx_int.IdUid(5, 6592232340286965425),
         name: 'habitId',
         type: 11,
         flags: 520,
-        indexId: const obx_int.IdUid(7, 6141537273374360403),
+        indexId: const obx_int.IdUid(8, 1338747343039691092),
         relationTarget: 'BuildHabit',
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(24, 7389139720940030233),
+    name: 'QuitHabit',
+    lastPropertyId: const obx_int.IdUid(4, 7532712773254921199),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 1444912687164528587),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 4428255611688628208),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 5623951069578105763),
+        name: 'relapses',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 7532712773254921199),
+        name: 'uuid',
+        type: 9,
+        flags: 0,
       ),
     ],
     relations: <obx_int.ModelRelation>[],
@@ -617,8 +617,8 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(21, 6297732843899120821),
-    lastIndexId: const obx_int.IdUid(7, 6141537273374360403),
+    lastEntityId: const obx_int.IdUid(24, 7389139720940030233),
+    lastIndexId: const obx_int.IdUid(8, 1338747343039691092),
     lastRelationId: const obx_int.IdUid(2, 752695274466247110),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [
@@ -633,6 +633,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
       7607445490998599197,
       2589025902994366859,
       505861874477099318,
+      6926195304423774827,
+      5942726025178938996,
+      6297732843899120821,
     ],
     retiredIndexUids: const [],
     retiredPropertyUids: const [
@@ -710,6 +713,26 @@ obx_int.ModelDefinition getObjectBoxModel() {
       7737763268396099687,
       5048437455904677637,
       1782595901618069094,
+      6686596062892651199,
+      4471496445410201184,
+      1070345930657924830,
+      7825162698733805813,
+      2254095229311474399,
+      227323701475972208,
+      8189946906651293110,
+      3381780172693510301,
+      6916167040014742632,
+      2655232841747707868,
+      7300113840678570791,
+      2783503085494288076,
+      4156112934328238334,
+      2028928016529444623,
+      7638664074095729895,
+      461961216352999831,
+      705288649375287344,
+      9064079498469193183,
+      1291502241583054140,
+      7263191118953218973,
     ],
     retiredRelationUids: const [],
     modelVersion: 5,
@@ -1259,53 +1282,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
-    QuitHabit: obx_int.EntityDefinition<QuitHabit>(
-      model: _entities[7],
-      toOneRelations: (QuitHabit object) => [],
-      toManyRelations: (QuitHabit object) => {},
-      getId: (QuitHabit object) => object.id,
-      setId: (QuitHabit object, int id) {
-        object.id = id;
-      },
-      objectToFB: (QuitHabit object, fb.Builder fbb) {
-        final nameOffset = fbb.writeString(object.name);
-        final relapsesOffset = object.relapses == null
-            ? null
-            : fbb.writeString(object.relapses!);
-        final uuidOffset = fbb.writeString(object.uuid);
-        fbb.startTable(5);
-        fbb.addInt64(0, object.id);
-        fbb.addOffset(1, nameOffset);
-        fbb.addOffset(2, relapsesOffset);
-        fbb.addOffset(3, uuidOffset);
-        fbb.finish(fbb.endTable());
-        return object.id;
-      },
-      objectFromFB: (obx.Store store, ByteData fbData) {
-        final buffer = fb.BufferContext(fbData);
-        final rootOffset = buffer.derefObject(0);
-        final idParam = const fb.Int64Reader().vTableGet(
-          buffer,
-          rootOffset,
-          4,
-          0,
-        );
-        final nameParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 6, '');
-        final uuidParam = const fb.StringReader(
-          asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 10, '');
-        final object = QuitHabit(id: idParam, name: nameParam, uuid: uuidParam)
-          ..relapses = const fb.StringReader(
-            asciiOptimization: true,
-          ).vTableGetNullable(buffer, rootOffset, 8);
-
-        return object;
-      },
-    ),
     BuildHabit: obx_int.EntityDefinition<BuildHabit>(
-      model: _entities[8],
+      model: _entities[7],
       toOneRelations: (BuildHabit object) => [],
       toManyRelations: (BuildHabit object) => {
         obx_int.RelInfo<HabitCompletion>.toOneBacklink(
@@ -1426,7 +1404,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
       },
     ),
     HabitCompletion: obx_int.EntityDefinition<HabitCompletion>(
-      model: _entities[9],
+      model: _entities[8],
       toOneRelations: (HabitCompletion object) => [object.habit],
       toManyRelations: (HabitCompletion object) => {},
       getId: (HabitCompletion object) => object.id,
@@ -1480,6 +1458,51 @@ obx_int.ModelDefinition getObjectBoxModel() {
           0,
         );
         object.habit.attach(store);
+        return object;
+      },
+    ),
+    QuitHabit: obx_int.EntityDefinition<QuitHabit>(
+      model: _entities[9],
+      toOneRelations: (QuitHabit object) => [],
+      toManyRelations: (QuitHabit object) => {},
+      getId: (QuitHabit object) => object.id,
+      setId: (QuitHabit object, int id) {
+        object.id = id;
+      },
+      objectToFB: (QuitHabit object, fb.Builder fbb) {
+        final nameOffset = fbb.writeString(object.name);
+        final relapsesOffset = object.relapses == null
+            ? null
+            : fbb.writeString(object.relapses!);
+        final uuidOffset = fbb.writeString(object.uuid);
+        fbb.startTable(5);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, nameOffset);
+        fbb.addOffset(2, relapsesOffset);
+        fbb.addOffset(3, uuidOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final uuidParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final object = QuitHabit(id: idParam, name: nameParam, uuid: uuidParam)
+          ..relapses = const fb.StringReader(
+            asciiOptimization: true,
+          ).vTableGetNullable(buffer, rootOffset, 8);
+
         return object;
       },
     ),
@@ -1758,84 +1781,61 @@ class BoxPref_ {
   );
 }
 
-/// [QuitHabit] entity fields to define ObjectBox queries.
-class QuitHabit_ {
-  /// See [QuitHabit.id].
-  static final id = obx.QueryIntegerProperty<QuitHabit>(
-    _entities[7].properties[0],
-  );
-
-  /// See [QuitHabit.name].
-  static final name = obx.QueryStringProperty<QuitHabit>(
-    _entities[7].properties[1],
-  );
-
-  /// See [QuitHabit.relapses].
-  static final relapses = obx.QueryStringProperty<QuitHabit>(
-    _entities[7].properties[2],
-  );
-
-  /// See [QuitHabit.uuid].
-  static final uuid = obx.QueryStringProperty<QuitHabit>(
-    _entities[7].properties[3],
-  );
-}
-
 /// [BuildHabit] entity fields to define ObjectBox queries.
 class BuildHabit_ {
   /// See [BuildHabit.id].
   static final id = obx.QueryIntegerProperty<BuildHabit>(
-    _entities[8].properties[0],
+    _entities[7].properties[0],
   );
 
   /// See [BuildHabit.name].
   static final name = obx.QueryStringProperty<BuildHabit>(
-    _entities[8].properties[1],
+    _entities[7].properties[1],
   );
 
   /// See [BuildHabit.measurementType].
   static final measurementType = obx.QueryStringProperty<BuildHabit>(
-    _entities[8].properties[2],
+    _entities[7].properties[2],
   );
 
   /// See [BuildHabit.description].
   static final description = obx.QueryStringProperty<BuildHabit>(
-    _entities[8].properties[3],
+    _entities[7].properties[3],
   );
 
   /// See [BuildHabit.color].
   static final color = obx.QueryStringProperty<BuildHabit>(
-    _entities[8].properties[4],
+    _entities[7].properties[4],
   );
 
   /// See [BuildHabit.reminders].
   static final reminders = obx.QueryStringProperty<BuildHabit>(
-    _entities[8].properties[5],
+    _entities[7].properties[5],
   );
 
   /// See [BuildHabit.startDate].
   static final startDate = obx.QueryDateProperty<BuildHabit>(
-    _entities[8].properties[6],
+    _entities[7].properties[6],
   );
 
   /// See [BuildHabit.endDate].
   static final endDate = obx.QueryDateProperty<BuildHabit>(
-    _entities[8].properties[7],
+    _entities[7].properties[7],
   );
 
   /// See [BuildHabit.startTime].
   static final startTime = obx.QueryDateProperty<BuildHabit>(
-    _entities[8].properties[8],
+    _entities[7].properties[8],
   );
 
   /// See [BuildHabit.endTime].
   static final endTime = obx.QueryDateProperty<BuildHabit>(
-    _entities[8].properties[9],
+    _entities[7].properties[9],
   );
 
   /// See [BuildHabit.uuid].
   static final uuid = obx.QueryStringProperty<BuildHabit>(
-    _entities[8].properties[10],
+    _entities[7].properties[10],
   );
 
   /// see [BuildHabit.completions]
@@ -1849,26 +1849,49 @@ class BuildHabit_ {
 class HabitCompletion_ {
   /// See [HabitCompletion.id].
   static final id = obx.QueryIntegerProperty<HabitCompletion>(
-    _entities[9].properties[0],
+    _entities[8].properties[0],
   );
 
   /// See [HabitCompletion.date].
   static final date = obx.QueryDateProperty<HabitCompletion>(
-    _entities[9].properties[1],
+    _entities[8].properties[1],
   );
 
   /// See [HabitCompletion.habitUuid].
   static final habitUuid = obx.QueryStringProperty<HabitCompletion>(
-    _entities[9].properties[2],
+    _entities[8].properties[2],
   );
 
   /// See [HabitCompletion.uuid].
   static final uuid = obx.QueryStringProperty<HabitCompletion>(
-    _entities[9].properties[3],
+    _entities[8].properties[3],
   );
 
   /// See [HabitCompletion.habit].
   static final habit = obx.QueryRelationToOne<HabitCompletion, BuildHabit>(
-    _entities[9].properties[4],
+    _entities[8].properties[4],
+  );
+}
+
+/// [QuitHabit] entity fields to define ObjectBox queries.
+class QuitHabit_ {
+  /// See [QuitHabit.id].
+  static final id = obx.QueryIntegerProperty<QuitHabit>(
+    _entities[9].properties[0],
+  );
+
+  /// See [QuitHabit.name].
+  static final name = obx.QueryStringProperty<QuitHabit>(
+    _entities[9].properties[1],
+  );
+
+  /// See [QuitHabit.relapses].
+  static final relapses = obx.QueryStringProperty<QuitHabit>(
+    _entities[9].properties[2],
+  );
+
+  /// See [QuitHabit.uuid].
+  static final uuid = obx.QueryStringProperty<QuitHabit>(
+    _entities[9].properties[3],
   );
 }
