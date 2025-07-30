@@ -38,9 +38,6 @@ class Task {
   int id;
   String title, priority;
   DateTime? createdAt, endDate,startTime, endTime;
-
-  // @Property(uid:9114797388521663395)
-  // DateTime? ;
   DateTime dueDate, startDate;
   bool isDone, isRepeating;
   String? reminders, repeatConfig,notes,stats;
