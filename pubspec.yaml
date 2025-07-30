@@ -81,6 +81,7 @@ dependencies:
   fluentui_system_icons: ^1.1.273
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
+  get_it: ^8.0.3
 
 dev_dependencies:
   flutter_test:

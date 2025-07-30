@@ -1,3 +1,6 @@
+import 'dart:ui' show lerpDouble;
+
+import 'package:darrt/habits/build/ui/quit_habit_item.dart';
 import 'package:flutter/material.dart';
 
 class QuitHabitTab extends StatelessWidget {
@@ -5,30 +8,10 @@ class QuitHabitTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(
-          child: AddQuitHabitCard(),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.all(16),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                return QuitHabitCard(
-                  habitName: 'Bad Habit ${index + 1}',
-                  description: 'Trying to quit this habit',
-                  daysClean: (index + 1) * 5,
-                  lastRelapse: DateTime.now().subtract(Duration(days: (index + 1) * 5)),
-                );
-              },
-              childCount: 3, // Sample data
-            ),
-          ),
-        ),
+    return Column(
+      children: [
+        Expanded(child: DraggableQuitHabitList()),
+        AddQuitHabitCard(),
       ],
     );
   }
@@ -92,107 +75,91 @@ class AddQuitHabitCard extends StatelessWidget {
   }
 }
 
+class DraggableQuitHabitList extends StatefulWidget {
+  const DraggableQuitHabitList({super.key});
 
+  @override
+  State<DraggableQuitHabitList> createState() => _DraggableQuitHabitListState();
+}
 
-class QuitHabitCard extends StatelessWidget {
-  final String habitName;
-  final String description;
-  final int daysClean;
-  final DateTime lastRelapse;
+class _DraggableQuitHabitListState extends State<DraggableQuitHabitList> {
+  final List<Map<String, dynamic>> _quitHabits = [
+    // ... your existing quit habits data
+    {
+      'id': '1',
+      'name': 'Quit Smoking',
+      'description': 'Breaking free from cigarette addiction',
+      'daysClean': 25,
+      'lastRelapse': DateTime.now().subtract(Duration(days: 25)),
+    },
+    {
+      'id': '2',
+      'name': 'Stop Social Media Scrolling',
+      'description': 'Reduce mindless social media consumption',
+      'daysClean': 12,
+      'lastRelapse': DateTime.now().subtract(Duration(days: 12)),
+    },
+    {
+      'id': '3',
+      'name': 'Quit Junk Food',
+      'description': 'Avoid processed and unhealthy foods',
+      'daysClean': 8,
+      'lastRelapse': DateTime.now().subtract(Duration(days: 8)),
+    },
+  ];
 
-  const QuitHabitCard({
-    super.key,
-    required this.habitName,
-    required this.description,
-    required this.daysClean,
-    required this.lastRelapse,
-  });
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    return ReorderableListView.builder(
+      buildDefaultDragHandles: false,
+      itemCount: _quitHabits.length,
+      onReorder: (oldIndex, newIndex) {
+        setState(() {
+          if (newIndex > oldIndex) {
+            newIndex -= 1;
+          }
+          final item = _quitHabits.removeAt(oldIndex);
+          _quitHabits.insert(newIndex, item);
+        });
+      },
+      proxyDecorator: (child, index, animation) {
+        return AnimatedBuilder(
+          animation: animation,
+          builder: (BuildContext context, Widget? child) {
+            final double animValue = Curves.easeInOut.transform(animation.value);
+            final double elevation = lerpDouble(1, 8, animValue)!;
+            final double scale = lerpDouble(1, 1.02, animValue)!;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Material(
-        elevation: 1,
-        borderRadius: BorderRadius.circular(12),
-        color: colorScheme.surface,
-        child: InkWell(
-          onTap: () {
-            // Navigate to quit habit details
+            return Transform.scale(
+              scale: scale,
+              child: Material(
+                elevation: elevation,
+                borderRadius: BorderRadius.circular(12),
+                child: child,
+              ),
+            );
           },
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: colorScheme.secondaryContainer,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.block,
-                        color: colorScheme.onSecondaryContainer,
-                        size: 16,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        habitName,
-                        style: textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  description,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface.withOpacity(0.7),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Days Clean',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: Colors.green[700],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        '$daysClean days',
-                        style: textTheme.titleMedium?.copyWith(
-                          color: Colors.green[700],
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          child: child,
+        );
+      },
+      itemBuilder: (context, index) {
+        final habit = _quitHabits[index];
+        return ReorderableDelayedDragStartListener(
+          key: ValueKey(habit['id']),
+          index: index,
+          child: QuitHabitItem(
+            habitName: habit['name'],
+            description: habit['description'],
+            daysClean: habit['daysClean'],
+            lastRelapse: habit['lastRelapse'],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

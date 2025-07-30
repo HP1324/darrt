@@ -29,6 +29,8 @@ class AddTaskPage extends StatefulWidget {
   ///Flag to indicate whether a task is being edited or a new task is being created
   final bool edit;
   final Task? task;
+  
+  /// Used to set the category as selected when adding the task directly from inside the category page
   final TaskCategory? category;
   @override
   State<AddTaskPage> createState() => _AddTaskPageState();

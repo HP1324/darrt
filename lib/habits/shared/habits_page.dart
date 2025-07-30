@@ -30,81 +30,50 @@ class _HabitsPageState extends State<HabitsPage> with SingleTickerProviderStateM
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return NestedScrollView(
-      headerSliverBuilder: (context, innerBoxIsScrolled) {
-        return [
-          // SliverToBoxAdapter(
-          //   child: SizedBox(
-          //     height: MediaQuery.sizeOf(context).height * 0.085,
-          //     child: ScrollableDateBar(),
-          //   ),
-          // ),
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: _StickyTabBarDelegate(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                  boxShadow: [
-                    BoxShadow(
-                      color: colorScheme.shadow.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: TabBar(
-                  controller: _tabController,
-                  indicatorColor: colorScheme.primary,
-                  indicatorWeight: 3,
-                  indicatorSize: TabBarIndicatorSize.label,
-                  labelColor: colorScheme.primary,
-                  unselectedLabelColor: colorScheme.onSurface.withOpacity(0.6),
-                  labelStyle: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                  unselectedLabelStyle: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                  ),
-                  splashFactory: NoSplash.splashFactory,
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
-                  tabs: [
-                    Tab(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.trending_up, size: 20),
-                          const SizedBox(width: 8),
-                          Text('Build'),
-                        ],
-                      ),
-                    ),
-                    Tab(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.block, size: 20),
-                          const SizedBox(width: 8),
-                          Text('Quit'),
-                        ],
-                      ),
-                    ),
+    return Column(
+      children: [
+        SizedBox(
+          height: 35,
+          child: TabBar(
+            controller: _tabController,
+            unselectedLabelColor: colorScheme.onSurface.withValues(alpha: 0.6),
+            labelStyle: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            unselectedLabelStyle: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500),
+            splashFactory: NoSplash.splashFactory,
+            tabs: [
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.trending_up, size: 20),
+                    const SizedBox(width: 8),
+                    Text('Build'),
                   ],
                 ),
               ),
-            ),
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.block, size: 20),
+                    const SizedBox(width: 8),
+                    Text('Quit'),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ];
-      },
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          BuildHabitTab(),
-          QuitHabitTab(),
-        ],
-      ),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              BuildHabitTab(),
+              QuitHabitTab(),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

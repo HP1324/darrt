@@ -91,7 +91,7 @@ class _BottomNavBarWidget extends StatelessWidget {
                 children: [
                   MiniBottomNavBarItem(
                     icon: Icons.calendar_month,
-                    label: 'Tasks',
+                    label: 'Calendar',
                     onTap: () => g.navMan.onDestinationChanged(0),
                     i: 0,
                   ),

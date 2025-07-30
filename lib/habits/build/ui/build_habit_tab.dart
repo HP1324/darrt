@@ -1,41 +1,21 @@
+import 'dart:ui' show lerpDouble;
+
 import 'package:darrt/habits/build/ui/build_habit_item.dart';
+import 'package:darrt/task/ui/tasks_page.dart';
 import 'package:flutter/material.dart';
 
 class BuildHabitTab extends StatelessWidget {
-  const BuildHabitTab({super.key});
-
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(
-          child: AddBuildHabitCard(),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.all(16),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                return BuildHabitItem(
-                  habitName: 'Sample Habit ${index + 1}',
-                  description: 'This is a sample habit for demonstration',
-                  progress: (index + 1) * 0.2,
-                  targetValue: '8 glasses',
-                  currentValue: '${(index + 1) * 2} glasses',
-                  isCompleted: (index + 1) * 0.2 >= 1.0,
-                );
-              },
-              childCount: 5, // Sample data
-            ),
-          ),
-        ),
+    return Column(
+      children: [
+        Expanded(child: DraggableBuildHabitList()),
+        AddBuildHabitCard(),
       ],
     );
   }
 }
+
 
 class AddBuildHabitCard extends StatelessWidget {
   const AddBuildHabitCard({super.key});
@@ -50,7 +30,7 @@ class AddBuildHabitCard extends StatelessWidget {
       child: Material(
         elevation: 1,
         borderRadius: BorderRadius.circular(12),
-        color: colorScheme.primaryContainer,
+        color: colorScheme.primaryContainer.withValues(alpha: 0.8),
         child: InkWell(
           onTap: () {
             // Add habit logic will go here
@@ -95,6 +75,117 @@ class AddBuildHabitCard extends StatelessWidget {
   }
 }
 
+class DraggableBuildHabitList extends StatefulWidget {
+  const DraggableBuildHabitList({super.key});
 
+  @override
+  State<DraggableBuildHabitList> createState() => _DraggableBuildHabitListState();
+}
 
+class _DraggableBuildHabitListState extends State<DraggableBuildHabitList> {
 
+  final List<Map<String, dynamic>> _habits = [
+    {
+      'id': '1',
+      'name': 'Drink Water',
+      'description': 'Stay hydrated throughout the day',
+      'progress': 0.6,
+      'targetValue': '8 glasses',
+      'currentValue': '5 glasses',
+      'isCompleted': false,
+    },
+    {
+      'id': '2',
+      'name': 'Morning Exercise',
+      'description': 'Start the day with 30 minutes of exercise',
+      'progress': 1.0,
+      'targetValue': '30 minutes',
+      'currentValue': '30 minutes',
+      'isCompleted': true,
+    },
+    {
+      'id': '3',
+      'name': 'Read Books',
+      'description': 'Read for at least 20 minutes daily',
+      'progress': 0.4,
+      'targetValue': '20 pages',
+      'currentValue': '8 pages',
+      'isCompleted': false,
+    },
+    {
+      'id': '4',
+      'name': 'Meditation',
+      'description': 'Practice mindfulness meditation',
+      'progress': 0.8,
+      'targetValue': '15 minutes',
+      'currentValue': '12 minutes',
+      'isCompleted': false,
+    },
+    {
+      'id': '5',
+      'name': 'Learn Programming',
+      'description': 'Practice coding for skill improvement',
+      'progress': 0.2,
+      'targetValue': '2 hours',
+      'currentValue': '25 minutes',
+      'isCompleted': false,
+    },
+  ];
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ReorderableListView.builder(
+      buildDefaultDragHandles: true,
+      itemCount: _habits.length,
+      onReorder: (oldIndex, newIndex) {
+        setState(() {
+          if (newIndex > oldIndex) {
+            newIndex -= 1;
+          }
+          final item = _habits.removeAt(oldIndex);
+          _habits.insert(newIndex, item);
+        });
+      },
+      proxyDecorator: (child, index, animation) {
+        return AnimatedBuilder(
+          animation: animation,
+          builder: (BuildContext context, Widget? child) {
+            final double animValue = Curves.easeInOut.transform(animation.value);
+            final double elevation = lerpDouble(1, 8, animValue)!;
+            final double scale = lerpDouble(1, 1.02, animValue)!;
+
+            return Transform.scale(
+              scale: scale,
+              child: Material(
+                elevation: elevation,
+                borderRadius: BorderRadius.circular(12),
+                child: child,
+              ),
+            );
+          },
+          child: child,
+        );
+      },
+      itemBuilder: (context, index) {
+        final habit = _habits[index];
+        return ReorderableDelayedDragStartListener(
+          key: ValueKey(habit['id']),
+          index: index,
+          child: BuildHabitItem(
+            habitName: habit['name'],
+            description: habit['description'],
+            progress: habit['progress'],
+            targetValue: habit['targetValue'],
+            currentValue: habit['currentValue'],
+            isCompleted: habit['isCompleted'],
+          ),
+        );
+      },
+    );
+  }
+}

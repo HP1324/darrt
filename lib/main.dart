@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:darrt/app/notification/notification_action_controller.dart';
@@ -21,6 +22,13 @@ import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/home.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:flutter/services.dart';
+
+void setupDependencies(){
+  final ProviderContainer container = ProviderContainer();
+
+  GetIt.I.registerSingleton<ProviderContainer>(container);
+}
+
 /// Initializes app services and state
 Future<void> initApp() async {
   try {
@@ -40,6 +48,8 @@ Future<void> initApp() async {
 
     Workmanager().initialize(callBackDispatcher, isInDebugMode: kDebugMode);
 
+    setupDependencies();
+
     FlutterNativeSplash.remove();
   } catch (e, t) {
     MiniLogger.e('Failed to initialize app: ${e.toString()}, Error type: ${e.runtimeType}');
@@ -54,7 +64,7 @@ void main() async {
   ]);
   runApp(DevicePreview(
     enabled: !kReleaseMode,
-    builder: (context) => ProviderScope(child: const Darrt()),
+    builder: (context) => UncontrolledProviderScope(container: GetIt.I<ProviderContainer>(),child: const Darrt(),),
   ));
 }
 

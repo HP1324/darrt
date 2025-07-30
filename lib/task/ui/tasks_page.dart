@@ -54,9 +54,10 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
                   labelStyle: textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
                   unselectedLabelStyle: textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w500),
                   tabs: const [
-                    Tab(text: 'All'),
+                    // Tab(text: 'All'),
                     Tab(text: 'One-time'),
                     Tab(text: 'Repeating'),
+                    Tab(text: 'Habits',)
                   ],
                 ),
               ),
@@ -73,9 +74,10 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
           body: TabBarView(
             controller: _tabController,
             children: [
-              TaskList(tasks: tasks),
+              // TaskList(tasks: tasks),
               TaskList(tasks: tasks, isRepeating: false),
               TaskList(tasks: tasks, isRepeating: true),
+              Text('Habits go here...'),
             ],
           ),
         );
