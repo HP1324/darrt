@@ -40,7 +40,7 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverToBoxAdapter(
               child: SizedBox(
-                height: MediaQuery.sizeOf(context).height * 0.085,
+                height: MediaQuery.sizeOf(context).height * 0.09,
                 child: ScrollableDateBar(),
               ),
             ),

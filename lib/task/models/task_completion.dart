@@ -12,7 +12,7 @@ class TaskCompletion {
   String? uuid;
   final task = ToOne<Task>();
 
-  TaskCompletion({this.id = 0, required this.date, required this.isDone, String? taskUuid, String? uuid}) : taskUuid = taskUuid ?? '', uuid = uuid ?? '${date.year}${date.month}${date.day}';
+  TaskCompletion({this.id = 0, required this.date, required this.isDone, String? taskUuid, String? uuid}) : taskUuid = taskUuid ?? '', uuid = uuid ?? '';
 
   Map<String, dynamic> toJson() => {
     'id': id,
