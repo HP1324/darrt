@@ -227,7 +227,7 @@
     {
       "id": "8:4829064955625959483",
       "lastPropertyId": "5:1882302315608805349",
-      "name": "TaskCategory",
+      "name": "EntityCategory",
       "properties": [
         {
           "id": "1:676214022164626525",
@@ -385,7 +385,13 @@
           "type": 9
         }
       ],
-      "relations": []
+      "relations": [
+        {
+          "id": "3:6757657595076491625",
+          "name": "categories",
+          "targetId": "8:4829064955625959483"
+        }
+      ]
     },
     {
       "id": "23:409088433803233745",
@@ -456,7 +462,7 @@
   ],
   "lastEntityId": "24:7389139720940030233",
   "lastIndexId": "8:1338747343039691092",
-  "lastRelationId": "2:752695274466247110",
+  "lastRelationId": "3:6757657595076491625",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,

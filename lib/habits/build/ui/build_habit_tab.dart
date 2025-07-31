@@ -1,10 +1,11 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:darrt/habits/build/ui/build_habit_item.dart';
-import 'package:darrt/task/ui/tasks_page.dart';
 import 'package:flutter/material.dart';
 
 class BuildHabitTab extends StatelessWidget {
+  const BuildHabitTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(

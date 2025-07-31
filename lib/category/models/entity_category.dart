@@ -3,8 +3,8 @@ import 'package:darrt/task/models/task.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
-class TaskCategory {
-  TaskCategory({
+class EntityCategory {
+  EntityCategory({
     this.id = 0,
     required this.name,
     this.icon = 'folder',
@@ -23,7 +23,7 @@ class TaskCategory {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is TaskCategory &&
+    return other is EntityCategory &&
         other.id == id &&
         other.name == name &&
         icon == other.icon &&
@@ -33,7 +33,7 @@ class TaskCategory {
   @override
   int get hashCode => Object.hash(id, name, icon, color);
 
-  factory TaskCategory.fromJson(Map<String, dynamic> json) => TaskCategory(
+  factory EntityCategory.fromJson(Map<String, dynamic> json) => EntityCategory(
     id: json["id"],
     name: json["name"],
     icon: json["icon_code"] ?? 'folder',
@@ -49,9 +49,9 @@ class TaskCategory {
     'uuid': uuid,
   };
 
-  /// Compares this [TaskCategory] with another to determine equality.
+  /// Compares this [EntityCategory] with another to determine equality.
   ///
-  /// This method checks whether two [TaskCategory] instances have identical
+  /// This method checks whether two [EntityCategory] instances have identical
   /// values across their key fields: [name], [icon], and [color].
   ///
   /// The optional [checkIdEquality] flag controls whether the [id] field
@@ -64,7 +64,7 @@ class TaskCategory {
   ///
   /// Returns `true` if all relevant fields match; otherwise, returns `false`.
 
-  bool equals(TaskCategory other, {bool? checkIdEquality = false}) {
+  bool equals(EntityCategory other, {bool? checkIdEquality = false}) {
     if (checkIdEquality! && id != other.id) {
       return false;
     }

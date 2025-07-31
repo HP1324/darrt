@@ -2,7 +2,7 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/helpers/messages.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/app/services/object_box.dart';
@@ -18,7 +18,7 @@ part 'task_state_controller.freezed.dart';
 @freezed
 abstract class TaskState with _$TaskState {
   const factory TaskState({
-    required Map<TaskCategory, bool> categorySelection,
+    required Map<EntityCategory, bool> categorySelection,
     required DateTime dueDate,
     required bool isRepeating,
     required DateTime startDate,
@@ -38,14 +38,14 @@ abstract class TaskState with _$TaskState {
 class TaskStateController extends StateController<TaskState, Task> {
   static int taskCount = 0;
   @override
-  void initState(bool edit, [Task? task, TaskCategory? category]) {
+  void initState(bool edit, [Task? task, EntityCategory? category]) {
     textController.text = edit ? task!.title : '';
     final categories = g.catVm.categories;
     state = TaskState(
       categorySelection: category == null
           ? edit
                 ? {for (var cat in categories) cat: task!.categories.contains(cat)}
-                : {TaskCategory(id: 1, name: 'General'): true}
+                : {EntityCategory(id: 1, name: 'General'): true}
           : {category: true},
       priority: edit ? task!.priority : priorities[3],
       dueDate: edit ? task!.dueDate : g.calMan.selectedDate,
@@ -70,7 +70,7 @@ class TaskStateController extends StateController<TaskState, Task> {
   @override
   void clearState() {
     state = state.copyWith(
-      categorySelection: {TaskCategory(id: 1, name: 'General'): true},
+      categorySelection: {EntityCategory(id: 1, name: 'General'): true},
       dueDate: DateTime.now(),
       isRepeating: false,
       startDate: DateTime.now(),
@@ -127,7 +127,7 @@ class TaskStateController extends StateController<TaskState, Task> {
     task.categories.clear();
     if (categories.isEmpty) {
       final generalCategory =
-          ObjectBox().categoryBox.get(1) ?? TaskCategory(id: 1, name: 'General');
+          ObjectBox().categoryBox.get(1) ?? EntityCategory(id: 1, name: 'General');
       task.categories.add(generalCategory);
       task.categoryUuids = [generalCategory.uuid];
     } else {
@@ -140,7 +140,7 @@ class TaskStateController extends StateController<TaskState, Task> {
 
 
 
-  void setCategory(TaskCategory category, bool value) {
+  void setCategory(EntityCategory category, bool value) {
     state = state.copyWith(categorySelection: {...categorySelection, category: value});
     notifyListeners();
   }
@@ -364,6 +364,6 @@ extension AccessState on TaskStateController {
   List<Reminder> get reminders => state.reminders;
   String get priority => state.priority;
   int get currentPriority => state.currentPriority;
-  Map<TaskCategory, bool> get categorySelection => state.categorySelection;
+  Map<EntityCategory, bool> get categorySelection => state.categorySelection;
   List<Note>? get notes => state.notes;
 }

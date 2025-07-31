@@ -24,9 +24,9 @@ class BuildHabitItem extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: Material(
-        elevation: 1,
+        elevation: 0,
         borderRadius: BorderRadius.circular(12),
         color: colorScheme.surface,
         child: InkWell(

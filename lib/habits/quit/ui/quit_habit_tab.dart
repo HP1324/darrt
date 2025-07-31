@@ -1,6 +1,6 @@
 import 'dart:ui' show lerpDouble;
 
-import 'package:darrt/habits/build/ui/quit_habit_item.dart';
+import 'package:darrt/habits/quit/ui/quit_habit_item.dart';
 import 'package:flutter/material.dart';
 
 class QuitHabitTab extends StatelessWidget {

@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/app/state/controllers/state_controller.dart';
 part 'category_state_controller.freezed.dart';
 
@@ -14,9 +14,9 @@ abstract class CategoryState with _$CategoryState {
 }
 
 ///Controls the temporary state of the category add page when category is being added or updated
-class CategoryStateController extends StateController<CategoryState, TaskCategory> {
+class CategoryStateController extends StateController<CategoryState, EntityCategory> {
   @override
-  void initState(bool edit, [TaskCategory? category]) {
+  void initState(bool edit, [EntityCategory? category]) {
     textController.text = edit ? category!.name : '';
     state = CategoryState(
       icon: edit ? category!.icon : 'folder',
@@ -34,9 +34,9 @@ class CategoryStateController extends StateController<CategoryState, TaskCategor
   }
 
   @override
-  TaskCategory buildModel({required bool edit, TaskCategory? model}) {
+  EntityCategory buildModel({required bool edit, EntityCategory? model}) {
     final category = model;
-    return TaskCategory(
+    return EntityCategory(
       name: textController.text,
       icon: icon,
       color: color,

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:darrt/app/services/boxpref.dart';
-import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/note/models/folder.dart';
 import 'package:darrt/note/models/note.dart';
 import 'package:darrt/objectbox.g.dart';
@@ -40,7 +40,7 @@ class ObjectBox {
 
   Box<Task> get taskBox => _store!.box<Task>();
 
-  Box<TaskCategory> get categoryBox => _store!.box<TaskCategory>();
+  Box<EntityCategory> get categoryBox => _store!.box<EntityCategory>();
 
   Box<TaskCompletion> get completionBox => _store!.box<TaskCompletion>();
 
@@ -64,14 +64,14 @@ class ObjectBox {
     }
   }
 
-  List<TaskCategory> _getInitialCategories() {
+  List<EntityCategory> _getInitialCategories() {
     return [
-        TaskCategory(name: 'General', icon: 'folder',uuid: 'general'),
-        TaskCategory(name: 'Work', icon: 'briefcase',uuid: 'work'),
-        TaskCategory(name: 'Study', icon: 'book',uuid: 'study'),
-        TaskCategory(name: 'Personal', icon: 'heart',uuid: 'personal'),
-        TaskCategory(name: 'Fitness', icon: 'dumbbell',uuid: 'fitness'),
-        TaskCategory(name: 'Shopping', icon: 'cart',uuid: 'shopping'),
+        EntityCategory(name: 'General', icon: 'folder',uuid: 'general'),
+        EntityCategory(name: 'Work', icon: 'briefcase',uuid: 'work'),
+        EntityCategory(name: 'Study', icon: 'book',uuid: 'study'),
+        EntityCategory(name: 'Personal', icon: 'heart',uuid: 'personal'),
+        EntityCategory(name: 'Fitness', icon: 'dumbbell',uuid: 'fitness'),
+        EntityCategory(name: 'Shopping', icon: 'cart',uuid: 'shopping'),
     ];
   }
 
@@ -86,7 +86,7 @@ class ObjectBox {
 
   Map<String, dynamic> getLocalData() {
     late final List<Task> tasks;
-    late final List<TaskCategory> categories;
+    late final List<EntityCategory> categories;
     late final List<Note> notes;
     late final List<Folder> folders;
     late final List<TaskCompletion> completions;

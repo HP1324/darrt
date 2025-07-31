@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/app/ui/icon_color_picker.dart';
-import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/category/state/category_state_controller.dart';
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/messages.dart';
@@ -13,7 +13,7 @@ class AddCategoryPage extends StatefulWidget {
   const AddCategoryPage({super.key, required this.edit, this.category})
     : assert(!edit || category != null);
   final bool edit;
-  final TaskCategory? category;
+  final EntityCategory? category;
   @override
   State<AddCategoryPage> createState() => _AddCategoryPageState();
 }

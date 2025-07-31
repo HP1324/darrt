@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TaskState {
 
- Map<TaskCategory, bool> get categorySelection; DateTime get dueDate; bool get isRepeating; DateTime get startDate; DateTime? get endDate; DateTime? get startTime; DateTime? get endTime; RepeatConfig get repeatConfig; List<Reminder> get reminders; List<Note>? get notes; String get priority; int get currentPriority;
+ Map<EntityCategory, bool> get categorySelection; DateTime get dueDate; bool get isRepeating; DateTime get startDate; DateTime? get endDate; DateTime? get startTime; DateTime? get endTime; RepeatConfig get repeatConfig; List<Reminder> get reminders; List<Note>? get notes; String get priority; int get currentPriority;
 /// Create a copy of TaskState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -46,7 +46,7 @@ abstract mixin class $TaskStateCopyWith<$Res>  {
   factory $TaskStateCopyWith(TaskState value, $Res Function(TaskState) _then) = _$TaskStateCopyWithImpl;
 @useResult
 $Res call({
- Map<TaskCategory, bool> categorySelection, DateTime dueDate, bool isRepeating, DateTime startDate, DateTime? endDate, DateTime? startTime, DateTime? endTime, RepeatConfig repeatConfig, List<Reminder> reminders, List<Note>? notes, String priority, int currentPriority
+ Map<EntityCategory, bool> categorySelection, DateTime dueDate, bool isRepeating, DateTime startDate, DateTime? endDate, DateTime? startTime, DateTime? endTime, RepeatConfig repeatConfig, List<Reminder> reminders, List<Note>? notes, String priority, int currentPriority
 });
 
 
@@ -66,7 +66,7 @@ class _$TaskStateCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? categorySelection = null,Object? dueDate = null,Object? isRepeating = null,Object? startDate = null,Object? endDate = freezed,Object? startTime = freezed,Object? endTime = freezed,Object? repeatConfig = null,Object? reminders = null,Object? notes = freezed,Object? priority = null,Object? currentPriority = null,}) {
   return _then(_self.copyWith(
 categorySelection: null == categorySelection ? _self.categorySelection : categorySelection // ignore: cast_nullable_to_non_nullable
-as Map<TaskCategory, bool>,dueDate: null == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
+as Map<EntityCategory, bool>,dueDate: null == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
 as DateTime,isRepeating: null == isRepeating ? _self.isRepeating : isRepeating // ignore: cast_nullable_to_non_nullable
 as bool,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as DateTime,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
@@ -88,11 +88,11 @@ as int,
 
 
 class _TaskState extends TaskState {
-  const _TaskState({required final  Map<TaskCategory, bool> categorySelection, required this.dueDate, required this.isRepeating, required this.startDate, this.endDate, this.startTime, this.endTime, required this.repeatConfig, required final  List<Reminder> reminders, final  List<Note>? notes, required this.priority, required this.currentPriority}): _categorySelection = categorySelection,_reminders = reminders,_notes = notes,super._();
+  const _TaskState({required final  Map<EntityCategory, bool> categorySelection, required this.dueDate, required this.isRepeating, required this.startDate, this.endDate, this.startTime, this.endTime, required this.repeatConfig, required final  List<Reminder> reminders, final  List<Note>? notes, required this.priority, required this.currentPriority}): _categorySelection = categorySelection,_reminders = reminders,_notes = notes,super._();
   
 
- final  Map<TaskCategory, bool> _categorySelection;
-@override Map<TaskCategory, bool> get categorySelection {
+ final  Map<EntityCategory, bool> _categorySelection;
+@override Map<EntityCategory, bool> get categorySelection {
   if (_categorySelection is EqualUnmodifiableMapView) return _categorySelection;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_categorySelection);
@@ -154,7 +154,7 @@ abstract mixin class _$TaskStateCopyWith<$Res> implements $TaskStateCopyWith<$Re
   factory _$TaskStateCopyWith(_TaskState value, $Res Function(_TaskState) _then) = __$TaskStateCopyWithImpl;
 @override @useResult
 $Res call({
- Map<TaskCategory, bool> categorySelection, DateTime dueDate, bool isRepeating, DateTime startDate, DateTime? endDate, DateTime? startTime, DateTime? endTime, RepeatConfig repeatConfig, List<Reminder> reminders, List<Note>? notes, String priority, int currentPriority
+ Map<EntityCategory, bool> categorySelection, DateTime dueDate, bool isRepeating, DateTime startDate, DateTime? endDate, DateTime? startTime, DateTime? endTime, RepeatConfig repeatConfig, List<Reminder> reminders, List<Note>? notes, String priority, int currentPriority
 });
 
 
@@ -174,7 +174,7 @@ class __$TaskStateCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? categorySelection = null,Object? dueDate = null,Object? isRepeating = null,Object? startDate = null,Object? endDate = freezed,Object? startTime = freezed,Object? endTime = freezed,Object? repeatConfig = null,Object? reminders = null,Object? notes = freezed,Object? priority = null,Object? currentPriority = null,}) {
   return _then(_TaskState(
 categorySelection: null == categorySelection ? _self._categorySelection : categorySelection // ignore: cast_nullable_to_non_nullable
-as Map<TaskCategory, bool>,dueDate: null == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
+as Map<EntityCategory, bool>,dueDate: null == dueDate ? _self.dueDate : dueDate // ignore: cast_nullable_to_non_nullable
 as DateTime,isRepeating: null == isRepeating ? _self.isRepeating : isRepeating // ignore: cast_nullable_to_non_nullable
 as bool,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as DateTime,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/app/services/object_box.dart';
@@ -43,7 +43,7 @@ class Task {
   String? reminders, repeatConfig,notes,stats;
   final String uuid;
   List<String> categoryUuids;
-  final categories = ToMany<TaskCategory>();
+  final categories = ToMany<EntityCategory>();
   @Backlink()
   final completions = ToMany<TaskCompletion>();
 
@@ -144,7 +144,7 @@ class Task {
       // final ids = (json['categoryIds'] as List<int>?)?.cast<int>() ?? [];
       final fetched = ObjectBox().categoryBox.getMany(ids);
 
-      final validCategories = <TaskCategory>[];
+      final validCategories = <EntityCategory>[];
       final missingIds = <int>[];
 
       for (int i = 0; i < ids.length; i++) {

@@ -15,7 +15,7 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'app/services/boxpref.dart';
-import 'category/models/task_category.dart';
+import 'category/models/entity_category.dart';
 import 'habits/build/models/build_habit.dart';
 import 'habits/build/models/habit_completion.dart';
 import 'habits/quit/models/quit_habit.dart';
@@ -300,7 +300,7 @@ final _entities = <obx_int.ModelEntity>[
   ),
   obx_int.ModelEntity(
     id: const obx_int.IdUid(8, 4829064955625959483),
-    name: 'TaskCategory',
+    name: 'EntityCategory',
     lastPropertyId: const obx_int.IdUid(5, 1882302315608805349),
     flags: 0,
     properties: <obx_int.ModelProperty>[
@@ -492,7 +492,13 @@ final _entities = <obx_int.ModelEntity>[
         flags: 0,
       ),
     ],
-    relations: <obx_int.ModelRelation>[],
+    relations: <obx_int.ModelRelation>[
+      obx_int.ModelRelation(
+        id: const obx_int.IdUid(3, 6757657595076491625),
+        name: 'categories',
+        targetId: const obx_int.IdUid(8, 4829064955625959483),
+      ),
+    ],
     backlinks: <obx_int.ModelBacklink>[
       obx_int.ModelBacklink(
         name: 'completions',
@@ -619,7 +625,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
     entities: _entities,
     lastEntityId: const obx_int.IdUid(24, 7389139720940030233),
     lastIndexId: const obx_int.IdUid(8, 1338747343039691092),
-    lastRelationId: const obx_int.IdUid(2, 752695274466247110),
+    lastRelationId: const obx_int.IdUid(3, 6757657595076491625),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [
       4083594686780447909,
@@ -1119,17 +1125,17 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
-    TaskCategory: obx_int.EntityDefinition<TaskCategory>(
+    EntityCategory: obx_int.EntityDefinition<EntityCategory>(
       model: _entities[4],
-      toOneRelations: (TaskCategory object) => [],
-      toManyRelations: (TaskCategory object) => {
+      toOneRelations: (EntityCategory object) => [],
+      toManyRelations: (EntityCategory object) => {
         obx_int.RelInfo<Task>.toManyBacklink(1, object.id): object.tasks,
       },
-      getId: (TaskCategory object) => object.id,
-      setId: (TaskCategory object, int id) {
+      getId: (EntityCategory object) => object.id,
+      setId: (EntityCategory object, int id) {
         object.id = id;
       },
-      objectToFB: (TaskCategory object, fb.Builder fbb) {
+      objectToFB: (EntityCategory object, fb.Builder fbb) {
         final nameOffset = fbb.writeString(object.name);
         final iconOffset = fbb.writeString(object.icon);
         final colorOffset = fbb.writeString(object.color);
@@ -1164,14 +1170,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final uuidParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 12, '');
-        final object = TaskCategory(
+        final object = EntityCategory(
           id: idParam,
           name: nameParam,
           icon: iconParam,
           color: colorParam,
           uuid: uuidParam,
         );
-        obx_int.InternalToManyAccess.setRelInfo<TaskCategory>(
+        obx_int.InternalToManyAccess.setRelInfo<EntityCategory>(
           object.tasks,
           store,
           obx_int.RelInfo<Task>.toManyBacklink(1, object.id),
@@ -1286,6 +1292,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
       model: _entities[7],
       toOneRelations: (BuildHabit object) => [],
       toManyRelations: (BuildHabit object) => {
+        obx_int.RelInfo<BuildHabit>.toMany(3, object.id): object.categories,
         obx_int.RelInfo<HabitCompletion>.toOneBacklink(
           5,
           object.id,
@@ -1390,6 +1397,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
           color: colorParam,
           startDate: startDateParam,
           uuid: uuidParam,
+        );
+        obx_int.InternalToManyAccess.setRelInfo<BuildHabit>(
+          object.categories,
+          store,
+          obx_int.RelInfo<BuildHabit>.toMany(3, object.id),
         );
         obx_int.InternalToManyAccess.setRelInfo<BuildHabit>(
           object.completions,
@@ -1597,7 +1609,7 @@ class Task_ {
   );
 
   /// see [Task.categories]
-  static final categories = obx.QueryRelationToMany<Task, TaskCategory>(
+  static final categories = obx.QueryRelationToMany<Task, EntityCategory>(
     _entities[0].relations[0],
   );
 
@@ -1702,30 +1714,30 @@ class Note_ {
   );
 }
 
-/// [TaskCategory] entity fields to define ObjectBox queries.
-class TaskCategory_ {
-  /// See [TaskCategory.id].
-  static final id = obx.QueryIntegerProperty<TaskCategory>(
+/// [EntityCategory] entity fields to define ObjectBox queries.
+class EntityCategory_ {
+  /// See [EntityCategory.id].
+  static final id = obx.QueryIntegerProperty<EntityCategory>(
     _entities[4].properties[0],
   );
 
-  /// See [TaskCategory.name].
-  static final name = obx.QueryStringProperty<TaskCategory>(
+  /// See [EntityCategory.name].
+  static final name = obx.QueryStringProperty<EntityCategory>(
     _entities[4].properties[1],
   );
 
-  /// See [TaskCategory.icon].
-  static final icon = obx.QueryStringProperty<TaskCategory>(
+  /// See [EntityCategory.icon].
+  static final icon = obx.QueryStringProperty<EntityCategory>(
     _entities[4].properties[2],
   );
 
-  /// See [TaskCategory.color].
-  static final color = obx.QueryStringProperty<TaskCategory>(
+  /// See [EntityCategory.color].
+  static final color = obx.QueryStringProperty<EntityCategory>(
     _entities[4].properties[3],
   );
 
-  /// See [TaskCategory.uuid].
-  static final uuid = obx.QueryStringProperty<TaskCategory>(
+  /// See [EntityCategory.uuid].
+  static final uuid = obx.QueryStringProperty<EntityCategory>(
     _entities[4].properties[4],
   );
 }
@@ -1836,6 +1848,11 @@ class BuildHabit_ {
   /// See [BuildHabit.uuid].
   static final uuid = obx.QueryStringProperty<BuildHabit>(
     _entities[7].properties[10],
+  );
+
+  /// see [BuildHabit.categories]
+  static final categories = obx.QueryRelationToMany<BuildHabit, EntityCategory>(
+    _entities[7].relations[0],
   );
 
   /// see [BuildHabit.completions]

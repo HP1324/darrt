@@ -1,4 +1,4 @@
-import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/messages.dart';
 import 'package:darrt/app/state/viewmodels/view_model.dart';
@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/task/models/task.dart';
 
-class CategoryViewModel extends ViewModel<TaskCategory> {
+class CategoryViewModel extends ViewModel<EntityCategory> {
   final ScrollController scrollController = ScrollController();
 
-  List<TaskCategory> get categories => items;
+  List<EntityCategory> get categories => items;
   @override
-  String putItem(TaskCategory item, {required bool edit, bool scrollToBottom = true}) {
+  String putItem(EntityCategory item, {required bool edit, bool scrollToBottom = true}) {
     final category = item;
     if (!edit && items.indexWhere((c) => c.name == category.name) != -1) {
       return Messages.mCategoryExists;
@@ -37,7 +37,7 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
   }
 
   @override
-  int getItemId(TaskCategory item) => item.id;
+  int getItemId(EntityCategory item) => item.id;
 
   @override
   String getCreateSuccessMessage() => Messages.mCategoryAdded;
@@ -50,19 +50,19 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
       length == 1 ? '1 ${Messages.mCategoryDeleted}' : '$length ${Messages.mCategoriesDeleted}';
 
   @override
-  void setItemId(TaskCategory item, int id) {
+  void setItemId(EntityCategory item, int id) {
     item.id = id;
   }
 
   @override
-  void putManyForRestore(List<TaskCategory> restoredItems, {List<Task>? tasks}) {
+  void putManyForRestore(List<EntityCategory> restoredItems, {List<Task>? tasks}) {
     box.putMany(restoredItems);
     reassignTaskCategories(restoredItems, tasks: tasks!);
     initializeItems();
     notifyListeners();
   }
 
-  void reassignTaskCategories(List<TaskCategory> restoredCategories, {required List<Task> tasks}) {
+  void reassignTaskCategories(List<EntityCategory> restoredCategories, {required List<Task> tasks}) {
 
     final categoryByUuid = {for (final cat in restoredCategories) cat.uuid: cat};
 
@@ -84,15 +84,15 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
   }
 
   @override
-  String getItemUuid(TaskCategory item) => item.uuid;
+  String getItemUuid(EntityCategory item) => item.uuid;
 
   @override
-  List<TaskCategory> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
-    return jsonList.map(TaskCategory.fromJson).toList();
+  List<EntityCategory> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
+    return jsonList.map(EntityCategory.fromJson).toList();
   }
 
   @override
-  List<Map<String, dynamic>> convertObjectsListToJsonList(List<TaskCategory> objectList) {
+  List<Map<String, dynamic>> convertObjectsListToJsonList(List<EntityCategory> objectList) {
     return objectList.map((category) => category.toJson()).toList();
   }
 }

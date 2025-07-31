@@ -77,25 +77,3 @@ class _HabitsPageState extends State<HabitsPage> with SingleTickerProviderStateM
     );
   }
 }
-
-class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
-  final Widget child;
-
-  _StickyTabBarDelegate({required this.child});
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return child;
-  }
-
-  @override
-  double get maxExtent => 49;
-
-  @override
-  double get minExtent => 49;
-
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-    return true;
-  }
-}

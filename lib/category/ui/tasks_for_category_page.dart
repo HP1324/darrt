@@ -2,7 +2,7 @@ import 'package:darrt/app/ui/mini_app_bar.dart';
 import 'package:darrt/task/ui/task_delete_confirmation_dialog.dart';
 import 'package:darrt/task/ui/task_timeline_item.dart';
 import 'package:flutter/material.dart';
-import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/task/ui/add_task_page.dart';
@@ -11,7 +11,7 @@ import 'package:darrt/helpers/globals.dart' as g;
 
 class TasksForCategoryPage extends StatefulWidget {
   const TasksForCategoryPage({super.key, required this.category});
-  final TaskCategory category;
+  final EntityCategory category;
   @override
   State<TasksForCategoryPage> createState() => _TasksForCategoryPageState();
 }

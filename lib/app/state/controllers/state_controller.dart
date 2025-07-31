@@ -19,11 +19,4 @@ abstract class StateController<S, M> extends ChangeNotifier {
 
   /// Build a model from the current state
   M buildModel({required bool edit, M? model});
-
-  @override
-  void dispose() {
-    textController.dispose();
-    textFieldNode.dispose();
-    super.dispose();
-  }
 }

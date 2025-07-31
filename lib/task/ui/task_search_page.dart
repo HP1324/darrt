@@ -1,7 +1,7 @@
 import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/ui/task_item.dart';
@@ -12,11 +12,11 @@ final _controller = SearchStateController();
 // Controller class to handle all state and business logic
 class SearchStateController extends ChangeNotifier {
   String _searchQuery = '';
-  TaskCategory? _selectedCategory;
+  EntityCategory? _selectedCategory;
   String? _selectedPriority;
   bool _showFilters = false;
   List<Task> _allTasks = [];
-  List<TaskCategory> _categories = [];
+  List<EntityCategory> _categories = [];
   final List<String> priorities = ['Low', 'Medium', 'High', 'Urgent'];
 
   SearchStateController() {
@@ -25,10 +25,10 @@ class SearchStateController extends ChangeNotifier {
 
   // Getters
   String get searchQuery => _searchQuery;
-  TaskCategory? get selectedCategory => _selectedCategory;
+  EntityCategory? get selectedCategory => _selectedCategory;
   String? get selectedPriority => _selectedPriority;
   bool get showFilters => _showFilters;
-  List<TaskCategory> get categories => _categories;
+  List<EntityCategory> get categories => _categories;
 
   // Computed property for filtered tasks
   List<Task> get filteredTasks {
@@ -58,7 +58,7 @@ class SearchStateController extends ChangeNotifier {
   // Load all data
   void _loadData() {
     _allTasks = ObjectBox().store!.box<Task>().getAll();
-    _categories = ObjectBox().store!.box<TaskCategory>().getAll();
+    _categories = ObjectBox().store!.box<EntityCategory>().getAll();
     notifyListeners();
   }
 
@@ -75,7 +75,7 @@ class SearchStateController extends ChangeNotifier {
   }
 
   // Update category filter
-  void setCategory(TaskCategory? category) {
+  void setCategory(EntityCategory? category) {
     _selectedCategory = category;
     notifyListeners();
   }
@@ -230,7 +230,7 @@ class _CategoryFilters extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryChip(BuildContext context, TaskCategory? category, String label) {
+  Widget _buildCategoryChip(BuildContext context, EntityCategory? category, String label) {
     return ListenableBuilder(
       listenable: _controller,
       builder: (context, child) {

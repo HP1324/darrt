@@ -4,7 +4,7 @@ import 'package:darrt/app/services/toast_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:darrt/app/notification/notification_service.dart';
-import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/category/ui/add_category_page.dart';
 import 'package:darrt/category/ui/category_chip.dart';
 import 'package:darrt/helpers/consts.dart';
@@ -31,7 +31,7 @@ class AddTaskPage extends StatefulWidget {
   final Task? task;
   
   /// Used to set the category as selected when adding the task directly from inside the category page
-  final TaskCategory? category;
+  final EntityCategory? category;
   @override
   State<AddTaskPage> createState() => _AddTaskPageState();
 }

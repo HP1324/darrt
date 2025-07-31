@@ -6,7 +6,7 @@ import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:darrt/app/exceptions.dart';
 import 'package:darrt/app/services/google_sign_in_service.dart';
-import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/app/services/object_box.dart';
@@ -200,7 +200,7 @@ class BackupService {
    final tasks = (mergedData['tasks'] as List).map((e) => Task.fromJson(e)).toList();
 
     final categories = (mergedData['categories'] as List)
-        .map((e) => TaskCategory.fromJson(e))
+        .map((e) => EntityCategory.fromJson(e))
         .toList();
     g.catVm.putManyForRestore(categories, tasks: tasks);
 
@@ -316,11 +316,11 @@ class BackupMergeService {
       switch (key) {
         case 'categories':
           mergedList = g.catVm.mergeItemLists(
-            oldList.cast<TaskCategory>(),
-            newList.cast<TaskCategory>(),
+            oldList.cast<EntityCategory>(),
+            newList.cast<EntityCategory>(),
             mergeType: mergeType,
           );
-          mergedData[key] = g.catVm.convertObjectsListToJsonList(mergedList.cast<TaskCategory>());
+          mergedData[key] = g.catVm.convertObjectsListToJsonList(mergedList.cast<EntityCategory>());
           break;
 
         case 'folders':
@@ -383,7 +383,7 @@ class BackupMergeService {
           objectList = jsonList.map((json) => Task.fromJson(json)).toList();
           break;
         case 'categories':
-          objectList = jsonList.map((json) => TaskCategory.fromJson(json)).toList();
+          objectList = jsonList.map((json) => EntityCategory.fromJson(json)).toList();
           break;
         case 'completions':
           objectList = jsonList.map((json) => TaskCompletion.fromJson(json)).toList();
@@ -416,7 +416,7 @@ class BackupMergeService {
           jsonList = objectList.map((obj) => (obj as Task).toJson()).toList();
           break;
         case 'categories':
-          jsonList = objectList.map((obj) => (obj as TaskCategory).toJson()).toList();
+          jsonList = objectList.map((obj) => (obj as EntityCategory).toJson()).toList();
           break;
         case 'completions':
           jsonList = objectList.map((obj) => (obj as TaskCompletion).toJson()).toList();
