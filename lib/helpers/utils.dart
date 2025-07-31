@@ -1,4 +1,5 @@
 import 'dart:io' show Platform;
+import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' show QuillController;
@@ -394,4 +395,8 @@ Color getScaffoldBackgroundColor(BuildContext context) {
       ? HSVColor.fromColor(Color.lerp(scheme.surface, scheme.primary, 0.07)!).toColor()
       : HSVColor.fromColor(Color.lerp(Colors.white, scheme.primary, 0.05)!).toColor();
   return backgroundColorHSV;
+}
+
+Color? getColorFromString(String colorString){
+  return IconColorStorage.colors[colorString];
 }

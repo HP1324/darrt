@@ -1,7 +1,10 @@
 import 'dart:ui' show lerpDouble;
 
+import 'package:darrt/habits/build/ui/build_habit_editor.dart';
 import 'package:darrt/habits/build/ui/build_habit_item.dart';
+import 'package:darrt/helpers/mini_router.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 
 class BuildHabitTab extends StatelessWidget {
   const BuildHabitTab({super.key});
@@ -34,7 +37,7 @@ class AddBuildHabitCard extends StatelessWidget {
         color: colorScheme.primaryContainer.withValues(alpha: 0.8),
         child: InkWell(
           onTap: () {
-            // Add habit logic will go here
+            MiniRouter.to(context, BuildHabitEditor(edit: false),type: PageTransitionType.rightToLeft);
           },
           borderRadius: BorderRadius.circular(12),
           child: Container(

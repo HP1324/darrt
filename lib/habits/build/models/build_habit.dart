@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/habits/build/models/habit_completion.dart';
 import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/task/models/reminder.dart';
 import 'package:objectbox/objectbox.dart';
 
 enum MeasurementType{ boolean, count}
@@ -9,7 +12,7 @@ enum MeasurementType{ boolean, count}
 class BuildHabit {
   @Id()
   int id;
-  String name, measurementType;
+  String name, measurementType, measurementUnit;
   String? description,color, reminders;
   DateTime startDate;
   DateTime? endDate, startTime, endTime;
@@ -25,6 +28,7 @@ class BuildHabit {
     required this.name,
     this.description,
     this.measurementType = 'boolean',
+    required this.measurementUnit,
     this.endDate,
     this.startTime,
     this.endTime,
@@ -45,6 +49,7 @@ class BuildHabit {
       'name': name,
       'description': description,
       'measurementType': measurementType,
+      'measurementUnit': measurementUnit,
       'startDate': startDate.millisecondsSinceEpoch,
       'endDate': endDate?.millisecondsSinceEpoch,
       'startTime': startTime?.millisecondsSinceEpoch,
@@ -68,6 +73,7 @@ class BuildHabit {
       reminders: json['reminders'],
       color: json['color'],
       uuid: json['uuid'],
+      measurementUnit: json['measurementUnit']
     );
 
   }
@@ -78,5 +84,20 @@ class BuildHabit {
 
   static List<Map<String, dynamic>> convertObjectsListToJsonList(List<BuildHabit> objectList) {
     return objectList.map((habit) => habit.toJson()).toList();
+  }
+
+  List<Reminder> get reminderObjects {
+    if (reminders == null || reminders == "{}") {
+      return [];
+    }
+    final List<dynamic> decodedReminders = jsonDecode(reminders!);
+
+    return decodedReminders.map((reminder) {
+      final id = reminder['id'];
+      final timeString = reminder['time'];
+      final type = reminder['type'] ?? 'notif';
+
+      return Reminder(id: id, time: Reminder.stringToTime(timeString), type: type);
+    }).toList();
   }
 }

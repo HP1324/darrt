@@ -422,7 +422,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(22, 2963082835627357693),
     name: 'BuildHabit',
-    lastPropertyId: const obx_int.IdUid(11, 7139556395201523611),
+    lastPropertyId: const obx_int.IdUid(12, 9066992510481817801),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -488,6 +488,12 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(11, 7139556395201523611),
         name: 'uuid',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(12, 9066992510481817801),
+        name: 'measurementUnit',
         type: 9,
         flags: 0,
       ),
@@ -1316,7 +1322,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ? null
             : fbb.writeString(object.reminders!);
         final uuidOffset = fbb.writeString(object.uuid);
-        fbb.startTable(12);
+        final measurementUnitOffset = fbb.writeString(object.measurementUnit);
+        fbb.startTable(13);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
         fbb.addOffset(2, measurementTypeOffset);
@@ -1328,6 +1335,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(8, object.startTime?.millisecondsSinceEpoch);
         fbb.addInt64(9, object.endTime?.millisecondsSinceEpoch);
         fbb.addOffset(10, uuidOffset);
+        fbb.addOffset(11, measurementUnitOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1364,6 +1372,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final measurementTypeParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 8, '');
+        final measurementUnitParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 26, '');
         final endDateParam = endDateValue == null
             ? null
             : DateTime.fromMillisecondsSinceEpoch(endDateValue);
@@ -1390,6 +1401,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           name: nameParam,
           description: descriptionParam,
           measurementType: measurementTypeParam,
+          measurementUnit: measurementUnitParam,
           endDate: endDateParam,
           startTime: startTimeParam,
           endTime: endTimeParam,
@@ -1848,6 +1860,11 @@ class BuildHabit_ {
   /// See [BuildHabit.uuid].
   static final uuid = obx.QueryStringProperty<BuildHabit>(
     _entities[7].properties[10],
+  );
+
+  /// See [BuildHabit.measurementUnit].
+  static final measurementUnit = obx.QueryStringProperty<BuildHabit>(
+    _entities[7].properties[11],
   );
 
   /// see [BuildHabit.categories]
