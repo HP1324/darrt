@@ -10,6 +10,7 @@ abstract class BuildHabitTarget with _$BuildHabitTarget {
   }) = _BuildHabitTarget;
 
 const BuildHabitTarget._();
+
   int get total => daily + weekly + monthly + yearly;
 
   Map<String, dynamic> toJson() {
