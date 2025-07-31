@@ -9,6 +9,16 @@ class Messages {
 
   static final mTaskEmpty = 'Enter a task first';
 
+  static final mHabitCreated = 'Habit created';
+
+  static final mHabitEdited = 'Habit edited';
+
+  static final mHabitDeleted = 'Habit deleted';
+
+  static final mHabitsDeleted = 'Habits deleted';
+
+  static final mHabitEmpty = 'Enter a name first';
+
   static final mReminderExists = 'Reminder already added';
 
   static final mReminderAdded = 'Reminder added';

@@ -1,11 +1,11 @@
 import 'package:darrt/app/state/viewmodels/view_model.dart';
 import 'package:darrt/habits/build/models/build_habit.dart';
+import 'package:darrt/helpers/messages.dart';
 
 class BuildHabitViewModel extends ViewModel<BuildHabit>{
   @override
   List<BuildHabit> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
-    // TODO: implement convertJsonListToObjectList
-    throw UnimplementedError();
+    return jsonList.map(BuildHabit.fromJson).toList();
   }
 
   @override
@@ -15,34 +15,21 @@ class BuildHabitViewModel extends ViewModel<BuildHabit>{
   }
 
   @override
-  String getCreateSuccessMessage() {
-    // TODO: implement getCreateSuccessMessage
-    throw UnimplementedError();
-  }
+  String getCreateSuccessMessage()=> Messages.mHabitCreated;
 
   @override
   String getDeleteSuccessMessage(int length) {
-    // TODO: implement getDeleteSuccessMessage
-    throw UnimplementedError();
+    return length == 1 ? Messages.mHabitDeleted : Messages.mHabitsDeleted;
   }
 
   @override
-  int getItemId(BuildHabit item) {
-    // TODO: implement getItemId
-    throw UnimplementedError();
-  }
+  int getItemId(BuildHabit item) => item.id;
 
   @override
-  String getItemUuid(BuildHabit item) {
-    // TODO: implement getItemUuid
-    throw UnimplementedError();
-  }
+  String getItemUuid(BuildHabit item) => item.uuid;
 
   @override
-  String getUpdateSuccessMessage() {
-    // TODO: implement getUpdateSuccessMessage
-    throw UnimplementedError();
-  }
+  String getUpdateSuccessMessage() => Messages.mHabitEdited;
 
   @override
   void putManyForRestore(List<BuildHabit> restoredItems) {
@@ -50,8 +37,6 @@ class BuildHabitViewModel extends ViewModel<BuildHabit>{
   }
 
   @override
-  void setItemId(BuildHabit item, int id) {
-    // TODO: implement setItemId
-  }
+  void setItemId(BuildHabit item, int id) => item.id = id;
 
 }

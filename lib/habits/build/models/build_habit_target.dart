@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 part 'build_habit_target.freezed.dart';
 @freezed
@@ -13,16 +15,19 @@ const BuildHabitTarget._();
 
   int get total => daily + weekly + monthly + yearly;
 
-  Map<String, dynamic> toJson() {
-    return {
+  String toJsonString() {
+    final map =  {
       'daily': daily,
       'weekly': weekly,
       'monthly': monthly,
       'yearly': yearly,
     };
+
+    return jsonEncode(map);
   }
 
-  factory BuildHabitTarget.fromJson(Map<String, dynamic> json) {
+  static BuildHabitTarget fromJsonString(String jsonString) {
+    final json = jsonDecode(jsonString);
     return BuildHabitTarget(
       daily: json['daily'],
       weekly: json['weekly'],
