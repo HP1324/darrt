@@ -37,9 +37,9 @@ class NotificationService {
         [
           NotificationChannel(
             channelKey: notifChannelKey,
-            channelName: 'Task Notifications',
+            channelName: 'Notifications',
             channelDescription:
-                'Channel used to notify users about their tasks with simple notification',
+                'Channel used to notify users about their tasks and habits with simple notification',
             importance: NotificationImportance.Max,
             playSound: true,
             defaultRingtoneType: DefaultRingtoneType.Notification,
@@ -49,8 +49,8 @@ class NotificationService {
           ),
           NotificationChannel(
             channelKey: alarmChannelKey,
-            channelName: 'Task Alarms',
-            channelDescription: 'Channel used to notify users about their tasks with alarm',
+            channelName: 'Alarms',
+            channelDescription: 'Channel used to notify users about their tasks and habits with alarm',
             importance: NotificationImportance.Max,
             playSound: true,
             defaultRingtoneType: DefaultRingtoneType.Alarm,
@@ -208,12 +208,6 @@ class NotificationService {
       while (notifyDate.weekday != weekday) {
         notifyDate = notifyDate.add(const Duration(days: 1));
       }
-      final id = int.parse('${task.id}$weekday');
-      if (kDebugMode) {
-        MiniLogger.dp('Weekday: $weekday');
-        MiniLogger.dp('Reminder: $id ${reminder.time.hour}:${reminder.time.minute}');
-        MiniLogger.dp('Base date: ${formatDate(baseDateTime, 'dd/MMM/yyyy')}');
-      }
       if (task.endDate != null && notifyDate.isAfter(task.endDate!)) {
         return;
       }
@@ -222,7 +216,7 @@ class NotificationService {
 
       await _notif.createNotification(
         content: NotificationContent(
-          id: id,
+          id: notificationId,
           groupKey: task.id.toString(),
           channelKey: isAlarm ? 'task_alarm' : 'task_notif',
           title: 'Task due at ${formatTime(reminder.time)}',

@@ -96,6 +96,95 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
       measurementType: edit ? habit!.getMeasurementType() : MeasurementType.count,
     );
   }
+
+  void setStartDate(DateTime date) {
+    state = state.copyWith(startDate: date);
+    notifyListeners();
+  }
+
+  void resetStartDate() {
+    state = state.copyWith(startDate: DateTime.now());
+    notifyListeners();
+  }
+
+  void setEndDate(DateTime? date) {
+    state = state.copyWith(endDate: date);
+    notifyListeners();
+  }
+
+  void resetEndDate() {
+    state = state.copyWith(endDate: null);
+    notifyListeners();
+  }
+
+  void setStartTime(TimeOfDay selectedTime) {
+    final dateTime = DateTime(1970, 1, 1, selectedTime.hour, selectedTime.minute);
+    state = state.copyWith(startTime: dateTime);
+    notifyListeners();
+  }
+
+  void resetStartTime() {
+    state = state.copyWith(startTime: null);
+    notifyListeners();
+  }
+
+  void setEndTime(TimeOfDay selectedTime) {
+    final dateTime = DateTime(1970, 1, 1, selectedTime.hour, selectedTime.minute);
+    state = state.copyWith(endTime: dateTime);
+    notifyListeners();
+  }
+
+  void resetEndTime() {
+    state = state.copyWith(endTime: null);
+    notifyListeners();
+  }
+
+  void setRepeatConfig(RepeatConfig config) {
+    state = state.copyWith(repeatConfig: config);
+    notifyListeners();
+  }
+
+  void setTarget(BuildHabitTarget target) {
+    state = state.copyWith(target: target);
+    notifyListeners();
+  }
+
+  void setMeasurementType(MeasurementType type) {
+    state = state.copyWith(measurementType: type);
+    notifyListeners();
+  }
+
+  void setCategory(EntityCategory category, bool value) {
+    state = state.copyWith(categorySelection: {...categorySelection, category: value});
+    notifyListeners();
+  }
+
+  void putReminder({required Reminder reminder, required bool edit}) {
+    List<Reminder> updatedReminders = List.from(reminders);
+    if (edit) {
+      final index = updatedReminders.indexWhere((r) => r.time == reminder.time);
+      if (index != -1) {
+        updatedReminders[index] = reminder;
+      }
+    } else {
+      updatedReminders = [...updatedReminders, reminder];
+    }
+    state = state.copyWith(reminders: updatedReminders);
+    notifyListeners();
+  }
+
+  void removeReminder(Reminder reminder) {
+    List<Reminder> updatedReminders = List.from(reminders);
+    updatedReminders.remove(reminder);
+    state = state.copyWith(reminders: updatedReminders);
+    notifyListeners();
+  }
+
+  void setColor(String color) {
+    state = state.copyWith(color: color);
+    notifyListeners();
+  }
+
 }
 
 extension AccessBuildHabitState on BuildHabitStateController {
