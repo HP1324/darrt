@@ -1,5 +1,5 @@
 import 'package:darrt/category/models/entity_category.dart';
-import 'package:darrt/habits/build/build_habit_repeat_config.dart';
+import 'package:darrt/habits/build/models/build_habit_repeat_config.dart';
 import 'package:darrt/task/models/reminder.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 part 'build_habit_state.freezed.dart';

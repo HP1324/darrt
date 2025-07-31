@@ -26,12 +26,12 @@ $BuildHabitStateCopyWith<BuildHabitState> get copyWith => _$BuildHabitStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BuildHabitState&&(identical(other.name, name) || other.name == name)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.color, color) || other.color == color)&&(identical(other.measurementType, measurementType) || other.measurementType == measurementType)&&(identical(other.measurementUnit, measurementUnit) || other.measurementUnit == measurementUnit)&&const DeepCollectionEquality().equals(other.categorySelection, categorySelection)&&const DeepCollectionEquality().equals(other.reminders, reminders)&&(identical(other.repeatConfig, repeatConfig) || other.repeatConfig == repeatConfig)&&(identical(other.startTime, startTime) || other.startTime == startTime)&&(identical(other.endTime, endTime) || other.endTime == endTime)&&(identical(other.description, description) || other.description == description)&&(identical(other.endDate, endDate) || other.endDate == endDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BuildHabitState&&(identical(other.name, name) || other.name == name)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.color, color) || other.color == color)&&(identical(other.measurementType, measurementType) || other.measurementType == measurementType)&&(identical(other.measurementUnit, measurementUnit) || other.measurementUnit == measurementUnit)&&const DeepCollectionEquality().equals(other.categorySelection, categorySelection)&&const DeepCollectionEquality().equals(other.reminders, reminders)&&const DeepCollectionEquality().equals(other.repeatConfig, repeatConfig)&&(identical(other.startTime, startTime) || other.startTime == startTime)&&(identical(other.endTime, endTime) || other.endTime == endTime)&&(identical(other.description, description) || other.description == description)&&(identical(other.endDate, endDate) || other.endDate == endDate));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,name,startDate,color,measurementType,measurementUnit,const DeepCollectionEquality().hash(categorySelection),const DeepCollectionEquality().hash(reminders),repeatConfig,startTime,endTime,description,endDate);
+int get hashCode => Object.hash(runtimeType,name,startDate,color,measurementType,measurementUnit,const DeepCollectionEquality().hash(categorySelection),const DeepCollectionEquality().hash(reminders),const DeepCollectionEquality().hash(repeatConfig),startTime,endTime,description,endDate);
 
 @override
 String toString() {
@@ -63,7 +63,7 @@ class _$BuildHabitStateCopyWithImpl<$Res>
 
 /// Create a copy of BuildHabitState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? startDate = null,Object? color = null,Object? measurementType = null,Object? measurementUnit = null,Object? categorySelection = null,Object? reminders = null,Object? repeatConfig = null,Object? startTime = freezed,Object? endTime = freezed,Object? description = freezed,Object? endDate = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? startDate = null,Object? color = null,Object? measurementType = null,Object? measurementUnit = null,Object? categorySelection = null,Object? reminders = null,Object? repeatConfig = freezed,Object? startTime = freezed,Object? endTime = freezed,Object? description = freezed,Object? endDate = freezed,}) {
   return _then(_self.copyWith(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
@@ -72,7 +72,7 @@ as String,measurementType: null == measurementType ? _self.measurementType : mea
 as String,measurementUnit: null == measurementUnit ? _self.measurementUnit : measurementUnit // ignore: cast_nullable_to_non_nullable
 as String,categorySelection: null == categorySelection ? _self.categorySelection : categorySelection // ignore: cast_nullable_to_non_nullable
 as Map<EntityCategory, bool>,reminders: null == reminders ? _self.reminders : reminders // ignore: cast_nullable_to_non_nullable
-as List<Reminder>,repeatConfig: null == repeatConfig ? _self.repeatConfig : repeatConfig // ignore: cast_nullable_to_non_nullable
+as List<Reminder>,repeatConfig: freezed == repeatConfig ? _self.repeatConfig : repeatConfig // ignore: cast_nullable_to_non_nullable
 as BuildHabitRepeatConfig,startTime: freezed == startTime ? _self.startTime : startTime // ignore: cast_nullable_to_non_nullable
 as DateTime?,endTime: freezed == endTime ? _self.endTime : endTime // ignore: cast_nullable_to_non_nullable
 as DateTime?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -126,12 +126,12 @@ _$BuildHabitStateCopyWith<_BuildHabitState> get copyWith => __$BuildHabitStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BuildHabitState&&(identical(other.name, name) || other.name == name)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.color, color) || other.color == color)&&(identical(other.measurementType, measurementType) || other.measurementType == measurementType)&&(identical(other.measurementUnit, measurementUnit) || other.measurementUnit == measurementUnit)&&const DeepCollectionEquality().equals(other._categorySelection, _categorySelection)&&const DeepCollectionEquality().equals(other._reminders, _reminders)&&(identical(other.repeatConfig, repeatConfig) || other.repeatConfig == repeatConfig)&&(identical(other.startTime, startTime) || other.startTime == startTime)&&(identical(other.endTime, endTime) || other.endTime == endTime)&&(identical(other.description, description) || other.description == description)&&(identical(other.endDate, endDate) || other.endDate == endDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BuildHabitState&&(identical(other.name, name) || other.name == name)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.color, color) || other.color == color)&&(identical(other.measurementType, measurementType) || other.measurementType == measurementType)&&(identical(other.measurementUnit, measurementUnit) || other.measurementUnit == measurementUnit)&&const DeepCollectionEquality().equals(other._categorySelection, _categorySelection)&&const DeepCollectionEquality().equals(other._reminders, _reminders)&&const DeepCollectionEquality().equals(other.repeatConfig, repeatConfig)&&(identical(other.startTime, startTime) || other.startTime == startTime)&&(identical(other.endTime, endTime) || other.endTime == endTime)&&(identical(other.description, description) || other.description == description)&&(identical(other.endDate, endDate) || other.endDate == endDate));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,name,startDate,color,measurementType,measurementUnit,const DeepCollectionEquality().hash(_categorySelection),const DeepCollectionEquality().hash(_reminders),repeatConfig,startTime,endTime,description,endDate);
+int get hashCode => Object.hash(runtimeType,name,startDate,color,measurementType,measurementUnit,const DeepCollectionEquality().hash(_categorySelection),const DeepCollectionEquality().hash(_reminders),const DeepCollectionEquality().hash(repeatConfig),startTime,endTime,description,endDate);
 
 @override
 String toString() {
@@ -163,7 +163,7 @@ class __$BuildHabitStateCopyWithImpl<$Res>
 
 /// Create a copy of BuildHabitState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? startDate = null,Object? color = null,Object? measurementType = null,Object? measurementUnit = null,Object? categorySelection = null,Object? reminders = null,Object? repeatConfig = null,Object? startTime = freezed,Object? endTime = freezed,Object? description = freezed,Object? endDate = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? startDate = null,Object? color = null,Object? measurementType = null,Object? measurementUnit = null,Object? categorySelection = null,Object? reminders = null,Object? repeatConfig = freezed,Object? startTime = freezed,Object? endTime = freezed,Object? description = freezed,Object? endDate = freezed,}) {
   return _then(_BuildHabitState(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
@@ -172,7 +172,7 @@ as String,measurementType: null == measurementType ? _self.measurementType : mea
 as String,measurementUnit: null == measurementUnit ? _self.measurementUnit : measurementUnit // ignore: cast_nullable_to_non_nullable
 as String,categorySelection: null == categorySelection ? _self._categorySelection : categorySelection // ignore: cast_nullable_to_non_nullable
 as Map<EntityCategory, bool>,reminders: null == reminders ? _self._reminders : reminders // ignore: cast_nullable_to_non_nullable
-as List<Reminder>,repeatConfig: null == repeatConfig ? _self.repeatConfig : repeatConfig // ignore: cast_nullable_to_non_nullable
+as List<Reminder>,repeatConfig: freezed == repeatConfig ? _self.repeatConfig : repeatConfig // ignore: cast_nullable_to_non_nullable
 as BuildHabitRepeatConfig,startTime: freezed == startTime ? _self.startTime : startTime // ignore: cast_nullable_to_non_nullable
 as DateTime?,endTime: freezed == endTime ? _self.endTime : endTime // ignore: cast_nullable_to_non_nullable
 as DateTime?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable

@@ -1,5 +1,5 @@
 import 'package:darrt/category/models/entity_category.dart';
-import 'package:darrt/habits/build/build_habit_repeat_config.dart';
+import 'package:darrt/habits/build/models/build_habit_repeat_config.dart';
 import 'package:darrt/habits/build/models/build_habit.dart';
 import 'package:darrt/habits/build/state/build_habit_state.dart';
 import 'package:darrt/app/state/controllers/state_controller.dart';
