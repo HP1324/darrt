@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$BuildHabitState {
 
- DateTime get startDate; Color get color; Map<EntityCategory, bool> get categorySelection; List<Reminder> get reminders; RepeatConfig get repeatConfig; DateTime? get startTime; DateTime? get endTime; String? get description; DateTime? get endDate;
+ DateTime get startDate; String get color; Map<EntityCategory, bool> get categorySelection; List<Reminder> get reminders; RepeatConfig get repeatConfig; DateTime? get startTime; DateTime? get endTime; DateTime? get endDate;
 /// Create a copy of BuildHabitState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $BuildHabitStateCopyWith<BuildHabitState> get copyWith => _$BuildHabitStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BuildHabitState&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.color, color) || other.color == color)&&const DeepCollectionEquality().equals(other.categorySelection, categorySelection)&&const DeepCollectionEquality().equals(other.reminders, reminders)&&(identical(other.repeatConfig, repeatConfig) || other.repeatConfig == repeatConfig)&&(identical(other.startTime, startTime) || other.startTime == startTime)&&(identical(other.endTime, endTime) || other.endTime == endTime)&&(identical(other.description, description) || other.description == description)&&(identical(other.endDate, endDate) || other.endDate == endDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BuildHabitState&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.color, color) || other.color == color)&&const DeepCollectionEquality().equals(other.categorySelection, categorySelection)&&const DeepCollectionEquality().equals(other.reminders, reminders)&&(identical(other.repeatConfig, repeatConfig) || other.repeatConfig == repeatConfig)&&(identical(other.startTime, startTime) || other.startTime == startTime)&&(identical(other.endTime, endTime) || other.endTime == endTime)&&(identical(other.endDate, endDate) || other.endDate == endDate));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,startDate,color,const DeepCollectionEquality().hash(categorySelection),const DeepCollectionEquality().hash(reminders),repeatConfig,startTime,endTime,description,endDate);
+int get hashCode => Object.hash(runtimeType,startDate,color,const DeepCollectionEquality().hash(categorySelection),const DeepCollectionEquality().hash(reminders),repeatConfig,startTime,endTime,endDate);
 
 @override
 String toString() {
-  return 'BuildHabitState(startDate: $startDate, color: $color, categorySelection: $categorySelection, reminders: $reminders, repeatConfig: $repeatConfig, startTime: $startTime, endTime: $endTime, description: $description, endDate: $endDate)';
+  return 'BuildHabitState(startDate: $startDate, color: $color, categorySelection: $categorySelection, reminders: $reminders, repeatConfig: $repeatConfig, startTime: $startTime, endTime: $endTime, endDate: $endDate)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $BuildHabitStateCopyWith<$Res>  {
   factory $BuildHabitStateCopyWith(BuildHabitState value, $Res Function(BuildHabitState) _then) = _$BuildHabitStateCopyWithImpl;
 @useResult
 $Res call({
- DateTime startDate, Color color, Map<EntityCategory, bool> categorySelection, List<Reminder> reminders, RepeatConfig repeatConfig, DateTime? startTime, DateTime? endTime, String? description, DateTime? endDate
+ DateTime startDate, String color, Map<EntityCategory, bool> categorySelection, List<Reminder> reminders, RepeatConfig repeatConfig, DateTime? startTime, DateTime? endTime, DateTime? endDate
 });
 
 
@@ -63,17 +63,16 @@ class _$BuildHabitStateCopyWithImpl<$Res>
 
 /// Create a copy of BuildHabitState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? startDate = null,Object? color = null,Object? categorySelection = null,Object? reminders = null,Object? repeatConfig = null,Object? startTime = freezed,Object? endTime = freezed,Object? description = freezed,Object? endDate = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? startDate = null,Object? color = null,Object? categorySelection = null,Object? reminders = null,Object? repeatConfig = null,Object? startTime = freezed,Object? endTime = freezed,Object? endDate = freezed,}) {
   return _then(_self.copyWith(
 startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as DateTime,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
-as Color,categorySelection: null == categorySelection ? _self.categorySelection : categorySelection // ignore: cast_nullable_to_non_nullable
+as String,categorySelection: null == categorySelection ? _self.categorySelection : categorySelection // ignore: cast_nullable_to_non_nullable
 as Map<EntityCategory, bool>,reminders: null == reminders ? _self.reminders : reminders // ignore: cast_nullable_to_non_nullable
 as List<Reminder>,repeatConfig: null == repeatConfig ? _self.repeatConfig : repeatConfig // ignore: cast_nullable_to_non_nullable
 as RepeatConfig,startTime: freezed == startTime ? _self.startTime : startTime // ignore: cast_nullable_to_non_nullable
 as DateTime?,endTime: freezed == endTime ? _self.endTime : endTime // ignore: cast_nullable_to_non_nullable
-as DateTime?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
 }
@@ -85,11 +84,11 @@ as DateTime?,
 
 
 class _BuildHabitState extends BuildHabitState {
-  const _BuildHabitState({required this.startDate, required this.color, required final  Map<EntityCategory, bool> categorySelection, required final  List<Reminder> reminders, required this.repeatConfig, this.startTime, this.endTime, this.description, this.endDate}): _categorySelection = categorySelection,_reminders = reminders,super._();
+  const _BuildHabitState({required this.startDate, required this.color, required final  Map<EntityCategory, bool> categorySelection, required final  List<Reminder> reminders, required this.repeatConfig, this.startTime, this.endTime, this.endDate}): _categorySelection = categorySelection,_reminders = reminders,super._();
   
 
 @override final  DateTime startDate;
-@override final  Color color;
+@override final  String color;
  final  Map<EntityCategory, bool> _categorySelection;
 @override Map<EntityCategory, bool> get categorySelection {
   if (_categorySelection is EqualUnmodifiableMapView) return _categorySelection;
@@ -107,7 +106,6 @@ class _BuildHabitState extends BuildHabitState {
 @override final  RepeatConfig repeatConfig;
 @override final  DateTime? startTime;
 @override final  DateTime? endTime;
-@override final  String? description;
 @override final  DateTime? endDate;
 
 /// Create a copy of BuildHabitState
@@ -120,16 +118,16 @@ _$BuildHabitStateCopyWith<_BuildHabitState> get copyWith => __$BuildHabitStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BuildHabitState&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.color, color) || other.color == color)&&const DeepCollectionEquality().equals(other._categorySelection, _categorySelection)&&const DeepCollectionEquality().equals(other._reminders, _reminders)&&(identical(other.repeatConfig, repeatConfig) || other.repeatConfig == repeatConfig)&&(identical(other.startTime, startTime) || other.startTime == startTime)&&(identical(other.endTime, endTime) || other.endTime == endTime)&&(identical(other.description, description) || other.description == description)&&(identical(other.endDate, endDate) || other.endDate == endDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BuildHabitState&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.color, color) || other.color == color)&&const DeepCollectionEquality().equals(other._categorySelection, _categorySelection)&&const DeepCollectionEquality().equals(other._reminders, _reminders)&&(identical(other.repeatConfig, repeatConfig) || other.repeatConfig == repeatConfig)&&(identical(other.startTime, startTime) || other.startTime == startTime)&&(identical(other.endTime, endTime) || other.endTime == endTime)&&(identical(other.endDate, endDate) || other.endDate == endDate));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,startDate,color,const DeepCollectionEquality().hash(_categorySelection),const DeepCollectionEquality().hash(_reminders),repeatConfig,startTime,endTime,description,endDate);
+int get hashCode => Object.hash(runtimeType,startDate,color,const DeepCollectionEquality().hash(_categorySelection),const DeepCollectionEquality().hash(_reminders),repeatConfig,startTime,endTime,endDate);
 
 @override
 String toString() {
-  return 'BuildHabitState(startDate: $startDate, color: $color, categorySelection: $categorySelection, reminders: $reminders, repeatConfig: $repeatConfig, startTime: $startTime, endTime: $endTime, description: $description, endDate: $endDate)';
+  return 'BuildHabitState(startDate: $startDate, color: $color, categorySelection: $categorySelection, reminders: $reminders, repeatConfig: $repeatConfig, startTime: $startTime, endTime: $endTime, endDate: $endDate)';
 }
 
 
@@ -140,7 +138,7 @@ abstract mixin class _$BuildHabitStateCopyWith<$Res> implements $BuildHabitState
   factory _$BuildHabitStateCopyWith(_BuildHabitState value, $Res Function(_BuildHabitState) _then) = __$BuildHabitStateCopyWithImpl;
 @override @useResult
 $Res call({
- DateTime startDate, Color color, Map<EntityCategory, bool> categorySelection, List<Reminder> reminders, RepeatConfig repeatConfig, DateTime? startTime, DateTime? endTime, String? description, DateTime? endDate
+ DateTime startDate, String color, Map<EntityCategory, bool> categorySelection, List<Reminder> reminders, RepeatConfig repeatConfig, DateTime? startTime, DateTime? endTime, DateTime? endDate
 });
 
 
@@ -157,17 +155,16 @@ class __$BuildHabitStateCopyWithImpl<$Res>
 
 /// Create a copy of BuildHabitState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? startDate = null,Object? color = null,Object? categorySelection = null,Object? reminders = null,Object? repeatConfig = null,Object? startTime = freezed,Object? endTime = freezed,Object? description = freezed,Object? endDate = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? startDate = null,Object? color = null,Object? categorySelection = null,Object? reminders = null,Object? repeatConfig = null,Object? startTime = freezed,Object? endTime = freezed,Object? endDate = freezed,}) {
   return _then(_BuildHabitState(
 startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as DateTime,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
-as Color,categorySelection: null == categorySelection ? _self._categorySelection : categorySelection // ignore: cast_nullable_to_non_nullable
+as String,categorySelection: null == categorySelection ? _self._categorySelection : categorySelection // ignore: cast_nullable_to_non_nullable
 as Map<EntityCategory, bool>,reminders: null == reminders ? _self._reminders : reminders // ignore: cast_nullable_to_non_nullable
 as List<Reminder>,repeatConfig: null == repeatConfig ? _self.repeatConfig : repeatConfig // ignore: cast_nullable_to_non_nullable
 as RepeatConfig,startTime: freezed == startTime ? _self.startTime : startTime // ignore: cast_nullable_to_non_nullable
 as DateTime?,endTime: freezed == endTime ? _self.endTime : endTime // ignore: cast_nullable_to_non_nullable
-as DateTime?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
 }

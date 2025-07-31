@@ -9,13 +9,12 @@ part 'build_habit_state.freezed.dart';
 abstract class BuildHabitState with _$BuildHabitState {
   const factory BuildHabitState({
     required DateTime startDate,
-    required Color color,
+    required String color,
     required Map<EntityCategory, bool> categorySelection,
     required List<Reminder> reminders,
     required RepeatConfig repeatConfig,
     DateTime? startTime,
     DateTime? endTime,
-    String? description,
     DateTime? endDate,
   }) = _BuildHabitState;
 

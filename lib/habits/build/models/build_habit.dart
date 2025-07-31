@@ -10,8 +10,8 @@ enum MeasurementType { boolean, count }
 class BuildHabit {
   @Id()
   int id;
-  String name, measurementType, repeatConfig, measurementUnit;
-  String? description, color, reminders;
+  String name, measurementType, repeatConfig;
+  String? description, color, reminders,unit, target;
   DateTime startDate;
   DateTime? endDate, startTime, endTime;
   List<String> categoryUuids;
@@ -26,7 +26,7 @@ class BuildHabit {
     this.id = 0,
     required this.name,
     required this.repeatConfig,
-    required this.measurementUnit,
+    this.unit,
     this.description,
     this.measurementType = 'boolean',
     this.endDate,
@@ -34,6 +34,7 @@ class BuildHabit {
     this.endTime,
     this.reminders,
     this.color = 'primary',
+    this.target,
     DateTime? startDate,
     String? uuid,
     List<String>? categoryUuids,
@@ -52,13 +53,14 @@ class BuildHabit {
       'name': name,
       'description': description,
       'measurementType': measurementType,
-      'measurementUnit': measurementUnit,
+      'unit': unit,
       'repeatConfig': repeatConfig,
       'startDate': startDate.millisecondsSinceEpoch,
       'endDate': endDate?.millisecondsSinceEpoch,
       'startTime': startTime?.millisecondsSinceEpoch,
       'endTime': endTime?.millisecondsSinceEpoch,
       'reminders': reminders,
+      'target': target,
       'color': color,
       'uuid': uuid,
     };
@@ -69,7 +71,7 @@ class BuildHabit {
       id: json['id'],
       name: json['name'],
       repeatConfig: json['repeatConfig'],
-      measurementUnit: json['measurementUnit'],
+      unit: json['unit'],
       description: json['description'],
       measurementType: json['measurementType'],
       startDate: DateTime.fromMillisecondsSinceEpoch(json['startDate']),
@@ -82,6 +84,7 @@ class BuildHabit {
       endTime: json['endTime'] != null
           ? DateTime.fromMillisecondsSinceEpoch(json['endTime'])
           : null,
+      target: json['target'],
       reminders: json['reminders'],
       color: json['color'],
       uuid: json['uuid'],
@@ -99,15 +102,13 @@ class BuildHabit {
   bool isActiveOn(DateTime targetDate) {
     DateTime onlyDate(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
     final d = onlyDate(targetDate);
-
-    // Repeating task
     final start = onlyDate(startDate);
     final end = endDate != null ? onlyDate(endDate!) : null;
 
     final isInRange = d.isAtSameMomentAs(start) || d.isAfter(start);
     final isBeforeEnd = end == null || d.isAtSameMomentAs(end) || d.isBefore(end);
     if (!(isInRange && isBeforeEnd)) return false;
-    final config = RepeatConfig.fromJsonString(repeatConfig ?? '{}');
+    final config = RepeatConfig.fromJsonString(repeatConfig);
     if (config.type == 'weekly') {
       return config.days.contains(d.weekday);
     } else if (config.type == 'monthly') {

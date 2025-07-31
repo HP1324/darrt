@@ -422,7 +422,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(22, 2963082835627357693),
     name: 'BuildHabit',
-    lastPropertyId: const obx_int.IdUid(14, 7433141056243671509),
+    lastPropertyId: const obx_int.IdUid(19, 3727464044542990275),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -499,7 +499,7 @@ final _entities = <obx_int.ModelEntity>[
       ),
       obx_int.ModelProperty(
         id: const obx_int.IdUid(13, 7764716526479545447),
-        name: 'measurementUnit',
+        name: 'unit',
         type: 9,
         flags: 0,
       ),
@@ -507,6 +507,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(14, 7433141056243671509),
         name: 'categoryUuids',
         type: 30,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(19, 3727464044542990275),
+        name: 'target',
+        type: 9,
         flags: 0,
       ),
     ],
@@ -757,6 +763,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
       9064079498469193183,
       1291502241583054140,
       7263191118953218973,
+      4421494046107425376,
+      7311629415618805693,
+      1077784722884705863,
+      3140299622951637853,
     ],
     retiredRelationUids: const [],
     modelVersion: 5,
@@ -1335,11 +1345,16 @@ obx_int.ModelDefinition getObjectBoxModel() {
             : fbb.writeString(object.reminders!);
         final uuidOffset = fbb.writeString(object.uuid);
         final repeatConfigOffset = fbb.writeString(object.repeatConfig);
-        final measurementUnitOffset = fbb.writeString(object.measurementUnit);
+        final unitOffset = object.unit == null
+            ? null
+            : fbb.writeString(object.unit!);
         final categoryUuidsOffset = fbb.writeList(
           object.categoryUuids.map(fbb.writeString).toList(growable: false),
         );
-        fbb.startTable(15);
+        final targetOffset = object.target == null
+            ? null
+            : fbb.writeString(object.target!);
+        fbb.startTable(20);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
         fbb.addOffset(2, measurementTypeOffset);
@@ -1352,8 +1367,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(9, object.endTime?.millisecondsSinceEpoch);
         fbb.addOffset(10, uuidOffset);
         fbb.addOffset(11, repeatConfigOffset);
-        fbb.addOffset(12, measurementUnitOffset);
+        fbb.addOffset(12, unitOffset);
         fbb.addOffset(13, categoryUuidsOffset);
+        fbb.addOffset(18, targetOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1387,9 +1403,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final repeatConfigParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 26, '');
-        final measurementUnitParam = const fb.StringReader(
+        final unitParam = const fb.StringReader(
           asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 28, '');
+        ).vTableGetNullable(buffer, rootOffset, 28);
         final descriptionParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 10);
@@ -1411,6 +1427,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final colorParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 12);
+        final targetParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 40);
         final startDateParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0),
         );
@@ -1425,7 +1444,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           id: idParam,
           name: nameParam,
           repeatConfig: repeatConfigParam,
-          measurementUnit: measurementUnitParam,
+          unit: unitParam,
           description: descriptionParam,
           measurementType: measurementTypeParam,
           endDate: endDateParam,
@@ -1433,6 +1452,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           endTime: endTimeParam,
           reminders: remindersParam,
           color: colorParam,
+          target: targetParam,
           startDate: startDateParam,
           uuid: uuidParam,
           categoryUuids: categoryUuidsParam,
@@ -1894,14 +1914,19 @@ class BuildHabit_ {
     _entities[7].properties[11],
   );
 
-  /// See [BuildHabit.measurementUnit].
-  static final measurementUnit = obx.QueryStringProperty<BuildHabit>(
+  /// See [BuildHabit.unit].
+  static final unit = obx.QueryStringProperty<BuildHabit>(
     _entities[7].properties[12],
   );
 
   /// See [BuildHabit.categoryUuids].
   static final categoryUuids = obx.QueryStringVectorProperty<BuildHabit>(
     _entities[7].properties[13],
+  );
+
+  /// See [BuildHabit.target].
+  static final target = obx.QueryStringProperty<BuildHabit>(
+    _entities[7].properties[14],
   );
 
   /// see [BuildHabit.categories]

@@ -59,4 +59,20 @@ class Reminder {
     return jsonEncode(reminderMapList);
   }
 
+
+  /// Takes a json string of reminders and returns [List<Reminder>]
+  static List<Reminder> getReminderObjects(String? reminders) {
+    if (reminders == null || reminders == "{}") {
+      return [];
+    }
+    final List<dynamic> decodedReminders = jsonDecode(reminders);
+
+    return decodedReminders.map((reminder) {
+      final id = reminder['id'];
+      final timeString = reminder['time'];
+      final type = reminder['type'] ?? 'notif';
+
+      return Reminder(id: id, time: Reminder.stringToTime(timeString), type: type);
+    }).toList();
+  }
 }
