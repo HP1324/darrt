@@ -422,7 +422,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(22, 2963082835627357693),
     name: 'BuildHabit',
-    lastPropertyId: const obx_int.IdUid(11, 7139556395201523611),
+    lastPropertyId: const obx_int.IdUid(14, 7433141056243671509),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -489,6 +489,24 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(11, 7139556395201523611),
         name: 'uuid',
         type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(12, 4537436271747857983),
+        name: 'repeatConfig',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(13, 7764716526479545447),
+        name: 'measurementUnit',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(14, 7433141056243671509),
+        name: 'categoryUuids',
+        type: 30,
         flags: 0,
       ),
     ],
@@ -1316,7 +1334,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ? null
             : fbb.writeString(object.reminders!);
         final uuidOffset = fbb.writeString(object.uuid);
-        fbb.startTable(12);
+        final repeatConfigOffset = fbb.writeString(object.repeatConfig);
+        final measurementUnitOffset = fbb.writeString(object.measurementUnit);
+        final categoryUuidsOffset = fbb.writeList(
+          object.categoryUuids.map(fbb.writeString).toList(growable: false),
+        );
+        fbb.startTable(15);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
         fbb.addOffset(2, measurementTypeOffset);
@@ -1328,6 +1351,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(8, object.startTime?.millisecondsSinceEpoch);
         fbb.addInt64(9, object.endTime?.millisecondsSinceEpoch);
         fbb.addOffset(10, uuidOffset);
+        fbb.addOffset(11, repeatConfigOffset);
+        fbb.addOffset(12, measurementUnitOffset);
+        fbb.addOffset(13, categoryUuidsOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1358,6 +1384,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final nameParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 6, '');
+        final repeatConfigParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 26, '');
+        final measurementUnitParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 28, '');
         final descriptionParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 10);
@@ -1385,9 +1417,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final uuidParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 24, '');
+        final categoryUuidsParam = const fb.ListReader<String>(
+          fb.StringReader(asciiOptimization: true),
+          lazy: false,
+        ).vTableGet(buffer, rootOffset, 30, []);
         final object = BuildHabit(
           id: idParam,
           name: nameParam,
+          repeatConfig: repeatConfigParam,
+          measurementUnit: measurementUnitParam,
           description: descriptionParam,
           measurementType: measurementTypeParam,
           endDate: endDateParam,
@@ -1397,6 +1435,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           color: colorParam,
           startDate: startDateParam,
           uuid: uuidParam,
+          categoryUuids: categoryUuidsParam,
         );
         obx_int.InternalToManyAccess.setRelInfo<BuildHabit>(
           object.categories,
@@ -1848,6 +1887,21 @@ class BuildHabit_ {
   /// See [BuildHabit.uuid].
   static final uuid = obx.QueryStringProperty<BuildHabit>(
     _entities[7].properties[10],
+  );
+
+  /// See [BuildHabit.repeatConfig].
+  static final repeatConfig = obx.QueryStringProperty<BuildHabit>(
+    _entities[7].properties[11],
+  );
+
+  /// See [BuildHabit.measurementUnit].
+  static final measurementUnit = obx.QueryStringProperty<BuildHabit>(
+    _entities[7].properties[12],
+  );
+
+  /// See [BuildHabit.categoryUuids].
+  static final categoryUuids = obx.QueryStringVectorProperty<BuildHabit>(
+    _entities[7].properties[13],
   );
 
   /// see [BuildHabit.categories]

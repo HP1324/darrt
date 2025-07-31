@@ -8,7 +8,6 @@ part 'build_habit_state.freezed.dart';
 @freezed
 abstract class BuildHabitState with _$BuildHabitState {
   const factory BuildHabitState({
-    required String name,
     required DateTime startDate,
     required Color color,
     required Map<EntityCategory, bool> categorySelection,

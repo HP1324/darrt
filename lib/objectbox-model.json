@@ -325,7 +325,7 @@
     },
     {
       "id": "22:2963082835627357693",
-      "lastPropertyId": "11:7139556395201523611",
+      "lastPropertyId": "14:7433141056243671509",
       "name": "BuildHabit",
       "properties": [
         {
@@ -383,6 +383,21 @@
           "id": "11:7139556395201523611",
           "name": "uuid",
           "type": 9
+        },
+        {
+          "id": "12:4537436271747857983",
+          "name": "repeatConfig",
+          "type": 9
+        },
+        {
+          "id": "13:7764716526479545447",
+          "name": "measurementUnit",
+          "type": 9
+        },
+        {
+          "id": "14:7433141056243671509",
+          "name": "categoryUuids",
+          "type": 30
         }
       ],
       "relations": [
