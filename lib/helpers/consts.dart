@@ -85,3 +85,9 @@ const String mPauseResumeSoundWithTimer = 'pause_resume_sound_with_timer';
 const String mSoundLoopMode = 'sound_loop_mode';
 
 const String mCancelNotificationsWithTaskFinish = 'cancel_notifications_with_task_finish';
+
+const String taskEntity = 'task';
+
+const String buildHabitEntity = 'build_habit';
+
+const String quitHabitEntity = 'quit_habit';

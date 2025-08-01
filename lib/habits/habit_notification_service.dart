@@ -1,5 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:darrt/habits/build/models/build_habit.dart';
+import 'package:darrt/helpers/consts.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/task/models/reminder.dart';
@@ -101,7 +102,7 @@ class HabitNotificationService{
           channelKey: isAlarm ? 'task_alarm' : 'task_notif',
           title: 'Activity scheduled at ${formatTime(reminder.time)}',
           body: 'Get ready for ${habit.name}',
-          payload: {'id': habit.id.toString()},
+          payload: {'id': habit.id.toString(),'entityType' : buildHabitEntity},
           notificationLayout: NotificationLayout.Default,
           category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
           wakeUpScreen: true,
@@ -169,7 +170,7 @@ class HabitNotificationService{
           channelKey: isAlarm ? 'task_alarm' : 'task_notif',
           title: 'Activity scheduled at ${formatTime(reminder.time)}',
           body: 'Get ready for ${habit.name}',
-          payload: {'id': habit.id.toString()},
+          payload: {'id': habit.id.toString(),'entityType' : buildHabitEntity},
           notificationLayout: NotificationLayout.Default,
           category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
           wakeUpScreen: true,
@@ -237,7 +238,7 @@ class HabitNotificationService{
           channelKey: isAlarm ? 'task_alarm' : 'task_notif',
           title: 'Yearly Activity scheduled at ${formatTime(reminder.time)}',
           body: 'Get ready for ${habit.name}',
-          payload: {'id': habit.id.toString()},
+          payload: {'id': habit.id.toString(),'entityType' : buildHabitEntity},
           notificationLayout: NotificationLayout.Default,
           category: isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
           wakeUpScreen: true,
