@@ -256,7 +256,7 @@ class _PreviousSoundButton extends StatelessWidget {
 }
 
 class _NextSoundButton extends StatelessWidget {
-  const _NextSoundButton({super.key});
+  const _NextSoundButton();
 
   @override
   Widget build(BuildContext context) {

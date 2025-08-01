@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 
 class BuildHabitEditor extends StatefulWidget {
   const BuildHabitEditor({super.key, required this.edit, this.habit, this.category})
-    : assert(!edit || habit != null);
+      : assert(!edit || habit != null);
 
   final BuildHabit? habit;
   final bool edit;
@@ -73,6 +73,138 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
           ),
         );
       },
+    );
+  }
+}
+
+class _DatePicker extends StatelessWidget {
+  final DateTime? initialDate;
+  final DateTime firstDate;
+  final DateTime lastDate;
+  final Color accentColor;
+  final Color backgroundColor;
+
+  const _DatePicker({
+    required this.initialDate,
+    required this.firstDate,
+    required this.lastDate,
+    required this.accentColor,
+    required this.backgroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Theme(
+      data: theme.copyWith(
+        colorScheme: theme.colorScheme.copyWith(
+          primary: accentColor,
+          onPrimary: Colors.white,
+          secondary: accentColor,
+          surface: backgroundColor,
+          onSurface: theme.colorScheme.onSurface,
+        ),
+        datePickerTheme: DatePickerThemeData(
+          backgroundColor: backgroundColor,
+          headerBackgroundColor: accentColor.withValues(alpha: 0.1),
+          headerForegroundColor: accentColor,
+          headerHeadlineStyle: theme.textTheme.headlineSmall?.copyWith(
+            color: accentColor,
+            fontWeight: FontWeight.bold,
+          ),
+          headerHelpStyle: theme.textTheme.labelMedium?.copyWith(
+            color: accentColor.withValues(alpha: 0.8),
+          ),
+          weekdayStyle: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            fontWeight: FontWeight.w600,
+          ),
+          dayStyle: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface,
+          ),
+          dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return Colors.white;
+            }
+            if (states.contains(WidgetState.disabled)) {
+              return theme.colorScheme.onSurface.withValues(alpha: 0.38);
+            }
+            return theme.colorScheme.onSurface;
+          }),
+          dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return accentColor;
+            }
+            if (states.contains(WidgetState.hovered)) {
+              return accentColor.withValues(alpha: 0.08);
+            }
+            return null;
+          }),
+          todayForegroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return Colors.white;
+            }
+            return accentColor;
+          }),
+          todayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return accentColor;
+            }
+            return null;
+          }),
+          todayBorder: BorderSide(color: accentColor, width: 1),
+          yearStyle: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.onSurface,
+          ),
+          yearForegroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return Colors.white;
+            }
+            return theme.colorScheme.onSurface;
+          }),
+          yearBackgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return accentColor;
+            }
+            return null;
+          }),
+          rangePickerBackgroundColor: backgroundColor,
+          rangePickerHeaderBackgroundColor: accentColor.withValues(alpha: 0.1),
+          rangePickerHeaderForegroundColor: accentColor,
+          rangeSelectionBackgroundColor: accentColor.withValues(alpha: 0.12),
+          rangeSelectionOverlayColor: WidgetStateProperty.all(
+            accentColor.withValues(alpha: 0.08),
+          ),
+          dividerColor: theme.colorScheme.outline.withValues(alpha: 0.2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 8,
+          shadowColor: Colors.black.withValues(alpha: 0.1),
+        ),
+        dialogTheme: DialogThemeData(
+          backgroundColor: backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 8,
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: accentColor,
+            textStyle: theme.textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+      child: DatePickerDialog(
+        initialDate: initialDate ?? DateTime.now(),
+        firstDate: firstDate,
+        lastDate: lastDate,
+        initialCalendarMode: DatePickerMode.day,
+      ),
     );
   }
 }
@@ -283,12 +415,28 @@ class _StartDatePickerState extends State<_StartDatePicker> {
   Future<void> _selectDate() async {
     final currentDate = g.buildHabitSc.startDate;
     final endDate = g.buildHabitSc.endDate;
+    final color = getColorFromString(g.buildHabitSc.color) ?? Theme.of(context).colorScheme.primary;
+    final backgroundColor = getLerpedColor(context, color);
 
-    final selectedDate = await showDatePicker(
+    final selectedDate = await showDialog<DateTime>(
       context: context,
-      initialDate: currentDate,
-      firstDate: getFirstDate(),
-      lastDate: endDate?.subtract(Duration(days: 1)) ?? getMaxDate(),
+      builder: (context) {
+        return ListenableBuilder(
+          listenable: g.buildHabitSc,
+          builder: (context, child) {
+            final currentColor = getColorFromString(g.buildHabitSc.color) ?? Theme.of(context).colorScheme.primary;
+            final currentBackgroundColor = getLerpedColor(context, currentColor);
+
+            return _DatePicker(
+              initialDate: currentDate,
+              firstDate: getFirstDate(),
+              lastDate: endDate?.subtract(Duration(days: 1)) ?? getMaxDate(),
+              accentColor: currentColor,
+              backgroundColor: currentBackgroundColor,
+            );
+          },
+        );
+      },
     );
 
     if (selectedDate != null) {
@@ -351,27 +499,28 @@ class _EndDatePickerState extends State<_EndDatePicker> {
     final startDate = g.buildHabitSc.startDate;
     final currentEndDate = g.buildHabitSc.endDate;
 
-    final selectedDate = await showDatePicker(
+    final selectedDate = await showDialog(
       context: context,
-      initialDate: currentEndDate ?? startDate.add(Duration(days: 7)),
-      firstDate: startDate.add(Duration(days: 1)),
-      lastDate: getMaxDate(),
+      builder: (context) {
+        return ListenableBuilder(
+          listenable: g.buildHabitSc,
+          builder: (context, child) {
+            final currentColor = getColorFromString(g.buildHabitSc.color) ?? Theme.of(context).colorScheme.primary;
+            final currentBackgroundColor = getLerpedColor(context, currentColor);
+
+            return _DatePicker(
+              initialDate: currentEndDate ?? startDate.add(Duration(days: 7)),
+              firstDate: startDate.add(Duration(days: 1)),
+              lastDate: getMaxDate(),
+              accentColor: currentColor,
+              backgroundColor: currentBackgroundColor,
+            );
+          },
+        );
+      },
     );
 
     if (selectedDate != null) {
-      // Validate that end date is not before start date
-      if (selectedDate.isBefore(startDate)) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('End date cannot be before start date'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-        return;
-      }
-
       g.buildHabitSc.setEndDate(selectedDate);
       _updateDateText();
     }
