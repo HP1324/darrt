@@ -11,10 +11,10 @@ import 'package:darrt/task/models/repeat_config.dart';
 import 'package:flutter/material.dart';
 
 class BuildHabitStateController extends StateController<BuildHabitState, BuildHabit> {
-  late final TextEditingController descriptionController;
-  late final FocusNode descriptionFocusNode;
-  late final TextEditingController unitController;
-  late final FocusNode unitFocusNode;
+  final TextEditingController descriptionController = TextEditingController();
+  final FocusNode descriptionFocusNode = FocusNode();
+  final TextEditingController unitController = TextEditingController();
+  final FocusNode unitFocusNode = FocusNode();
 
   @override
   BuildHabit buildModel({required bool edit, BuildHabit? model}) {
@@ -60,22 +60,14 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
       color: 'primary',
       target: BuildHabitTarget(),
     );
-    descriptionController.dispose();
-    descriptionFocusNode.dispose();
-    unitController.dispose();
-    unitFocusNode.dispose();
+    textController.clear();
+    descriptionController.clear();
+    unitController.clear();
   }
 
-  void _initControllers() {
-    descriptionController = TextEditingController();
-    descriptionFocusNode = FocusNode();
-    unitController = TextEditingController();
-    unitFocusNode = FocusNode();
-  }
 
   @override
-  void initState(bool edit, [BuildHabit? habit]) {
-    _initControllers();
+  void initState(bool edit, [BuildHabit? habit, EntityCategory? category]) {
     textController.text = edit ? habit!.name : '';
     descriptionController.text = edit ? habit!.description ?? '' : '';
     unitController.text = edit ? habit!.unit ?? '' : '';
@@ -83,9 +75,11 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
     final categories = g.catVm.categories;
 
     state = BuildHabitState(
-      categorySelection: edit
-          ? {for (var cat in categories) cat: habit!.categories.contains(cat)}
-          : {EntityCategory(id: 1, name: 'General'): true},
+      categorySelection: category == null
+          ? edit
+                ? {for (var cat in categories) cat: habit!.categories.contains(cat)}
+                : {EntityCategory(id: 1, name: 'General'): true}
+          : {category: true},
       startDate: edit ? habit!.startDate : DateTime.now(),
       color: edit ? habit!.color! : 'primary',
       reminders: edit ? Reminder.getReminderObjects(habit!.reminders) : [],
@@ -184,7 +178,6 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
     state = state.copyWith(color: color);
     notifyListeners();
   }
-
 }
 
 extension AccessBuildHabitState on BuildHabitStateController {

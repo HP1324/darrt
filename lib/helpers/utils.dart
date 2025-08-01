@@ -387,13 +387,13 @@ void showSettingsDialog(BuildContext context) {
   );
 }
 
-Color getScaffoldBackgroundColor(BuildContext context) {
+Color getLerpedColor(BuildContext context, [Color? color]) {
   final theme = Theme.of(context);
   final isDark = theme.brightness == Brightness.dark;
   final scheme = theme.colorScheme;
   Color backgroundColorHSV = isDark
-      ? HSVColor.fromColor(Color.lerp(scheme.surface, scheme.primary, 0.07)!).toColor()
-      : HSVColor.fromColor(Color.lerp(Colors.white, scheme.primary, 0.05)!).toColor();
+      ? HSVColor.fromColor(Color.lerp(scheme.surface,color ?? scheme.primary, 0.07)!).toColor()
+      : HSVColor.fromColor(Color.lerp(Colors.white, color ?? scheme.primary, 0.05)!).toColor();
   return backgroundColorHSV;
 }
 

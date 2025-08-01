@@ -110,9 +110,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: getScaffoldBackgroundColor(context),
+        backgroundColor: getLerpedColor(context),
         appBar: AppBar(
-          backgroundColor: getScaffoldBackgroundColor(context),
+          backgroundColor: getLerpedColor(context),
           title: Text(widget.edit ? widget.task!.title.replaceAll('\n', ' ') : 'Add New Task'),
         ),
         body: Padding(

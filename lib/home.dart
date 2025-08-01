@@ -36,7 +36,7 @@ class _HomeState extends State<Home> {
     return SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: getScaffoldBackgroundColor(context),
+        backgroundColor: getLerpedColor(context),
         appBar: MiniAppBar(),
         drawer: const AppDrawer(),
         body: ValueListenableBuilder(

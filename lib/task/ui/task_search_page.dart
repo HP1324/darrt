@@ -115,9 +115,9 @@ class _SearchPageContentState extends State<_SearchPageContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: getScaffoldBackgroundColor(context),
+      backgroundColor: getLerpedColor(context),
       appBar: AppBar(
-        backgroundColor: getScaffoldBackgroundColor(context),
+        backgroundColor: getLerpedColor(context),
         leading: BackButton(),
         title: ListenableBuilder(
           listenable: _controller,
