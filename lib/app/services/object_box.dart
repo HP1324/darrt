@@ -1,3 +1,5 @@
+import 'package:darrt/habits/build/models/build_habit.dart';
+import 'package:darrt/habits/quit/models/quit_habit.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:darrt/app/services/boxpref.dart';
 import 'package:darrt/category/models/entity_category.dart';
@@ -49,6 +51,10 @@ class ObjectBox {
   Box<Note> get noteBox => _store!.box<Note>();
 
   Box<BoxPref> get prefsBox => _store!.box<BoxPref>();
+
+  Box<BuildHabit> get buildHabitBox => _store!.box<BuildHabit>();
+
+  Box<QuitHabit> get quitHabitBox => _store!.box<QuitHabit>();
 
   void close() {
     _store!.close();
