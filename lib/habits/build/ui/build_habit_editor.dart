@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 
 class BuildHabitEditor extends StatefulWidget {
   const BuildHabitEditor({super.key, required this.edit, this.habit, this.category})
-      : assert(!edit || habit != null);
+    : assert(!edit || habit != null);
 
   final BuildHabit? habit;
   final bool edit;
@@ -415,8 +415,6 @@ class _StartDatePickerState extends State<_StartDatePicker> {
   Future<void> _selectDate() async {
     final currentDate = g.buildHabitSc.startDate;
     final endDate = g.buildHabitSc.endDate;
-    final color = getColorFromString(g.buildHabitSc.color) ?? Theme.of(context).colorScheme.primary;
-    final backgroundColor = getLerpedColor(context, color);
 
     final selectedDate = await showDialog<DateTime>(
       context: context,
@@ -424,7 +422,8 @@ class _StartDatePickerState extends State<_StartDatePicker> {
         return ListenableBuilder(
           listenable: g.buildHabitSc,
           builder: (context, child) {
-            final currentColor = getColorFromString(g.buildHabitSc.color) ?? Theme.of(context).colorScheme.primary;
+            final currentColor =
+                getColorFromString(g.buildHabitSc.color) ?? Theme.of(context).colorScheme.primary;
             final currentBackgroundColor = getLerpedColor(context, currentColor);
 
             return _DatePicker(
@@ -440,12 +439,12 @@ class _StartDatePickerState extends State<_StartDatePicker> {
     );
 
     if (selectedDate != null) {
-      if (endDate != null && selectedDate.isAfter(endDate)) {
-        if (mounted) {
-          showErrorToast(context, 'Start date cannot be after end date');
-        }
-        return;
-      }
+      // if (endDate != null && selectedDate.isAfter(endDate)) {
+      //   if (mounted) {
+      //     showErrorToast(context, 'Start date cannot be after end date');
+      //   }
+      //   return;
+      // }
 
       g.buildHabitSc.setStartDate(selectedDate);
       _updateDateText();
@@ -468,7 +467,23 @@ class _StartDatePickerState extends State<_StartDatePicker> {
       labelText: 'Start date',
       readOnly: true,
       onTap: _selectDate,
-      suffixIcon: Icon(Icons.calendar_today, color: color, size: 20),
+      suffixIcon: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (!DateUtils.isSameDay(g.buildHabitSc.startDate, DateTime.now())) ...[
+            IconButton(
+              onPressed: () {
+                g.buildHabitSc.resetStartDate();
+                _updateDateText();
+              },
+              icon: Icon(Icons.clear, color: color),
+              padding: EdgeInsets.zero,
+            ),
+          ] else ...[
+            Icon(Icons.calendar_today, color: color, size: 20),
+          ],
+        ],
+      ),
     );
   }
 }
@@ -505,7 +520,8 @@ class _EndDatePickerState extends State<_EndDatePicker> {
         return ListenableBuilder(
           listenable: g.buildHabitSc,
           builder: (context, child) {
-            final currentColor = getColorFromString(g.buildHabitSc.color) ?? Theme.of(context).colorScheme.primary;
+            final currentColor =
+                getColorFromString(g.buildHabitSc.color) ?? Theme.of(context).colorScheme.primary;
             final currentBackgroundColor = getLerpedColor(context, currentColor);
 
             return _DatePicker(
@@ -546,21 +562,21 @@ class _EndDatePickerState extends State<_EndDatePicker> {
     return _HabitTextField(
       controller: controller,
       labelText: 'End date (Optional)',
-      hintText: 'No end date',
+      hintText: 'Not set',
       readOnly: true,
       onTap: _selectDate,
       suffixIcon: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (hasEndDate)
+          if (hasEndDate) ...[
             IconButton(
               onPressed: _clearDate,
-              icon: Icon(Icons.clear, color: color, size: 18),
-              constraints: BoxConstraints(minWidth: 24, minHeight: 24),
+              icon: Icon(Icons.clear, color: color),
               padding: EdgeInsets.zero,
             ),
-          Icon(Icons.calendar_today, color: color, size: 20),
-          SizedBox(width: 8),
+          ] else ...[
+            Icon(Icons.calendar_today, color: color, size: 20),
+          ],
         ],
       ),
     );
