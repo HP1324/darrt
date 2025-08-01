@@ -66,6 +66,18 @@ DateTime getMaxDate() {
   return DateTime.now().add(Duration(days: maxExtentDateDays));
 }
 
+bool isSameDay(DateTime? date1, DateTime? date2) {
+  return DateUtils.isSameDay(date1, date2);
+}
+
+String getDateText(DateTime date){
+  final dateText = isSameDay(DateTime.now(), date)
+      ? 'Today'
+      : formatDateNoJm(date, 'dd/MM/yyyy');
+
+  return dateText;
+}
+
 Future<List<pw.Font>> loadAllFonts() async {
   final fontPaths = [
     "assets/fonts/DejaVuSans-Bold.ttf",

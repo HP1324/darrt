@@ -5,6 +5,7 @@ import 'package:darrt/habits/build/models/build_habit_target.dart';
 import 'package:darrt/habits/build/state/build_habit_state.dart';
 import 'package:darrt/app/state/controllers/state_controller.dart';
 import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/task/models/reminder.dart';
 import 'package:darrt/task/models/repeat_config.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,10 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
   final FocusNode descriptionFocusNode = FocusNode();
   final TextEditingController unitController = TextEditingController();
   final FocusNode unitFocusNode = FocusNode();
+
+  // Had to define time controllers here to dynamically reset the end time when start time is reset, without doing this, that was not possible
+  final TextEditingController startTimeController = TextEditingController();
+  final TextEditingController endTimeController = TextEditingController();
 
   @override
   BuildHabit buildModel({required bool edit, BuildHabit? model}) {
@@ -96,7 +101,7 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
   }
 
   void resetStartDate() {
-    state = state.copyWith(startDate: DateTime.now());
+    state = state.copyWith(startDate: DateTime.now(), endDate: null);
     notifyListeners();
   }
 
@@ -113,22 +118,27 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
   void setStartTime(TimeOfDay selectedTime) {
     final dateTime = DateTime(1970, 1, 1, selectedTime.hour, selectedTime.minute);
     state = state.copyWith(startTime: dateTime);
+    startTimeController.text = startTime != null ? formatDateNoJm(startTime!, 'hh:mm a') : '';
     notifyListeners();
   }
 
   void resetStartTime() {
-    state = state.copyWith(startTime: null);
+    state = state.copyWith(startTime: null, endTime: null);
+    startTimeController.text = '';
+    endTimeController.text = '';
     notifyListeners();
   }
 
   void setEndTime(TimeOfDay selectedTime) {
     final dateTime = DateTime(1970, 1, 1, selectedTime.hour, selectedTime.minute);
     state = state.copyWith(endTime: dateTime);
+    endTimeController.text = endTime != null ? formatDateNoJm(endTime!, 'hh:mm a') : '';
     notifyListeners();
   }
 
   void resetEndTime() {
     state = state.copyWith(endTime: null);
+    endTimeController.text = '';
     notifyListeners();
   }
 

@@ -29,7 +29,7 @@ class AddTaskPage extends StatefulWidget {
   ///Flag to indicate whether a task is being edited or a new task is being created
   final bool edit;
   final Task? task;
-  
+
   /// Used to set the category as selected when adding the task directly from inside the category page
   final EntityCategory? category;
   @override
@@ -240,6 +240,12 @@ class StartTimeSelector extends StatelessWidget {
               initialTime: time != null ? TimeOfDay.fromDateTime(time) : TimeOfDay.now(),
             );
             if (selectedTime != null) {
+              if (g.taskSc.endTime != null && !selectedTime.isBefore(TimeOfDay.fromDateTime(g.taskSc.endTime!))) {
+                if (context.mounted) {
+                  showErrorToast(context, 'Start time must be before end time');
+                }
+                return;
+              }
               g.taskSc.setStartTime(selectedTime);
             }
           },
@@ -300,7 +306,7 @@ class EndTimeSelector extends StatelessWidget {
             );
             if (selectedTime != null) {
               if (!selectedTime.isAfter(TimeOfDay.fromDateTime(g.taskSc.startTime!))) {
-                if(context.mounted) {
+                if (context.mounted) {
                   showErrorToast(context, 'End time must be after start time');
                 }
                 return;
@@ -1337,9 +1343,7 @@ class CategorySelector extends StatelessWidget {
 }
 
 class PrioritySelector extends StatelessWidget {
-  const PrioritySelector({
-    super.key,
-  });
+  const PrioritySelector({super.key});
 
   @override
   Widget build(BuildContext context) {
