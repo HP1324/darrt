@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/habits/build/models/build_habit.dart';
@@ -87,7 +86,7 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
       endDate: edit ? habit!.endDate : null,
       endTime: edit ? habit!.endTime : null,
       target: edit ? BuildHabitTarget.fromJsonString(habit!.target!) : BuildHabitTarget(),
-      measurementType: edit ? habit!.getMeasurementType() : MeasurementType.count,
+      measurementType: edit ? habit!.getMeasurementType() : MeasurementType.boolean,
     );
   }
 
