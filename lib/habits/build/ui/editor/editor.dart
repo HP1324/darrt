@@ -4,11 +4,13 @@ import 'package:darrt/habits/build/models/build_habit.dart';
 import 'package:darrt/habits/build/state/build_habit_state_controller.dart';
 import 'package:darrt/habits/build/ui/editor/date_pickers.dart';
 import 'package:darrt/habits/build/ui/editor/habit_color_picker.dart';
-import 'package:darrt/habits/build/ui/editor/habit_description_field.dart';
-import 'package:darrt/habits/build/ui/editor/habit_name_field.dart';
+import 'package:darrt/habits/build/ui/editor/description_field.dart';
+import 'package:darrt/habits/build/ui/editor/name_field.dart';
 import 'package:darrt/habits/build/ui/editor/habit_text_field.dart';
 import 'package:darrt/habits/build/ui/editor/measurement_type_selector.dart';
+import 'package:darrt/habits/build/ui/editor/target_selector.dart';
 import 'package:darrt/habits/build/ui/editor/time_pickers.dart';
+import 'package:darrt/habits/build/ui/editor/unit_field.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +77,7 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
                   ),
                   MeasurementTypeSelector(),
                   AnimatedSwitcher(
-                    duration: Duration(milliseconds: 300),
+                    duration: Duration(milliseconds: 390),
                     child: g.buildHabitSc.measurementType == MeasurementType.boolean
                         ? Row(
                             spacing: 8,
@@ -84,7 +86,12 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
                               Expanded(child: EndTimePicker()),
                             ],
                           )
-                        : SizedBox.shrink(),
+                        : Column(
+                          children: [
+                            UnitField(),
+                            TargetSelector(),
+                          ],
+                        ),
                   ),
                 ],
               ),

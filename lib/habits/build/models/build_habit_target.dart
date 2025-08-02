@@ -26,7 +26,8 @@ const BuildHabitTarget._();
     return jsonEncode(map);
   }
 
-  static BuildHabitTarget fromJsonString(String jsonString) {
+  static BuildHabitTarget
+  fromJsonString(String jsonString) {
     final json = jsonDecode(jsonString);
     return BuildHabitTarget(
       daily: json['daily'],

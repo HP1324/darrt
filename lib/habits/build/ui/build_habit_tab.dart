@@ -1,6 +1,6 @@
 import 'dart:ui' show lerpDouble;
 
-import 'package:darrt/habits/build/ui/editor/build_habit_editor.dart';
+import 'package:darrt/habits/build/ui/editor/editor.dart';
 import 'package:darrt/habits/build/ui/build_habit_item.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:flutter/material.dart';
