@@ -1,4 +1,5 @@
 import 'package:darrt/app/services/toast_service.dart';
+import 'package:darrt/habits/build/models/build_habit.dart';
 import 'package:darrt/helpers/consts.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/utils.dart';
@@ -6,9 +7,9 @@ import 'package:darrt/task/models/task.dart';
 import 'package:flutter/material.dart';
 
 class StatsCalendarWidget extends StatefulWidget {
-  final Task task;
+  final BuildHabit habit;
 
-  const StatsCalendarWidget({super.key, required this.task});
+  const StatsCalendarWidget({super.key, required this.habit});
 
   @override
   State<StatsCalendarWidget> createState() => _StatsCalendarWidgetState();
@@ -89,7 +90,7 @@ class _StatsCalendarWidgetState extends State<StatsCalendarWidget> {
               },
               itemBuilder: (context, page) {
                 final month = _getMonthFromPage(page);
-                return _MonthView(month: month, task: widget.task);
+                return _MonthView(month: month, habit: widget.habit);
               },
             ),
           ),
@@ -208,9 +209,9 @@ class _WeekdayHeader extends StatelessWidget {
 
 class _MonthView extends StatelessWidget {
   final DateTime month;
-  final Task task;
+  final BuildHabit habit;
 
-  const _MonthView({required this.month, required this.task});
+  const _MonthView({required this.month, required this.habit});
 
   @override
   Widget build(BuildContext context) {
@@ -242,19 +243,19 @@ class _MonthView extends StatelessWidget {
 
       dayWidgets.add(
         ListenableBuilder(
-          listenable: g.taskVm,
+          listenable: g.buildHabitVm,
           builder: (context, child) {
             final dateMs = DateUtils.dateOnly(date).millisecondsSinceEpoch;
-            final rtc = g.taskVm.repeatingTaskCompletions;
-            final isFinished = rtc[task.id]?.contains(dateMs) ?? false;
+            final completions = g.buildHabitVm.habitCompletions;
+            final isFinished = completions[habit.id]?.contains(dateMs) ?? false;
 
             return _DateItem(
               date: date,
-              task: task,
+              habit: habit,
               value: isFinished,
               onChanged: (newValue) {
-                if (task.isActiveOn(date)) {
-                  g.taskVm.toggleStatus(task, newValue ?? false, date, context);
+                if (habit.isActiveOn(date)) {
+                  g.buildHabitVm.toggleStatus(habit, newValue ?? false, date, context);
                 } else {
                   showWarningToast(context, 'Task not active on this date');
                 }
@@ -280,13 +281,13 @@ class _MonthView extends StatelessWidget {
 
 class _DateItem extends StatelessWidget {
   final DateTime date;
-  final Task task;
+  final BuildHabit habit;
   final bool? value;
   final ValueChanged<bool?>? onChanged;
 
   const _DateItem({
     required this.date,
-    required this.task,
+    required this.habit,
     required this.value,
     required this.onChanged,
   });

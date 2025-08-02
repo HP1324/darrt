@@ -179,11 +179,11 @@ class TaskTitleRow extends StatelessWidget {
             size: 13,
             color: scheme.primary.withAlpha(200),
           ),
-          InkWell(
-            borderRadius: BorderRadius.circular(8),
-            onTap: () => MiniRouter.to(context, StatsPage(task: task)),
-            child: Icon(Icons.calendar_month_outlined, size: 21, color: scheme.secondary),
-          ),
+          // InkWell(
+          //   borderRadius: BorderRadius.circular(8),
+          //   onTap: () => MiniRouter.to(context, StatsPage(habit: task)),
+          //   child: Icon(Icons.calendar_month_outlined, size: 21, color: scheme.secondary),
+          // ),
         ],
         // TaskPrioritySection(task: task, isUrgent: isUrgent, context: context),
       ],

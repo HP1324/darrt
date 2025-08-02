@@ -64,7 +64,7 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
         MiniLogger.dp('Completion task uuid: ${completion.habitUuid!}');
         _completionBox.put(completion);
         habitCompletions.putIfAbsent(habit.id, () => {}).add(date);
-        performTaskStatsLogicAfterTaskFinish(habit, dateOnly, context);
+        performHabitStatsLogicAfterHabitFinish(habit, dateOnly, context);
         g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
       } else {
         final query = _completionBox
@@ -74,7 +74,7 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
         query.close();
         MiniLogger.d('removed $removed completions for task ${habit.id}');
         habitCompletions[habit.id]?.remove(date);
-        performTaskStatsLogicAfterTaskUnfinish(habit, dateOnly);
+        performHabitStatsLogicAfterHabitUnfinish(habit, dateOnly);
       }
     }
 
@@ -84,11 +84,11 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
 
   BuildHabitStats? currentHabitStats = BuildHabitStats();
 
-  void initTaskStats(BuildHabit habit) {
+  void initHabitStats(BuildHabit habit) {
     currentHabitStats = BuildHabitStats.fromJsonString(habit.stats);
   }
 
-  void updateTaskFromAppWideStateChanges(BuildHabit habit) {
+  void updateHabitFromAppWideStateChanges(BuildHabit habit) {
     final id = box.put(habit);
     int index = habits.indexWhere((i) => getItemId(i) == id);
     if (index != -1) {
@@ -96,7 +96,7 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
     }
   }
 
-  void performTaskStatsLogicAfterTaskFinish(BuildHabit habit, DateTime dateOnly, [BuildContext? context]) {
+  void performHabitStatsLogicAfterHabitFinish(BuildHabit habit, DateTime dateOnly, [BuildContext? context]) {
     MiniLogger.dp('finish stats function called');
     var stats = BuildHabitStats.fromJsonString(habit.stats);
     final List<DateTime> updatedCompletions = List<DateTime>.from(stats.completions);
@@ -139,10 +139,10 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
     checkAndHandleAchievements(habit, stats, context);
     habit.stats = stats.toJsonString();
     currentHabitStats = stats.copyWith();
-    updateTaskFromAppWideStateChanges(habit);
+    updateHabitFromAppWideStateChanges(habit);
   }
 
-  void performTaskStatsLogicAfterTaskUnfinish(BuildHabit habit, DateTime dateOnly) {
+  void performHabitStatsLogicAfterHabitUnfinish(BuildHabit habit, DateTime dateOnly) {
     final stats = BuildHabitStats.fromJsonString(habit.stats);
     final List<DateTime> updatedCompletions = List<DateTime>.from(stats.completions);
 
@@ -183,7 +183,7 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
     MiniLogger.dp('Current streak start: ${stats.currentStreakStart}');
     habit.stats = stats.toJsonString();
     currentHabitStats = stats.copyWith();
-    updateTaskFromAppWideStateChanges(habit);
+    updateHabitFromAppWideStateChanges(habit);
   }
 
   void removeInvalidAchievements(BuildHabit habit, BuildHabitStats stats) {
@@ -311,7 +311,7 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
           habit.stats = stats.toJsonString();
           stats.achievementUnlocks = unlocked;
           currentHabitStats = stats;
-          updateTaskFromAppWideStateChanges(habit);
+          updateHabitFromAppWideStateChanges(habit);
           final achieved = template.copyWith(
             isUnlocked: true,
             unlockedDate: unlocked[key],

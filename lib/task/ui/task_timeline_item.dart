@@ -234,15 +234,15 @@
               color: scheme.primary.withAlpha(200),
             ),
             const SizedBox(width: 8),
-            InkWell(
-              borderRadius: BorderRadius.circular(8),
-              onTap: () => MiniRouter.to(context, StatsPage(task: task)),
-              child: Icon(
-                Icons.calendar_month_outlined,
-                size: 21,
-                color: scheme.secondary,
-              ),
-            ),
+            // InkWell(
+            //   borderRadius: BorderRadius.circular(8),
+            //   onTap: () => MiniRouter.to(context, StatsPage(habit: task)),
+            //   child: Icon(
+            //     Icons.calendar_month_outlined,
+            //     size: 21,
+            //     color: scheme.secondary,
+            //   ),
+            // ),
           ],
         ],
       );
@@ -333,11 +333,11 @@
               color: theme.colorScheme.primary.withAlpha(200),
             ),
             const SizedBox(width: 8),
-            InkWell(
-              borderRadius: BorderRadius.circular(8),
-              onTap: () => MiniRouter.to(context, StatsPage(task: task)),
-              child: Icon(Icons.calendar_month_outlined, size: 21, color: theme.colorScheme.secondary),
-            ),
+            // InkWell(
+            //   borderRadius: BorderRadius.circular(8),
+            //   onTap: () => MiniRouter.to(context, StatsPage(habit: task)),
+            //   child: Icon(Icons.calendar_month_outlined, size: 21, color: theme.colorScheme.secondary),
+            // ),
           ],
         ],
       );
