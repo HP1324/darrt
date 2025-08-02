@@ -444,58 +444,24 @@ class IconColorStorage{
   }
 
   static const Map<String, Color> colors = {
-    // Primary blues - excellent readability
+    // Primary & Cool Tones
     'blue': Color(0xFF2196F3),
-    'lightBlue': Color(0xFF03A9F4),
-    'navy': Color(0xFF1565C0),
-    'slate': Color(0xFF546E7A),
-
-    // Greens - calming and accessible
-    'green': Color(0xFF4CAF50),
     'teal': Color(0xFF009688),
-    'emerald': Color(0xFF00695C),
-    'mint': Color(0xFF26A69A),
+    'cyan': Color(0xFF00BCD4),
 
-    // Warm colors - balanced saturation
-    'orange': Color(0xFFFF9800),
-    'amber': Color(0xFFFFC107),
-    'coral': Color(0xFFFF7043),
-    'peach': Color(0xFFFFAB40),
-
-    // Purples - sophisticated and easy on eyes
-    'purple': Color(0xFF9C27B0),
-    'indigo': Color(0xFF3F51B5),
-    'lavender': Color(0xFF7986CB),
-    'deepPurple': Color(0xFF673AB7),
-
-    // Reds - muted for better accessibility
-    'red': Color(0xFFF44336),
-    'pink': Color(0xFFE91E63),
-    'rose': Color(0xFFAD1457),
-    'crimson': Color(0xFFD32F2F),
-
-    // Yellows - adjusted brightness
-    'yellow': Color(0xFFFDD835),
-    'lime': Color(0xFF689F38),
-    'gold': Color(0xFFFF8F00),
-
-    // Neutrals - perfect contrast ratios
-    'grey': Color(0xFF757575),
-    'darkGrey': Color(0xFF424242),
-    'charcoal': Color(0xFF37474F),
-    'steel': Color(0xFF607D8B),
-
-    // Nature tones - soothing
-    'brown': Color(0xFF8D6E63),
-    'coffee': Color(0xFF5D4037),
-    'olive': Color(0xFF827717),
+    // Greens & Nature
+    'green': Color(0xFF4CAF50),
     'forest': Color(0xFF2E7D32),
 
-    // Cool tones - modern and accessible
-    'cyan': Color(0xFF00BCD4),
-    'turquoise': Color(0xFF00ACC1),
-    'aqua': Color(0xFF0097A7),
-    'jade': Color(0xFF00796B),
+    // Warm & Earthy
+    'orange': Color(0xFFFF9800),
+    'amber': Color(0xFFFFC107),
+    'brown': Color(0xFF8D6E63),
+
+    // Purples & Deep Tones
+    'indigo': Color(0xFF3F51B5),
+    'deepPurple': Color(0xFF673AB7),
+
   };
 
 }

@@ -632,7 +632,7 @@ class AddRemindersSection extends StatelessWidget {
                               return ReminderItem(
                                 reminder: reminders[index],
                                 onTap: () async {
-                                  await showReminderDialog(
+                                  await _showReminderDialog(
                                     context,
                                     edit: true,
                                     reminder: reminders[index],
@@ -649,7 +649,7 @@ class AddRemindersSection extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton.icon(
-                      onPressed: () => showReminderDialog(context),
+                      onPressed: () => _showReminderDialog(context),
                       icon: const Icon(Icons.add),
                       label: Text(
                         g.taskSc.startTime == null ? 'Add Reminder' : 'Add Custom Reminder',
@@ -1153,7 +1153,7 @@ class _ReminderDialogState extends State<ReminderDialog> {
   }
 }
 
-Future<void> showReminderDialog(
+Future<void> _showReminderDialog(
   BuildContext context, {
   bool edit = false,
   Reminder? reminder,

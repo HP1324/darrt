@@ -5,9 +5,12 @@ import 'package:darrt/habits/build/models/build_habit_target.dart';
 import 'package:darrt/habits/build/state/build_habit_state.dart';
 import 'package:darrt/app/state/controllers/state_controller.dart';
 import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/messages.dart';
+import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/task/models/reminder.dart';
 import 'package:darrt/task/models/repeat_config.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class BuildHabitStateController extends StateController<BuildHabitState, BuildHabit> {
@@ -230,18 +233,31 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
     );
     notifyListeners();
   }
-  void putReminder({required Reminder reminder, required bool edit}) {
+  ///Add or edit a reminder.
+  ///[oldReminder] is necessary to provide when editing task to match if this reminder exists
+  String putReminder({bool edit = false, required Reminder reminder, Reminder? oldReminder}) {
     List<Reminder> updatedReminders = List.from(reminders);
+    if (kDebugMode) {
+      MiniLogger.dp('All Reminders');
+      for (var reminder in updatedReminders) {
+        MiniLogger.dp('Reminder: ${reminder.time.hour}:${reminder.time.minute}');
+      }
+      MiniLogger.dp('All reminders');
+    }
     if (edit) {
-      final index = updatedReminders.indexWhere((r) => r.time == reminder.time);
+      final index = updatedReminders.indexWhere((r) => r.time == oldReminder!.time);
+      MiniLogger.dp('this is index: $index');
       if (index != -1) {
         updatedReminders[index] = reminder;
       }
     } else {
-      updatedReminders = [...updatedReminders, reminder];
+      final exists = updatedReminders.any((r) => r.time.isAtSameTimeAs(reminder.time));
+      if (exists) return Messages.mReminderExists;
+      updatedReminders.add(reminder);
     }
     state = state.copyWith(reminders: updatedReminders);
     notifyListeners();
+    return Messages.mReminderAdded;
   }
 
   void removeReminder(Reminder reminder) {
