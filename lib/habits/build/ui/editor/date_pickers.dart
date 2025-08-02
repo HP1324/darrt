@@ -3,7 +3,6 @@ import 'package:darrt/habits/build/ui/editor/habit_text_field.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
-
 class StartDatePicker extends StatefulWidget {
   const StartDatePicker();
 
@@ -12,6 +11,23 @@ class StartDatePicker extends StatefulWidget {
 }
 
 class _StartDatePickerState extends State<StartDatePicker> {
+  late final TextEditingController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = TextEditingController();
+    _updateDateText();
+  }
+
+  void _updateDateText() {
+    final startDate = g.buildHabitSc.startDate;
+    final dateText = DateUtils.isSameDay(DateTime.now(), startDate)
+        ? 'Today'
+        : formatDateNoJm(startDate, 'dd/MM/yyyy');
+    controller.text = dateText;
+  }
+
   Future<void> _selectDate() async {
     final currentDate = g.buildHabitSc.startDate;
     final endDate = g.buildHabitSc.endDate;
@@ -40,7 +56,14 @@ class _StartDatePickerState extends State<StartDatePicker> {
 
     if (selectedDate != null) {
       g.buildHabitSc.setStartDate(selectedDate);
+      _updateDateText(); // Add this line to update the display
     }
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -49,6 +72,7 @@ class _StartDatePickerState extends State<StartDatePicker> {
     final color = getColorFromString(g.buildHabitSc.color) ?? scheme.primary;
 
     return HabitTextField(
+      controller: controller, // Add the controller
       labelText: 'Start date',
       readOnly: true,
       onTap: _selectDate,
@@ -59,6 +83,7 @@ class _StartDatePickerState extends State<StartDatePicker> {
             IconButton(
               onPressed: () {
                 g.buildHabitSc.resetStartDate();
+                _updateDateText(); // Update text when reset
               },
               icon: Icon(Icons.clear, color: color),
               padding: EdgeInsets.zero,
@@ -71,6 +96,7 @@ class _StartDatePickerState extends State<StartDatePicker> {
     );
   }
 }
+
 
 class EndDatePicker extends StatefulWidget {
   const EndDatePicker();

@@ -162,6 +162,74 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
     notifyListeners();
   }
 
+  void setRepeatType(String type) {
+    state = state.copyWith(repeatConfig: repeatConfig.copyWith(type: type));
+    notifyListeners();
+  }
+
+  void updateWeekdayValidity() {
+    var config = repeatConfig;
+    if (config.type != 'weekly') return;
+
+    List<int> validWeekdays = [];
+
+    // Filter out invalid weekdays
+    for (var day in config.days) {
+      if (isWeekdayValid(day)) {
+        validWeekdays.add(day);
+      }
+    }
+
+    // If nothing valid is left, pick first valid weekday from range
+    if (validWeekdays.isEmpty) {
+      for (int i = 1; i <= 7; i++) {
+        if (isWeekdayValid(i)) {
+          validWeekdays.add(i);
+          break;
+        }
+      }
+    }
+    config.days = validWeekdays;
+    // config = config.copyWith(days: validWeekdays);
+  }
+
+  bool isWeekdayValid(int weekday) {
+    if (endDate == null) return true;
+
+    var date = startDate;
+    if (date.weekday == weekday) {
+      return true;
+    }
+
+    // Move forward from start date to find the next matching weekday
+    while (date.isBefore(endDate!)) {
+      date = date.add(const Duration(days: 1));
+      if (date.weekday == weekday) {
+        return true; // found a valid day in the range
+      }
+    }
+
+    // No matching weekday found in range
+    return false;
+  }
+
+  void toggleWeekday(int day, bool selected) {
+    final updatedDays = List<int>.from(repeatConfig.days);
+    if (selected) {
+      if (!updatedDays.contains(day)) {
+        updatedDays.add(day);
+      }
+    } else {
+      if (updatedDays.length > 1) {
+        updatedDays.remove(day);
+      }
+    }
+    updatedDays.sort();
+    state = state.copyWith(
+      repeatConfig: RepeatConfig(type: repeatConfig.type, days: updatedDays),
+    );
+    notifyListeners();
+  }
   void putReminder({required Reminder reminder, required bool edit}) {
     List<Reminder> updatedReminders = List.from(reminders);
     if (edit) {

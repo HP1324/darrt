@@ -8,6 +8,7 @@ import 'package:darrt/habits/build/ui/editor/description_field.dart';
 import 'package:darrt/habits/build/ui/editor/name_field.dart';
 import 'package:darrt/habits/build/ui/editor/habit_text_field.dart';
 import 'package:darrt/habits/build/ui/editor/measurement_type_selector.dart';
+import 'package:darrt/habits/build/ui/editor/repeat_section.dart';
 import 'package:darrt/habits/build/ui/editor/target_selector.dart';
 import 'package:darrt/habits/build/ui/editor/time_pickers.dart';
 import 'package:darrt/habits/build/ui/editor/unit_field.dart';
@@ -46,10 +47,12 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
     return ListenableBuilder(
       listenable: g.buildHabitSc,
       builder: (context, child) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         return Scaffold(
-          backgroundColor: getLerpedColor(context, getColorFromString(g.buildHabitSc.color)),
+          //TODO: check this out //  isDark ? Color(0xFF1E1E1E) :
+          backgroundColor: isDark ? Color(0xFF1E1E1E) :getLerpedColor(context, getColorFromString(g.buildHabitSc.color)),
           appBar: AppBar(
-            backgroundColor: getLerpedColor(context, getColorFromString(g.buildHabitSc.color)),
+            backgroundColor: isDark ? Color(0xFF1E1E1E) :getLerpedColor(context, getColorFromString(g.buildHabitSc.color)),
             leading: BackButton(),
             title: FittedBox(child: Text(widget.edit ? widget.habit!.name : 'Build A New Habit')),
           ),
@@ -63,8 +66,8 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
                   Row(
                     children: [
                       Expanded(child: HabitNameField()),
-                      const SizedBox(width: 12),
-                      HabitColorPicker(),
+                      // const SizedBox(width: 12),
+                      // HabitColorPicker(),
                     ],
                   ),
                   HabitDescriptionField(),
@@ -73,6 +76,12 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
                     children: [
                       Expanded(child: StartDatePicker()),
                       Expanded(child: EndDatePicker()),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      RepeatTypeSelector(),
+                      if (g.buildHabitSc.repeatConfig.type == 'weekly') WeekdaySelector(),
                     ],
                   ),
                   MeasurementTypeSelector(),
@@ -87,11 +96,11 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
                             ],
                           )
                         : Column(
-                          children: [
-                            UnitField(),
-                            TargetSelector(),
-                          ],
-                        ),
+                            children: [
+                              UnitField(),
+                              TargetSelector(),
+                            ],
+                          ),
                   ),
                 ],
               ),
@@ -102,14 +111,3 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-

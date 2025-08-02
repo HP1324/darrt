@@ -33,30 +33,40 @@ class HabitTextField extends StatelessWidget {
     final scheme = ColorScheme.of(context);
     final color = getColorFromString(g.buildHabitSc.color) ?? scheme.primary;
 
-    return TextField(
-      keyboardType: keyboardType,
-      controller: controller,
-      focusNode: focusNode,
-      enabled: enabled,
-      readOnly: readOnly,
-      autofocus: autoFocus,
-      onTap: onTap,
-      decoration: InputDecoration(
-        hintText: hintText,
-        labelText: labelText,
-        suffixIcon: suffixIcon,
-        labelStyle: TextStyle(color: color),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: color),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: color),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: color, width: 2),
+    return SizedBox(
+      height: 55,
+      child: TextField(
+        keyboardType: keyboardType,
+        controller: controller,
+        focusNode: focusNode,
+        enabled: enabled,
+        readOnly: readOnly,
+        autofocus: autoFocus,
+        onTap: onTap,
+        decoration: InputDecoration(
+          hintText: hintText,
+          labelText: labelText,
+          suffixIcon: suffixIcon,
+          labelStyle: TextStyle(color: color),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: color,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: color,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: color,
+              width: 2,
+            ),
+          ),
         ),
       ),
     );
