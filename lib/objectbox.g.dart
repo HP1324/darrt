@@ -591,31 +591,31 @@ final _entities = <obx_int.ModelEntity>[
     backlinks: <obx_int.ModelBacklink>[],
   ),
   obx_int.ModelEntity(
-    id: const obx_int.IdUid(24, 7389139720940030233),
+    id: const obx_int.IdUid(26, 6194129653980776374),
     name: 'QuitHabit',
-    lastPropertyId: const obx_int.IdUid(4, 7532712773254921199),
+    lastPropertyId: const obx_int.IdUid(4, 52449165482333282),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 1444912687164528587),
+        id: const obx_int.IdUid(1, 2136463867782674045),
         name: 'id',
         type: 6,
         flags: 1,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 4428255611688628208),
+        id: const obx_int.IdUid(2, 7831621557627309882),
         name: 'name',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 5623951069578105763),
+        id: const obx_int.IdUid(3, 5765942802577043586),
         name: 'relapses',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 7532712773254921199),
+        id: const obx_int.IdUid(4, 52449165482333282),
         name: 'uuid',
         type: 9,
         flags: 0,
@@ -664,7 +664,7 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(24, 7389139720940030233),
+    lastEntityId: const obx_int.IdUid(26, 6194129653980776374),
     lastIndexId: const obx_int.IdUid(8, 1338747343039691092),
     lastRelationId: const obx_int.IdUid(3, 6757657595076491625),
     lastSequenceId: const obx_int.IdUid(0, 0),
@@ -683,6 +683,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
       6926195304423774827,
       5942726025178938996,
       6297732843899120821,
+      7389139720940030233,
+      1243552072229383896,
     ],
     retiredIndexUids: const [],
     retiredPropertyUids: const [
@@ -784,6 +786,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
       7311629415618805693,
       1077784722884705863,
       3140299622951637853,
+      1444912687164528587,
+      4428255611688628208,
+      5623951069578105763,
+      7532712773254921199,
+      4354336278224589948,
+      8146460766606777727,
+      8848769609903730247,
+      2602144198210229531,
     ],
     retiredRelationUids: const [],
     modelVersion: 5,
@@ -1606,13 +1616,18 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final nameParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 6, '');
+        final relapsesParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 8);
         final uuidParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 10, '');
-        final object = QuitHabit(id: idParam, name: nameParam, uuid: uuidParam)
-          ..relapses = const fb.StringReader(
-            asciiOptimization: true,
-          ).vTableGetNullable(buffer, rootOffset, 8);
+        final object = QuitHabit(
+          id: idParam,
+          name: nameParam,
+          relapses: relapsesParam,
+          uuid: uuidParam,
+        );
 
         return object;
       },
