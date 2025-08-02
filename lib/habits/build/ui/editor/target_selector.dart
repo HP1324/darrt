@@ -14,27 +14,31 @@ class TargetSelector extends StatefulWidget {
 class _TargetSelectorState extends State<TargetSelector> {
   Icon icon = Icon(Icons.add_circle_outline_rounded);
   bool isExpanded = false;
+  late VoidCallback _unitListener;
   String unitText = '';
 
   @override
   void initState() {
     super.initState();
-    g.buildHabitSc.unitController.addListener(() {
+    _unitListener = () {
+      if (!mounted) return;
       setState(() {
         unitText = g.buildHabitSc.unitController.text;
       });
-    });
+    };
+    g.buildHabitSc.unitController.addListener(_unitListener);
   }
 
   @override
+  void dispose(){
+    g.buildHabitSc.removeListener(_unitListener);
+    super.dispose();
+  }
+  @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: g.buildHabitSc,
-      builder: (context, child) {
-        final scheme = ColorScheme.of(context);
-        final color = getColorFromString(g.buildHabitSc.color) ?? scheme.primary;
-
-        return ExpansionTile(
+    final scheme = ColorScheme.of(context);
+    final color = getColorFromString(g.buildHabitSc.color) ?? scheme.primary;
+    return  ExpansionTile(
           onExpansionChanged: (expanded) {
             setState(() {
               isExpanded = expanded;
@@ -69,8 +73,6 @@ class _TargetSelectorState extends State<TargetSelector> {
             ),
           ],
         );
-      },
-    );
   }
 }
 
@@ -92,6 +94,7 @@ class TargetItem extends StatefulWidget {
 class _TargetItemState extends State<TargetItem> {
   late TextEditingController _controller;
   late FocusNode _focusNode;
+  late VoidCallback _unitListener;
   Timer? _longPressTimer;
   bool _isLongPressing = false;
 
@@ -123,11 +126,15 @@ class _TargetItemState extends State<TargetItem> {
   void _startLongPressIncrement() {
     _isLongPressing = true;
     _longPressTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-      if (_isLongPressing) {
-        _increment();
-      } else {
+      if (!_isLongPressing) {
         timer.cancel();
+        return;
       }
+      if (!mounted) {  // <--- Add this mounted check
+        timer.cancel();
+        return;
+      }
+      _increment();
     });
   }
 
@@ -135,14 +142,19 @@ class _TargetItemState extends State<TargetItem> {
     if (widget.targetCount > 0) {
       _isLongPressing = true;
       _longPressTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-        if (_isLongPressing && widget.targetCount > 0) {
-          _decrement();
-        } else {
+        if (!_isLongPressing || widget.targetCount <= 0) {
           timer.cancel();
+          return;
         }
+        if (!mounted) {  // <--- Add this mounted check
+          timer.cancel();
+          return;
+        }
+        _decrement();
       });
     }
   }
+
 
   void _stopLongPress() {
     _isLongPressing = false;

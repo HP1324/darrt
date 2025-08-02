@@ -8,6 +8,7 @@ import 'package:darrt/helpers/consts.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/messages.dart';
 import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/task/models/reminder.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +20,7 @@ class ReminderSection extends StatelessWidget {
     final theme = Theme.of(context);
     return InkWell(
       onTap: () async {
-        g.buildHabitSc.textFieldNode.unfocus();
+        FocusScope.of(context).unfocus();
         final allowed = await AwesomeNotifications().isNotificationAllowed();
         if (context.mounted) {
           if ((allowed || await NotificationService.showNotificationRationale(context)) &&
@@ -29,17 +30,18 @@ class ReminderSection extends StatelessWidget {
         }
       },
       child: Row(
-        children:[
-        Icon( Icons.notification_add_outlined),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Reminders',
-                style: theme.textTheme.titleSmall,
-              ),
-              Expanded(
-                child: ListenableBuilder(
+        children: [
+          Icon(Icons.notification_add_outlined,color: getColorFromString(g.buildHabitSc.color)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Reminders',
+                  style: theme.textTheme.titleSmall,
+                ),
+                ListenableBuilder(
                   listenable: g.buildHabitSc,
                   builder: (context, child) {
                     final reminders = g.buildHabitSc.reminders;
@@ -51,8 +53,8 @@ class ReminderSection extends StatelessWidget {
                     );
                   },
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           IconButton(
             onPressed: () {
@@ -61,9 +63,7 @@ class ReminderSection extends StatelessWidget {
             },
             icon: Icon(Icons.info_outline),
           ),
-        ]
-
-
+        ],
       ),
     );
   }
@@ -137,32 +137,32 @@ class ReminderSection extends StatelessWidget {
                   Flexible(
                     child: reminders.isEmpty
                         ? Center(
-                      child: Text(
-                        'No reminders set',
-                        style: textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
-                      ),
-                    )
+                            child: Text(
+                              'No reminders set',
+                              style: textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
+                            ),
+                          )
                         : ListView.builder(
-                      itemCount: reminders.length,
-                      itemBuilder: (context, index) {
-                        MiniLogger.dp(
-                          'Reminder ${index + 1} time in list: ${reminders[index].time.hour}:${reminders[index].time.minute}',
-                        );
-                        return HabitReminderItem(
-                          reminder: reminders[index],
-                          onTap: () async {
-                            await _showReminderDialog(
-                              context,
-                              edit: true,
-                              reminder: reminders[index],
-                            );
-                          },
-                          onRemove: () {
-                            g.buildHabitSc.removeReminder(reminders[index]);
-                          },
-                        );
-                      },
-                    ),
+                            itemCount: reminders.length,
+                            itemBuilder: (context, index) {
+                              MiniLogger.dp(
+                                'Reminder ${index + 1} time in list: ${reminders[index].time.hour}:${reminders[index].time.minute}',
+                              );
+                              return HabitReminderItem(
+                                reminder: reminders[index],
+                                onTap: () async {
+                                  await _showReminderDialog(
+                                    context,
+                                    edit: true,
+                                    reminder: reminders[index],
+                                  );
+                                },
+                                onRemove: () {
+                                  g.buildHabitSc.removeReminder(reminders[index]);
+                                },
+                              );
+                            },
+                          ),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
@@ -184,11 +184,12 @@ class ReminderSection extends StatelessWidget {
     );
   }
 }
+
 Future<void> _showReminderDialog(
-    BuildContext context, {
-      bool edit = false,
-      Reminder? reminder,
-    }) async {
+  BuildContext context, {
+  bool edit = false,
+  Reminder? reminder,
+}) async {
   MiniLogger.dp('Reminder time: ${reminder?.time.hour}:${reminder?.time.minute}');
   await showAdaptiveDialog(
     context: context,
@@ -209,6 +210,7 @@ Future<void> _showReminderDialog(
     ),
   );
 }
+
 class EasyReminderActions extends StatelessWidget {
   const EasyReminderActions({super.key});
 

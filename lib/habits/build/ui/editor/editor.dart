@@ -3,16 +3,19 @@ import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/habits/build/models/build_habit.dart';
 import 'package:darrt/habits/build/state/build_habit_state_controller.dart';
 import 'package:darrt/habits/build/ui/editor/date_pickers.dart';
+import 'package:darrt/habits/build/ui/editor/habit_category_selector.dart';
 import 'package:darrt/habits/build/ui/editor/habit_color_picker.dart';
 import 'package:darrt/habits/build/ui/editor/description_field.dart';
 import 'package:darrt/habits/build/ui/editor/name_field.dart';
 import 'package:darrt/habits/build/ui/editor/habit_text_field.dart';
 import 'package:darrt/habits/build/ui/editor/measurement_type_selector.dart';
+import 'package:darrt/habits/build/ui/editor/reminder_section.dart';
 import 'package:darrt/habits/build/ui/editor/repeat_section.dart';
 import 'package:darrt/habits/build/ui/editor/target_selector.dart';
 import 'package:darrt/habits/build/ui/editor/time_pickers.dart';
 import 'package:darrt/habits/build/ui/editor/unit_field.dart';
 import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/messages.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -50,9 +53,13 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return Scaffold(
           //TODO: check this out //  isDark ? Color(0xFF1E1E1E) :
-          backgroundColor: isDark ? Color(0xFF1E1E1E) :getLerpedColor(context, getColorFromString(g.buildHabitSc.color)),
+          backgroundColor: isDark
+              ? Color(0xFF1E1E1E)
+              : getLerpedColor(context, getColorFromString(g.buildHabitSc.color)),
           appBar: AppBar(
-            backgroundColor: isDark ? Color(0xFF1E1E1E) :getLerpedColor(context, getColorFromString(g.buildHabitSc.color)),
+            backgroundColor: isDark
+                ? Color(0xFF1E1E1E)
+                : getLerpedColor(context, getColorFromString(g.buildHabitSc.color)),
             leading: BackButton(),
             title: FittedBox(child: Text(widget.edit ? widget.habit!.name : 'Build A New Habit')),
           ),
@@ -66,8 +73,8 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
                   Row(
                     children: [
                       Expanded(child: HabitNameField()),
-                      // const SizedBox(width: 12),
-                      // HabitColorPicker(),
+                      const SizedBox(width: 12),
+                      HabitColorPicker(),
                     ],
                   ),
                   HabitDescriptionField(),
@@ -84,6 +91,8 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
                       if (g.buildHabitSc.repeatConfig.type == 'weekly') WeekdaySelector(),
                     ],
                   ),
+                  ReminderSection(),
+                  HabitCategorySelector(),
                   MeasurementTypeSelector(),
                   AnimatedSwitcher(
                     duration: Duration(milliseconds: 390),
@@ -102,12 +111,30 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
                             ],
                           ),
                   ),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
           ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              _putHabit(context);
+            },
+            backgroundColor: getColorFromString(g.buildHabitSc.color),
+            child: Icon(Icons.done),
+          ),
         );
       },
     );
+  }
+  void _putHabit(BuildContext context) {
+    BuildHabit newHabit = g.buildHabitSc.buildModel(edit: widget.edit, model: widget.habit);
+    final message = g.buildHabitVm.putItem(newHabit, edit: widget.edit);
+    if (message == Messages.mHabitCreated|| message == Messages.mHabitEdited) {
+      showSuccessToast(context, message);
+      Navigator.pop(context);
+    } else {
+      showErrorToast(context, message);
+    }
   }
 }

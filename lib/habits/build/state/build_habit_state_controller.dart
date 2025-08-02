@@ -70,6 +70,9 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
     textController.clear();
     descriptionController.clear();
     unitController.clear();
+    startTimeController.clear();
+    endTimeController.clear();
+
   }
 
 
@@ -127,8 +130,8 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
 
   void resetStartTime() {
     state = state.copyWith(startTime: null, endTime: null);
-    startTimeController.text = '';
-    endTimeController.text = '';
+    startTimeController.clear();
+    endTimeController.clear();
     notifyListeners();
   }
 
@@ -157,6 +160,11 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
 
   void setMeasurementType(MeasurementType type) {
     state = state.copyWith(measurementType: type);
+    if(type == MeasurementType.count){
+      state = state.copyWith( startTime: null, endTime: null);
+      startTimeController.clear();
+      endTimeController.clear();
+    }
     notifyListeners();
   }
 

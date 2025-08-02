@@ -1,3 +1,4 @@
+import 'package:darrt/habits/build/models/build_habit.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/task/models/task.dart';
 import 'package:objectbox/objectbox.dart';
@@ -19,7 +20,8 @@ class EntityCategory {
   final String uuid;
   @Backlink('categories')
   final tasks = ToMany<Task>();
-
+  @Backlink('categories')
+  final buildHabits = ToMany<BuildHabit>();
 
   @override
   bool operator ==(Object other) {

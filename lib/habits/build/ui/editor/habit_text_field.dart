@@ -16,6 +16,7 @@ class HabitTextField extends StatelessWidget {
     this.readOnly = false,
     this.onTap,
     this.suffixIcon,
+    this.maxLines,
   });
   final TextEditingController? controller;
   final String labelText;
@@ -27,45 +28,45 @@ class HabitTextField extends StatelessWidget {
   final bool readOnly;
   final VoidCallback? onTap;
   final Widget? suffixIcon;
-
+  final int? maxLines;
   @override
   Widget build(BuildContext context) {
     final scheme = ColorScheme.of(context);
     final color = getColorFromString(g.buildHabitSc.color) ?? scheme.primary;
 
-    return SizedBox(
-      height: 55,
-      child: TextField(
-        keyboardType: keyboardType,
-        controller: controller,
-        focusNode: focusNode,
-        enabled: enabled,
-        readOnly: readOnly,
-        autofocus: autoFocus,
-        onTap: onTap,
-        decoration: InputDecoration(
-          hintText: hintText,
-          labelText: labelText,
-          suffixIcon: suffixIcon,
-          labelStyle: TextStyle(color: color),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(
-              color: color,
-            ),
+    return TextField(
+      keyboardType: keyboardType,
+      controller: controller,
+      focusNode: focusNode,
+      enabled: enabled,
+      readOnly: readOnly,
+      autofocus: autoFocus,
+      onTap: onTap,
+      maxLines: maxLines,
+      style: TextStyle(color: scheme.onSurface),
+      decoration: InputDecoration(
+        hintText: hintText,
+        labelText: labelText,
+        suffixIcon: suffixIcon,
+        hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8)),
+        labelStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: scheme.outline,
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(
-              color: color,
-            ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: scheme.outline,
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(
-              color: color,
-              width: 2,
-            ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: scheme.outline,
+            width: 2,
           ),
         ),
       ),

@@ -1,8 +1,29 @@
+import 'package:darrt/app/notification/notification_service.dart';
 import 'package:darrt/app/state/viewmodels/view_model.dart';
 import 'package:darrt/habits/build/models/build_habit.dart';
+import 'package:darrt/habits/habit_notification_service.dart';
 import 'package:darrt/helpers/messages.dart';
 
 class BuildHabitViewModel extends ViewModel<BuildHabit>{
+
+  @override
+  String putItem(BuildHabit item, {required bool edit}) {
+    final habit = item;
+    final name = habit.name.trim();
+
+    if (name.isEmpty) return Messages.mHabitEmpty;
+    habit.name= name;
+
+    final message = super.putItem(habit, edit: edit);
+
+    HabitNotificationService.removeAllHabitNotifications(habit).then((_){
+      HabitNotificationService.createHabitNotifications(habit);
+    });
+
+    return message;
+  }
+
+
   @override
   List<BuildHabit> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
     return jsonList.map(BuildHabit.fromJson).toList();

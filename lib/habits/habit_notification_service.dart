@@ -267,4 +267,18 @@ class HabitNotificationService{
 
   static int get notificationId => DateTime.now().millisecondsSinceEpoch.remainder(100000);
 
+
+  static Future<void> removeAllHabitNotifications(BuildHabit habit) async {
+    try {
+      if (habit.reminders == null) {
+        return;
+      } else {
+        await _notif.cancelNotificationsByGroupKey(habit.id.toString());
+      }
+    } catch (e, stacktrace) {
+      MiniLogger.e(
+        'Error removing notification: ${e.toString()}\n$stacktrace\nError type: ${e.runtimeType}',
+      );
+    }
+  }
 }

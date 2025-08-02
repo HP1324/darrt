@@ -121,8 +121,14 @@ class TaskStateController extends StateController<TaskState, Task> {
         notes: Note.notesToJsonString(notes),
       );
     }
+    assignSelectedCategories(task);
+    taskCount++;
+    return task;
+  }
+
+  void assignSelectedCategories(Task task) {
     final categories = g.catVm.categories
-        .where((c) => g.taskSc.categorySelection[c] == true)
+        .where((c) => categorySelection[c] == true)
         .toList();
     task.categories.clear();
     if (categories.isEmpty) {
@@ -134,11 +140,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       task.categories.addAll(categories);
       task.categoryUuids = categories.map((c) => c.uuid).toList();
     }
-    taskCount++;
-    return task;
   }
-
-
 
   void setCategory(EntityCategory category, bool value) {
     state = state.copyWith(categorySelection: {...categorySelection, category: value});
