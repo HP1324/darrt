@@ -8,7 +8,7 @@ abstract class RelapseEntry with _$RelapseEntry {
 
   static String toJsonString(List<RelapseEntry> relapses) {
     final map = relapses.map(
-      (relapse) => {"date": relapse.dateTime.millisecondsSinceEpoch, "trigger": relapse.trigger},
+      (relapse) => {"dateTime": relapse.dateTime.millisecondsSinceEpoch, "trigger": relapse.trigger},
     );
     return jsonEncode(map);
   }
@@ -17,7 +17,7 @@ abstract class RelapseEntry with _$RelapseEntry {
     final List<dynamic> data = jsonDecode(json);
     return data.map((item) {
       return RelapseEntry(
-        dateTime: DateTime.fromMillisecondsSinceEpoch(item['date']),
+        dateTime: DateTime.fromMillisecondsSinceEpoch(item['dateTime']),
         trigger: item['trigger'],
       );
     }).toList();
