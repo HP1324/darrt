@@ -325,7 +325,7 @@
     },
     {
       "id": "22:2963082835627357693",
-      "lastPropertyId": "19:3727464044542990275",
+      "lastPropertyId": "20:8021575706145800585",
       "name": "BuildHabit",
       "properties": [
         {
@@ -403,6 +403,11 @@
           "id": "19:3727464044542990275",
           "name": "target",
           "type": 9
+        },
+        {
+          "id": "20:8021575706145800585",
+          "name": "stats",
+          "type": 9
         }
       ],
       "relations": [
@@ -415,7 +420,7 @@
     },
     {
       "id": "23:409088433803233745",
-      "lastPropertyId": "5:6592232340286965425",
+      "lastPropertyId": "6:3409687907561479404",
       "name": "HabitCompletion",
       "properties": [
         {
@@ -446,6 +451,11 @@
           "flags": 520,
           "indexId": "8:1338747343039691092",
           "relationTarget": "BuildHabit"
+        },
+        {
+          "id": "6:3409687907561479404",
+          "name": "isDone",
+          "type": 1
         }
       ],
       "relations": []

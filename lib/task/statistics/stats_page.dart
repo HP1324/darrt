@@ -253,7 +253,7 @@ class ChartToggleWidget extends StatefulWidget {
   });
 
   final Task task;
-  final TaskStats stats;
+  final BuildHabitStats stats;
 
   @override
   State<ChartToggleWidget> createState() => _ChartToggleWidgetState();
@@ -354,7 +354,7 @@ class WeeklyChart extends StatelessWidget {
   });
 
   final Task task;
-  final TaskStats stats;
+  final BuildHabitStats stats;
 
   @override
   Widget build(BuildContext context) {
@@ -595,7 +595,7 @@ class MonthlyChart extends StatelessWidget {
   });
 
   final Task task;
-  final TaskStats stats;
+  final BuildHabitStats stats;
 
   @override
   Widget build(BuildContext context) {
@@ -822,7 +822,7 @@ class YearlyChart extends StatelessWidget {
   });
 
   final Task task;
-  final TaskStats stats;
+  final BuildHabitStats stats;
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,5 @@
 import 'package:darrt/habits/build/models/build_habit.dart';
+import 'package:darrt/habits/build/models/habit_completion.dart';
 import 'package:darrt/habits/quit/models/quit_habit.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:darrt/app/services/boxpref.dart';
@@ -56,6 +57,7 @@ class ObjectBox {
 
   Box<QuitHabit> get quitHabitBox => _store!.box<QuitHabit>();
 
+  Box<HabitCompletion> get habitCompletionBox => _store!.box<HabitCompletion>();
   void close() {
     _store!.close();
   }

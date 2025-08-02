@@ -8,6 +8,7 @@ class HabitCompletion{
   DateTime date;
   String? habitUuid;
   String? uuid;
+  bool isDone;
   final habit = ToOne<BuildHabit>();
-  HabitCompletion({this.id = 0, required this.date, String? habitUuid, String? uuid}) : habitUuid = habitUuid ?? '', uuid = uuid ?? '';
+  HabitCompletion({this.id = 0, required this.date, this.isDone = false,String? habitUuid, String? uuid}) : habitUuid = habitUuid ?? '', uuid = uuid ?? '';
 }

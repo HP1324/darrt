@@ -11,7 +11,7 @@ class BuildHabit {
   @Id()
   int id;
   String name, measurementType, repeatConfig;
-  String? description, color, reminders,unit, target;
+  String? description, color, reminders,unit, target, stats;
   DateTime startDate;
   DateTime? endDate, startTime, endTime;
   List<String> categoryUuids;
@@ -33,6 +33,7 @@ class BuildHabit {
     this.startTime,
     this.endTime,
     this.reminders,
+    this.stats,
     this.color = 'primary',
     this.target,
     DateTime? startDate,

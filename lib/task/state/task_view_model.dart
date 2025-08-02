@@ -292,10 +292,10 @@ class TaskViewModel extends ViewModel<Task> {
     taskTimerNotes = Note.notesFromJsonString(task.notes);
   }
 
-  TaskStats? currentTaskStats = TaskStats();
+  BuildHabitStats? currentTaskStats = BuildHabitStats();
 
   void initTaskStats(Task task) {
-    currentTaskStats = TaskStats.fromJsonString(task.stats);
+    currentTaskStats = BuildHabitStats.fromJsonString(task.stats);
   }
 
   void updateTaskFromAppWideStateChanges(Task task) {
@@ -308,7 +308,7 @@ class TaskViewModel extends ViewModel<Task> {
 
   void performTaskStatsLogicAfterTaskFinish(Task task, DateTime dateOnly, [BuildContext? context]) {
     MiniLogger.dp('finish stats function called');
-    var stats = TaskStats.fromJsonString(task.stats);
+    var stats = BuildHabitStats.fromJsonString(task.stats);
     final List<DateTime> updatedCompletions = List<DateTime>.from(stats.completions);
     final today = DateUtils.dateOnly(DateTime.now());
     if (!updatedCompletions.contains(dateOnly)) {
@@ -353,7 +353,7 @@ class TaskViewModel extends ViewModel<Task> {
   }
 
   void performTaskStatsLogicAfterTaskUnfinish(Task task, DateTime dateOnly) {
-    final stats = TaskStats.fromJsonString(task.stats);
+    final stats = BuildHabitStats.fromJsonString(task.stats);
     final List<DateTime> updatedCompletions = List<DateTime>.from(stats.completions);
 
     final today = DateUtils.dateOnly(DateTime.now());
@@ -396,7 +396,7 @@ class TaskViewModel extends ViewModel<Task> {
     updateTaskFromAppWideStateChanges(task);
   }
 
-  void removeInvalidAchievements(Task task, TaskStats stats) {
+  void removeInvalidAchievements(Task task, BuildHabitStats stats) {
     MiniLogger.dp('remove invalid achievements called');
     final completions = List<DateTime>.from(stats.completions)..sort();
     final unlocked = stats.achievementUnlocks;
@@ -474,7 +474,7 @@ class TaskViewModel extends ViewModel<Task> {
 
   Future<void> checkAndHandleAchievements(
     Task task,
-    TaskStats stats, [
+    BuildHabitStats stats, [
     BuildContext? context,
   ]) async {
     Map<String,DateTime> unlocked = Map.from(stats.achievementUnlocks);
