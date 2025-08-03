@@ -112,53 +112,6 @@ class DraggableBuildHabitList extends StatefulWidget {
 }
 
 class _DraggableBuildHabitListState extends State<DraggableBuildHabitList> {
-  final List<Map<String, dynamic>> _habits = [
-    {
-      'id': '1',
-      'name': 'Drink Water',
-      'description': 'Stay hydrated throughout the day',
-      'progress': 0.6,
-      'targetValue': '8 glasses',
-      'currentValue': '5 glasses',
-      'isCompleted': false,
-    },
-    {
-      'id': '2',
-      'name': 'Morning Exercise',
-      'description': 'Start the day with 30 minutes of exercise',
-      'progress': 1.0,
-      'targetValue': '30 minutes',
-      'currentValue': '30 minutes',
-      'isCompleted': true,
-    },
-    {
-      'id': '3',
-      'name': 'Read Books',
-      'description': 'Read for at least 20 minutes daily',
-      'progress': 0.4,
-      'targetValue': '20 pages',
-      'currentValue': '8 pages',
-      'isCompleted': false,
-    },
-    {
-      'id': '4',
-      'name': 'Meditation',
-      'description': 'Practice mindfulness meditation',
-      'progress': 0.8,
-      'targetValue': '15 minutes',
-      'currentValue': '12 minutes',
-      'isCompleted': false,
-    },
-    {
-      'id': '5',
-      'name': 'Learn Programming',
-      'description': 'Practice coding for skill improvement',
-      'progress': 0.2,
-      'targetValue': '2 hours',
-      'currentValue': '25 minutes',
-      'isCompleted': false,
-    },
-  ];
 
   @override
   void dispose() {
@@ -167,53 +120,53 @@ class _DraggableBuildHabitListState extends State<DraggableBuildHabitList> {
 
   @override
   Widget build(BuildContext context) {
-    return ReorderableListView.builder(
-      buildDefaultDragHandles: true,
-      itemCount: _habits.length,
-      onReorder: (oldIndex, newIndex) {
-        setState(() {
-          if (newIndex > oldIndex) {
-            newIndex -= 1;
-          }
-          final item = _habits.removeAt(oldIndex);
-          _habits.insert(newIndex, item);
-        });
-      },
-      proxyDecorator: (child, index, animation) {
-        return AnimatedBuilder(
-          animation: animation,
-          builder: (BuildContext context, Widget? child) {
-            final double animValue = Curves.easeInOut.transform(animation.value);
-            final double elevation = lerpDouble(1, 8, animValue)!;
-            final double scale = lerpDouble(1, 1.02, animValue)!;
+    return ListenableBuilder(
+      listenable: Listenable.merge([g.buildHabitVm, g.habitCalMan]),
+      builder: (context,child) {
+        final habits = g.buildHabitVm.habits.where((h) => h.isActiveOn(g.habitCalMan.selectedDate)).toList();
+        return ReorderableListView.builder(
+          itemCount: habits.length,
+          onReorder: (oldIndex, newIndex) {
+            setState(() {
+              if (newIndex > oldIndex) {
+                newIndex -= 1;
+              }
+              final item = habits.removeAt(oldIndex);
+              habits.insert(newIndex, item);
+            });
+          },
+          proxyDecorator: (child, index, animation) {
+            return AnimatedBuilder(
+              animation: animation,
+              builder: (BuildContext context, Widget? child) {
+                final double animValue = Curves.easeInOut.transform(animation.value);
+                final double elevation = lerpDouble(1, 8, animValue)!;
+                final double scale = lerpDouble(1, 1.02, animValue)!;
 
-            return Transform.scale(
-              scale: scale,
-              child: Material(
-                elevation: elevation,
-                borderRadius: BorderRadius.circular(12),
-                child: child,
+                return Transform.scale(
+                  scale: scale,
+                  child: Material(
+                    elevation: elevation,
+                    borderRadius: BorderRadius.circular(12),
+                    child: child,
+                  ),
+                );
+              },
+              child: child,
+            );
+          },
+          itemBuilder: (context, index) {
+            final habit = habits[index];
+            return ReorderableDelayedDragStartListener(
+              key: ValueKey(habit.id),
+              index: index,
+              child: BuildHabitItem(
+                habit: habit,
               ),
             );
           },
-          child: child,
         );
-      },
-      itemBuilder: (context, index) {
-        final habit = _habits[index];
-        return ReorderableDelayedDragStartListener(
-          key: ValueKey(habit['id']),
-          index: index,
-          child: BuildHabitItem(
-            habitName: habit['name'],
-            description: habit['description'],
-            progress: habit['progress'],
-            targetValue: habit['targetValue'],
-            currentValue: habit['currentValue'],
-            isCompleted: habit['isCompleted'],
-          ),
-        );
-      },
+      }
     );
   }
 }

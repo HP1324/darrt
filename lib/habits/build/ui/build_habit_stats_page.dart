@@ -48,9 +48,9 @@ class _StatsPageState extends State<StatsPage> {
             const StreakDisplayWidget(),
             const SizedBox(height: 16),
             ListenableBuilder(
-              listenable: g.taskVm,
+              listenable: g.buildHabitVm,
               builder: (context, child) {
-                final stats = g.taskVm.currentTaskStats;
+                final stats = g.buildHabitVm.currentHabitStats;
                 if (stats == null) {
                   return const Center(child: CircularProgressIndicator());
                 }
@@ -117,9 +117,9 @@ class _AchievementsSection extends StatelessWidget {
           },
         ),
         ListenableBuilder(
-          listenable: g.taskVm,
+          listenable: g.buildHabitVm,
           builder: (context, child) {
-            final achievements = g.taskVm.currentTaskStats!.achievements;
+            final achievements = g.buildHabitVm.currentHabitStats!.achievements;
 
             return Container(
               padding: const EdgeInsets.all(10),
@@ -150,9 +150,9 @@ class StreakDisplayWidget extends StatelessWidget {
     final textTheme = TextTheme.of(context);
 
     return ListenableBuilder(
-      listenable: g.taskVm,
+      listenable: g.buildHabitVm,
       builder: (context, child) {
-        final stats = g.taskVm.currentTaskStats;
+        final stats = g.buildHabitVm.currentHabitStats;
         if (stats == null) return const SizedBox();
 
         final currentStreak = stats.currentStreakLength;

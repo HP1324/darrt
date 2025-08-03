@@ -105,9 +105,10 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
                             ],
                           )
                         : Column(
+                            spacing: 10,
                             children: [
                               UnitField(),
-                              TargetSelector(),
+                              DailyTarget(),
                             ],
                           ),
                   ),
@@ -127,10 +128,11 @@ class _BuildHabitEditorState extends State<BuildHabitEditor> {
       },
     );
   }
+
   void _putHabit(BuildContext context) {
     BuildHabit newHabit = g.buildHabitSc.buildModel(edit: widget.edit, model: widget.habit);
     final message = g.buildHabitVm.putItem(newHabit, edit: widget.edit);
-    if (message == Messages.mHabitCreated|| message == Messages.mHabitEdited) {
+    if (message == Messages.mHabitCreated || message == Messages.mHabitEdited) {
       showSuccessToast(context, message);
       Navigator.pop(context);
     } else {

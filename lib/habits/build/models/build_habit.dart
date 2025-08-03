@@ -11,7 +11,7 @@ class BuildHabit {
   @Id()
   int id;
   String name, measurementType, repeatConfig;
-  String? description, color, reminders,unit, target, completedTarget, stats;
+  String? description, color, reminders,unit, target, completedTarget, stats,targetCompletions;
   DateTime startDate;
   DateTime? endDate, startTime, endTime;
   List<String> categoryUuids;
@@ -36,6 +36,7 @@ class BuildHabit {
     this.stats,
     this.color = 'primary',
     this.target,
+    this.targetCompletions,
     DateTime? startDate,
     String? uuid,
     List<String>? categoryUuids,
@@ -62,8 +63,10 @@ class BuildHabit {
       'endTime': endTime?.millisecondsSinceEpoch,
       'reminders': reminders,
       'target': target,
+      'targetCompletions': targetCompletions,
       'color': color,
       'uuid': uuid,
+      'categoryUuids': categoryUuids,
     };
   }
 
@@ -89,6 +92,8 @@ class BuildHabit {
       reminders: json['reminders'],
       color: json['color'],
       uuid: json['uuid'],
+      categoryUuids: List<String>.from(json['categoryUuids']),
+      targetCompletions: json['targetCompletions'],
     );
   }
 
@@ -104,6 +109,7 @@ class BuildHabit {
     DateTime onlyDate(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
     final d = onlyDate(targetDate);
     final start = onlyDate(startDate);
+    print('start: $start, end: $endDate');
     final end = endDate != null ? onlyDate(endDate!) : null;
 
     final isInRange = d.isAtSameMomentAs(start) || d.isAfter(start);

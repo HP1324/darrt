@@ -1,4 +1,5 @@
 
+import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/category/models/entity_category.dart';
 import 'package:darrt/habits/build/models/build_habit.dart';
 import 'package:darrt/habits/build/models/build_habit_target.dart';
@@ -36,6 +37,9 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
       habit.endTime = endTime;
       habit.repeatConfig = repeatConfig.toJsonString();
       habit.reminders = Reminder.remindersToJsonString(reminders);
+      habit.color = color;
+      habit.target = target.toJsonString();
+      habit.measurementType = measurementType.name;
     } else {
       habit = BuildHabit(
         name: textController.text,
@@ -51,7 +55,23 @@ class BuildHabitStateController extends StateController<BuildHabitState, BuildHa
         target: target.toJsonString(),
       );
     }
+    assignSelectedCategories(habit);
     return habit;
+  }
+  void assignSelectedCategories(BuildHabit habit) {
+    final categories = g.catVm.categories
+        .where((c) => categorySelection[c] == true)
+        .toList();
+    habit.categories.clear();
+    if (categories.isEmpty) {
+      final generalCategory =
+          ObjectBox().categoryBox.get(1) ?? EntityCategory(id: 1, name: 'General');
+      habit.categories.add(generalCategory);
+      habit.categoryUuids = [generalCategory.uuid];
+    } else {
+      habit.categories.addAll(categories);
+      habit.categoryUuids = categories.map((c) => c.uuid).toList();
+    }
   }
 
   @override

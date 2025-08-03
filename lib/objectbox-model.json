@@ -325,7 +325,7 @@
     },
     {
       "id": "22:2963082835627357693",
-      "lastPropertyId": "21:3762458279347625590",
+      "lastPropertyId": "22:4131706911318625688",
       "name": "BuildHabit",
       "properties": [
         {
@@ -412,6 +412,11 @@
         {
           "id": "21:3762458279347625590",
           "name": "completedTarget",
+          "type": 9
+        },
+        {
+          "id": "22:4131706911318625688",
+          "name": "targetCompletions",
           "type": 9
         }
       ],

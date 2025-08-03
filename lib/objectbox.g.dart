@@ -427,7 +427,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(22, 2963082835627357693),
     name: 'BuildHabit',
-    lastPropertyId: const obx_int.IdUid(21, 3762458279347625590),
+    lastPropertyId: const obx_int.IdUid(22, 4131706911318625688),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -529,6 +529,12 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(21, 3762458279347625590),
         name: 'completedTarget',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(22, 4131706911318625688),
+        name: 'targetCompletions',
         type: 9,
         flags: 0,
       ),
@@ -1401,7 +1407,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final completedTargetOffset = object.completedTarget == null
             ? null
             : fbb.writeString(object.completedTarget!);
-        fbb.startTable(22);
+        final targetCompletionsOffset = object.targetCompletions == null
+            ? null
+            : fbb.writeString(object.targetCompletions!);
+        fbb.startTable(23);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
         fbb.addOffset(2, measurementTypeOffset);
@@ -1419,6 +1428,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(18, targetOffset);
         fbb.addOffset(19, statsOffset);
         fbb.addOffset(20, completedTargetOffset);
+        fbb.addOffset(21, targetCompletionsOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1482,6 +1492,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final targetParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 40);
+        final targetCompletionsParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 46);
         final startDateParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0),
         );
@@ -1507,6 +1520,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
                 stats: statsParam,
                 color: colorParam,
                 target: targetParam,
+                targetCompletions: targetCompletionsParam,
                 startDate: startDateParam,
                 uuid: uuidParam,
                 categoryUuids: categoryUuidsParam,
@@ -2007,6 +2021,11 @@ class BuildHabit_ {
   /// See [BuildHabit.completedTarget].
   static final completedTarget = obx.QueryStringProperty<BuildHabit>(
     _entities[7].properties[16],
+  );
+
+  /// See [BuildHabit.targetCompletions].
+  static final targetCompletions = obx.QueryStringProperty<BuildHabit>(
+    _entities[7].properties[17],
   );
 
   /// see [BuildHabit.categories]

@@ -176,15 +176,12 @@ class _TargetItemState extends State<TargetItem> {
     return Row(
       children: [
         // Label
-        SizedBox(
-          width: 70,
-          child: Text(
-            widget.label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: scheme.onSurface,
-            ),
+        Text(
+          widget.label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: scheme.onSurface,
           ),
         ),
 
@@ -322,7 +319,7 @@ class DailyTarget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TargetItem(
-      label: 'Daily',
+      label: 'Daily Target',
       targetCount: g.buildHabitSc.target.daily,
       onChanged: (value) {
         g.buildHabitSc.setTarget(

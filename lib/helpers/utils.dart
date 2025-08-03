@@ -412,3 +412,7 @@ Color getLerpedColor(BuildContext context, [Color? color]) {
 Color? getColorFromString(String colorString) {
   return IconColorStorage.colors[colorString];
 }
+
+extension DateTimeUtils on DateTime{
+  DateTime get dateOnly => DateUtils.dateOnly(this);
+}
