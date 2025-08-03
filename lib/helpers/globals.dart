@@ -45,7 +45,9 @@ final folderVm = FolderViewModel();
 
 final themeMan = ThemeManager();
 
-final calMan = CalendarManager();
+final taskCalMan = CalendarManager();
+
+final habitCalMan = CalendarManager();
 
 final navMan = NavigationManager();
 

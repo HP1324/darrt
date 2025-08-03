@@ -2,24 +2,44 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:darrt/habits/build/ui/editor/editor.dart';
 import 'package:darrt/habits/build/ui/build_habit_item.dart';
+import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/task/ui/tasks_page.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
-class BuildHabitTab extends StatelessWidget {
+class BuildHabitTab extends StatefulWidget {
   const BuildHabitTab({super.key});
 
   @override
+  State<BuildHabitTab> createState() => _BuildHabitTabState();
+}
+
+class _BuildHabitTabState extends State<BuildHabitTab> with AutomaticKeepAliveClientMixin{
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Column(
       children: [
+        SizedBox(
+          height: MediaQuery.sizeOf(context).height * 0.09,
+          child: ListenableBuilder(
+            listenable: g.habitCalMan,
+            builder: (context,child) {
+              return ScrollableDateBar(controller: g.habitCalMan);
+            }
+          ),
+        ),
         Expanded(child: DraggableBuildHabitList()),
         AddBuildHabitCard(),
       ],
     );
   }
-}
 
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
+}
 
 class AddBuildHabitCard extends StatelessWidget {
   const AddBuildHabitCard({super.key});
@@ -37,7 +57,11 @@ class AddBuildHabitCard extends StatelessWidget {
         color: colorScheme.primaryContainer.withValues(alpha: 0.8),
         child: InkWell(
           onTap: () {
-            MiniRouter.to(context, BuildHabitEditor(edit: false),type: PageTransitionType.rightToLeft);
+            MiniRouter.to(
+              context,
+              BuildHabitEditor(edit: false),
+              type: PageTransitionType.rightToLeft,
+            );
           },
           borderRadius: BorderRadius.circular(12),
           child: Container(
@@ -67,7 +91,8 @@ class AddBuildHabitCard extends StatelessWidget {
                 const Spacer(),
                 Icon(
                   Icons.arrow_forward_ios,
-                  color: colorScheme.onPrimaryContainer.withOpacity(0.5),
+                  color: colorScheme.onPrimaryContainer.withValues(alpha:
+                  0.5),
                   size: 14,
                 ),
               ],
@@ -87,7 +112,6 @@ class DraggableBuildHabitList extends StatefulWidget {
 }
 
 class _DraggableBuildHabitListState extends State<DraggableBuildHabitList> {
-
   final List<Map<String, dynamic>> _habits = [
     {
       'id': '1',

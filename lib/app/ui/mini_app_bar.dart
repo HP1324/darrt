@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:darrt/app/services/google_sign_in_service.dart';
 import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/app/ui/date_selector.dart';
 import 'package:darrt/app/ui/motivation_dialog.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:flutter/foundation.dart';
@@ -31,80 +32,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
           return AppBar(
             backgroundColor: backgroundColor,
             elevation: 0,
-            title: InkWell(
-              splashFactory: NoSplash.splashFactory,
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (context) {
-                    return CalendarDatePicker(
-                      initialDate: DateTime.now(),
-                      firstDate: getFirstDate(),
-                      lastDate: getMaxDate(),
-                      onDateChanged: (selectedDate) {
-                        final date = DateUtils.dateOnly(selectedDate);
-                        g.calMan.scrollToDate(date);
-                      },
-                    );
-                  },
-                );
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListenableBuilder(
-                    listenable: g.calMan,
-                    builder: (context, child) {
-                      final selectedDate = g.calMan.selectedDate;
-                      final isBefore = selectedDate.isBefore(g.calMan.previousSelectedDate);
-                      final title = DateUtils.isSameDay(selectedDate, DateTime.now())
-                          ? 'Today'
-                          : formatDateNoJm(selectedDate, 'EEE, d MMM, yyyy');
-                      return AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        transitionBuilder: (child, animation) {
-                          final inAnimation = Tween<Offset>(
-                            begin: const Offset(-1.0, 0.0),
-                            end: Offset.zero,
-                          ).animate(animation);
-
-                          final outAnimation = Tween<Offset>(
-                            begin: const Offset(1.0, 0.0),
-                            end: Offset.zero,
-                          ).animate(animation);
-
-                          if (child.key == ValueKey<DateTime>(selectedDate)) {
-                            // This is the new date coming in
-                            return ClipRect(
-                              child: SlideTransition(
-                                position: isBefore ? inAnimation : outAnimation,
-                                child: child,
-                              ),
-                            );
-                          } else {
-                            // This is the old date going out
-                            return ClipRect(
-                              child: SlideTransition(
-                                position: isBefore ? outAnimation : inAnimation,
-                                child: child,
-                              ),
-                            );
-                          }
-                        },
-                        child: Text(
-                          title,
-                          key: ValueKey<DateTime>(selectedDate),
-                          style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  Icon(Icons.arrow_drop_down_rounded),
-                ],
-              ),
-            ),
+            title: DateSelector(controller: g.taskCalMan),
             actions: [
               _MiniAppBarAction(
                 icon: Icon(Icons.lightbulb_outline),
@@ -220,7 +148,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
         } else if (value == 1) {
           return AppBar(
             backgroundColor: backgroundColor,
-            title: Text('Habits', style: Theme.of(context).textTheme.titleMedium),
+            title: DateSelector(controller: g.habitCalMan),
           );
         }else if(value == 2) {
           return AppBar(

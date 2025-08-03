@@ -177,11 +177,11 @@
     @override
     Widget build(BuildContext context) {
       return ListenableBuilder(
-        listenable: Listenable.merge([g.calMan, g.taskVm]),
+        listenable: Listenable.merge([g.taskCalMan, g.taskVm]),
         builder: (context, child) {
           final textTheme = Theme.of(context).textTheme;
           final scheme = Theme.of(context).colorScheme;
-          final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
+          final date = DateUtils.dateOnly(g.taskCalMan.selectedDate).millisecondsSinceEpoch;
           final repeat = task.isRepeating;
           final stc = g.taskVm.onetimeTaskCompletions;
           final rtc = g.taskVm.repeatingTaskCompletions;
@@ -356,12 +356,12 @@
         width: 24,
         height: 24,
         child: ListenableBuilder(
-          listenable: Listenable.merge([g.taskVm, g.calMan]),
+          listenable: Listenable.merge([g.taskVm, g.taskCalMan]),
           builder: (context, child) {
             final repeat = task.isRepeating;
             final oneTimeCompletions = g.taskVm.onetimeTaskCompletions;
             final repeatingCompletions = g.taskVm.repeatingTaskCompletions;
-            final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
+            final date = DateUtils.dateOnly(g.taskCalMan.selectedDate).millisecondsSinceEpoch;
             final isCompleted = repeat
                 ? repeatingCompletions[task.id]?.contains(date) ?? false
                 : oneTimeCompletions[task.id] ?? false;
@@ -371,7 +371,7 @@
               child: Checkbox(
                 value: isCompleted,
                 onChanged: (value) {
-                  g.taskVm.toggleStatus(task, value ?? false, g.calMan.selectedDate, context);
+                  g.taskVm.toggleStatus(task, value ?? false, g.taskCalMan.selectedDate, context);
                 },
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),

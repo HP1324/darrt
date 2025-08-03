@@ -48,13 +48,13 @@ class TaskStateController extends StateController<TaskState, Task> {
                 : {EntityCategory(id: 1, name: 'General'): true}
           : {category: true},
       priority: edit ? task!.priority : priorities[3],
-      dueDate: edit ? task!.dueDate : g.calMan.selectedDate,
+      dueDate: edit ? task!.dueDate : g.taskCalMan.selectedDate,
       isRepeating: edit
           ? task!.isRepeating
           : g.navMan.currentTab.value == 2
           ? true
           : false,
-      startDate: edit ? task!.startDate : g.calMan.selectedDate,
+      startDate: edit ? task!.startDate : g.taskCalMan.selectedDate,
       endDate: edit ? task!.endDate : null,
       startTime: edit ? task!.startTime : null,
       endTime: edit ? task!.endTime : null,

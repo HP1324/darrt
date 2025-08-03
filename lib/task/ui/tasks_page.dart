@@ -1,3 +1,4 @@
+import 'package:darrt/app/state/managers/calendar_manager.dart';
 import 'package:darrt/task/ui/task_delete_confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -8,7 +9,6 @@ import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/ui/task_item.dart';
 import 'package:darrt/task/ui/task_timeline_item.dart';
-import 'package:toastification/toastification.dart';
 
 class TasksPage extends StatefulWidget {
   const TasksPage({super.key});
@@ -32,16 +32,16 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([g.taskVm, g.calMan]),
+      listenable: Listenable.merge([g.taskVm, g.taskCalMan]),
       builder: (context, child) {
-        final tasks = g.taskVm.tasks.where((t) => t.isActiveOn(g.calMan.selectedDate)).toList();
+        final tasks = g.taskVm.tasks.where((t) => t.isActiveOn(g.taskCalMan.selectedDate)).toList();
         final textTheme = TextTheme.of(context);
         return NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverToBoxAdapter(
               child: SizedBox(
                 height: MediaQuery.sizeOf(context).height * 0.09,
-                child: ScrollableDateBar(),
+                child: ScrollableDateBar(controller: g.taskCalMan),
               ),
             ),
             SliverPersistentHeader(
@@ -87,8 +87,8 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
 }
 
 class DateItem extends StatelessWidget {
-  const DateItem({super.key, required this.date});
-
+  const DateItem({super.key, required this.date, required this.controller});
+  final CalendarManager controller;
   final DateTime date;
 
   @override
@@ -96,9 +96,9 @@ class DateItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 1.0),
       child: ListenableBuilder(
-        listenable: g.calMan,
+        listenable: controller,
         builder: (context, child) {
-          final bool isSelected = g.calMan.selectedDate == date;
+          final bool isSelected = controller.selectedDate == date;
           final bool isToday = DateUtils.isSameDay(date, DateTime.now());
           final scheme = Theme.of(context).colorScheme;
 
@@ -122,7 +122,7 @@ class DateItem extends StatelessWidget {
           }
 
           return InkWell(
-            onTap: () => g.calMan.updateSelectedDate(date),
+            onTap: () => controller.updateSelectedDate(date),
             borderRadius: BorderRadius.circular(12),
             child: Container(
               decoration: BoxDecoration(
@@ -300,20 +300,20 @@ class TasksSelectedActions extends StatelessWidget {
 
 
 class ScrollableDateBar extends StatelessWidget {
-  const ScrollableDateBar({super.key});
-
+  const ScrollableDateBar({super.key, required this.controller});
+  final CalendarManager controller;
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: g.calMan,
+      listenable: controller,
       builder: (context, child) {
         return ListView.builder(
-          controller: g.calMan.dateScrollController,
+          controller: controller.dateScrollController,
           scrollDirection: Axis.horizontal,
-          itemExtent: g.calMan.dateItemWidth,
+          itemExtent: controller.dateItemWidth,
           physics: const BouncingScrollPhysics(),
-          itemCount: g.calMan.dates.length,
-          itemBuilder: (context, index) => DateItem(date: g.calMan.dates[index]),
+          itemCount: controller.dates.length,
+          itemBuilder: (context, index) => DateItem(date: controller.dates[index],controller: controller),
         );
       },
     );

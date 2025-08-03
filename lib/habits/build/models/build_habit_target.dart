@@ -27,7 +27,8 @@ const BuildHabitTarget._();
   }
 
   static BuildHabitTarget
-  fromJsonString(String jsonString) {
+  fromJsonString(String? jsonString) {
+    if (jsonString == null) return const BuildHabitTarget();
     final json = jsonDecode(jsonString);
     return BuildHabitTarget(
       daily: json['daily'],

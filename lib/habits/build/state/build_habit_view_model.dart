@@ -1,12 +1,12 @@
 import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/app/state/viewmodels/view_model.dart';
 import 'package:darrt/habits/build/models/build_habit.dart';
+import 'package:darrt/habits/build/models/build_habit_target.dart';
 import 'package:darrt/habits/build/models/habit_completion.dart';
 import 'package:darrt/habits/habit_notification_service.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/messages.dart';
 import 'package:darrt/helpers/mini_logger.dart';
-import 'package:darrt/objectbox.g.dart';
 import 'package:darrt/objectbox.g.dart';
 import 'package:darrt/task/statistics/achievement_dialog.dart';
 import 'package:darrt/task/statistics/achievements.dart';
@@ -81,7 +81,6 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
     notifyListeners();
   }
 
-
   BuildHabitStats? currentHabitStats = BuildHabitStats();
 
   void initHabitStats(BuildHabit habit) {
@@ -90,13 +89,17 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
 
   void updateHabitFromAppWideStateChanges(BuildHabit habit) {
     final id = box.put(habit);
-    int index = habits.indexWhere((i) => getItemId(i) == id);
+    int index = getIndexOf(habit);
     if (index != -1) {
       habits[index] = habit;
     }
   }
 
-  void performHabitStatsLogicAfterHabitFinish(BuildHabit habit, DateTime dateOnly, [BuildContext? context]) {
+  void performHabitStatsLogicAfterHabitFinish(
+    BuildHabit habit,
+    DateTime dateOnly, [
+    BuildContext? context,
+  ]) {
     MiniLogger.dp('finish stats function called');
     var stats = BuildHabitStats.fromJsonString(habit.stats);
     final List<DateTime> updatedCompletions = List<DateTime>.from(stats.completions);
@@ -262,16 +265,11 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
     3650,
   ];
 
-  Future<void> checkAndHandleAchievements(
-      BuildHabit habit,
-      BuildHabitStats stats, [
-        BuildContext? context,
-      ]) async {
+  Future<void> checkAndHandleAchievements(BuildHabit habit,BuildHabitStats stats, [BuildContext? context]) async {
     Map<String, DateTime> unlocked = Map.from(stats.achievementUnlocks);
     final templates = Achievement.getAchievementTemplates();
 
-    final sortedCompletions = List<DateTime>.from(stats.completions)
-      ..sort();
+    final sortedCompletions = List<DateTime>.from(stats.completions)..sort();
 
     List<List<DateTime>> streakSegments = [];
     List<DateTime> currentSegment = [];
@@ -328,6 +326,46 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
     }
   }
 
+  int getIndexOf(BuildHabit habit) => habits.indexWhere((h) => h.id == habit.id);
+
+  void modifyTarget(BuildHabit habit){
+    final index = getIndexOf(habit);
+    if(index != -1){
+      final newTarget = BuildHabitTarget.fromJsonString(habit.completedTarget);
+      habit.completedTarget = newTarget.toJsonString();
+      habits[index] = habit;
+      updateHabitFromAppWideStateChanges(habit);
+      notifyListeners();
+    }
+  }
+
+  void incrementDailyTarget(BuildHabit habit, [BuildContext? context]){
+    final index = getIndexOf(habit);
+    if(index != -1){
+      var completedTarget = BuildHabitTarget.fromJsonString(habit.completedTarget);
+      completedTarget = completedTarget.copyWith(daily: completedTarget.daily + 1);
+      habit.completedTarget = completedTarget.toJsonString();
+      habits[index] = habit;
+      final habitTarget = BuildHabitTarget.fromJsonString(habit.target);
+      if(completedTarget.daily >= habitTarget.daily){
+        toggleStatus(habit, true, DateTime.now(), context);
+      }
+    }
+  }
+
+  void decrementDailyTarget(BuildHabit habit, [BuildContext? context]){
+    final index = getIndexOf(habit);
+    if(index != -1){
+      var completedTarget = BuildHabitTarget.fromJsonString(habit.target);
+      completedTarget = completedTarget.copyWith(daily: completedTarget.daily - 1);
+      habit.target = completedTarget.toJsonString();
+      habits[index] = habit;
+      final habitTarget = BuildHabitTarget.fromJsonString(habit.target);
+      if(completedTarget.daily < habitTarget.daily){
+        toggleStatus(habit, false, DateTime.now(), context);
+      }
+    }
+  }
   @override
   List<BuildHabit> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
     return jsonList.map(BuildHabit.fromJson).toList();
@@ -340,7 +378,7 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
   }
 
   @override
-  String getCreateSuccessMessage()=> Messages.mHabitCreated;
+  String getCreateSuccessMessage() => Messages.mHabitCreated;
 
   @override
   String getDeleteSuccessMessage(int length) {
@@ -363,5 +401,4 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
 
   @override
   void setItemId(BuildHabit item, int id) => item.id = id;
-
 }

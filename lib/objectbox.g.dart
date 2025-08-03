@@ -427,7 +427,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(22, 2963082835627357693),
     name: 'BuildHabit',
-    lastPropertyId: const obx_int.IdUid(20, 8021575706145800585),
+    lastPropertyId: const obx_int.IdUid(21, 3762458279347625590),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -526,6 +526,12 @@ final _entities = <obx_int.ModelEntity>[
         type: 9,
         flags: 0,
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(21, 3762458279347625590),
+        name: 'completedTarget',
+        type: 9,
+        flags: 0,
+      ),
     ],
     relations: <obx_int.ModelRelation>[
       obx_int.ModelRelation(
@@ -545,7 +551,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(23, 409088433803233745),
     name: 'HabitCompletion',
-    lastPropertyId: const obx_int.IdUid(6, 3409687907561479404),
+    lastPropertyId: const obx_int.IdUid(7, 7862850684503279509),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -794,6 +800,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
       8146460766606777727,
       8848769609903730247,
       2602144198210229531,
+      7862850684503279509,
     ],
     retiredRelationUids: const [],
     modelVersion: 5,
@@ -1391,7 +1398,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final statsOffset = object.stats == null
             ? null
             : fbb.writeString(object.stats!);
-        fbb.startTable(21);
+        final completedTargetOffset = object.completedTarget == null
+            ? null
+            : fbb.writeString(object.completedTarget!);
+        fbb.startTable(22);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
         fbb.addOffset(2, measurementTypeOffset);
@@ -1408,6 +1418,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addOffset(13, categoryUuidsOffset);
         fbb.addOffset(18, targetOffset);
         fbb.addOffset(19, statsOffset);
+        fbb.addOffset(20, completedTargetOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -1481,24 +1492,28 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fb.StringReader(asciiOptimization: true),
           lazy: false,
         ).vTableGet(buffer, rootOffset, 30, []);
-        final object = BuildHabit(
-          id: idParam,
-          name: nameParam,
-          repeatConfig: repeatConfigParam,
-          unit: unitParam,
-          description: descriptionParam,
-          measurementType: measurementTypeParam,
-          endDate: endDateParam,
-          startTime: startTimeParam,
-          endTime: endTimeParam,
-          reminders: remindersParam,
-          stats: statsParam,
-          color: colorParam,
-          target: targetParam,
-          startDate: startDateParam,
-          uuid: uuidParam,
-          categoryUuids: categoryUuidsParam,
-        );
+        final object =
+            BuildHabit(
+                id: idParam,
+                name: nameParam,
+                repeatConfig: repeatConfigParam,
+                unit: unitParam,
+                description: descriptionParam,
+                measurementType: measurementTypeParam,
+                endDate: endDateParam,
+                startTime: startTimeParam,
+                endTime: endTimeParam,
+                reminders: remindersParam,
+                stats: statsParam,
+                color: colorParam,
+                target: targetParam,
+                startDate: startDateParam,
+                uuid: uuidParam,
+                categoryUuids: categoryUuidsParam,
+              )
+              ..completedTarget = const fb.StringReader(
+                asciiOptimization: true,
+              ).vTableGetNullable(buffer, rootOffset, 44);
         obx_int.InternalToManyAccess.setRelInfo<BuildHabit>(
           object.categories,
           store,
@@ -1531,7 +1546,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final uuidOffset = object.uuid == null
             ? null
             : fbb.writeString(object.uuid!);
-        fbb.startTable(7);
+        fbb.startTable(8);
         fbb.addInt64(0, object.id);
         fbb.addInt64(1, object.date.millisecondsSinceEpoch);
         fbb.addOffset(2, habitUuidOffset);
@@ -1987,6 +2002,11 @@ class BuildHabit_ {
   /// See [BuildHabit.stats].
   static final stats = obx.QueryStringProperty<BuildHabit>(
     _entities[7].properties[15],
+  );
+
+  /// See [BuildHabit.completedTarget].
+  static final completedTarget = obx.QueryStringProperty<BuildHabit>(
+    _entities[7].properties[16],
   );
 
   /// see [BuildHabit.categories]

@@ -259,9 +259,9 @@ class TaskTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: ListenableBuilder(
-        listenable: Listenable.merge([g.calMan, g.taskVm]),
+        listenable: Listenable.merge([g.taskCalMan, g.taskVm]),
         builder: (context, child) {
-          final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
+          final date = DateUtils.dateOnly(g.taskCalMan.selectedDate).millisecondsSinceEpoch;
           final repeat = task.isRepeating;
           final stc = g.taskVm.onetimeTaskCompletions, rtc = g.taskVm.repeatingTaskCompletions;
           final isFinished = repeat ? rtc[task.id]?.contains(date) ?? false : stc[task.id] ?? false;
@@ -400,12 +400,12 @@ class TaskFinishCheckbox extends StatelessWidget {
       child: Transform.scale(
         scale: 1.0,
         child: ListenableBuilder(
-          listenable: Listenable.merge([g.taskVm, g.calMan]),
+          listenable: Listenable.merge([g.taskVm, g.taskCalMan]),
           builder: (context, child) {
             final repeat = task.isRepeating;
             final oneTimeCompletions = g.taskVm.onetimeTaskCompletions;
             final repeatingCompletions = g.taskVm.repeatingTaskCompletions;
-            final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
+            final date = DateUtils.dateOnly(g.taskCalMan.selectedDate).millisecondsSinceEpoch;
 
             return CheckboxTheme(
               data: _buildCheckboxTheme(context),
@@ -415,7 +415,7 @@ class TaskFinishCheckbox extends StatelessWidget {
                     ? repeatingCompletions[task.id]?.contains(date) ?? false
                     : oneTimeCompletions[task.id] ?? false,
                 onChanged: (value) {
-                  g.taskVm.toggleStatus(task, value ?? false, g.calMan.selectedDate, context);
+                  g.taskVm.toggleStatus(task, value ?? false, g.taskCalMan.selectedDate, context);
                 },
               ),
             );

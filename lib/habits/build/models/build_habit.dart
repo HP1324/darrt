@@ -11,7 +11,7 @@ class BuildHabit {
   @Id()
   int id;
   String name, measurementType, repeatConfig;
-  String? description, color, reminders,unit, target, stats;
+  String? description, color, reminders,unit, target, completedTarget, stats;
   DateTime startDate;
   DateTime? endDate, startTime, endTime;
   List<String> categoryUuids;
