@@ -123,8 +123,8 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
       int streak = 0;
       DateTime? streakStart;
 
-      for (int i = 0; i < 365; i++) {
-        // Max look-back range (e.g., 1 year)
+      for (int i = 0; i <= 5000; i++) {
+        // Max look-back range (e.g., 1 year or whatever)
         final date = today.subtract(Duration(days: i));
 
         if (!habit.isActiveOn(date)) continue; // skip if task wasn't supposed to run
