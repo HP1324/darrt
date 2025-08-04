@@ -47,19 +47,7 @@ class _StatsPageState extends State<StatsPage> {
             const SizedBox(height: 16),
             const StreakDisplayWidget(),
             const SizedBox(height: 16),
-            ListenableBuilder(
-              listenable: g.taskVm,
-              builder: (context, child) {
-                final stats = g.taskVm.currentTaskStats;
-                if (stats == null) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                return ChartToggleWidget(
-                  task: widget.task,
-                  stats: stats,
-                );
-              },
-            ),
+            SeeChartsWidget(task: widget.task),
             _AchievementsSection(),
           ],
         ),
@@ -67,6 +55,299 @@ class _StatsPageState extends State<StatsPage> {
     );
   }
 }
+
+class SeeChartsWidget extends StatelessWidget {
+  const SeeChartsWidget({
+    super.key,
+    required this.task,
+  });
+
+  final Task task;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = ColorScheme.of(context);
+    final textTheme = TextTheme.of(context);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Material(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: () => _showChartsBottomSheet(context),
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: scheme.outline.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: scheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.bar_chart,
+                    color: scheme.primary,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'View Charts',
+                        style: textTheme.titleMedium?.copyWith(
+                          color: scheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Weekly, monthly & yearly completion data',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: scheme.onSurfaceVariant,
+                  size: 16,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showChartsBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ChartsBottomSheet(task: task),
+    );
+  }
+}
+
+class ChartsBottomSheet extends StatelessWidget {
+  const ChartsBottomSheet({
+    super.key,
+    required this.task,
+  });
+
+  final Task task;
+
+  // Future that delays for 800-900ms before resolving
+  Future<bool> _delayedChartLoad() async {
+    await Future.delayed(const Duration(milliseconds: 850));
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = ColorScheme.of(context);
+    final mediaQuery = MediaQuery.of(context);
+
+    return Container(
+      height: mediaQuery.size.height * 0.7,
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      child: Column(
+        children: [
+          // Handle bar
+          Container(
+            margin: const EdgeInsets.only(top: 12, bottom: 8),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: scheme.onSurfaceVariant.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          // Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Text(
+                  'Task Statistics',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: scheme.onSurface,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: Icon(
+                    Icons.close,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          // Charts content with FutureBuilder
+          Expanded(
+            child: FutureBuilder<bool>(
+              future: _delayedChartLoad(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return _buildLoadingState(context);
+                }
+
+                if (snapshot.hasError) {
+                  return _buildErrorState(context);
+                }
+
+                return _buildChartsContent(context);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingState(BuildContext context) {
+    final scheme = ColorScheme.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 48,
+            height: 48,
+            child: CircularProgressIndicator(
+              strokeWidth: 3,
+              valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Loading charts...',
+            style: textTheme.titleMedium?.copyWith(
+              color: scheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Analyzing your task completion data',
+            style: textTheme.bodySmall?.copyWith(
+              color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context) {
+    final scheme = ColorScheme.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 48,
+            color: scheme.error,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Failed to load charts',
+            style: textTheme.titleMedium?.copyWith(
+              color: scheme.onSurface,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Please try again',
+            style: textTheme.bodySmall?.copyWith(
+              color: scheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChartsContent(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 32),
+      child: Column(
+        children: [
+          const SizedBox(height: 16),
+          ListenableBuilder(
+            listenable: g.taskVm,
+            builder: (context, child) {
+              final stats = g.taskVm.currentTaskStats;
+              if (stats == null) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      children: [
+                        CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Processing task statistics...',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+              return AnimatedOpacity(
+                opacity: 1.0,
+                duration: const Duration(milliseconds: 300),
+                child: ChartToggleWidget(
+                  task: task,
+                  stats: stats,
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
 class _AchievementsSection extends StatelessWidget {
   const _AchievementsSection();
@@ -123,7 +404,7 @@ class _AchievementsSection extends StatelessWidget {
 
             return Container(
               padding: const EdgeInsets.all(10),
-              height:150,
+              height: 150,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: achievements.length,
@@ -477,7 +758,8 @@ class _WeeklyChartScrollViewState extends State<_WeeklyChartScrollView> {
     }
 
     if (currentWeekIndex != -1 && _scrollController.hasClients) {
-      final scrollPosition = (currentWeekIndex * 50.0) - (MediaQuery.of(context).size.width / 2) + 25;
+      final scrollPosition =
+          (currentWeekIndex * 50.0) - (MediaQuery.of(context).size.width / 2) + 25;
       _scrollController.animateTo(
         scrollPosition.clamp(0.0, _scrollController.position.maxScrollExtent),
         duration: const Duration(milliseconds: 300),
@@ -709,7 +991,8 @@ class _MonthlyChartScrollViewState extends State<_MonthlyChartScrollView> {
     }
 
     if (currentMonthIndex != -1 && _scrollController.hasClients) {
-      final scrollPosition = (currentMonthIndex * 60.0) - (MediaQuery.of(context).size.width / 2) + 30;
+      final scrollPosition =
+          (currentMonthIndex * 60.0) - (MediaQuery.of(context).size.width / 2) + 30;
       _scrollController.animateTo(
         scrollPosition.clamp(0.0, _scrollController.position.maxScrollExtent),
         duration: const Duration(milliseconds: 300),
@@ -936,7 +1219,8 @@ class _YearlyChartScrollViewState extends State<_YearlyChartScrollView> {
     }
 
     if (currentYearIndex != -1 && _scrollController.hasClients) {
-      final scrollPosition = (currentYearIndex * 80.0) - (MediaQuery.of(context).size.width / 2) + 40;
+      final scrollPosition =
+          (currentYearIndex * 80.0) - (MediaQuery.of(context).size.width / 2) + 40;
       _scrollController.animateTo(
         scrollPosition.clamp(0.0, _scrollController.position.maxScrollExtent),
         duration: const Duration(milliseconds: 300),
@@ -1062,16 +1346,18 @@ class AchievementItem extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       width: 120,
       decoration: BoxDecoration(
-        color: isUnlocked ? achievement.color.withValues(alpha:0.08) : colorScheme.surfaceContainerHighest,
+        color: isUnlocked
+            ? achievement.color.withValues(alpha: 0.08)
+            : colorScheme.surfaceContainerHighest,
         border: Border.all(
-          color: isUnlocked ? achievement.color : colorScheme.outline.withValues(alpha:0.4),
+          color: isUnlocked ? achievement.color : colorScheme.outline.withValues(alpha: 0.4),
           width: 1.5,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: isUnlocked
             ? [
                 BoxShadow(
-                  color: achievement.color.withValues(alpha:0.3),
+                  color: achievement.color.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -1084,7 +1370,9 @@ class AchievementItem extends StatelessWidget {
           Icon(
             achievement.icon,
             size: 32,
-            color: isUnlocked ? achievement.color : colorScheme.onSurfaceVariant.withValues(alpha:0.5),
+            color: isUnlocked
+                ? achievement.color
+                : colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 8),
           Text(
@@ -1093,7 +1381,7 @@ class AchievementItem extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: isUnlocked
                   ? colorScheme.onSurface
-                  : colorScheme.onSurfaceVariant.withValues(alpha:0.5),
+                  : colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             textAlign: TextAlign.center,
             maxLines: 2,
@@ -1106,8 +1394,8 @@ class AchievementItem extends StatelessWidget {
               style: textTheme.labelSmall?.copyWith(
                 fontSize: 10,
                 color: isUnlocked
-                    ? colorScheme.onSurface.withValues(alpha:0.6)
-                    : colorScheme.onSurfaceVariant.withValues(alpha:0.5),
+                    ? colorScheme.onSurface.withValues(alpha: 0.6)
+                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
               textAlign: TextAlign.center,
             ),
