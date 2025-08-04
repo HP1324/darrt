@@ -158,6 +158,7 @@ class BackupNotifier extends _$BackupNotifier {
 
   Future<void> changeAutoBackupFrequency(String newFrequency) async {
     if (state.isAnyOperationInProgress) return;
+    state = state.copyWith(autoBackupFrequency: newFrequency);
 
     final duration = newFrequency == 'daily'
         ? Duration(days: 1)
@@ -172,7 +173,6 @@ class BackupNotifier extends _$BackupNotifier {
       frequency: duration,
     );
     MiniBox().write(mAutoBackupFrequency, newFrequency);
-    state = state.copyWith(autoBackupFrequency: newFrequency);
   }
 
   Future<void> performRestore(BuildContext context) async {
