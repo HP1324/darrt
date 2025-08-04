@@ -7,8 +7,11 @@ import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.embedding.android.FlutterFragmentActivity
+import com.ryanheise.audioservice.AudioServiceFragmentActivity
 
-class MainActivity : FlutterActivity() {
+class MainActivity : AudioServiceFragmentActivity() {
+
     private val BATTERY_CHANNEL = "com.hp.minimaltodo/battery_settings"
     private val PDF_CHANNEL = "com.hp.minimaltodo/pdf_saver"
 
