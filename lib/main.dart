@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:device_preview/device_preview.dart';
@@ -19,13 +20,25 @@ import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/home.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:flutter/services.dart';
+
+Future<void> _configureRevenueCatSdk() async {
+  await Purchases.setLogLevel(LogLevel.debug);
+
+  PurchasesConfiguration configuration = PurchasesConfiguration("goog_VoehHrOnclbtuqCwAJyRvUSpIHy");
+
+  await Purchases.configure(configuration);
+}
+
 /// Initializes app services and state
 Future<void> initApp() async {
   try {
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+    _configureRevenueCatSdk();
 
     // Initialize google mobile ads sdk
     unawaited(MobileAds.instance.initialize());
@@ -52,10 +65,12 @@ void main() async {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
-  runApp(DevicePreview(
-    enabled: !kReleaseMode,
-    builder: (context) => ProviderScope(child: const Darrt()),
-  ));
+  runApp(
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) => ProviderScope(child: const Darrt()),
+    ),
+  );
 }
 
 class Darrt extends StatefulWidget {
