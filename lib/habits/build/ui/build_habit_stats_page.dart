@@ -7,6 +7,7 @@ import 'package:darrt/task/statistics/achievements.dart';
 import 'package:darrt/task/statistics/stats_calendar_widget.dart';
 import 'package:darrt/task/statistics/task_stats.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
@@ -262,6 +263,7 @@ class ChartToggleWidget extends StatefulWidget {
 class _ChartToggleWidgetState extends State<ChartToggleWidget> {
   int selectedIndex = 0;
   final List<String> chartTypes = ['Weekly', 'Monthly', 'Yearly'];
+  // final List<String> chartTypes = [ 'Monthly', 'Yearly'];
 
   @override
   Widget build(BuildContext context) {
@@ -340,13 +342,15 @@ class _ChartToggleWidgetState extends State<ChartToggleWidget> {
         return MonthlyChart(habit: widget.habit, stats: widget.stats);
       case 2:
         return YearlyChart(habit: widget.habit, stats: widget.stats);
+      // default:
+      //   return WeeklyChart(habit: widget.habit, stats: widget.stats);
       default:
-        return WeeklyChart(habit: widget.habit, stats: widget.stats);
+        return const SizedBox.shrink();
     }
   }
 }
 
-class WeeklyChart extends StatelessWidget {
+class WeeklyChart extends StatefulWidget {
   const WeeklyChart({
     super.key,
     required this.habit,
@@ -357,10 +361,32 @@ class WeeklyChart extends StatelessWidget {
   final BuildHabitStats stats;
 
   @override
+  State<WeeklyChart> createState() => _WeeklyChartState();
+}
+
+class _WeeklyChartState extends State<WeeklyChart> {
+  late Future<List<Map<String, dynamic>>> _weeklyDataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _weeklyDataFuture = _getWeeklyData();
+  }
+
+  @override
+  void didUpdateWidget(WeeklyChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Only refresh data if habit or stats changed
+    if (oldWidget.habit != widget.habit ||
+        oldWidget.stats.completions.length != widget.stats.completions.length) {
+      _weeklyDataFuture = _getWeeklyData();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final scheme = ColorScheme.of(context);
     final textTheme = TextTheme.of(context);
-    final data = _getWeeklyData();
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -391,10 +417,65 @@ class WeeklyChart extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: _WeeklyChartScrollView(
-              data: data,
-              scheme: scheme,
-              textTheme: textTheme,
+            child: FutureBuilder<List<Map<String, dynamic>>>(
+              future: _weeklyDataFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          color: scheme.error,
+                          size: 48,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Error loading chart data',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: scheme.onErrorContainer,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.bar_chart,
+                          color: scheme.onSurfaceVariant,
+                          size: 48,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'No data available',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return _WeeklyChartScrollView(
+                  data: snapshot.data!,
+                  scheme: scheme,
+                  textTheme: textTheme,
+                );
+              },
             ),
           ),
         ],
@@ -402,37 +483,68 @@ class WeeklyChart extends StatelessWidget {
     );
   }
 
-  List<Map<String, dynamic>> _getWeeklyData() {
-    final startDate = habit.startDate;
-    final endDate = habit.endDate ?? getMaxDate();
-    final weeks = <Map<String, dynamic>>[];
-    DateTime currentWeek = _getStartOfWeek(startDate);
-
-    while (currentWeek.isBefore(endDate) || currentWeek.isAtSameMomentAs(endDate)) {
-      final weekEnd = currentWeek.add(const Duration(days: 6));
-      final completionsInWeek = stats.completions.where((completion) {
-        return completion.isAfter(currentWeek.subtract(const Duration(days: 1))) &&
-            completion.isBefore(weekEnd.add(const Duration(days: 1)));
-      }).length;
-
-      weeks.add({
-        'label': DateFormat('MMM dd').format(currentWeek),
-        'count': completionsInWeek,
-        'week': currentWeek,
-      });
-
-      currentWeek = currentWeek.add(const Duration(days: 7));
-    }
-
-    return weeks;
-  }
-
-  DateTime _getStartOfWeek(DateTime date) {
-    final daysFromMonday = date.weekday - 1;
-    return DateTime(date.year, date.month, date.day - daysFromMonday);
+  // Convert to async function with compute isolation
+  Future<List<Map<String, dynamic>>> _getWeeklyData() async {
+    return compute(_calculateWeeklyData, _WeeklyDataParams(
+      startDate: widget.habit.startDate,
+      endDate: widget.habit.endDate ?? getMaxDate(),
+      completions: widget.stats.completions,
+    ));
   }
 }
 
+// Data class for compute function parameters
+class _WeeklyDataParams {
+  const _WeeklyDataParams({
+    required this.startDate,
+    required this.endDate,
+    required this.completions,
+  });
+
+  final DateTime startDate;
+  final DateTime endDate;
+  final List<DateTime> completions;
+}
+
+// Isolated computation function (runs in separate isolate)
+List<Map<String, dynamic>> _calculateWeeklyData(_WeeklyDataParams params) {
+  final weeks = <Map<String, dynamic>>[];
+  DateTime currentWeek = _getStartOfWeek(params.startDate);
+
+  // Pre-create DateFormat instance for better performance
+  final dateFormatter = DateFormat('MMM dd');
+
+  // Convert completions to Set for O(1) lookup instead of O(n) filtering
+  final completionDates = <String, int>{};
+  for (final completion in params.completions) {
+    final weekKey = _getStartOfWeek(completion).toIso8601String();
+    completionDates[weekKey] = (completionDates[weekKey] ?? 0) + 1;
+  }
+
+  while (currentWeek.isBefore(params.endDate) ||
+      currentWeek.isAtSameMomentAs(params.endDate)) {
+
+    final weekKey = currentWeek.toIso8601String();
+    final completionsInWeek = completionDates[weekKey] ?? 0;
+
+    weeks.add({
+      'label': dateFormatter.format(currentWeek),
+      'count': completionsInWeek,
+      'week': currentWeek.toIso8601String(), // Store as string for serialization
+    });
+
+    currentWeek = currentWeek.add(const Duration(days: 7));
+  }
+
+  return weeks;
+}
+
+DateTime _getStartOfWeek(DateTime date) {
+  final daysFromMonday = date.weekday - 1;
+  return DateTime(date.year, date.month, date.day - daysFromMonday);
+}
+
+// Updated scroll view to work with async data
 class _WeeklyChartScrollView extends StatefulWidget {
   const _WeeklyChartScrollView({
     required this.data,
@@ -450,6 +562,7 @@ class _WeeklyChartScrollView extends StatefulWidget {
 
 class _WeeklyChartScrollViewState extends State<_WeeklyChartScrollView> {
   final ScrollController _scrollController = ScrollController();
+  BarChartData? _cachedChartData;
 
   @override
   void initState() {
@@ -459,25 +572,36 @@ class _WeeklyChartScrollViewState extends State<_WeeklyChartScrollView> {
     });
   }
 
+  @override
+  void didUpdateWidget(_WeeklyChartScrollView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Clear cache if data changed
+    if (oldWidget.data != widget.data) {
+      _cachedChartData = null;
+    }
+  }
+
   void _scrollToCurrentWeek() {
+    if (!_scrollController.hasClients) return;
+
     final now = DateTime.now();
     final currentWeekStart = _getStartOfWeek(now);
+    final currentWeekKey = currentWeekStart.toIso8601String();
 
     // Find the index of the current week
     int currentWeekIndex = -1;
     for (int i = 0; i < widget.data.length; i++) {
       final weekData = widget.data[i];
-      final weekStart = weekData['week'] as DateTime;
-      if (weekStart.isAtSameMomentAs(currentWeekStart) ||
-          (weekStart.isBefore(currentWeekStart) &&
-              weekStart.add(const Duration(days: 6)).isAfter(currentWeekStart))) {
+      final weekKey = weekData['week'] as String;
+      if (weekKey == currentWeekKey) {
         currentWeekIndex = i;
         break;
       }
     }
 
-    if (currentWeekIndex != -1 && _scrollController.hasClients) {
-      final scrollPosition = (currentWeekIndex * 50.0) - (MediaQuery.of(context).size.width / 2) + 25;
+    if (currentWeekIndex != -1) {
+      final scrollPosition = (currentWeekIndex * 50.0) -
+          (MediaQuery.of(context).size.width / 2) + 25;
       _scrollController.animateTo(
         scrollPosition.clamp(0.0, _scrollController.position.maxScrollExtent),
         duration: const Duration(milliseconds: 300),
@@ -486,9 +610,87 @@ class _WeeklyChartScrollViewState extends State<_WeeklyChartScrollView> {
     }
   }
 
-  DateTime _getStartOfWeek(DateTime date) {
-    final daysFromMonday = date.weekday - 1;
-    return DateTime(date.year, date.month, date.day - daysFromMonday);
+  BarChartData _buildChartData() {
+    if (_cachedChartData != null) {
+      return _cachedChartData!;
+    }
+
+    _cachedChartData = BarChartData(
+      barTouchData: BarTouchData(enabled: false),
+      barGroups: widget.data.asMap().entries.map((entry) {
+        final index = entry.key;
+        final item = entry.value;
+        final count = item['count'] as int;
+
+        return BarChartGroupData(
+          x: index,
+          barRods: [
+            BarChartRodData(
+              toY: count > 0 ? count.toDouble() : 0.1,
+              color: count > 0
+                  ? widget.scheme.primary
+                  : widget.scheme.outline.withValues(alpha: 0.3),
+              width: count > 0 ? 16 : 3,
+              borderRadius: BorderRadius.circular(count > 0 ? 6 : 1.5),
+            ),
+          ],
+        );
+      }).toList(),
+      gridData: const FlGridData(show: false),
+      borderData: FlBorderData(show: false),
+      titlesData: FlTitlesData(
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 20,
+            getTitlesWidget: (value, meta) {
+              final index = value.toInt();
+              if (index >= 0 && index < widget.data.length) {
+                final count = widget.data[index]['count'] as int;
+                if (count > 0) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      count.toString(),
+                      style: widget.textTheme.labelSmall?.copyWith(
+                        color: widget.scheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  );
+                }
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 25,
+            getTitlesWidget: (value, meta) {
+              final index = value.toInt();
+              if (index >= 0 && index < widget.data.length) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    widget.data[index]['label'],
+                    style: widget.textTheme.labelSmall?.copyWith(
+                      color: widget.scheme.onSurfaceVariant,
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      ),
+    );
+
+    return _cachedChartData!;
   }
 
   @override
@@ -504,84 +706,7 @@ class _WeeklyChartScrollViewState extends State<_WeeklyChartScrollView> {
       scrollDirection: Axis.horizontal,
       child: SizedBox(
         width: widget.data.length * 50.0,
-        child: BarChart(
-          BarChartData(
-            barTouchData: BarTouchData(enabled: false),
-            barGroups: widget.data.asMap().entries.map((entry) {
-              final index = entry.key;
-              final item = entry.value;
-              final count = item['count'] as int;
-
-              return BarChartGroupData(
-                x: index,
-                barRods: [
-                  BarChartRodData(
-                    toY: count > 0 ? count.toDouble() : 0.1,
-                    color: count > 0
-                        ? widget.scheme.primary
-                        : widget.scheme.outline.withValues(alpha: 0.3),
-                    width: count > 0 ? 16 : 3,
-                    borderRadius: BorderRadius.circular(count > 0 ? 6 : 1.5),
-                  ),
-                ],
-              );
-            }).toList(),
-            gridData: FlGridData(show: false),
-            borderData: FlBorderData(show: false),
-            titlesData: FlTitlesData(
-              topTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: (value, meta) {
-                    final index = value.toInt();
-                    if (index >= 0 && index < widget.data.length) {
-                      final count = widget.data[index]['count'] as int;
-                      if (count > 0) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: Text(
-                            count.toString(),
-                            style: widget.textTheme.labelSmall?.copyWith(
-                              color: widget.scheme.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        );
-                      }
-                    }
-                    return const SizedBox();
-                  },
-                ),
-              ),
-              rightTitles: AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: (value, meta) {
-                    final index = value.toInt();
-                    if (index >= 0 && index < widget.data.length) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Text(
-                          widget.data[index]['label'],
-                          style: widget.textTheme.labelSmall?.copyWith(
-                            color: widget.scheme.onSurfaceVariant,
-                          ),
-                        ),
-                      );
-                    }
-                    return const SizedBox();
-                  },
-                ),
-              ),
-            ),
-          ),
-        ),
+        child: BarChart(_buildChartData()),
       ),
     );
   }
