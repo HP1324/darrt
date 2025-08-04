@@ -325,7 +325,7 @@ class TaskViewModel extends ViewModel<Task> {
       int streak = 0;
       DateTime? streakStart;
 
-      for (int i = 0; i < 365; i++) {
+      for (int i = 0; i < 7000; i++) {
         // Max look-back range (e.g., 1 year)
         final date = today.subtract(Duration(days: i));
 
