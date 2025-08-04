@@ -70,7 +70,7 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
         _completionBox.put(completion);
         habitCompletions.putIfAbsent(habit.id, () => {}).add(date);
         performHabitStatsLogicAfterHabitFinish(habit, dateOnly, context);
-        g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
+        // g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
       } else {
         final query = _completionBox
             .query(HabitCompletion_.habit.equals(habit.id).and(HabitCompletion_.date.equals(date)))
@@ -108,7 +108,7 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
     MiniLogger.dp('finish stats function called');
     var stats = BuildHabitStats.fromJsonString(habit.stats);
     final List<DateTime> updatedCompletions = List<DateTime>.from(stats.completions);
-    final today = DateUtils.dateOnly(DateTime.now());
+    final today = DateTime.now().dateOnly;
     if (!updatedCompletions.contains(dateOnly)) {
       updatedCompletions.add(dateOnly);
     }
@@ -129,7 +129,7 @@ class BuildHabitViewModel extends ViewModel<BuildHabit> {
 
         if (!habit.isActiveOn(date)) continue; // skip if task wasn't supposed to run
 
-        if (updatedCompletions.any((d) => DateUtils.isSameDay(d, date))) {
+        if (updatedCompletions.any((d) => isSameDay(d, date))) {
           streak += 1;
           streakStart = date;
         } else {

@@ -42,11 +42,12 @@ class BuildHabitStats {
 
   /// Create an object from a JSON string
   static BuildHabitStats fromJsonString(String? jsonString) {
+    Stopwatch stopwatch = Stopwatch()..start();
     if (jsonString == null || jsonString.trim().isEmpty) return BuildHabitStats();
 
     final map = jsonDecode(jsonString);
 
-    return BuildHabitStats(
+    final stats =  BuildHabitStats(
       completions:
           (map['completions'] as List<dynamic>?)
               ?.map((d) => DateTime.fromMillisecondsSinceEpoch(d as int))
@@ -61,6 +62,9 @@ class BuildHabitStats {
       ) ??
           {},
     );
+    print('Elapsed time: ${stopwatch.elapsed.inMilliseconds}');
+    stopwatch.stop();
+    return stats;
   }
 }
 extension AchievementMapper on BuildHabitStats {
