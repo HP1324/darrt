@@ -1,3 +1,4 @@
+import 'package:darrt/app/ads/subscription_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:darrt/helpers/mini_logger.dart';
@@ -60,6 +61,7 @@ class AdsController extends ChangeNotifier {
   bool isFullPageOnCustomSoundPickAdLoaded = false;
 
   void initializeHomePageBannerAd() {
+    if (!subService.showAds) return;
     _homePageBannerAd = BannerAd(
       adUnitId: _homePageBannerUnitId,
       size: AdSize.banner,
@@ -70,7 +72,9 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          MiniLogger.dp("Home page banner ad failed to load: ${error.message}, ${error.code}, domain: ${error.domain}, message: ${error.message}");
+          MiniLogger.dp(
+            "Home page banner ad failed to load: ${error.message}, ${error.code}, domain: ${error.domain}, message: ${error.message}",
+          );
           isHomePageBannerAdLoaded = false;
           notifyListeners();
           ad.dispose();
@@ -81,6 +85,7 @@ class AdsController extends ChangeNotifier {
   }
 
   void initializeNotesPageBannerAd() {
+    if(!subService.showAds) return;
     _notesPageBannerAd = BannerAd(
       adUnitId: _notesPageBannerUnitId,
       size: AdSize.banner,
@@ -91,7 +96,9 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          MiniLogger.dp('Notes page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}');
+          MiniLogger.dp(
+            'Notes page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}',
+          );
           isNotesPageBannerAdLoaded = false;
           notifyListeners();
           ad.dispose();
@@ -102,6 +109,7 @@ class AdsController extends ChangeNotifier {
   }
 
   void initializeAddNotePageBannerAd() {
+    if(!subService.showAds) return;
     _addNotePageBannerAd = BannerAd(
       adUnitId: _addNotePageBannerUnitId,
       size: AdSize.banner,
@@ -112,7 +120,9 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          MiniLogger.dp('Add note page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}');
+          MiniLogger.dp(
+            'Add note page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}',
+          );
           isAddNotePageBannerAdLoaded = false;
           notifyListeners();
           ad.dispose();
@@ -123,6 +133,7 @@ class AdsController extends ChangeNotifier {
   }
 
   void initializeThemePageBannerAd() {
+    if(!subService.showAds) return;
     _themePageBannerAd = BannerAd(
       adUnitId: _themePageBannerUnitId,
       size: AdSize.banner,
@@ -133,7 +144,9 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          MiniLogger.dp('Theme page banner app failed to load: ${error.code}, domain: ${error.domain}, message: ${error.message}');
+          MiniLogger.dp(
+            'Theme page banner app failed to load: ${error.code}, domain: ${error.domain}, message: ${error.message}',
+          );
           isThemePageBannerAdLoaded = false;
           notifyListeners();
           ad.dispose();
@@ -144,6 +157,7 @@ class AdsController extends ChangeNotifier {
   }
 
   void initializeFullPageAdOnAddTaskPagePop() async {
+    if(!subService.showAds) return;
     await InterstitialAd.load(
       adUnitId: _fullPageOnAddTaskPagePopUnitId,
       request: AdRequest(),
@@ -160,6 +174,7 @@ class AdsController extends ChangeNotifier {
   }
 
   void initializeFullPageAdOnAddCategoryPagePop() async {
+    if(!subService.showAds) return;
     await InterstitialAd.load(
       adUnitId: _fullPageOnAddCategoryPagePopAdUnitId,
       request: AdRequest(),
@@ -174,7 +189,9 @@ class AdsController extends ChangeNotifier {
       ),
     );
   }
+
   void initializeFullPageAdOnAddNotePagePop() async {
+    if(!subService.showAds) return;
     await InterstitialAd.load(
       adUnitId: _fullPageOnAddNotePagePopUnitId,
       request: AdRequest(),
@@ -189,7 +206,9 @@ class AdsController extends ChangeNotifier {
       ),
     );
   }
+
   void initializeFullPageOnAddFolderPagePopAd() async {
+    if(!subService.showAds) return;
     await InterstitialAd.load(
       adUnitId: _fullPageOnAddFolderPagePopAdUnitId,
       request: AdRequest(),
@@ -205,9 +224,8 @@ class AdsController extends ChangeNotifier {
     );
   }
 
-
-
   void initializeFullPageAdOnCustomSoundPick() async {
+    if(!subService.showAds) return;
     await InterstitialAd.load(
       adUnitId: _fullPageOnCustomSoundPickUnitId,
       request: AdRequest(),
@@ -222,5 +240,4 @@ class AdsController extends ChangeNotifier {
       ),
     );
   }
-
 }
