@@ -132,10 +132,14 @@ class _AddNotePageState extends State<AddNotePage> {
               listenable: g.adsController,
               builder: (context, child) {
                 return TimedBannerAdWidget(
+                  hideFor: Duration(seconds: 10),
+                  showFor: Duration(seconds: 35),
                   adInitializer: () => g.adsController.initializeAddNotePageBannerAd(),
                   childBuilder: () {
                     if (g.adsController.isAddNotePageBannerAdLoaded) {
-                      return MyBannerAdWidget(bannerAd: g.adsController.addNotePageBannerAd);
+                      return MyBannerAdWidget(
+                        bannerAd: g.adsController.addNotePageBannerAd,
+                      );
                     }
                     return const SizedBox.shrink();
                   },
