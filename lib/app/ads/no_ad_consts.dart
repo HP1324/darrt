@@ -1,0 +1,1 @@
+const googleApiKey = "goog_VoehHrOnclbtuqCwAJyRvUSpIHy";

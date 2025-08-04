@@ -66,6 +66,15 @@ class AppDrawer extends StatelessWidget {
               MiniRouter.to(context, CommonIssuesFixPage());
             },
           ),
+          // No ads list tile, to allow user to purchase no ad subscription
+          ListTile(
+            leading: const Icon(Icons.block),
+            title: const Text('Remove Ads'),
+            onTap: () {
+              // MiniRouter.to(context, AdsPage());
+            },
+          ),
+
           const Spacer(),
           const FooterSection(),
         ],
