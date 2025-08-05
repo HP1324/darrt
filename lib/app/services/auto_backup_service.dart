@@ -64,3 +64,5 @@ Future<void> createBackupSuccessNotification() async {
     ),
   );
 }
+
+// await registerPeriodicTask()
