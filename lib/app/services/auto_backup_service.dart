@@ -1,4 +1,3 @@
-
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:darrt/app/exceptions.dart';
 import 'package:darrt/app/notification/notification_action_controller.dart';
@@ -65,4 +64,34 @@ Future<void> createBackupSuccessNotification() async {
   );
 }
 
-// await registerPeriodicTask()
+Future<void> registerAutoBackup(
+  String uniqueName,
+  String taskName, {
+  Duration? frequency,
+  Duration? flexInterval,
+  Map<String, dynamic>? inputData,
+  Duration? initialDelay,
+  Constraints? constraints,
+  ExistingWorkPolicy? existingWorkPolicy,
+  BackoffPolicy? backoffPolicy,
+  Duration? backoffPolicyDelay,
+  String? tag,
+}) async {
+  await Workmanager().registerPeriodicTask(
+    uniqueName,
+    taskName,
+    frequency: frequency,
+    flexInterval: flexInterval,
+    inputData: inputData,
+    initialDelay: initialDelay,
+    constraints: constraints,
+    existingWorkPolicy: existingWorkPolicy,
+    backoffPolicy: backoffPolicy,
+    backoffPolicyDelay: backoffPolicyDelay,
+    tag: tag,
+  );
+}
+
+Future<void> cancelAutoBackup() async {
+  await Workmanager().cancelByUniqueName(mAutoBackup);
+}
