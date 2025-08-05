@@ -3,6 +3,7 @@ import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/app/ui/common_issues_fix_page.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:darrt/app/ui/settings_page/settings_page.dart';
 import 'package:darrt/app/ui/theme_settings_page.dart';
@@ -73,6 +74,10 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.block),
             title: const Text('Remove Ads'),
             onTap: () async{
+              if(!await InternetConnection().hasInternetAccess){
+                showErrorToast(context, 'No internet connection');
+                return;
+              }
               final paywallResult = await subService.presentPaywall();
               if(paywallResult == PaywallResult.purchased){
                   showSuccessToast(context, 'Thank you for supporting us!');
