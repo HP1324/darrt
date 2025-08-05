@@ -1,5 +1,6 @@
+import 'package:darrt/helpers/mini_logger.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
-
+import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 // Global instance
 final subService = SubscriptionService();
 
@@ -34,5 +35,10 @@ class SubscriptionService {
 
   Future<void> restorePurchases() async {
     await Purchases.restorePurchases();
+  }
+
+  Future<void> presentPaywall() async{
+      final paywallResult = await RevenueCatUI.presentPaywall();
+      MiniLogger.dp('Paywall result: $paywallResult');
   }
 }

@@ -1,3 +1,4 @@
+import 'package:darrt/app/ads/subscription_service.dart';
 import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/app/ui/common_issues_fix_page.dart';
 import 'package:flutter/material.dart';
@@ -70,8 +71,8 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.block),
             title: const Text('Remove Ads'),
-            onTap: () {
-              // MiniRouter.to(context, AdsPage());
+            onTap: () async{
+              await subService.presentPaywall();
             },
           ),
 

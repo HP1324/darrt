@@ -51,12 +51,14 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   Future<void> _showFullPageAd() async {
     final int popCount = MiniBox().read('add_task_pop_count') ?? 1;
-    MiniLogger.d('add task pop count: $popCount');
-    if (popCount % 4 == 0) {
-      //print popcount and if condition result
-      await g.adsController.fullPageAdOnAddTaskPagePop.show();
+    if (g.adsController.isFullPageAfterTaskPutAdLoaded) {
+      MiniLogger.d('add task pop count: $popCount');
+      if (popCount % 3 == 0) {
+        //print popcount and if condition result
+        await g.adsController.fullPageAdOnAddTaskPagePop.show();
+      }
+      MiniBox().write('add_task_pop_count', popCount + 1);
     }
-    MiniBox().write('add_task_pop_count', popCount + 1);
   }
 
   bool _isHandlingPop = false;
@@ -298,7 +300,7 @@ class EndTimeSelector extends StatelessWidget {
             );
             if (selectedTime != null) {
               if (!selectedTime.isAfter(TimeOfDay.fromDateTime(g.taskSc.startTime!))) {
-                if(context.mounted) {
+                if (context.mounted) {
                   showErrorToast(context, 'End time must be after start time');
                 }
                 return;

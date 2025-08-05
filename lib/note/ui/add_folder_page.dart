@@ -33,11 +33,13 @@ class _AddFolderPageState extends State<AddFolderPage> {
   }
 
   Future<void> showFullPageAd() async {
-    final popCount = MiniBox().read('add_folder_pop_count') ?? 0;
-    if (popCount % 3 == 0) {
-      await g.adsController.fullPageAdOnAddFolderPagePop.show();
+    if(g.adsController.isFullPageOnAddFolderPagePopAdLoaded) {
+      final popCount = MiniBox().read('add_folder_pop_count') ?? 0;
+      if (popCount % 3 == 0) {
+        await g.adsController.fullPageAdOnAddFolderPagePop.show();
+      }
+      MiniBox().write('add_folder_pop_count', popCount + 1);
     }
-    MiniBox().write('add_folder_pop_count', popCount + 1);
   }
 
   @override
