@@ -142,6 +142,7 @@ class BackupNotifier extends _$BackupNotifier {
           mAutoBackup,
           mAutoBackup,
           existingWorkPolicy: ExistingWorkPolicy.replace,
+          constraints: Constraints(networkType: NetworkType.connected),
           initialDelay: Duration(seconds: 10),
           frequency: Duration(minutes: 20),
         );
@@ -172,6 +173,7 @@ class BackupNotifier extends _$BackupNotifier {
       mAutoBackup,
       mAutoBackup,
       existingWorkPolicy: ExistingWorkPolicy.replace,
+      constraints: Constraints(networkType: NetworkType.connected),
       frequency: duration,
     );
     MiniLogger.dp('Is task replaced: ${await Workmanager().isScheduledByUniqueName(mAutoBackup)}');
