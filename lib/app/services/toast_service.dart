@@ -23,11 +23,20 @@ void showToast(
   );
 }
 
-void showErrorToast(BuildContext context, String message) =>
+void showErrorToast(BuildContext context, String message) {
+  if(context.mounted) {
     showToast(context, errorType, message);
+  }
+}
 
-void showSuccessToast(BuildContext context, String message) =>
+void showSuccessToast(BuildContext context, String message) {
+  if(context.mounted) {
     showToast(context, successType, message);
+  }
+}
 
-void showWarningToast(BuildContext context, String message) =>
+void showWarningToast(BuildContext context, String message) {
+  if(context.mounted) {
     showToast(context, warningType, message);
+  }
+}
