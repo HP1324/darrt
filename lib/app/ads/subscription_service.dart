@@ -37,8 +37,9 @@ class SubscriptionService {
     await Purchases.restorePurchases();
   }
 
-  Future<void> presentPaywall() async{
+  Future<PaywallResult> presentPaywall() async{
       final paywallResult = await RevenueCatUI.presentPaywall();
       MiniLogger.dp('Paywall result: $paywallResult');
+      return paywallResult;
   }
 }

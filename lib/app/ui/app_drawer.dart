@@ -8,6 +8,7 @@ import 'package:darrt/app/ui/settings_page/settings_page.dart';
 import 'package:darrt/app/ui/theme_settings_page.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/quickreminder/ui/quick_reminders_page.dart';
+import 'package:purchases_ui_flutter/paywall_result.dart';
 import 'package:url_launcher/url_launcher.dart';
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -72,7 +73,12 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.block),
             title: const Text('Remove Ads'),
             onTap: () async{
-              await subService.presentPaywall();
+              final paywallResult = await subService.presentPaywall();
+              if(paywallResult == PaywallResult.purchased){
+                  showSuccessToast(context, 'Thank you for supporting us!');
+              }else if(paywallResult == PaywallResult.restored){
+                  showSuccessToast(context, 'Your purchase has been restored');
+              }
             },
           ),
 
