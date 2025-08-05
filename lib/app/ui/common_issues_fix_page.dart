@@ -33,6 +33,30 @@ Go to Settings > Battery > Battery Optimization > Darrt, and set it to Not Optim
 
 This allows the app to run in the background and send notifications without delay, especially important for timers or reminders.''',
           ),
+          SizedBox(height: 24),
+          IssueCard(
+            title: '3. Auto-backup not working sometimes',
+            description: '''
+Auto-backup may not work reliably if your device has poor internet connection or restricts background activity due to battery optimizations.
+
+🔧 Fix:
+You can always go to the app's settings and manually trigger a backup. It only takes a few seconds and ensures your data is safe. 
+
+Also, consider disabling battery optimizations for Darrt to allow smoother auto-backup functionality.''',
+          ),
+          SizedBox(height: 24),
+          IssueCard(
+            title: '4. Ads showing even after purchasing',
+            description: '''
+Sometimes, ads may still appear after purchase due to the app not restarting properly or purchase data not being restored yet.
+
+🔧 Fix:
+- Please completely close and restart the app after purchasing to apply the changes.
+- If you've reinstalled the app, tap the "Remove Ads" button again. This will show the purchase dialog where you'll see a "Restore Purchases" option.
+- Tap Restore Purchases, and restart the app again.
+
+If restore still doesn’t work, make sure you're logged into the Play Store with the same account used during purchase.''',
+          ),
         ],
       ),
     );
