@@ -110,9 +110,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: getScaffoldBackgroundColor(context),
+        backgroundColor: getSurfaceColor(context),
         appBar: AppBar(
-          backgroundColor: getScaffoldBackgroundColor(context),
+          backgroundColor: getSurfaceColor(context),
           title: Text(widget.edit ? widget.task!.title.replaceAll('\n', ' ') : 'Add New Task'),
         ),
         body: Padding(
@@ -573,7 +573,7 @@ class AddRemindersSection extends StatelessWidget {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: getSurfaceColor(context),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(20),
@@ -1018,7 +1018,7 @@ class _ReminderDialogState extends State<ReminderDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: getSurfaceColor(context),
       elevation: 3,
       content: Column(
         mainAxisSize: MainAxisSize.min,

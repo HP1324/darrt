@@ -16,8 +16,8 @@ class _FoldersPageState extends State<FoldersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: getScaffoldBackgroundColor(context),
-      appBar: AppBar(backgroundColor: getScaffoldBackgroundColor(context),
+      backgroundColor: getSurfaceColor(context),
+      appBar: AppBar(backgroundColor: getSurfaceColor(context),
           title: Text('Folders')),
       body: ListenableBuilder(
         listenable: g.folderVm,

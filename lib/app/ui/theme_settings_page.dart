@@ -1,3 +1,4 @@
+import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:darrt/app/ads/my_banner_ad_widget.dart';
@@ -21,6 +22,7 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: getSurfaceColor(context),
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(50),
         title: Text('Theme Colors'),

@@ -29,9 +29,9 @@ class _StatsPageState extends State<StatsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: getScaffoldBackgroundColor(context),
+      backgroundColor: getSurfaceColor(context),
       appBar: AppBar(
-        backgroundColor: getScaffoldBackgroundColor(context),
+        backgroundColor: getSurfaceColor(context),
         title: Text(widget.task.title.replaceAll('\n', ' ')),
         actions: [
           IconButton(

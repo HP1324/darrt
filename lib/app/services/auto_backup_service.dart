@@ -72,7 +72,7 @@ Future<void> registerAutoBackup(
   Map<String, dynamic>? inputData,
   Duration? initialDelay,
   Constraints? constraints,
-  ExistingWorkPolicy? existingWorkPolicy,
+  ExistingPeriodicWorkPolicy? existingWorkPolicy,
   BackoffPolicy? backoffPolicy,
   Duration? backoffPolicyDelay,
   String? tag,

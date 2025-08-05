@@ -26,7 +26,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
     return ValueListenableBuilder(
       valueListenable: g.navMan.currentDestination,
       builder: (context, value, child) {
-        final backgroundColor = getScaffoldBackgroundColor(context);
+        final backgroundColor = getSurfaceColor(context);
         if (value == 0) {
           return AppBar(
             backgroundColor: backgroundColor,

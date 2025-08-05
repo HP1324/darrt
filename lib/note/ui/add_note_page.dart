@@ -119,9 +119,9 @@ class _AddNotePageState extends State<AddNotePage> {
         }
       },
       child: Scaffold(
-        backgroundColor: getScaffoldBackgroundColor(context),
+        backgroundColor: getSurfaceColor(context),
         appBar: AppBar(
-          backgroundColor: getScaffoldBackgroundColor(context),
+          backgroundColor: getSurfaceColor(context),
           leading: const BackButton(),
           actions: [
             // const SaveNotePdfButton(),

@@ -1,3 +1,4 @@
+import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
@@ -35,7 +36,7 @@ class _TaskNoteBottomSheetState extends State<TaskNoteBottomSheet> {
     final scheme = ColorScheme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: scheme.surface,
+        color: getSurfaceColor(context),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -163,7 +164,7 @@ class _TaskNoteBottomSheetState extends State<TaskNoteBottomSheet> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: scheme.surface,
+              color: getSurfaceColor(context),
               border: Border(
                 top: BorderSide(
                   color: scheme.outline.withValues(alpha: 0.1),

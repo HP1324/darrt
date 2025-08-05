@@ -132,26 +132,28 @@ class BackupNotifier extends _$BackupNotifier {
 
       if (value) {
         final frequency = state.autoBackupFrequency;
-        Duration duration = frequency == 'daily'
+        Duration backupDuration = frequency == 'daily'
             ? Duration(days: 1)
             : frequency == 'weekly'
             ? Duration(days: 7)
             : Duration(days: 30);
-        MiniLogger.dp('Registering background task: frequency: $frequency, duration: $duration');
+        MiniLogger.dp('Registering background task: frequency: $frequency, duration: $backupDuration');
+        final ms = DateTime.now().millisecondsSinceEpoch;
         await registerAutoBackup(
           mAutoBackup,
           mAutoBackup,
-          existingWorkPolicy: ExistingWorkPolicy.replace,
+          tag: mAutoBackup,
+          existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
           constraints: Constraints(networkType: NetworkType.connected),
-          initialDelay: Duration(seconds: 10),
-          frequency: Duration(minutes: 25),
+          initialDelay: Duration(minutes: 15),
+          frequency: backupDuration,
         );
         MiniLogger.dp(
           'Is work registered: ${await Workmanager().isScheduledByUniqueName(mAutoBackup)}',
         );
       } else {
         MiniLogger.dp('Cancelling background task');
-        await Workmanager().cancelByUniqueName(mAutoBackup);
+        await Workmanager().cancelByTag(mAutoBackup);
       }
     } on GoogleClientNotAuthenticatedError {
       if (context.mounted) showErrorToast(context, 'Sign in to continue!');
@@ -162,19 +164,19 @@ class BackupNotifier extends _$BackupNotifier {
     if (state.isAnyOperationInProgress) return;
     state = state.copyWith(autoBackupFrequency: newFrequency);
 
-    final duration = newFrequency == 'daily'
+    final backupDuration = newFrequency == 'daily'
         ? Duration(days: 1)
         : newFrequency == 'weekly'
         ? Duration(days: 7)
         : Duration(days: 30);
 
-    // await Workmanager().cancelByUniqueName(mAutoBackup);
+    final ms = DateTime.now().millisecondsSinceEpoch;
     await registerAutoBackup(
       mAutoBackup,
       mAutoBackup,
-      existingWorkPolicy: ExistingWorkPolicy.replace,
       constraints: Constraints(networkType: NetworkType.connected),
-      frequency: duration,
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
+      frequency: backupDuration,
     );
     MiniLogger.dp('Is task replaced: ${await Workmanager().isScheduledByUniqueName(mAutoBackup)}');
     MiniBox().write(mAutoBackupFrequency, newFrequency);
