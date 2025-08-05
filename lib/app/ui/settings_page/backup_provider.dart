@@ -1,4 +1,5 @@
 import 'package:darrt/app/exceptions.dart';
+import 'package:darrt/app/services/auto_backup_service.dart';
 import 'package:darrt/app/services/backup_service.dart';
 import 'package:darrt/app/services/google_sign_in_service.dart';
 import 'package:darrt/app/services/mini_box.dart';
@@ -90,8 +91,6 @@ class BackupNotifier extends _$BackupNotifier {
     await Workmanager().cancelByUniqueName(mAutoBackup);
     await GoogleSignInService().signOut();
     MiniBox().remove(mGoogleEmail);
-
-
   }
 
   Future<void> performBackup(BuildContext context) async {
@@ -138,14 +137,16 @@ class BackupNotifier extends _$BackupNotifier {
             : frequency == 'weekly'
             ? Duration(days: 7)
             : Duration(days: 30);
-        MiniLogger.dp(
-          'Registering background task: frequency: $frequency, duration: $duration',
+        MiniLogger.dp('Registering background task: frequency: $frequency, duration: $duration');
+        await registerAutoBackup(
+          mAutoBackup,
+          mAutoBackup,
+          existingWorkPolicy: ExistingWorkPolicy.replace,
+          initialDelay: Duration(seconds: 10),
+          frequency: Duration(minutes: 20),
         );
-        await Workmanager().registerPeriodicTask(
-          mAutoBackup,
-          mAutoBackup,
-          initialDelay: Duration(seconds: 5),
-          frequency: duration,
+        MiniLogger.dp(
+          'Is work registered: ${await Workmanager().isScheduledByUniqueName(mAutoBackup)}',
         );
       } else {
         MiniLogger.dp('Cancelling background task');
@@ -166,12 +167,14 @@ class BackupNotifier extends _$BackupNotifier {
         ? Duration(days: 7)
         : Duration(days: 30);
 
-    await Workmanager().cancelByUniqueName(mAutoBackup);
-    await Workmanager().registerPeriodicTask(
+    // await Workmanager().cancelByUniqueName(mAutoBackup);
+    await registerAutoBackup(
       mAutoBackup,
       mAutoBackup,
+      existingWorkPolicy: ExistingWorkPolicy.replace,
       frequency: duration,
     );
+    MiniLogger.dp('Is task replaced: ${await Workmanager().isScheduledByUniqueName(mAutoBackup)}');
     MiniBox().write(mAutoBackupFrequency, newFrequency);
   }
 
@@ -285,4 +288,3 @@ class BackupNotifier extends _$BackupNotifier {
     );
   }
 }
-
