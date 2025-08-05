@@ -14,7 +14,7 @@ class SubscriptionService {
   late final CustomerInfo _customerInfo;
 
   Future<void> configureRevenueCatSdk() async {
-    await Purchases.setLogLevel(LogLevel.debug);
+    await Purchases.setLogLevel(LogLevel.verbose);
 
     PurchasesConfiguration configuration = PurchasesConfiguration(
       "goog_VoehHrOnclbtuqCwAJyRvUSpIHy",
@@ -38,8 +38,14 @@ class SubscriptionService {
   }
 
   Future<PaywallResult> presentPaywall() async{
+    try {
       final paywallResult = await RevenueCatUI.presentPaywall();
       MiniLogger.dp('Paywall result: $paywallResult');
       return paywallResult;
+    }catch (e,t){
+      MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
+      MiniLogger.t('$t');
+      return PaywallResult.error;
+    }
   }
 }
