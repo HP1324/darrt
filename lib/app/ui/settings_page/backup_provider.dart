@@ -144,7 +144,7 @@ class BackupNotifier extends _$BackupNotifier {
           existingWorkPolicy: ExistingWorkPolicy.replace,
           constraints: Constraints(networkType: NetworkType.connected),
           initialDelay: Duration(seconds: 10),
-          frequency: Duration(minutes: 20),
+          frequency: Duration(minutes: 15),
         );
         MiniLogger.dp(
           'Is work registered: ${await Workmanager().isScheduledByUniqueName(mAutoBackup)}',
