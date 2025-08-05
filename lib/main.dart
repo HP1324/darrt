@@ -48,7 +48,7 @@ Future<void> initApp() async {
     // Initialize notifications
     await NotificationService.init();
 
-    Workmanager().initialize(callBackDispatcher, isInDebugMode: kDebugMode);
+    await Workmanager().initialize(callBackDispatcher);
 
     FlutterNativeSplash.remove();
   } catch (e, t) {

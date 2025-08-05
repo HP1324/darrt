@@ -444,60 +444,25 @@ class IconColorStorage{
   }
 
   static const Map<String, Color> colors = {
-    'red': Color(0xFFE57373),
-    'pink': Color(0xFFF06292),
-    'purple': Color(0xFFBA68C8),
-    'deepPurple': Color(0xFF9575CD),
-    'indigo': Color(0xFF7986CB),
-    'blue': Color(0xFF64B5F6),
-    'lightBlue': Color(0xFF4FC3F7),
-    'cyan': Color(0xFF4DD0E1),
-    'teal': Color(0xFF4DB6AC),
-    'green': Color(0xFF81C784),
-    'lightGreen': Color(0xFFAED581),
-    'orange': Color(0xFFFFB74D),
-    'deepOrange': Color(0xFFFF8A65),
-    'brown': Color(0xFFA1887F),
-    'blueGrey': Color(0xFF90A4AE),
-    'amber': Color(0xFFFFD54F),
-    'yellow': Color(0xFFFFEE58),
-    'lime': Color(0xFFD4E157),
-    'lightBrown': Color(0xFFBCAAA4),
-    'grey': Color(0xFFBDBDBD),
-    'darkGrey': Color(0xFF757575),
-    'coral': Color(0xFFFF7F50),
-    'salmon': Color(0xFFFA8072),
-    'crimson': Color(0xFFDC143C),
-    'maroon': Color(0xFF800000),
-    'fuchsia': Color(0xFFFF00FF),
-    'magenta': Color(0xFFFF4081),
-    'darkPurple': Color(0xFF673AB7),
-    'navy': Color(0xFF3F51B5),
-    'royalBlue': Color(0xFF1976D2),
-    'skyBlue': Color(0xFF03A9F4),
-    'aqua': Color(0xFF00BCD4),
-    'mint': Color(0xFF009688),
-    'seafoam': Color(0xFF26A69A),
-    'emerald': Color(0xFF2E7D32),
-    'olive': Color(0xFF689F38),
-    'pear': Color(0xFF9CCC65),
-    'gold': Color(0xFFFFC107),
-    'tangerine': Color(0xFFFF9800),
-    'rust': Color(0xFFE64A19),
-    'coffee': Color(0xFF795548),
-    'slate': Color(0xFF607D8B),
-    'charcoal': Color(0xFF455A64),
-    'lavender': Color(0xFFB39DDB),
-    'periwinkle': Color(0xFF7986CB),
-    'turquoise': Color(0xFF26C6DA),
-    'jade': Color(0xFF00897B),
-    'forest': Color(0xFF388E3C),
-    'peach': Color(0xFFFFAB91),
-    'apricot': Color(0xFFFFCCBC),
-    'rose': Color(0xFFF8BBD0),
-    'mauve': Color(0xFFCE93D8),
-    'lilac': Color(0xFFD1C4E9),
-    'steel': Color(0xFF78909C),
+    'red': Color(0xFFE57373),        // Classic red - good contrast
+    'pink': Color(0xFFF06292),       // Vibrant pink - distinct from red
+    'purple': Color(0xFFBA68C8),     // Medium purple - balanced
+    'indigo': Color(0xFF7986CB),     // Blue-purple - distinct from pure blue
+    'blue': Color(0xFF64B5F6),       // Sky blue - good visibility
+    'cyan': Color(0xFF4DD0E1),       // Bright cyan - distinct from blue
+    'teal': Color(0xFF4DB6AC),       // Blue-green - unique shade
+    'green': Color(0xFF81C784),      // Fresh green - balanced brightness
+    'lime': Color(0xFFD4E157),       // Yellow-green - distinct from green
+    'amber': Color(0xFFFFD54F),      // Golden yellow - warm and visible
+    'orange': Color(0xFFFFB74D),     // Warm orange - distinct from amber
+    'deepOrange': Color(0xFFFF8A65), // Red-orange - bridges red and orange
+    'brown': Color(0xFFA1887F),      // Neutral brown - earthy tone
+    'blueGrey': Color(0xFF90A4AE),   // Cool grey - professional
+    'charcoal': Color(0xFF455A64),   // Dark grey - good contrast in light mode
+    'magenta': Color(0xFFFF4081),    // Hot pink - distinct from pink/purple
+    'emerald': Color(0xFF2E7D32),    // Deep green - distinct from green/teal
+    'gold': Color(0xFFFFC107),       // Rich gold - distinct from amber/orange
+    'coral': Color(0xFFFF7F50),      // Salmon-orange - fills gap between orange/red
+    'slate': Color(0xFF607D8B),      // Blue-grey - distinct from blueGrey/charcoal
   };
-
 }

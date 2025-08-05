@@ -386,7 +386,17 @@ void showSettingsDialog(BuildContext context) {
   );
 }
 
-Color getScaffoldBackgroundColor(BuildContext context) {
+Color getSurfaceColor(BuildContext context) {
+  final theme = Theme.of(context);
+  final isDark = theme.brightness == Brightness.dark;
+  final scheme = theme.colorScheme;
+  Color backgroundColorHSV = isDark
+      ? Color(0xFF1E1E1E)
+      : theme.colorScheme.surface;
+  return backgroundColorHSV;
+}
+
+Color getLerpedScaffoldBackgroundColor(BuildContext context) {
   final theme = Theme.of(context);
   final isDark = theme.brightness == Brightness.dark;
   final scheme = theme.colorScheme;

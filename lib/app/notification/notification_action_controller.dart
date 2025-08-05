@@ -71,7 +71,7 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
         break;
     }
   } catch (e, t) {
-    MiniLogger.e(
+    MiniLogger.dp(
       'Error was thrown by onActionReceivedMethod: ${e.toString()}\nStacktrace: ${t.toString()}\n Error type: ${e.runtimeType}',
     );
   }
