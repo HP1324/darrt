@@ -11,6 +11,7 @@ import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/quickreminder/ui/quick_reminders_page.dart';
 import 'package:purchases_ui_flutter/paywall_result.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
@@ -29,8 +30,7 @@ class AppDrawer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Text('Darrt',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  const Text('Darrt', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   Text(
                     dateFormat.format(now),
                     style: const TextStyle(fontSize: 14),
@@ -73,16 +73,18 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.block),
             title: const Text('Remove Ads'),
-            onTap: () async{
-              if(!await InternetConnection().hasInternetAccess){
+            onTap: () async {
+              if (!await InternetConnection().hasInternetAccess) {
                 showErrorToast(context, 'No internet connection');
                 return;
               }
               final paywallResult = await subService.presentPaywall();
-              if(paywallResult == PaywallResult.purchased){
-                  showSuccessToast(context, 'Thank you for supporting us!');
-              }else if(paywallResult == PaywallResult.restored){
-                  showSuccessToast(context, 'Your purchase has been restored');
+              if (paywallResult == PaywallResult.purchased) {
+                subService.disableAds();
+                showSuccessToast(context, 'Thank you for supporting us!');
+              } else if (paywallResult == PaywallResult.restored) {
+                subService.disableAds();
+                showSuccessToast(context, 'Your purchase has been restored');
               }
             },
           ),
@@ -121,7 +123,7 @@ class FooterSection extends StatelessWidget {
               if (await canLaunchUrl(url)) {
                 await launchUrl(url, mode: LaunchMode.externalApplication);
               } else {
-                if(context.mounted){
+                if (context.mounted) {
                   showErrorToast(context, 'Could not launch URL');
                 }
               }
@@ -140,4 +142,3 @@ class FooterSection extends StatelessWidget {
     );
   }
 }
-

@@ -142,7 +142,6 @@ class BackupNotifier extends _$BackupNotifier {
         await registerAutoBackup(
           mAutoBackup,
           mAutoBackup,
-          tag: mAutoBackup,
           existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
           constraints: Constraints(networkType: NetworkType.connected),
           initialDelay: Duration(minutes: 15),
@@ -153,7 +152,7 @@ class BackupNotifier extends _$BackupNotifier {
         );
       } else {
         MiniLogger.dp('Cancelling background task');
-        await Workmanager().cancelByTag(mAutoBackup);
+        await cancelAutoBackup();
       }
     } on GoogleClientNotAuthenticatedError {
       if (context.mounted) showErrorToast(context, 'Sign in to continue!');

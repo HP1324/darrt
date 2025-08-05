@@ -9,9 +9,15 @@ class SubscriptionService {
   factory SubscriptionService() => _instance;
   SubscriptionService._internal();
 
-  bool showAds = true;
+  bool _showAds = true;
+
+  bool get showAds => _showAds;
 
   late final CustomerInfo _customerInfo;
+
+  void disableAds(){
+    _showAds = false;
+  }
 
   Future<void> configureRevenueCatSdk() async {
     await Purchases.setLogLevel(LogLevel.verbose);
@@ -24,12 +30,15 @@ class SubscriptionService {
 
     _customerInfo = await Purchases.getCustomerInfo();
 
+
     await isUserSubscribed();
   }
 
   Future<void> isUserSubscribed() async {
+    MiniLogger.d('Inside isUserSubscribed: showAds: $showAds');
     if (_customerInfo.entitlements.all['no-ads']?.isActive ?? false) {
-      showAds = false;
+      MiniLogger.d('User is subscribed to no ads');
+      disableAds();
     }
   }
 
