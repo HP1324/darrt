@@ -133,10 +133,10 @@ class BackupNotifier extends _$BackupNotifier {
       if (value) {
         final frequency = state.autoBackupFrequency;
         Duration backupDuration = frequency == 'daily'
-            ? Duration(days: 1)
-            : frequency == 'weekly'
-            ? Duration(days: 7)
-            : Duration(days: 30);
+            ? Duration(minutes: 15)
+            : frequency ==  'weekly'
+            ? Duration(minutes: 20)
+            : Duration(minutes: 25);
         MiniLogger.dp('Registering background task: frequency: $frequency, duration: $backupDuration');
         final ms = DateTime.now().millisecondsSinceEpoch;
         await registerAutoBackup(
@@ -164,10 +164,10 @@ class BackupNotifier extends _$BackupNotifier {
     state = state.copyWith(autoBackupFrequency: newFrequency);
 
     final backupDuration = newFrequency == 'daily'
-        ? Duration(days: 1)
+        ? Duration(minutes: 15)
         : newFrequency == 'weekly'
-        ? Duration(days: 7)
-        : Duration(days: 30);
+        ? Duration(minutes: 20)
+        : Duration(minutes: 25);
 
     final ms = DateTime.now().millisecondsSinceEpoch;
     await registerAutoBackup(
