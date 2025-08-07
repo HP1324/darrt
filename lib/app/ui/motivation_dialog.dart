@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class MotivationDialog extends StatefulWidget {
-  const MotivationDialog({Key? key}) : super(key: key);
+  const MotivationDialog({super.key});
 
   @override
   State<MotivationDialog> createState() => _MotivationDialogState();

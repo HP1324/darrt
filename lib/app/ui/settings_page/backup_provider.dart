@@ -138,7 +138,6 @@ class BackupNotifier extends _$BackupNotifier {
             ? Duration(days: 7)
             : Duration(days: 30);
         MiniLogger.dp('Registering background task: frequency: $frequency, duration: $backupDuration');
-        final ms = DateTime.now().millisecondsSinceEpoch;
         await registerAutoBackup(
           mAutoBackup,
           mAutoBackup,
@@ -169,7 +168,6 @@ class BackupNotifier extends _$BackupNotifier {
         ? Duration(days: 7)
         : Duration(days: 30);
 
-    final ms = DateTime.now().millisecondsSinceEpoch;
     await registerAutoBackup(
       mAutoBackup,
       mAutoBackup,

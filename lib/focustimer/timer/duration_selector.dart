@@ -115,7 +115,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? Theme.of(context).primaryColor.withOpacity(0.1)
+                                  ? Theme.of(context).primaryColor.withValues(alpha:0.1)
                                   : null,
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -165,7 +165,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? Theme.of(context).primaryColor.withOpacity(0.1)
+                                  ? Theme.of(context).primaryColor.withValues(alpha:0.1)
                                   : null,
                               borderRadius: BorderRadius.circular(8),
                             ),

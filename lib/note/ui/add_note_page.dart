@@ -10,8 +10,6 @@ import 'package:darrt/helpers/messages.dart' show Messages;
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/helpers/mini_router.dart';
-import 'package:darrt/helpers/utils.dart'
-    show generateNotePdf, savePdfToDownloads, showToast, showSettingsDialog;
 import 'package:darrt/note/models/folder.dart';
 import 'package:darrt/note/models/note.dart';
 import 'package:darrt/note/state/note_state_controller.dart';
