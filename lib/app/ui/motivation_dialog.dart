@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:darrt/helpers/mini_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -58,6 +59,8 @@ class _MotivationDialogState extends State<MotivationDialog> {
             if (quote.endsWith('.')) {
               quote = quote.substring(0, quote.length - 1);
             }
+            // quote = "This is a long quote intended to test the behavior of the widget that is showing this quote. to see if the long quote is displayed properly or not or is it getting hidden behind the dialog and not showing to the user in its full form. so let's check if this is working or not, now let's make it much bigger than ever so that we can rest assured that not in the lifetime of the universe any quote gets hidden";
+            MiniLogger.d("Quote: $quote");
           }
           isLoading = false;
         });
@@ -109,7 +112,7 @@ class _MotivationDialogState extends State<MotivationDialog> {
             const SizedBox(width: 8),
             Flexible(
               child: Text(
-                'Random Quote',
+                'Quote',
                 style: textTheme.titleMedium?.copyWith(
                   color: scheme.onPrimary,
                   fontWeight: FontWeight.w600,
@@ -122,35 +125,28 @@ class _MotivationDialogState extends State<MotivationDialog> {
         ),
       ),
       content: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: 150,
-            maxHeight: MediaQuery.of(context).size.height * 0.4,
-            maxWidth: MediaQuery.of(context).size.width * 0.8,
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: scheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: scheme.outline.withValues(alpha: 0.2),
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: scheme.shadow.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: scheme.outline.withValues(alpha: 0.2),
+              width: 1,
             ),
-            child: !hasInternet
-                ? _buildNoInternetContent(scheme, textTheme)
-                : isLoading
-                ? _buildLoadingContent(scheme, textTheme)
-                : _buildQuoteContent(scheme, textTheme),
+            boxShadow: [
+              BoxShadow(
+                color: scheme.shadow.withValues(alpha: 0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
+          child: !hasInternet
+              ? _buildNoInternetContent(scheme, textTheme)
+              : isLoading
+              ? _buildLoadingContent(scheme, textTheme)
+              : _buildQuoteContent(scheme, textTheme),
         ),
       ),
       actions: [
@@ -255,7 +251,6 @@ class _MotivationDialogState extends State<MotivationDialog> {
               letterSpacing: 0.3,
             ),
             overflow: TextOverflow.fade,
-            maxLines: 8,
           ),
         ),
         if (author.isNotEmpty) ...[
