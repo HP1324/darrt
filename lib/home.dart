@@ -127,7 +127,7 @@ class _BottomNavBarWidget extends StatelessWidget {
             return TimedBannerAdWidget(
               adInitializer: () => g.adsController.initializeHomePageBannerAd(),
               showFor: const Duration(seconds: 40),
-              hideFor: const Duration(seconds: 20),
+              hideFor: const Duration(seconds: 10),
               showFirst: false,
               childBuilder: () {
                 if (g.adsController.isHomePageBannerAdLoaded) {

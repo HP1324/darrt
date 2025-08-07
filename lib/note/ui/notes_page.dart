@@ -455,6 +455,8 @@ class _NotesPageState extends State<NotesPage> {
         listenable: g.adsController,
         builder: (context, child) {
           return TimedBannerAdWidget(
+            showFor: Duration(seconds: 50),
+            hideFor: Duration(seconds: 10),
             adInitializer: () => g.adsController.initializeNotesPageBannerAd(),
             childBuilder: () {
               if (g.adsController.isNotesPageBannerAdLoaded) {
