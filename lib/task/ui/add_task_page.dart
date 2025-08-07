@@ -19,7 +19,6 @@ import 'package:darrt/task/models/reminder.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/ui/task_note_bottom_sheet.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:toastification/toastification.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 
 class AddTaskPage extends StatefulWidget {

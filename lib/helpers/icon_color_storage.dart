@@ -152,7 +152,7 @@ class IconColorStorage{
       'signature': FontAwesomeIcons.signature,
       'network': FontAwesomeIcons.networkWired,
       'meeting': FontAwesomeIcons.usersBetweenLines,
-      'deadline': FontAwesomeIcons.clockFour,
+      'deadline': FontAwesomeIcons.clock,
       'project': FontAwesomeIcons.folderOpen,
       'client': FontAwesomeIcons.userTie,
       'invoice': FontAwesomeIcons.fileInvoiceDollar,

@@ -8,7 +8,6 @@ import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/ui/task_item.dart';
 import 'package:darrt/task/ui/task_timeline_item.dart';
-import 'package:toastification/toastification.dart';
 
 class TasksPage extends StatefulWidget {
   const TasksPage({super.key});
