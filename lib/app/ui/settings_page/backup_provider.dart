@@ -86,7 +86,7 @@ class BackupNotifier extends _$BackupNotifier {
 
   Future<void> _signOut(BuildContext context) async {
     state = state.copyWith(autoBackup: false, currentEmail: null);
-    if (context.mounted) showWarningToast(context, 'Signed out');
+    showWarningToast(context, 'Signed out');
     MiniBox().write(mAutoBackup, false);
     await Workmanager().cancelByUniqueName(mAutoBackup);
     await GoogleSignInService().signOut();
@@ -133,12 +133,11 @@ class BackupNotifier extends _$BackupNotifier {
       if (value) {
         final frequency = state.autoBackupFrequency;
         Duration backupDuration = frequency == 'daily'
-            ? Duration(minutes: 15)
+            ? Duration(days: 1)
             : frequency ==  'weekly'
-            ? Duration(minutes: 20)
-            : Duration(minutes: 25);
+            ? Duration(days: 7)
+            : Duration(days: 30);
         MiniLogger.dp('Registering background task: frequency: $frequency, duration: $backupDuration');
-        final ms = DateTime.now().millisecondsSinceEpoch;
         await registerAutoBackup(
           mAutoBackup,
           mAutoBackup,
@@ -164,12 +163,11 @@ class BackupNotifier extends _$BackupNotifier {
     state = state.copyWith(autoBackupFrequency: newFrequency);
 
     final backupDuration = newFrequency == 'daily'
-        ? Duration(minutes: 15)
+        ? Duration(days: 1)
         : newFrequency == 'weekly'
-        ? Duration(minutes: 20)
-        : Duration(minutes: 25);
+        ? Duration(days: 7)
+        : Duration(days: 30);
 
-    final ms = DateTime.now().millisecondsSinceEpoch;
     await registerAutoBackup(
       mAutoBackup,
       mAutoBackup,

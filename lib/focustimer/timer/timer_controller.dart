@@ -180,14 +180,14 @@ class TimerController extends ChangeNotifier {
     _ticker = null;
   }
 
-  void _completeTimer() {
-    _stopTicker();
-    _state = TimerState.completed;
-    _remainingSeconds = 0;
-    _startTime = null;
-    _saveToStorage();
-    notifyListeners();
-  }
+  // void _completeTimer() {
+  //   _stopTicker();
+  //   _state = TimerState.completed;
+  //   _remainingSeconds = 0;
+  //   _startTime = null;
+  //   _saveToStorage();
+  //   notifyListeners();
+  // }
 
   void pauseTimer() {
     if (_state == TimerState.running) {
@@ -429,7 +429,7 @@ class TimerController extends ChangeNotifier {
 
     final typeLabel = _currentType == TimerType.focus ? 'Focus' : 'Break';
     final stateLabel = _state == TimerState.paused ? '⏸️ Paused' : '▶️ Running';
-    final title = typeLabel == 'Focus' ? 'Focus session - $stateLabel' : 'Taking a break';;
+    final title = typeLabel == 'Focus' ? 'Focus session - $stateLabel' : 'Taking a break';
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: 999, // Use a fixed ID for updating

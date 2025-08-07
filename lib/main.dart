@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:darrt/app/ads/subscription_service.dart';
@@ -21,7 +20,6 @@ import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/home.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:flutter/services.dart';
 
@@ -87,6 +85,12 @@ class _DarrtState extends State<Darrt> {
     );
   }
 
+  @override
+  void dispose() {
+    MiniLogger.dp('Main dispose called');
+    g.audioController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(

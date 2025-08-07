@@ -1,5 +1,4 @@
 import 'package:darrt/helpers/utils.dart';
-import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/app/services/object_box.dart';
@@ -253,42 +252,42 @@ class _CategoryFilters extends StatelessWidget {
 }
 
 // Priority filters widget
-class _PriorityFilters extends StatelessWidget {
-  const _PriorityFilters();
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: _controller,
-      builder: (context, child) {
-        final selectedPriority = _controller.selectedPriority;
-        return Wrap(
-          spacing: 7,
-          children: [
-            FilterChip(
-              showCheckmark: false,
-              label: Text(
-                'All Priorities',
-                style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium!.fontSize),
-              ),
-              selected: selectedPriority == null,
-              onSelected: (_) => _controller.setPriority(null),
-            ),
-            ..._controller.priorities.map((priority) => FilterChip(
-                  showCheckmark: false,
-                  label: Text(
-                    priority,
-                    style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium!.fontSize),
-                  ),
-                  selected: selectedPriority == priority,
-                  onSelected: (selected) => _controller.setPriority(selected ? priority : null),
-                )),
-          ],
-        );
-      },
-    );
-  }
-}
+// class _PriorityFilters extends StatelessWidget {
+//   const _PriorityFilters();
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListenableBuilder(
+//       listenable: _controller,
+//       builder: (context, child) {
+//         final selectedPriority = _controller.selectedPriority;
+//         return Wrap(
+//           spacing: 7,
+//           children: [
+//             FilterChip(
+//               showCheckmark: false,
+//               label: Text(
+//                 'All Priorities',
+//                 style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium!.fontSize),
+//               ),
+//               selected: selectedPriority == null,
+//               onSelected: (_) => _controller.setPriority(null),
+//             ),
+//             ..._controller.priorities.map((priority) => FilterChip(
+//                   showCheckmark: false,
+//                   label: Text(
+//                     priority,
+//                     style: TextStyle(fontSize: Theme.of(context).textTheme.labelMedium!.fontSize),
+//                   ),
+//                   selected: selectedPriority == priority,
+//                   onSelected: (selected) => _controller.setPriority(selected ? priority : null),
+//                 )),
+//           ],
+//         );
+//       },
+//     );
+//   }
+// }
 
 // Empty search state widget
 class _EmptySearchState extends StatelessWidget {

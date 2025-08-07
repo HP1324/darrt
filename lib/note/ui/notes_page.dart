@@ -470,7 +470,7 @@ class _NotesPageState extends State<NotesPage> {
 }
 
 class _NotesEmptyIndicator extends StatelessWidget {
-  const _NotesEmptyIndicator({super.key});
+  const _NotesEmptyIndicator();
 
   @override
   Widget build(BuildContext context) {
