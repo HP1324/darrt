@@ -7,6 +7,7 @@ import 'package:darrt/helpers/consts.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/helpers/mini_logger.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 
 @pragma('vm:entry-point')
@@ -26,11 +27,14 @@ void callBackDispatcher() {
           ObjectBox().close();
         } on InternetOffError catch (e) {
           MiniLogger.dp("internet off");
+          await Sentry.captureException(e);
           await createBackupFailureNotification(e.userMessage!);
         } on GoogleClientNotAuthenticatedError catch (e) {
           MiniLogger.dp("client not authenticated");
+          await Sentry.captureException(e);
           await createBackupFailureNotification(e.userMessage!);
         } catch (e, t) {
+          await Sentry.captureException(e,stackTrace: t);
           MiniLogger.dp('${e.toString()}, type: ${e.runtimeType}');
           MiniLogger.dp(t.toString());
           await createBackupFailureNotification('Something went wrong');

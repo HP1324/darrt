@@ -13,6 +13,7 @@ import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/quickreminder/ui/quick_reminder_dialog.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:toastification/toastification.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -169,6 +170,17 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                           child: _MiniAppBarAction(
                             icon: Icon(Icons.handyman),
                             onTap: () async {
+
+                              try {
+                                throw StateError('Sentry Test Exception');
+                              } catch (exception, stackTrace) {
+                                await Sentry.captureException(
+                                  exception,
+                                  stackTrace: stackTrace,
+                                );
+                                return;
+                              }
+
                               if (kDebugMode) {
                                 final user = GoogleSignInService().currentUser;
                                 MiniLogger.dp(user?.email ?? 'No user is currently logged in');

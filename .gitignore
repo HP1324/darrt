@@ -54,3 +54,6 @@ android/app/.cxx/
 /linux/
 /macos/
 /windows/
+
+sentry.properties
+sentry-wizard
