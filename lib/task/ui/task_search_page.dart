@@ -6,7 +6,7 @@ import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/ui/task_item.dart';
 
 ///This state controller is used only within this file that's why not put in globals.dart
-final _controller = SearchStateController();
+late final _controller = SearchStateController();
 
 // Controller class to handle all state and business logic
 class SearchStateController extends ChangeNotifier {
