@@ -4,6 +4,7 @@ import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/ui/task_item.dart';
+import 'package:darrt/helpers/globals.dart' as g show taskVm, catVm;
 
 ///This state controller is used only within this file that's why not put in globals.dart
 late final _controller = SearchStateController();
@@ -56,8 +57,8 @@ class SearchStateController extends ChangeNotifier {
 
   // Load all data
   void _loadData() {
-    _allTasks = ObjectBox().store!.box<Task>().getAll();
-    _categories = ObjectBox().store!.box<TaskCategory>().getAll();
+    _allTasks = g.taskVm.tasks;
+    _categories = g.catVm.categories;
     notifyListeners();
   }
 
