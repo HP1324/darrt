@@ -1,7 +1,6 @@
 import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/category/models/task_category.dart';
-import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/ui/task_item.dart';
 import 'package:darrt/helpers/globals.dart' as g show taskVm, catVm;
