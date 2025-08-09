@@ -15,16 +15,6 @@ class AdsController extends ChangeNotifier {
   final String _fullPageOnCustomSoundPickUnitId = "ca-app-pub-4229818111096005/5233669822";
   final String _themePageBannerUnitId = "ca-app-pub-4229818111096005/6880394618";
 
-  // final String _homePageBannerUnitId = "ca-app-pub-3940256099942544/6300978111";
-  // final String _fullPageOnAddTaskPagePopUnitId = "ca-app-pub-3940256099942544/1033173712";
-  // final String _notesPageBannerUnitId = "ca-app-pub-3940256099942544/6300978111";
-  // final String _addNotePageBannerUnitId = "ca-app-pub-3940256099942544/6300978111";
-  // final String _fullPageOnAddCategoryPagePopAdUnitId = "ca-app-pub-3940256099942544/1033173712";
-  // final String _fullPageOnAddFolderPagePopAdUnitId = "ca-app-pub-3940256099942544/1033173712";
-  // final String _fullPageOnAddNotePagePopUnitId = "ca-app-pub-3940256099942544/1033173712";
-  // final String _fullPageOnCustomSoundPickUnitId = "ca-app-pub-3940256099942544/1033173712";
-  // final String _themePageBannerUnitId = "ca-app-pub-3940256099942544/6300978111";
-
   late BannerAd _homePageBannerAd;
   BannerAd get homePageBannerAd => _homePageBannerAd;
   bool isHomePageBannerAdLoaded = false;
@@ -73,9 +63,10 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          MiniLogger.dp(
-            "Home page banner ad failed to load: ${error.message}, ${error.code}, domain: ${error.domain}, message: ${error.message}",
-          );
+          final fullMessage =
+              "Home page banner ad failed to load: ${error.code}, domain: ${error.domain}, message: ${error.message}";
+          Sentry.captureException(error, message: SentryMessage(fullMessage));
+          MiniLogger.dp(fullMessage);
           isHomePageBannerAdLoaded = false;
           notifyListeners();
           ad.dispose();
@@ -86,7 +77,7 @@ class AdsController extends ChangeNotifier {
   }
 
   void initializeNotesPageBannerAd() {
-    if(!subService.showAds) return;
+    if (!subService.showAds) return;
     _notesPageBannerAd = BannerAd(
       adUnitId: _notesPageBannerUnitId,
       size: AdSize.banner,
@@ -97,9 +88,9 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          final fullMessage = 'Notes page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}';
-          final SentryMessage sentryMessage =SentryMessage(fullMessage);
-          Sentry.captureException(error,message: sentryMessage);
+          final fullMessage =
+              'Notes page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}';
+          Sentry.captureException(error, message: SentryMessage(fullMessage));
           MiniLogger.dp(fullMessage);
           isNotesPageBannerAdLoaded = false;
           notifyListeners();
@@ -111,7 +102,7 @@ class AdsController extends ChangeNotifier {
   }
 
   void initializeAddNotePageBannerAd() {
-    if(!subService.showAds) return;
+    if (!subService.showAds) return;
     _addNotePageBannerAd = BannerAd(
       adUnitId: _addNotePageBannerUnitId,
       size: AdSize.banner,
@@ -122,9 +113,10 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          MiniLogger.dp(
-            'Add note page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}',
-          );
+          final fullMessage =
+              'Add note page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}';
+          Sentry.captureException(error, message: SentryMessage(fullMessage));
+          MiniLogger.dp(fullMessage);
           isAddNotePageBannerAdLoaded = false;
           notifyListeners();
           ad.dispose();
@@ -135,7 +127,7 @@ class AdsController extends ChangeNotifier {
   }
 
   void initializeThemePageBannerAd() {
-    if(!subService.showAds) return;
+    if (!subService.showAds) return;
     _themePageBannerAd = BannerAd(
       adUnitId: _themePageBannerUnitId,
       size: AdSize.banner,
@@ -146,9 +138,10 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          MiniLogger.dp(
-            'Theme page banner app failed to load: ${error.code}, domain: ${error.domain}, message: ${error.message}',
-          );
+          final fullMessage =
+              'Theme page banner app failed to load: ${error.code}, domain: ${error.domain}, message: ${error.message}';
+          Sentry.captureException(error, message: SentryMessage(fullMessage));
+          MiniLogger.dp(fullMessage);
           isThemePageBannerAdLoaded = false;
           notifyListeners();
           ad.dispose();
@@ -159,7 +152,7 @@ class AdsController extends ChangeNotifier {
   }
 
   void initializeFullPageAdOnAddTaskPagePop() async {
-    if(!subService.showAds) return;
+    if (!subService.showAds) return;
     await InterstitialAd.load(
       adUnitId: _fullPageOnAddTaskPagePopUnitId,
       request: AdRequest(),
@@ -169,6 +162,10 @@ class AdsController extends ChangeNotifier {
           isFullPageAfterTaskPutAdLoaded = true;
         },
         onAdFailedToLoad: (adError) {
+          final fullMessage =
+              "Full page ad on add task page pop failed: ${adError.code}, message: ${adError.message}";
+          Sentry.captureException(adError, message: SentryMessage(fullMessage));
+          MiniLogger.dp(fullMessage);
           isFullPageAfterTaskPutAdLoaded = false;
         },
       ),
@@ -176,7 +173,7 @@ class AdsController extends ChangeNotifier {
   }
 
   void initializeFullPageAdOnAddCategoryPagePop() async {
-    if(!subService.showAds) return;
+    if (!subService.showAds) return;
     await InterstitialAd.load(
       adUnitId: _fullPageOnAddCategoryPagePopAdUnitId,
       request: AdRequest(),
@@ -186,6 +183,10 @@ class AdsController extends ChangeNotifier {
           isFullPageAdOnAddCategoryPopLoaded = true;
         },
         onAdFailedToLoad: (adError) {
+          final fullMessage =
+              "Full page ad on add category page pop failed: ${adError.code}, message: ${adError.message}";
+          Sentry.captureException(adError, message: SentryMessage(fullMessage));
+          MiniLogger.dp(fullMessage);
           isFullPageAdOnAddCategoryPopLoaded = false;
         },
       ),
@@ -193,7 +194,7 @@ class AdsController extends ChangeNotifier {
   }
 
   void initializeFullPageAdOnAddNotePagePop() async {
-    if(!subService.showAds) return;
+    if (!subService.showAds) return;
     await InterstitialAd.load(
       adUnitId: _fullPageOnAddNotePagePopUnitId,
       request: AdRequest(),
@@ -203,6 +204,10 @@ class AdsController extends ChangeNotifier {
           isFullPageOnAddNotePagePopAdLoaded = true;
         },
         onAdFailedToLoad: (adError) {
+          final fullMessage =
+              "Full page ad on add note page pop failed: ${adError.code}, message: ${adError.message}";
+          Sentry.captureException(adError, message: SentryMessage(fullMessage));
+          MiniLogger.dp(fullMessage);
           isFullPageOnAddNotePagePopAdLoaded = false;
         },
       ),
@@ -210,7 +215,7 @@ class AdsController extends ChangeNotifier {
   }
 
   void initializeFullPageOnAddFolderPagePopAd() async {
-    if(!subService.showAds) return;
+    if (!subService.showAds) return;
     await InterstitialAd.load(
       adUnitId: _fullPageOnAddFolderPagePopAdUnitId,
       request: AdRequest(),
@@ -220,6 +225,10 @@ class AdsController extends ChangeNotifier {
           isFullPageOnAddFolderPagePopAdLoaded = true;
         },
         onAdFailedToLoad: (adError) {
+          final fullMessage =
+              "Full page ad on add folder page pop failed: ${adError.code}, message: ${adError.message}";
+          Sentry.captureException(adError, message: SentryMessage(fullMessage));
+          MiniLogger.dp(fullMessage);
           isFullPageOnAddFolderPagePopAdLoaded = false;
         },
       ),
@@ -227,7 +236,7 @@ class AdsController extends ChangeNotifier {
   }
 
   void initializeFullPageAdOnCustomSoundPick() async {
-    if(!subService.showAds) return;
+    if (!subService.showAds) return;
     await InterstitialAd.load(
       adUnitId: _fullPageOnCustomSoundPickUnitId,
       request: AdRequest(),
@@ -237,6 +246,10 @@ class AdsController extends ChangeNotifier {
           isFullPageOnCustomSoundPickAdLoaded = true;
         },
         onAdFailedToLoad: (adError) {
+          final fullMessage =
+              "Full page ad on custom sound pick failed: ${adError.code}, message: ${adError.message}";
+          Sentry.captureException(adError, message: SentryMessage(fullMessage));
+          MiniLogger.dp(fullMessage);
           isFullPageOnCustomSoundPickAdLoaded = false;
         },
       ),
