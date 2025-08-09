@@ -48,7 +48,7 @@ class _StatsPageState extends State<StatsPage> {
             const StreakDisplayWidget(),
             const SizedBox(height: 16),
             SeeChartsWidget(task: widget.task),
-            _AchievementsSection(),
+            SafeArea(child: _AchievementsSection()),
           ],
         ),
       ),
