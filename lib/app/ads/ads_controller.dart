@@ -2,6 +2,7 @@ import 'package:darrt/app/ads/subscription_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:darrt/helpers/mini_logger.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class AdsController extends ChangeNotifier {
   final String _homePageBannerUnitId = "ca-app-pub-4229818111096005/5755031111";
@@ -96,9 +97,10 @@ class AdsController extends ChangeNotifier {
           notifyListeners();
         },
         onAdFailedToLoad: (ad, error) {
-          MiniLogger.dp(
-            'Notes page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}',
-          );
+          final fullMessage = 'Notes page banner app failed to load:  ${error.code}, domain: ${error.domain}, message: ${error.message}';
+          final SentryMessage sentryMessage =SentryMessage(fullMessage);
+          Sentry.captureException(error,message: sentryMessage);
+          MiniLogger.dp(fullMessage);
           isNotesPageBannerAdLoaded = false;
           notifyListeners();
           ad.dispose();
