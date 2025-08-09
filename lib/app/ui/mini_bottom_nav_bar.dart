@@ -12,12 +12,14 @@ class MiniBottomNavBar extends StatefulWidget {
 class _MiniBottomNavBarState extends State<MiniBottomNavBar> {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.sizeOf(context).height * 0.09,
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: widget.children,
+    return SafeArea(
+      child: SizedBox(
+        height: MediaQuery.sizeOf(context).height * 0.09,
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: widget.children,
+          ),
         ),
       ),
     );
