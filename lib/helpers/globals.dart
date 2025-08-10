@@ -21,45 +21,45 @@ import 'package:uuid/uuid.dart';
 
 
 
-late final taskSc = TaskStateController();
+final taskSc = TaskStateController();
 
-late final taskVm = TaskViewModel();
+final taskVm = TaskViewModel();
 
-late final catSc = CategoryStateController();
+final catSc = CategoryStateController();
 
-late final catVm = CategoryViewModel();
+final catVm = CategoryViewModel();
 
-late final noteSc = NoteStateController();
+final noteSc = NoteStateController();
 
-late final noteVm = NoteViewModel();
+final noteVm = NoteViewModel();
 
-late final folderSc = FolderStateController();
+final folderSc = FolderStateController();
 
-late final folderVm = FolderViewModel();
+final folderVm = FolderViewModel();
 
-late final themeMan = ThemeManager();
+final themeMan = ThemeManager();
 
-late final calMan = CalendarManager();
+final calMan = CalendarManager();
 
-late final navMan = NavigationManager();
+final navMan = NavigationManager();
 
-late final taskSttController = TaskSttController();
+final taskSttController = TaskSttController();
 
-late final noteSttController = NoteSttController();
+final noteSttController = NoteSttController();
 
-late final settingsSc = SettingsStateController();
+final settingsSc = SettingsStateController();
 
-late final completionVm = CompletionViewModel();
+final completionVm = CompletionViewModel();
 
-late final quickVm = QuickReminderViewModel();
+final quickVm = QuickReminderViewModel();
 
-late final audioController = SoundController();
+final audioController = SoundController();
 
-late final timerController = TimerController();
+final timerController = TimerController();
 
-late final adsController = AdsController();
+final adsController = AdsController();
 
-late final Uuid uuid = Uuid();
+final Uuid uuid = Uuid();
 
 
 
