@@ -99,7 +99,7 @@ class BackupNotifier extends _$BackupNotifier {
     state = state.copyWith(isBackingUp: true);
     try {
       await BackupService().performBackup();
-        showSuccessToast(context, 'Backup completed successfully');
+      showSuccessToast(context, 'Backup completed successfully');
       final now = DateTime.now();
       MiniBox().write(mLastBackupDate, now);
       state = state.copyWith(lastBackupDate: now);
@@ -109,9 +109,7 @@ class BackupNotifier extends _$BackupNotifier {
       if (context.mounted) showSuccessToast(context, e.userMessage!);
     } catch (e) {
       MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
-      if (context.mounted) {
-        showErrorToast(context, 'Unknown error occurred, try after sometime!');
-      }
+      showErrorToast(context, 'Unknown error occurred, try after sometime!');
     } finally {
       state = state.copyWith(isBackingUp: false);
     }
@@ -132,10 +130,12 @@ class BackupNotifier extends _$BackupNotifier {
         final frequency = state.autoBackupFrequency;
         Duration backupDuration = frequency == 'daily'
             ? Duration(days: 1)
-            : frequency ==  'weekly'
+            : frequency == 'weekly'
             ? Duration(days: 7)
             : Duration(days: 30);
-        MiniLogger.dp('Registering background task: frequency: $frequency, duration: $backupDuration');
+        MiniLogger.dp(
+          'Registering background task: frequency: $frequency, duration: $backupDuration',
+        );
         await registerAutoBackup(
           mAutoBackup,
           mAutoBackup,
@@ -159,6 +159,7 @@ class BackupNotifier extends _$BackupNotifier {
   Future<void> changeAutoBackupFrequency(String newFrequency) async {
     if (state.isAnyOperationInProgress) return;
     state = state.copyWith(autoBackupFrequency: newFrequency);
+    MiniBox().write(mAutoBackupFrequency, newFrequency);
 
     final backupDuration = newFrequency == 'daily'
         ? Duration(days: 1)
@@ -173,8 +174,9 @@ class BackupNotifier extends _$BackupNotifier {
       existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
       frequency: backupDuration,
     );
-    MiniLogger.dp('Is task replaced: ${await Workmanager().isScheduledByUniqueName(mAutoBackup)}');
-    MiniBox().write(mAutoBackupFrequency, newFrequency);
+    MiniLogger.dp(
+      'Is task replaced: ${await Workmanager().isScheduledByUniqueName(mAutoBackup)}',
+    );
   }
 
   Future<void> performRestore(BuildContext context) async {
