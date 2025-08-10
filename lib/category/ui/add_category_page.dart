@@ -7,7 +7,6 @@ import 'package:darrt/category/state/category_state_controller.dart';
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/messages.dart';
 import 'package:darrt/helpers/utils.dart';
-import 'package:toastification/toastification.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 
 class AddCategoryPage extends StatefulWidget {

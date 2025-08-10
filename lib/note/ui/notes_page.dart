@@ -9,7 +9,6 @@ import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/note/ui/add_note_page.dart';
 import 'package:darrt/note/ui/folders_page.dart';
 import 'package:darrt/note/ui/note_item.dart';
-import 'package:toastification/toastification.dart' show ToastificationType;
 import 'dart:convert';
 
 import '../models/note.dart';

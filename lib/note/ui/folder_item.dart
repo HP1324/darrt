@@ -7,7 +7,6 @@ import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/helpers/utils.dart';
-import 'package:toastification/toastification.dart';
 
 class FolderItem extends StatefulWidget {
   const FolderItem({super.key, required this.folder});

@@ -40,10 +40,4 @@ class QuickReminderViewModel extends ViewModel<QuickReminder> {
   void setItemId(QuickReminder item, int id) {
     // TODO: implement setItemId
   }
-
-  @override
-  List<QuickReminder> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) => [];
-
-  @override
-  List<Map<String, dynamic>> convertObjectsListToJsonList(List<QuickReminder> objectList) => [];
 }

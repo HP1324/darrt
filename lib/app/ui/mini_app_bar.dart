@@ -12,7 +12,6 @@ import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/quickreminder/ui/quick_reminder_dialog.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:toastification/toastification.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   MiniAppBar({super.key});

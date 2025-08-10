@@ -9,6 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'consts.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+/// Take a [GlobalKey] associated with a widget and return the offset and size of the widget.
 (Offset, Size) getOffsetAndSize(GlobalKey key) {
   Offset offset = Offset.zero;
   Size size = Size.zero;
@@ -20,6 +21,7 @@ import 'package:pdf/widgets.dart' as pw;
   return (offset, size);
 }
 
+/// Get the relative rect from an [Offset] and [Size].
 RelativeRect getRelativeRectFromOffsetAndSize(Offset offset, Size size) {
   return RelativeRect.fromLTRB(
     offset.dx,

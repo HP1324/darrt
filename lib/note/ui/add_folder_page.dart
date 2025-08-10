@@ -7,7 +7,6 @@ import 'package:darrt/helpers/messages.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/note/models/folder.dart';
 import 'package:darrt/note/state/folder_state_controller.dart';
-import 'package:toastification/toastification.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 
 class AddFolderPage extends StatefulWidget {

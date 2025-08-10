@@ -8,9 +8,7 @@ import 'package:darrt/app/notification/notification_service.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/messages.dart' show Messages;
 import 'package:darrt/helpers/mini_logger.dart';
-import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/quickreminder/model/quick_reminder.dart';
-import 'package:toastification/toastification.dart';
 
 class QuickReminderDialog extends StatefulWidget {
   const QuickReminderDialog({super.key, required this.edit, this.reminder})
