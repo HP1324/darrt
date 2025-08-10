@@ -1,3 +1,4 @@
+import 'package:darrt/app/services/toast_service.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/category/ui/add_category_page.dart';
@@ -218,7 +219,7 @@ class _DeleteCategoryDialogState extends State<_DeleteCategoryDialog> {
         FilledButton(
           onPressed: () async {
             final message = g.catVm.deleteItem(widget.categoryId, deleteTasks: deleteTasks);
-            showToast(context, type: ToastificationType.success, description: message);
+            showSuccessToast(context,  message);
             Navigator.pop(context);
           },
           child: const Text('Delete'),

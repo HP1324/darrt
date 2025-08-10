@@ -1,3 +1,4 @@
+import 'package:darrt/app/services/toast_service.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/note/models/folder.dart';
 import 'package:darrt/note/ui/add_folder_page.dart';
@@ -218,7 +219,7 @@ class _DeleteFolderDialogState extends State<_DeleteFolderDialog> {
         FilledButton(
           onPressed: () async {
             final message = g.folderVm.deleteItem(widget.folderId, deleteTasks: deleteNotes);
-            showToast(context, type: ToastificationType.success, description: message);
+            showSuccessToast(context, message);
             Navigator.pop(context);
           },
           child: const Text('Delete'),

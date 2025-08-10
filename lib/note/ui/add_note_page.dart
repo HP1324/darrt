@@ -1,3 +1,4 @@
+import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -178,13 +179,6 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 
   void _saveNote(BuildContext context) {
-    // Note note;
-    // if (!g.noteSc.controller.document.isEmpty()) {
-    //   final note = g.noteSc.buildModel(
-    //     edit: widget.edit,
-    //     model: widget.edit ? widget.note : null,
-    //   );
-    // }
     if (widget.isTaskNote != null && widget.task != null) {
       MiniLogger.dp('we are here');
       if (!g.noteSc.controller.document.isEmpty()) {
@@ -207,7 +201,7 @@ class _AddNotePageState extends State<AddNotePage> {
       }
       return;
     } else {
-      var message = '';
+      String message = '';
       if (!g.noteSc.controller.document.isEmpty()) {
         final note = g.noteSc.buildModel(
           edit: widget.edit,
@@ -218,24 +212,14 @@ class _AddNotePageState extends State<AddNotePage> {
       } else {
         message = Messages.mNoteEmpty;
       }
-      showToast(
-        context,
-        type: message == Messages.mNoteEmpty
-            ? ToastificationType.error
-            : ToastificationType.success,
-        description: message,
-      );
+      if(message == Messages.mNoteEmpty) showErrorToast(context, message);
+      else showSuccessToast(context, message);
+      
     }
   }
 
+  void showMicrophonePermissionDeniedToast() => showErrorToast(context, 'All requested permissions are necessary for speech recognition');
   Future<void> _handleSpeechToText(BuildContext context) async {
-    showPermissionDeniedToast() {
-      showToast(
-        context,
-        type: ToastificationType.error,
-        description: 'Microphone permission denied',
-      );
-    }
 
     // Check permission status first using permission_handler
     final micPermissionStatus = await Permission.microphone.status;
@@ -255,7 +239,7 @@ class _AddNotePageState extends State<AddNotePage> {
           g.noteSttController.startListening();
         } else {
           MiniLogger.d('Speech initialization failed');
-          showPermissionDeniedToast();
+          showMicrophonePermissionDeniedToast();
         }
       } else {
         MiniLogger.d('Speech already initialized, starting listening');
@@ -283,16 +267,12 @@ class _AddNotePageState extends State<AddNotePage> {
             g.noteSttController.startListening();
           } else {
             if (context.mounted) {
-              showToast(
-                context,
-                type: ToastificationType.error,
-                description: 'All requested permissions are necessary for speech recognition',
-              );
+              showMicrophonePermissionDeniedToast();
             }
           }
         } else {
           MiniLogger.d('Some permissions denied on first request');
-          showPermissionDeniedToast();
+          showMicrophonePermissionDeniedToast();
         }
       } else {
         MiniLogger.d('Not first time, checking if denied again flag is set');
@@ -313,12 +293,12 @@ class _AddNotePageState extends State<AddNotePage> {
             if (initResult) {
               g.noteSttController.startListening();
             } else {
-              showPermissionDeniedToast();
+              showMicrophonePermissionDeniedToast();
             }
           } else {
             MiniLogger.d('Some permissions denied on second request');
             MiniBox().write(micPermissionDeniedAgain, true);
-            showPermissionDeniedToast();
+            showMicrophonePermissionDeniedToast();
           }
         } else {
           MiniLogger.d('Permissions denied multiple times, showing settings dialog');
@@ -488,12 +468,12 @@ class SaveNotePdfButton extends StatelessWidget {
       onPressed: () async {
         final file = await generateNotePdf(g.noteSc.controller);
         if (identical(file, noteEmptyErrorBytes) && context.mounted) {
-          showToast(context, type: ToastificationType.error, description: Messages.mNoteEmpty);
+          showErrorToast(context, Messages.mNoteEmpty);
           return;
         }
         await savePdfToDownloads(file, 'note${DateTime.now().millisecondsSinceEpoch}.pdf');
         if (context.mounted) {
-          showToast(context, type: ToastificationType.success, description: 'PDF saved to device');
+          showSuccessToast(context,'PDF saved to device');
         }
       },
       icon: const Icon(FontAwesomeIcons.filePdf),

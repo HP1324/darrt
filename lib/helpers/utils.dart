@@ -6,25 +6,8 @@ import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 import 'package:intl/intl.dart';
 import 'package:darrt/app/ui/icon_color_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:toastification/toastification.dart';
 import 'consts.dart';
 import 'package:pdf/widgets.dart' as pw;
-
-void showToast(
-  BuildContext context, {
-  required ToastificationType type,
-  required String description,
-  Duration? duration,
-  Alignment? alignment,
-}) {
-  toastification.show(
-    context: context,
-    description: Text(description),
-    type: type,
-    autoCloseDuration: duration ?? const Duration(milliseconds: 1500),
-    alignment: alignment ?? Alignment.bottomCenter,
-  );
-}
 
 (Offset, Size) getOffsetAndSize(GlobalKey key) {
   Offset offset = Offset.zero;
@@ -395,7 +378,7 @@ Color getSurfaceColor(BuildContext context) {
   return backgroundColorHSV;
 }
 
-Color getLerpedScaffoldBackgroundColor(BuildContext context) {
+Color getLerpedSurfaceColor(BuildContext context) {
   final theme = Theme.of(context);
   final isDark = theme.brightness == Brightness.dark;
   final scheme = theme.colorScheme;

@@ -1,3 +1,4 @@
+import 'package:darrt/app/services/toast_service.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/app/ui/icon_color_picker.dart';
@@ -163,10 +164,10 @@ class _AddFolderPageState extends State<AddFolderPage> {
                     final folder = g.folderSc.buildModel(edit: widget.edit, model: widget.folder);
                     final message = g.folderVm.putItem(folder, edit: widget.edit);
                     if (message != Messages.mFolderEmpty) {
-                      showToast(context, type: ToastificationType.success, description: message);
+                      showSuccessToast(context, message);
                       Navigator.pop(context);
                     } else {
-                      showToast(context, type: ToastificationType.error, description: message);
+                      showErrorToast(context, message);
                     }
                   },
                   backgroundColor: IconColorStorage.colors[g.folderSc.color],

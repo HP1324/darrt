@@ -1,3 +1,4 @@
+import 'package:darrt/app/services/toast_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:darrt/app/ads/my_banner_ad_widget.dart';
@@ -279,10 +280,8 @@ class _NotesPageState extends State<NotesPage> {
               ),
             );
             if (mounted) {
-              showToast(
-                context,
-                type: ToastificationType.success,
-                description: message,
+              showSuccessToast(
+                context,message
               );
             }
           },

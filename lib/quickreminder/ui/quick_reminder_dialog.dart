@@ -1,5 +1,7 @@
 import 'package:darrt/app/services/mini_box.dart';
-import 'package:darrt/helpers/consts.dart' show notifReminderType, alarmReminderType, mDefaultReminderType;
+import 'package:darrt/app/services/toast_service.dart';
+import 'package:darrt/helpers/consts.dart'
+    show notifReminderType, alarmReminderType, mDefaultReminderType;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:darrt/app/notification/notification_service.dart';
@@ -9,7 +11,6 @@ import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/quickreminder/model/quick_reminder.dart';
 import 'package:toastification/toastification.dart';
-
 
 class QuickReminderDialog extends StatefulWidget {
   const QuickReminderDialog({super.key, required this.edit, this.reminder})
@@ -31,7 +32,8 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
       type = widget.reminder!.type!;
       _titleController.text = widget.reminder!.title ?? '';
       _minutesController.text = widget.reminder!.durationMinutes.toString();
-    }else type = MiniBox().read(mDefaultReminderType);
+    } else
+      type = MiniBox().read(mDefaultReminderType);
   }
 
   @override
@@ -134,7 +136,8 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
                           TextInputFormatter.withFunction(
                             (oldValue, newValue) {
                               // Don't allow starting with 0
-                              if (newValue.text.startsWith('0') && newValue.text.isNotEmpty) {
+                              if (newValue.text.startsWith('0') &&
+                                  newValue.text.isNotEmpty) {
                                 return oldValue;
                               }
 
@@ -167,19 +170,25 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
           onPressed: () async {
             final title = _titleController.text;
             final minutes = int.parse(_minutesController.text);
-            showToast(
+            showSuccessToast(
               context,
-              type: ToastificationType.success,
-              description:
-                  'Reminder set after ${minutes > 1 ? '$minutes minutes' : '$minutes minute'}',
+              'Reminder set after ${minutes > 1 ? '$minutes minutes' : '$minutes minute'}',
             );
             Navigator.pop(context);
-            final notifId = DateTime.now().millisecondsSinceEpoch.remainder(1000000);
-            await NotificationService.scheduleQuickReminder(id: notifId, title, minutes, type: type);
-            MiniLogger.dp('title: $title, minutes: $minutes, type: ${minutes.runtimeType}');
+            final notifId = DateTime.now().millisecondsSinceEpoch.remainder(
+              1000000,
+            );
+            await NotificationService.scheduleQuickReminder(
+              id: notifId,
+              title,
+              minutes,
+              type: type,
+            );
+            MiniLogger.dp(
+              'title: $title, minutes: $minutes, type: ${minutes.runtimeType}',
+            );
 
-
-            final reminder =  QuickReminder(
+            final reminder = QuickReminder(
               id: widget.edit ? widget.reminder!.id : 0,
               notifId: notifId,
               durationMinutes: minutes,
@@ -194,5 +203,4 @@ class _QuickReminderDialogState extends State<QuickReminderDialog> {
       ],
     );
   }
-
 }

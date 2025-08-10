@@ -1,3 +1,4 @@
+import 'package:darrt/app/services/toast_service.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/app/ui/icon_color_picker.dart';
@@ -164,10 +165,10 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                     final category = g.catSc.buildModel(edit: widget.edit, model: widget.category);
                     final message = g.catVm.putItem(category, edit: widget.edit);
                     if (message != Messages.mFolderEmpty) {
-                      showToast(context, type: ToastificationType.success, description: message);
+                      showSuccessToast(context, message);
                       Navigator.pop(context);
                     } else {
-                      showToast(context, type: ToastificationType.error, description: message);
+                      showErrorToast(context,message);
                     }
                   },
                   backgroundColor: IconColorStorage.colors[g.catSc.color],
