@@ -205,69 +205,13 @@ class Task {
     );
   }
 
-  /// Compares this [Task] with another [Task] to determine equality.
-  ///
-  /// This method performs a deep comparison between two [Task] objects,
-  /// including all primitive fields, nullable [DateTime] fields,
-  /// and [ToMany] relations such as [categories] and [completions].
-  ///
-  /// The [checkIdEquality] parameter allows control over whether the `id`
-  /// field is included in the equality check:
-  ///
-  /// - If `checkIdEquality` is `true`, the `id` values of both tasks
-  ///   must match for them to be considered equal.
-  /// - If `false` (default), the `id` is ignored, and only the content
-  ///   of the task is compared.
-  ///
-  /// Two [Task]s are considered equal if:
-  /// - Their primitive fields (e.g., `title`, `priority`, `isDone`) are equal,
-  /// - Their [DateTime] fields (e.g., `createdAt`, `startDate`, `dueDate`) match by value,
-  /// - Their [categories] lists contain the same elements (matched by their own `.equals()`),
-  /// - Their [completions] lists contain the same elements (also matched by `.equals()`),
-  /// - And optionally, their `id` values match (when `checkIdEquality` is `true`).
-  ///
-  /// Returns `true` if all comparisons match, `false` otherwise.
-  bool equals(Task other, {bool? checkIdEquality = false}) {
-    if (checkIdEquality! && id != other.id) {
-      return false;
-    }
-    return contentHash() == other.contentHash();
+  static List<Task> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
+    return jsonList.map(Task.fromJson).toList();
   }
 
-  String contentHash() {
-    // Basic fields
-    final basicFields = '$title|$priority|$isDone|$isRepeating';
-
-    // DateTime fields (handle nulls for createdAt and endDate, non-null for dueDate and startDate)
-    final dateFields =
-        '${createdAt?.millisecondsSinceEpoch ?? 'null'}|'
-        '${dueDate.millisecondsSinceEpoch}|'
-        '${startDate.millisecondsSinceEpoch}|'
-        '${endDate?.millisecondsSinceEpoch ?? 'null'}';
-
-    // String fields (handle nulls)
-    final stringFields = '${reminders ?? 'null'}|${repeatConfig ?? 'null'}';
-
-    // Categories (sort by name for consistency)
-    final catNames = categories.map((c) => c.name).toList()..sort();
-    final categoriesStr = catNames.join(',');
-
-    // Completions (sort by date for consistency)
-    final completionDates = completions.map((c) => c.date.millisecondsSinceEpoch).toList()..sort();
-    final completionsStr = completionDates.join(',');
-
-    return '$basicFields|$dateFields|$stringFields|$categoriesStr|$completionsStr';
+  static List<Map<String, dynamic>> convertObjectsListToJsonList(List<Task> objectList) {
+    return objectList.map((task) => task.toJson()).toList();
   }
-
-  @override
-  bool operator ==(Object other) {
-    return other is Task && uuid == other.uuid;
-  }
-
-  @override
-  // TODO: implement hashCode
-  int get hashCode => uuid.hashCode;
-
 }
 
 extension TaskUtilities on Task {

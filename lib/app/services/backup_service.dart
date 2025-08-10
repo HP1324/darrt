@@ -291,8 +291,6 @@ class BackupService {
 }
 
 class BackupMergeService {
-  static Map<String, List<dynamic>> oldCacheObjects = {};
-
   static Map<String, dynamic> mergeData(
     Map<String, dynamic> oldData,
     Map<String, dynamic> newData, {
@@ -320,7 +318,7 @@ class BackupMergeService {
             newList.cast<TaskCategory>(),
             mergeType: mergeType,
           );
-          mergedData[key] = g.catVm.convertObjectsListToJsonList(mergedList.cast<TaskCategory>());
+          mergedData[key] = TaskCategory.convertObjectsListToJsonList(mergedList.cast<TaskCategory>());
           break;
 
         case 'folders':
@@ -329,7 +327,7 @@ class BackupMergeService {
             newList.cast<Folder>(),
             mergeType: mergeType,
           );
-          mergedData[key] = g.folderVm.convertObjectsListToJsonList(mergedList.cast<Folder>());
+          mergedData[key] = Folder.convertObjectsListToJsonList(mergedList.cast<Folder>());
           break;
 
         case 'tasks':
@@ -338,7 +336,7 @@ class BackupMergeService {
             newList.cast<Task>(),
             mergeType: mergeType,
           );
-          mergedData[key] = g.taskVm.convertObjectsListToJsonList(mergedList.cast<Task>());
+          mergedData[key] = Task.convertObjectsListToJsonList(mergedList.cast<Task>());
           break;
 
         case 'notes':
@@ -347,7 +345,7 @@ class BackupMergeService {
             newList.cast<Note>(),
             mergeType: mergeType,
           );
-          mergedData[key] = g.noteVm.convertObjectsListToJsonList(mergedList.cast<Note>());
+          mergedData[key] = Note.convertObjectsListToJsonList(mergedList.cast<Note>());
           break;
 
         case 'completions':
@@ -356,7 +354,7 @@ class BackupMergeService {
             newList.cast<TaskCompletion>(),
             mergeType: mergeType,
           );
-          mergedData[key] = g.completionVm.convertObjectsListToJsonList(
+          mergedData[key] = TaskCompletion.convertObjectsListToJsonList(
             mergedList.cast<TaskCompletion>(),
           );
           break;

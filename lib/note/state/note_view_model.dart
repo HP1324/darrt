@@ -52,13 +52,4 @@ class NoteViewModel extends ViewModel<Note> {
   @override
   String getItemUuid(Note item) => item.uuid;
 
-  @override
-  List<Note> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
-    return jsonList.map(Note.fromJson).toList();
-  }
-
-  @override
-  List<Map<String, dynamic>> convertObjectsListToJsonList(List<Note> objectList) {
-    return objectList.map((note) => note.toJson()).toList();
-  }
 }

@@ -66,4 +66,12 @@ class TaskCompletion {
       box.put(item);
     }
   }
+
+  static List<TaskCompletion> convertJsonListToObjectList(List<Map<String,dynamic>> jsonList) {
+    return jsonList.map(TaskCompletion.fromJson).toList();
+  }
+
+  static List<Map<String,dynamic>> convertObjectsListToJsonList(List<TaskCompletion> objectList) {
+    return objectList.map((completion) => completion.toJson()).toList();
+  }
 }

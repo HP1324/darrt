@@ -21,16 +21,7 @@ class CompletionViewModel extends ViewModel<TaskCompletion> {
   }
 
 
-  @override
-  List<TaskCompletion> convertJsonListToObjectList(List<Map<String,dynamic>> jsonList) {
-    return jsonList.map(TaskCompletion.fromJson).toList();
-  }
 
-  @override
-  List<Map<String,dynamic>> convertObjectsListToJsonList(List<TaskCompletion> objectList) {
-    MiniLogger.dp('no error until now');
-    return objectList.map((completion) => completion.toJson()).toList();
-  }
 
 
   //The following methods are only overridden to avoid not implemented error. this class does not need to override them functionally

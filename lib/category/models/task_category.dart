@@ -49,29 +49,11 @@ class TaskCategory {
     'uuid': uuid,
   };
 
-  /// Compares this [TaskCategory] with another to determine equality.
-  ///
-  /// This method checks whether two [TaskCategory] instances have identical
-  /// values across their key fields: [name], [icon], and [color].
-  ///
-  /// The optional [checkIdEquality] flag controls whether the [id] field
-  /// should be included in the comparison:
-  ///
-  /// - If `checkIdEquality` is `true`, the [id] values must match for the two
-  ///   categories to be considered equal.
-  /// - If `false` (default), the [id] is ignored and only the content fields
-  ///   are compared.
-  ///
-  /// Returns `true` if all relevant fields match; otherwise, returns `false`.
-
-  bool equals(TaskCategory other, {bool? checkIdEquality = false}) {
-    if (checkIdEquality! && id != other.id) {
-      return false;
-    }
-    return contentHash() == other.contentHash();
+  static List<TaskCategory> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
+    return jsonList.map(TaskCategory.fromJson).toList();
   }
 
-  String contentHash() {
-    return '$name|$icon|$color';
+  static List<Map<String, dynamic>> convertObjectsListToJsonList(List<TaskCategory> objectList) {
+    return objectList.map((category) => category.toJson()).toList();
   }
 }

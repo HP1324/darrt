@@ -86,13 +86,4 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
   @override
   String getItemUuid(TaskCategory item) => item.uuid;
 
-  @override
-  List<TaskCategory> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
-    return jsonList.map(TaskCategory.fromJson).toList();
-  }
-
-  @override
-  List<Map<String, dynamic>> convertObjectsListToJsonList(List<TaskCategory> objectList) {
-    return objectList.map((category) => category.toJson()).toList();
-  }
 }

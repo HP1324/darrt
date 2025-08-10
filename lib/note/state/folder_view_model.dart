@@ -80,13 +80,4 @@ class FolderViewModel extends ViewModel<Folder> {
   @override
   String getItemUuid(Folder item) => item.uuid;
 
-  @override
-  List<Folder> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
-    return jsonList.map(Folder.fromJson).toList();
-  }
-
-  @override
-  List<Map<String, dynamic>> convertObjectsListToJsonList(List<Folder> objectList) {
-    return objectList.map((folder) => folder.toJson()).toList();
-  }
 }

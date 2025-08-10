@@ -199,19 +199,6 @@ class TaskViewModel extends ViewModel<Task> {
   @override
   String getItemUuid(Task item) => item.uuid;
 
-  // @override
-  // void mergeItems(Map<String,dynamic><Task> oldItems, Map<String,dynamic><Task> newItems) {}
-
-  @override
-  List<Task> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
-    return jsonList.map(Task.fromJson).toList();
-  }
-
-  @override
-  List<Map<String, dynamic>> convertObjectsListToJsonList(List<Task> objectList) {
-    return objectList.map((task) => task.toJson()).toList();
-  }
-
   bool _isTimelineView = MiniBox().read('isTimeLine') ?? true;
   bool get isTimelineView => _isTimelineView;
 

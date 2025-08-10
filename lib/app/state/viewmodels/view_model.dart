@@ -168,7 +168,6 @@ abstract class ViewModel<T> extends ChangeNotifier {
         }
       } else {
         if (mergeType == MergeType.restore) {
-          BackupMergeService.oldCacheObjects.putIfAbsent(getTypeKey(item), () => []).add(item);
           setItemId(item, 0);
         }
         mergedList.add(item);
@@ -187,11 +186,6 @@ abstract class ViewModel<T> extends ChangeNotifier {
     return '';
   }
 
-  /// Convert [List<Map<String,dynamic>>] to [EntityObjectList]
-  List<T> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList);
-
-  /// Convert [EntityObjectList] to [List<Map<String,dynamic>>]
-  List<Map<String, dynamic>> convertObjectsListToJsonList(List<T> objectList);
 
   String getItemUuid(T item);
 }
