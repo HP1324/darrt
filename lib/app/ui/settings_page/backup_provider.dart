@@ -67,8 +67,8 @@ class BackupNotifier extends _$BackupNotifier {
         MiniBox().write(mGoogleEmail, email);
         state = state.copyWith(currentEmail: email);
 
-        final authentication = await account.authentication;
-        MiniBox().write(mGoogleAuthToken, authentication.accessToken);
+        // final authentication = await account.authentication;
+        // MiniBox().write(mGoogleAuthToken, authentication.accessToken);
       } else {
         MiniBox().write(mAutoBackup, false);
         state = state.copyWith(autoBackup: false);
