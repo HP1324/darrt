@@ -99,9 +99,7 @@ class BackupNotifier extends _$BackupNotifier {
     state = state.copyWith(isBackingUp: true);
     try {
       await BackupService().performBackup();
-      if (context.mounted) {
         showSuccessToast(context, 'Backup completed successfully');
-      }
       final now = DateTime.now();
       MiniBox().write(mLastBackupDate, now);
       state = state.copyWith(lastBackupDate: now);
