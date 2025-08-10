@@ -6,7 +6,7 @@ import 'package:darrt/task/ui/task_item.dart';
 import 'package:darrt/helpers/globals.dart' as g show taskVm, catVm;
 
 ///This state controller is used only within this file that's why not put in globals.dart
-late final _controller = SearchStateController();
+final _controller = SearchStateController();
 
 // Controller class to handle all state and business logic
 class SearchStateController extends ChangeNotifier {

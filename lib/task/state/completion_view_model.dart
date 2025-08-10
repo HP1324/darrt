@@ -1,4 +1,3 @@
-import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/app/state/viewmodels/view_model.dart';
 import 'package:darrt/task/models/task_completion.dart';
 

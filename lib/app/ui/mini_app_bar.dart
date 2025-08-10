@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:darrt/app/services/google_sign_in_service.dart';
-import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/app/ui/motivation_dialog.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:flutter/foundation.dart';
@@ -12,7 +10,6 @@ import 'package:darrt/helpers/consts.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/quickreminder/ui/quick_reminder_dialog.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:toastification/toastification.dart';
 
@@ -180,27 +177,6 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                                 );
                                 return;
                               }
-
-                              if (kDebugMode) {
-                                final user = GoogleSignInService().currentUser;
-                                MiniLogger.dp(user?.email ?? 'No user is currently logged in');
-                              }
-                              final path = ObjectBox().store!.directoryPath;
-                              MiniLogger.dp('ObjectBox path: $path');
-                              final docsDir = await getApplicationDocumentsDirectory();
-                              MiniLogger.dp('App docs dir: ${docsDir.path}/objectbox');
-                              await AwesomeNotifications().createNotification(
-                                content: NotificationContent(
-                                  id: 10,
-                                  channelKey: notifChannelKey,
-                                  title: 'Test notification',
-                                  body: 'Check what dismiss does',
-                                ),
-                                schedule: NotificationInterval(
-                                  interval: Duration(seconds: 60),
-                                  repeats: true,
-                                ),
-                              );
                             },
                           ),
                         ),

@@ -1,7 +1,7 @@
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:darrt/app/services/backup_service.dart' show MergeType, BackupMergeService;
+import 'package:darrt/app/services/backup_service.dart' show MergeType;
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/app/services/object_box.dart';
