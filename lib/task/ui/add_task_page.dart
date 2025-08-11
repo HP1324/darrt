@@ -75,6 +75,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
           final shouldPop = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
               title: Text('Quit without saving?'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
