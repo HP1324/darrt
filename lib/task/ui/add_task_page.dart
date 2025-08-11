@@ -1,6 +1,8 @@
 import 'package:app_settings/app_settings.dart';
-import 'package:awesome_notifications/awesome_notifications.dart' show AwesomeNotifications;
+import 'package:awesome_notifications/awesome_notifications.dart'
+    show AwesomeNotifications;
 import 'package:darrt/app/services/toast_service.dart';
+import 'package:darrt/note/models/note.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:darrt/app/notification/notification_service.dart';
@@ -40,7 +42,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
   void initState() {
     super.initState();
     controller = context.read<TaskStateController>();
-    controller.initState(widget.edit, widget.edit ? widget.task : null, widget.category);
+    controller.initState(
+      widget.edit,
+      widget.edit ? widget.task : null,
+      widget.category,
+    );
     g.adsController.initializeFullPageAdOnAddTaskPagePop();
   }
 
@@ -78,7 +84,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
           final shouldPop = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
               title: Text('Quit without saving?'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -116,7 +124,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
         backgroundColor: getSurfaceColor(context),
         appBar: AppBar(
           backgroundColor: getSurfaceColor(context),
-          title: Text(widget.edit ? widget.task!.title.replaceAll('\n', ' ') : 'Add New Task'),
+          title: Text(
+            widget.edit
+                ? widget.task!.title.replaceAll('\n', ' ')
+                : 'Add New Task',
+          ),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 13.0),
@@ -187,10 +199,10 @@ class TaskNoteSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Take Notes', style: textTheme.titleSmall),
-            ListenableBuilder(
-              listenable: g.taskSc,
-              builder: (context, child) {
-                final length = g.taskSc.notes?.length ?? 0;
+            Selector<TaskStateController, List<Note>?>(
+              selector: (context, controller) => controller.notes,
+              builder: (context, notes, child) {
+                final length = notes?.length ?? 0;
                 final text = length != 0
                     ? length > 1
                           ? '$length notes'
@@ -230,52 +242,60 @@ class StartTimeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: g.taskSc,
-      builder: (context, child) {
-        final textTheme = TextTheme.of(context);
-        final time = g.taskSc.startTime;
-        return InkWell(
-          onTap: () async {
-            g.taskSc.textFieldNode.unfocus();
-            final selectedTime = await showTimePicker(
-              context: context,
-              initialTime: time != null ? TimeOfDay.fromDateTime(time) : TimeOfDay.now(),
-            );
-            if (selectedTime != null) {
-              g.taskSc.setStartTime(selectedTime);
-            }
-          },
-          child: StructuredRow(
-            leadingIcon: Icons.timer,
-            expanded: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Start Time', style: textTheme.titleSmall),
-                Text(
-                  time != null ? TimeOfDay.fromDateTime(time).format(context) : 'No time set',
+    final textTheme = TextTheme.of(context);
+    return InkWell(
+      onTap: () async {
+        final controller = context.read<TaskStateController>();
+        controller.textFieldNode.unfocus();
+        final time = controller.startTime;
+        final selectedTime = await showTimePicker(
+          context: context,
+          initialTime: time != null
+              ? TimeOfDay.fromDateTime(time)
+              : TimeOfDay.now(),
+        );
+        if (selectedTime != null) {
+          g.taskSc.setStartTime(selectedTime);
+        }
+      },
+      child: StructuredRow(
+        leadingIcon: Icons.timer,
+        expanded: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Start Time', style: textTheme.titleSmall),
+            Selector<TaskStateController, DateTime?>(
+              selector: (context, controller) => controller.startTime,
+              builder: (context, time, child) {
+                return Text(
+                  time != null
+                      ? TimeOfDay.fromDateTime(time).format(context)
+                      : 'No time set',
                   style: textTheme.bodySmall,
-                ),
-              ],
-            ),
-            trailing: Builder(
-              builder: (context) {
-                if (time != null) {
-                  return IconButton(
-                    icon: Icon(
-                      Icons.clear,
-                      size: 20,
-                      color: ColorScheme.of(context).error,
-                    ),
-                    onPressed: () => g.taskSc.resetStartTime(),
-                  );
-                }
-                return SizedBox.shrink();
+                );
               },
             ),
-          ),
-        );
-      },
+          ],
+        ),
+        trailing: Selector<TaskStateController, DateTime?>(
+          selector: (context, controller) => controller.startTime,
+          builder: (context, time, child) {
+            if (time != null) {
+              return IconButton(
+                icon: Icon(
+                  Icons.clear,
+                  size: 20,
+                  color: ColorScheme.of(context).error,
+                ),
+                onPressed: () {
+                  context.read<TaskStateController>().resetStartTime();
+                },
+              );
+            }
+            return SizedBox.shrink();
+          },
+        ),
+      ),
     );
   }
 }
@@ -299,10 +319,14 @@ class EndTimeSelector extends StatelessWidget {
             }
             final selectedTime = await showTimePicker(
               context: context,
-              initialTime: time != null ? TimeOfDay.fromDateTime(time) : TimeOfDay.now(),
+              initialTime: time != null
+                  ? TimeOfDay.fromDateTime(time)
+                  : TimeOfDay.now(),
             );
             if (selectedTime != null) {
-              if (!selectedTime.isAfter(TimeOfDay.fromDateTime(g.taskSc.startTime!))) {
+              if (!selectedTime.isAfter(
+                TimeOfDay.fromDateTime(g.taskSc.startTime!),
+              )) {
                 if (context.mounted) {
                   showErrorToast(context, 'End time must be after start time');
                 }
@@ -318,7 +342,9 @@ class EndTimeSelector extends StatelessWidget {
               children: [
                 Text('End Time', style: textTheme.titleSmall),
                 Text(
-                  time != null ? TimeOfDay.fromDateTime(time).format(context) : 'No time set',
+                  time != null
+                      ? TimeOfDay.fromDateTime(time).format(context)
+                      : 'No time set',
                   style: textTheme.bodySmall,
                 ),
               ],
@@ -409,7 +435,8 @@ class TitleTextField extends StatelessWidget {
     final micPermissionStatus = await Permission.microphone.status;
     final nearbyDevicesStatus = await Permission.bluetoothConnect.status;
 
-    bool allPermissionsGranted = micPermissionStatus.isGranted && (nearbyDevicesStatus.isGranted);
+    bool allPermissionsGranted =
+        micPermissionStatus.isGranted && (nearbyDevicesStatus.isGranted);
 
     if (allPermissionsGranted) {
       MiniLogger.d('All required permissions are granted');
@@ -442,7 +469,8 @@ class TitleTextField extends StatelessWidget {
         // Request nearby devices permission (for Bluetooth headsets)
         final nearbyResult = await Permission.bluetoothConnect.request();
 
-        bool permissionsGranted = micResult.isGranted && (nearbyResult.isGranted);
+        bool permissionsGranted =
+            micResult.isGranted && (nearbyResult.isGranted);
 
         if (permissionsGranted) {
           MiniLogger.d('Permissions granted on first request');
@@ -468,7 +496,8 @@ class TitleTextField extends StatelessWidget {
           final micResult = await Permission.microphone.request();
           final nearbyResult = await Permission.bluetoothConnect.request();
 
-          bool permissionsGranted = micResult.isGranted && (nearbyResult.isGranted);
+          bool permissionsGranted =
+              micResult.isGranted && (nearbyResult.isGranted);
 
           if (permissionsGranted) {
             MiniLogger.d('Permissions granted on second request');
@@ -485,7 +514,9 @@ class TitleTextField extends StatelessWidget {
             showPermissionDeniedToast();
           }
         } else {
-          MiniLogger.d('Permissions denied multiple times, showing settings dialog');
+          MiniLogger.d(
+            'Permissions denied multiple times, showing settings dialog',
+          );
           if (context.mounted) {
             showSettingsDialog(context);
           }
@@ -506,7 +537,10 @@ class AddRemindersSection extends StatelessWidget {
         g.taskSc.textFieldNode.unfocus();
         final allowed = await AwesomeNotifications().isNotificationAllowed();
         if (context.mounted) {
-          if ((allowed || await NotificationService.showNotificationRationale(context)) &&
+          if ((allowed ||
+                  await NotificationService.showNotificationRationale(
+                    context,
+                  )) &&
               context.mounted) {
             _showRemindersBottomSheet(context);
           }
@@ -585,7 +619,9 @@ class AddRemindersSection extends StatelessWidget {
       builder: (context) {
         return Container(
           padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
+          ),
           child: ListenableBuilder(
             listenable: g.taskSc,
             builder: (context, child) {
@@ -602,7 +638,9 @@ class AddRemindersSection extends StatelessWidget {
                     children: [
                       Text(
                         'Reminders',
-                        style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                        style: textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.close),
@@ -611,13 +649,16 @@ class AddRemindersSection extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  if (g.taskSc.startTime != null) Flexible(child: EasyReminderActions()),
+                  if (g.taskSc.startTime != null)
+                    Flexible(child: EasyReminderActions()),
                   Flexible(
                     child: reminders.isEmpty
                         ? Center(
                             child: Text(
                               'No reminders set',
-                              style: textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
+                              style: textTheme.bodyLarge?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                              ),
                             ),
                           )
                         : ListView.builder(
@@ -649,7 +690,9 @@ class AddRemindersSection extends StatelessWidget {
                       onPressed: () => showReminderDialog(context),
                       icon: const Icon(Icons.add),
                       label: Text(
-                        g.taskSc.startTime == null ? 'Add Reminder' : 'Add Custom Reminder',
+                        g.taskSc.startTime == null
+                            ? 'Add Reminder'
+                            : 'Add Custom Reminder',
                       ),
                     ),
                   ),
@@ -778,7 +821,8 @@ class WeekdaySelector extends StatelessWidget {
                 builder: (context, child) {
                   final weekdays = g.taskSc.repeatConfig.days;
                   final isSelected =
-                      weekdays.contains(index + 1) && g.taskSc.isWeekdayValid(index + 1);
+                      weekdays.contains(index + 1) &&
+                      g.taskSc.isWeekdayValid(index + 1);
                   final colorScheme = Theme.of(context).colorScheme;
 
                   return InkWell(
@@ -789,7 +833,10 @@ class WeekdaySelector extends StatelessWidget {
                     },
                     customBorder: CircleBorder(),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 7,
+                      ),
                       child: Container(
                         width: 25,
                         height: 25,
@@ -851,13 +898,28 @@ class RepeatTypeSelector extends StatelessWidget {
                   children: [
                     // Each option takes equal space within the card
                     Expanded(
-                      child: _buildRadioOption(context, 'Weekly', 'weekly', selectedType),
+                      child: _buildRadioOption(
+                        context,
+                        'Weekly',
+                        'weekly',
+                        selectedType,
+                      ),
                     ),
                     Expanded(
-                      child: _buildRadioOption(context, 'Monthly', 'monthly', selectedType),
+                      child: _buildRadioOption(
+                        context,
+                        'Monthly',
+                        'monthly',
+                        selectedType,
+                      ),
                     ),
                     Expanded(
-                      child: _buildRadioOption(context, 'Yearly', 'yearly', selectedType),
+                      child: _buildRadioOption(
+                        context,
+                        'Yearly',
+                        'yearly',
+                        selectedType,
+                      ),
                     ),
                   ],
                 ),
@@ -871,7 +933,12 @@ class RepeatTypeSelector extends StatelessWidget {
     );
   }
 
-  Widget _buildRadioOption(BuildContext context, String label, String value, String selectedType) {
+  Widget _buildRadioOption(
+    BuildContext context,
+    String label,
+    String value,
+    String selectedType,
+  ) {
     final isSelected = value == selectedType;
     final theme = Theme.of(context);
 
@@ -898,7 +965,9 @@ class RepeatTypeSelector extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected ? theme.colorScheme.primary : theme.textTheme.bodyLarge?.color,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.textTheme.bodyLarge?.color,
                 ),
               ),
             ),
@@ -980,7 +1049,10 @@ class ReminderDialog extends StatefulWidget {
     required this.edit,
     this.reminder,
     required this.onSaved,
-  }) : assert(!edit || reminder != null, 'Reminder must be provided when editing');
+  }) : assert(
+         !edit || reminder != null,
+         'Reminder must be provided when editing',
+       );
 
   @override
   State<ReminderDialog> createState() => _ReminderDialogState();
@@ -994,7 +1066,9 @@ class _ReminderDialogState extends State<ReminderDialog> {
   void initState() {
     super.initState();
     // Initialize from existing reminder if editing, else defaults
-    _selectedType = widget.edit ? widget.reminder!.type : MiniBox().read(mDefaultReminderType);
+    _selectedType = widget.edit
+        ? widget.reminder!.type
+        : MiniBox().read(mDefaultReminderType);
     _selectedTime = widget.edit ? widget.reminder!.time : TimeOfDay.now();
   }
 
@@ -1079,7 +1153,8 @@ class _ReminderDialogState extends State<ReminderDialog> {
               ),
             ],
             selected: {_selectedType},
-            onSelectionChanged: (val) => setState(() => _selectedType = val.first),
+            onSelectionChanged: (val) =>
+                setState(() => _selectedType = val.first),
           ),
           const SizedBox(height: 24),
           Text(
@@ -1095,9 +1170,14 @@ class _ReminderDialogState extends State<ReminderDialog> {
               onTap: _selectTime,
               borderRadius: BorderRadius.circular(12),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).colorScheme.outline),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -1155,7 +1235,9 @@ Future<void> showReminderDialog(
   bool edit = false,
   Reminder? reminder,
 }) async {
-  MiniLogger.dp('Reminder time: ${reminder?.time.hour}:${reminder?.time.minute}');
+  MiniLogger.dp(
+    'Reminder time: ${reminder?.time.hour}:${reminder?.time.minute}',
+  );
   await showAdaptiveDialog(
     context: context,
     builder: (context) => ReminderDialog(
@@ -1184,7 +1266,10 @@ class TaskTypeSelector extends StatelessWidget {
     final theme = Theme.of(context);
     return StructuredRow(
       leadingIcon: Icons.repeat,
-      expanded: Text('Repeat Task', style: theme.textTheme.titleMedium!.copyWith()),
+      expanded: Text(
+        'Repeat Task',
+        style: theme.textTheme.titleMedium!.copyWith(),
+      ),
       trailing: ListenableBuilder(
         listenable: g.taskSc,
         builder: (context, child) {
@@ -1226,7 +1311,9 @@ class CategorySelector extends StatelessWidget {
                   children: [
                     Text(
                       'Categories',
-                      style: TextStyle(fontSize: textTheme.labelLarge!.fontSize),
+                      style: TextStyle(
+                        fontSize: textTheme.labelLarge!.fontSize,
+                      ),
                     ),
                   ],
                 ),
@@ -1234,16 +1321,20 @@ class CategorySelector extends StatelessWidget {
             ),
             SizedBox(
               height: MediaQuery.sizeOf(context).height * 0.03,
-              child: Selector<TaskStateController,Map<TaskCategory, bool>>(
+              child: Selector<TaskStateController, Map<TaskCategory, bool>>(
                 selector: (context, controller) => controller.categorySelection,
-                builder: (context, selectionMap,child) {
+                builder: (context, selectionMap, child) {
                   final selectionMap = g.taskSc.categorySelection;
-                  final categories = selectionMap.entries.where((e) => e.value).map((e) => e.key).toList();
+                  final categories = selectionMap.entries
+                      .where((e) => e.value)
+                      .map((e) => e.key)
+                      .toList();
                   return ListView.separated(
                     scrollDirection: Axis.horizontal,
                     shrinkWrap: true,
                     physics: BouncingScrollPhysics(),
-                    separatorBuilder: (context, index) => const SizedBox(width: 2),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 2),
                     itemCount: categories.length,
                     itemBuilder: (context, index) {
                       final category = categories[index];
@@ -1287,7 +1378,9 @@ class CategorySelector extends StatelessWidget {
               ),
               leading: Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: const Icon(Icons.add),
               ),
               trailing: const Icon(Icons.list_alt),
@@ -1307,7 +1400,9 @@ class CategorySelector extends StatelessWidget {
                       return ListTile(
                         selected: map[cat] ?? false,
                         selectedColor: IconColorStorage.colors[cat.color],
-                        leading: Icon(IconColorStorage.flattenedIcons[cat.icon]),
+                        leading: Icon(
+                          IconColorStorage.flattenedIcons[cat.icon],
+                        ),
                         trailing: Checkbox(
                           fillColor: WidgetStateProperty.resolveWith((states) {
                             if (states.contains(WidgetState.selected)) {
@@ -1324,7 +1419,9 @@ class CategorySelector extends StatelessWidget {
                         ),
                         title: Text(
                           cat.name,
-                          style: const TextStyle(overflow: TextOverflow.ellipsis),
+                          style: const TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       );
                     },
@@ -1355,7 +1452,10 @@ class PrioritySelector extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 0),
+                bottom: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 0,
+                ),
               ),
             ),
             child: Column(
@@ -1376,7 +1476,9 @@ class PrioritySelector extends StatelessWidget {
                         onTap: () => g.taskSc.navigatePriority(false),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withAlpha(20),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withAlpha(20),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(Icons.chevron_left),
@@ -1384,23 +1486,28 @@ class PrioritySelector extends StatelessWidget {
                       ),
                       Expanded(
                         child: Center(
-                          child: ListenableBuilder(
-                            listenable: g.taskSc,
-                            builder: (context, child) => Text(
-                              g.taskSc.priority,
-                              style: TextStyle(
-                                fontSize: Theme.of(context).textTheme.labelLarge!.fontSize,
-                                fontWeight: FontWeight.w400,
-                              ),
+                          child: Text(
+                            context.select<TaskStateController, String>(
+                              (c) => c.priority,
+                            ),
+                            style: TextStyle(
+                              fontSize: Theme.of(
+                                context,
+                              ).textTheme.labelLarge!.fontSize,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => g.taskSc.navigatePriority(true),
+                        onTap: () => context
+                            .read<TaskStateController>()
+                            .navigatePriority(true),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withAlpha(20),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withAlpha(20),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(Icons.chevron_right),
@@ -1494,7 +1601,9 @@ class ReminderItem extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+      color: Theme.of(
+        context,
+      ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
@@ -1514,7 +1623,9 @@ class ReminderItem extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    reminder.type == 'alarm' ? Icons.alarm : Icons.notifications,
+                    reminder.type == 'alarm'
+                        ? Icons.alarm
+                        : Icons.notifications,
                     color: Theme.of(context).colorScheme.primary,
                     size: 20,
                   ),
@@ -1529,7 +1640,10 @@ class ReminderItem extends StatelessWidget {
               ),
               const Spacer(),
               IconButton(
-                icon: Icon(Icons.close, color: Theme.of(context).colorScheme.error),
+                icon: Icon(
+                  Icons.close,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 onPressed: onRemove,
                 tooltip: 'Remove reminder',
               ),
@@ -1674,7 +1788,15 @@ class RepeatTypeHelpButton extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     final weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    final selectedDays = [true, false, true, false, true, false, false]; // Example selection
+    final selectedDays = [
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+    ]; // Example selection
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
