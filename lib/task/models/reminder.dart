@@ -59,4 +59,16 @@ class Reminder {
     return jsonEncode(reminderMapList);
   }
 
+  // override == and hashCode with Object.hash
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! Reminder) return false;
+    return other.id == id && other.time == time && other.type == type;
+  }
+
+  @override
+  int get hashCode => Object.hash(id, time, type);
+
+
 }
