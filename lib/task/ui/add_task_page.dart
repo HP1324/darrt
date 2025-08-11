@@ -827,20 +827,20 @@ class WeekdaySelector extends StatelessWidget {
             7,
             (index) {
               final List<String> days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-              return ListenableBuilder(
-                listenable: g.taskSc,
-                builder: (context, child) {
-                  final weekdays = g.taskSc.repeatConfig.days;
+              return Consumer<TaskStateController>(
+                builder: (context, controller,child) {
+                  final weekdays = controller.repeatConfig.days;
                   final isSelected =
                       weekdays.contains(index + 1) &&
-                      g.taskSc.isWeekdayValid(index + 1);
-                  final colorScheme = Theme.of(context).colorScheme;
+                      controller.isWeekdayValid(index + 1);
+
+                  final colorScheme = ColorScheme.of(context);
 
                   return InkWell(
                     onTap: () {
-                      final isValid = g.taskSc.isWeekdayValid(index + 1);
+                      final isValid = controller.isWeekdayValid(index + 1);
                       if (!isValid) return;
-                      g.taskSc.toggleWeekday(index + 1, !isSelected);
+                      controller.toggleWeekday(index + 1, !isSelected);
                     },
                     customBorder: CircleBorder(),
                     child: Padding(
