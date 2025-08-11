@@ -17,9 +17,10 @@ import 'package:darrt/task/state/completion_view_model.dart';
 import 'package:darrt/task/state/task_state_controller.dart' show TaskStateController;
 import 'package:darrt/task/state/task_stt_controller.dart';
 import 'package:darrt/task/state/task_view_model.dart' show TaskViewModel;
+import 'package:get_it/get_it.dart';
 import 'package:uuid/uuid.dart';
 
-
+final getIt = GetIt.instance;
 
 final taskSc = TaskStateController();
 

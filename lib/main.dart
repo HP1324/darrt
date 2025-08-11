@@ -2,13 +2,14 @@ import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:darrt/app/ads/subscription_service.dart';
+import 'package:darrt/task/state/task_state_controller.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' hide ChangeNotifierProvider;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:darrt/app/notification/notification_action_controller.dart';
@@ -20,17 +21,22 @@ import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/home.dart';
+import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:flutter/services.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-
+void registerSingletons(){
+  g.getIt.registerLazySingleton(() => TaskStateController());
+}
 
 /// Initializes app services and state
 Future<void> initApp() async {
   try {
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+    registerSingletons();
 
     await subService.configureRevenueCatSdk();
 
@@ -113,26 +119,31 @@ class _DarrtState extends State<Darrt> {
         final darkTheme = g.themeMan.darkTheme;
         final themeMode = g.themeMan.themeMode;
 
-        return MaterialApp(
-          builder: DevicePreview.appBuilder,
-          locale: DevicePreview.locale(context),
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            FlutterQuillLocalizations.delegate,
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => g.getIt<TaskStateController>()),
           ],
-          navigatorKey: Darrt.navigatorKey,
-          theme: lightTheme.copyWith(
-            textTheme: GoogleFonts.gabaritoTextTheme(lightTheme.textTheme),
+          child: MaterialApp(
+            builder: DevicePreview.appBuilder,
+            locale: DevicePreview.locale(context),
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              FlutterQuillLocalizations.delegate,
+            ],
+            navigatorKey: Darrt.navigatorKey,
+            theme: lightTheme.copyWith(
+              textTheme: GoogleFonts.gabaritoTextTheme(lightTheme.textTheme),
+            ),
+            darkTheme: darkTheme.copyWith(
+              textTheme: GoogleFonts.gabaritoTextTheme(darkTheme.textTheme),
+            ),
+            themeMode: themeMode,
+            debugShowCheckedModeBanner: false,
+            title: 'Darrt',
+            home: Home(),
           ),
-          darkTheme: darkTheme.copyWith(
-            textTheme: GoogleFonts.gabaritoTextTheme(darkTheme.textTheme),
-          ),
-          themeMode: themeMode,
-          debugShowCheckedModeBanner: false,
-          title: 'Darrt',
-          home: Home(),
         );
       },
     );

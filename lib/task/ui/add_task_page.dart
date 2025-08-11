@@ -20,6 +20,7 @@ import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/ui/task_note_bottom_sheet.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:darrt/helpers/globals.dart' as g;
+import 'package:provider/provider.dart';
 
 class AddTaskPage extends StatefulWidget {
   const AddTaskPage({super.key, required this.edit, this.task, this.category})
@@ -34,16 +35,18 @@ class AddTaskPage extends StatefulWidget {
 }
 
 class _AddTaskPageState extends State<AddTaskPage> {
+  late final TaskStateController controller;
   @override
   void initState() {
     super.initState();
-    g.taskSc.initState(widget.edit, widget.edit ? widget.task : null, widget.category);
+    controller = context.read<TaskStateController>();
+    controller.initState(widget.edit, widget.edit ? widget.task : null, widget.category);
     g.adsController.initializeFullPageAdOnAddTaskPagePop();
   }
 
   @override
   void dispose() {
-    g.taskSc.clearState();
+    controller.clearState();
     g.taskSttController.clearSttState();
     super.dispose();
   }
@@ -1231,11 +1234,11 @@ class CategorySelector extends StatelessWidget {
             ),
             SizedBox(
               height: MediaQuery.sizeOf(context).height * 0.03,
-              child: ListenableBuilder(
-                listenable: g.taskSc,
-                builder: (context, child) {
-                  final map = g.taskSc.categorySelection;
-                  final categories = map.entries.where((e) => e.value).map((e) => e.key).toList();
+              child: Selector<TaskStateController,Map<TaskCategory, bool>>(
+                selector: (context, controller) => controller.categorySelection,
+                builder: (context, selectionMap,child) {
+                  final selectionMap = g.taskSc.categorySelection;
+                  final categories = selectionMap.entries.where((e) => e.value).map((e) => e.key).toList();
                   return ListView.separated(
                     scrollDirection: Axis.horizontal,
                     shrinkWrap: true,
