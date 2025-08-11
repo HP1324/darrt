@@ -640,13 +640,15 @@ class AddRemindersSection extends StatelessWidget {
                           ),
                   ),
                   const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: () => showReminderDialog(context),
-                      icon: const Icon(Icons.add),
-                      label: Text(
-                        g.taskSc.startTime == null ? 'Add Reminder' : 'Add Custom Reminder',
+                  SafeArea(
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: () => showReminderDialog(context),
+                        icon: const Icon(Icons.add),
+                        label: Text(
+                          g.taskSc.startTime == null ? 'Add Reminder' : 'Add Custom Reminder',
+                        ),
                       ),
                     ),
                   ),

@@ -172,24 +172,26 @@ class _TaskNoteBottomSheetState extends State<TaskNoteBottomSheet> {
                 ),
               ),
             ),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () {
-                  MiniRouter.to(context, AddNotePage(edit: false, isTaskNote: true, task: widget.task,));
-                },
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            child: SafeArea(
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () {
+                    MiniRouter.to(context, AddNotePage(edit: false, isTaskNote: true, task: widget.task,));
+                  },
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                ),
-                icon: const Icon(Icons.add),
-                label: const Text(
-                  'Write a note',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                  icon: const Icon(Icons.add),
+                  label: const Text(
+                    'Write a note',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
