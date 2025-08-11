@@ -168,7 +168,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   }
 
   void _putTask(BuildContext context) {
-    Task newTask = g.taskSc.buildModel(edit: widget.edit, model: widget.task);
+    Task newTask = controller.buildModel(edit: widget.edit, model: widget.task);
     final message = g.taskVm.putItem(newTask, edit: widget.edit);
     if (message == Messages.mTaskAdded || message == Messages.mTaskEdited) {
       showSuccessToast(context, message);
@@ -305,15 +305,16 @@ class EndTimeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: g.taskSc,
-      builder: (context, child) {
+    return Consumer<TaskStateController>(
+      builder: (context, controller, child) {
         final textTheme = TextTheme.of(context);
-        final time = g.taskSc.endTime;
+
+        final time = controller.endTime;
+
         return InkWell(
           onTap: () async {
-            g.taskSc.textFieldNode.unfocus();
-            if (g.taskSc.startTime == null) {
+            controller.textFieldNode.unfocus();
+            if (controller.startTime == null) {
               showErrorToast(context, 'Set start time first!');
               return;
             }
@@ -327,9 +328,7 @@ class EndTimeSelector extends StatelessWidget {
               if (!selectedTime.isAfter(
                 TimeOfDay.fromDateTime(g.taskSc.startTime!),
               )) {
-                if (context.mounted) {
-                  showErrorToast(context, 'End time must be after start time');
-                }
+                showErrorToast(context, 'End time must be after start time');
                 return;
               }
               g.taskSc.setEndTime(selectedTime);
@@ -376,11 +375,10 @@ class DueDateOrRepeatConfigSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: g.taskSc,
-      builder: (context, child) {
-        final isRepeating = g.taskSc.isRepeating;
-        final type = g.taskSc.repeatConfig.type;
+    return Consumer<TaskStateController>(
+      builder: (context, controller,child) {
+        final isRepeating = controller.isRepeating;
+        final type = controller.repeatConfig.type;
         return Column(
           spacing: 10.0,
           children: [
@@ -555,10 +553,9 @@ class AddRemindersSection extends StatelessWidget {
               'Reminders',
               style: theme.textTheme.titleSmall,
             ),
-            ListenableBuilder(
-              listenable: g.taskSc,
-              builder: (context, child) {
-                final reminders = g.taskSc.reminders;
+            Selector<TaskStateController, List<Reminder>>(
+              selector: (context, controller) => controller.reminders,
+              builder: (context, reminders, child) {
                 return Text(
                   reminders.isEmpty
                       ? 'Tap here to add reminders per day'
@@ -622,12 +619,14 @@ class AddRemindersSection extends StatelessWidget {
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.7,
           ),
-          child: ListenableBuilder(
-            listenable: g.taskSc,
-            builder: (context, child) {
-              final textTheme = Theme.of(context).textTheme;
-              final scheme = Theme.of(context).colorScheme;
-              final reminders = List.from(g.taskSc.reminders);
+          child: Consumer<TaskStateController>(
+            builder: (context, controller,child) {
+              final textTheme = TextTheme.of(context);
+
+              final scheme = ColorScheme.of(context);
+
+              final reminders = List.from(controller.reminders);
+
               reminders.sort((a, b) => a.time.compareTo(b.time));
               return Column(
                 mainAxisSize: MainAxisSize.min,
@@ -649,7 +648,7 @@ class AddRemindersSection extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  if (g.taskSc.startTime != null)
+                  if (controller.startTime != null)
                     Flexible(child: EasyReminderActions()),
                   Flexible(
                     child: reminders.isEmpty
@@ -677,7 +676,7 @@ class AddRemindersSection extends StatelessWidget {
                                   );
                                 },
                                 onRemove: () {
-                                  g.taskSc.removeReminder(reminders[index]);
+                                  controller.removeReminder(reminders[index]);
                                 },
                               );
                             },
@@ -690,7 +689,7 @@ class AddRemindersSection extends StatelessWidget {
                       onPressed: () => showReminderDialog(context),
                       icon: const Icon(Icons.add),
                       label: Text(
-                        g.taskSc.startTime == null
+                        controller.startTime == null
                             ? 'Add Reminder'
                             : 'Add Custom Reminder',
                       ),
@@ -706,8 +705,21 @@ class AddRemindersSection extends StatelessWidget {
   }
 }
 
-class EasyReminderActions extends StatelessWidget {
+class EasyReminderActions extends StatefulWidget {
   const EasyReminderActions({super.key});
+
+  @override
+  State<EasyReminderActions> createState() => _EasyReminderActionsState();
+}
+
+class _EasyReminderActionsState extends State<EasyReminderActions> {
+  late final controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = context.read<TaskStateController>();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -740,7 +752,7 @@ class EasyReminderActions extends StatelessWidget {
         child: FilledButton(
           onPressed: () {
             final reminder = buildReminder(minutes: minutes);
-            final message = g.taskSc.putReminder(
+            final message = controller.putReminder(
               edit: false,
               reminder: reminder,
             );
@@ -760,10 +772,10 @@ class EasyReminderActions extends StatelessWidget {
     Reminder? reminder;
     TimeOfDay reminderTime = TimeOfDay.now();
     if (minutes == null) {
-      reminderTime = TimeOfDay.fromDateTime(g.taskSc.startTime!);
+      reminderTime = TimeOfDay.fromDateTime(controller.startTime!);
     } else {
       reminderTime = TimeOfDay.fromDateTime(
-        g.taskSc.startTime!.subtract(Duration(minutes: minutes)),
+        controller.startTime!.subtract(Duration(minutes: minutes)),
       );
     }
     reminder = Reminder(time: reminderTime);
@@ -776,25 +788,24 @@ class DuedateSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: g.taskSc,
-      builder: (context, child) {
+    return Consumer<TaskStateController>(
+      builder: (context, controller, child) {
         return DateSelector(
           icon: Icons.calendar_today,
           title: 'Date',
-          date: g.taskSc.dueDate,
+          date: controller.dueDate,
           onTap: () async {
             final date = await showDatePicker(
               context: context,
-              initialDate: g.taskSc.dueDate,
+              initialDate: controller.dueDate,
               firstDate: getFirstDate(),
               lastDate: getMaxDate(),
             );
             if (date != null) {
-              g.taskSc.setDueDate(date);
+              controller.setDueDate(date);
             }
           },
-          onClear: () => g.taskSc.resetDueDate(),
+          onClear: () => controller.resetDueDate(),
         );
       },
     );
@@ -875,12 +886,10 @@ class RepeatTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: g.taskSc,
-      builder: (context, child) {
-        final config = g.taskSc.repeatConfig;
+    return Consumer<TaskStateController>(
+      builder: (context, controller,child) {
+        final config = controller.repeatConfig;
         final selectedType = config.type ?? 'weekly';
-
         return Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -983,30 +992,29 @@ class DateRangeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: g.taskSc,
-      builder: (context, child) {
+    return Consumer<TaskStateController>(
+      builder: (context, controller,child) {
         return Row(
           children: [
             Expanded(
               child: DateSelector(
                 icon: Icons.calendar_today_outlined,
                 title: 'Start Date',
-                date: g.taskSc.startDate,
+                date: controller.startDate,
                 onTap: () async {
-                  g.taskSc.textFieldNode.unfocus();
+                  controller.textFieldNode.unfocus();
                   final date = await showDatePicker(
                     context: context,
-                    initialDate: g.taskSc.startDate,
+                    initialDate: controller.startDate,
                     firstDate: getFirstDate(),
                     lastDate: getMaxDate(),
                   );
                   if (date != null) {
-                    g.taskSc.setStartDate(date);
+                    controller.setStartDate(date);
                   }
                 },
                 onClear: () {
-                  g.taskSc.resetStartDate();
+                  controller.resetStartDate();
                 },
               ),
             ),
@@ -1014,21 +1022,21 @@ class DateRangeSelector extends StatelessWidget {
               child: DateSelector(
                 icon: Icons.event_repeat,
                 title: 'End Date',
-                date: g.taskSc.endDate,
+                date: controller.endDate,
                 onTap: () async {
                   g.taskSc.textFieldNode.unfocus();
                   final date = await showDatePicker(
                     context: context,
-                    initialDate: g.taskSc.endDate,
-                    firstDate: g.taskSc.startDate.add(Duration(days: 1)),
+                    initialDate: controller.endDate,
+                    firstDate: controller.startDate.add(Duration(days: 1)),
                     lastDate: getMaxDate(),
                   );
                   if (date != null) {
-                    g.taskSc.setEndDate(date);
+                    controller.setEndDate(date);
                   }
                 },
                 onClear: () {
-                  g.taskSc.resetEndDate();
+                  controller.resetEndDate();
                 },
               ),
             ),
@@ -1270,16 +1278,16 @@ class TaskTypeSelector extends StatelessWidget {
         'Repeat Task',
         style: theme.textTheme.titleMedium!.copyWith(),
       ),
-      trailing: ListenableBuilder(
-        listenable: g.taskSc,
-        builder: (context, child) {
-          final repeat = g.taskSc.isRepeating;
+      trailing: Selector<TaskStateController, bool>(
+        selector: (context, controller) => controller.isRepeating,
+        builder: (context, repeat, child) {
           return Transform.scale(
             scale: 0.9,
             child: Checkbox(
               value: repeat,
               onChanged: (value) {
-                if (value != null) g.taskSc.toggleRepeat(value);
+                if (value != null)
+                  context.read<TaskStateController>().toggleRepeat(value);
               },
             ),
           );
@@ -1663,7 +1671,7 @@ class RepeatTypeHelpButton extends StatelessWidget {
     return IconButton(
       // borderRadius: BorderRadius.circular(16),
       onPressed: () {
-        g.taskSc.textFieldNode.unfocus();
+        context.read<TaskStateController>().textFieldNode.unfocus();
         _showRepeatTypeDialog(context);
       },
       icon: Icon(Icons.info_outline),
