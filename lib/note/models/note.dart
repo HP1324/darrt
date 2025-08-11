@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart' show TextSelection;
-import 'package:flutter_quill/flutter_quill.dart' show Document, QuillController;
+import 'package:flutter_quill/flutter_quill.dart'
+    show Document, QuillController;
 import 'package:flutter_quill/quill_delta.dart' show Delta;
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_logger.dart';
@@ -17,11 +18,11 @@ class Note {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? uuid,
-    List<String>? folderUuids
-  })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now(),
-        uuid = uuid ?? g.uuid.v4(),
-        folderUuids = folderUuids ?? [];
+    List<String>? folderUuids,
+  }) : createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now(),
+       uuid = uuid ?? g.uuid.v4(),
+       folderUuids = folderUuids ?? [];
   @Id()
   int id;
   String content;
@@ -30,16 +31,24 @@ class Note {
   List<String> folderUuids;
   final folders = ToMany<Folder>();
 
-  factory Note.fromQuillController(QuillController controller,{String? uuid}) {
+  factory Note.fromQuillController(QuillController controller, {String? uuid}) {
     final deltaJson = jsonEncode(controller.document.toDelta().toJson());
     final now = DateTime.now();
-    return Note(content: deltaJson, createdAt: now, updatedAt: now,uuid: uuid ?? g.uuid.v4());
+    return Note(
+      content: deltaJson,
+      createdAt: now,
+      updatedAt: now,
+      uuid: uuid ?? g.uuid.v4(),
+    );
   }
 
   QuillController get quillController {
     final delta = Delta.fromJson(jsonDecode(content));
-    final doc =   Document.fromDelta(delta);
-    return QuillController(document: doc, selection: const TextSelection.collapsed(offset: 0));
+    final doc = Document.fromDelta(delta);
+    return QuillController(
+      document: doc,
+      selection: const TextSelection.collapsed(offset: 0),
+    );
   }
 
   Map<String, dynamic> toJson() => {
@@ -49,7 +58,7 @@ class Note {
     'updatedAt': updatedAt?.millisecondsSinceEpoch,
     'folderIds': folders.where((f) => f.id > 0).map((f) => f.id).toList(),
     'uuid': uuid,
-    'folderUuids':folders.where((f) => f.id > 0).map((f) => f.uuid).toList(),
+    'folderUuids': folders.where((f) => f.id > 0).map((f) => f.uuid).toList(),
   };
 
   factory Note.fromJson(Map<String, dynamic> json) {
@@ -95,8 +104,6 @@ class Note {
     }
   }
 
-
-
   static String? notesToJsonString(List<Note>? notes) {
     if (notes == null) return null;
 
@@ -107,6 +114,7 @@ class Note {
 
     return jsonEncode(notesMap);
   }
+
   static List<Note>? notesFromJsonString(String? jsonString) {
     if (jsonString == null || jsonString.isEmpty || jsonString == '{}') {
       return null;
@@ -116,8 +124,8 @@ class Note {
       final Map<String, dynamic> decoded = jsonDecode(jsonString);
       return decoded.entries.map((entry) {
         return Note(
-          uuid: entry.key,        // UUID from JSON key
-          content: entry.value.toString(),  // Content from JSON value
+          uuid: entry.key, // UUID from JSON key
+          content: entry.value.toString(), // Content from JSON value
         );
       }).toList();
     } catch (e) {
@@ -126,13 +134,32 @@ class Note {
     }
   }
 
-
-  static List<Note> convertJsonListToObjectList(List<Map<String, dynamic>> jsonList) {
+  static List<Note> convertJsonListToObjectList(
+    List<Map<String, dynamic>> jsonList,
+  ) {
     return jsonList.map(Note.fromJson).toList();
   }
 
-  static List<Map<String, dynamic>> convertObjectsListToJsonList(List<Note> objectList) {
+  static List<Map<String, dynamic>> convertObjectsListToJsonList(
+    List<Note> objectList,
+  ) {
     return objectList.map((note) => note.toJson()).toList();
   }
 
+  //override == and hashCode for this class
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! Note) return false;
+    return other.id == id &&
+        other.content == content &&
+        other.createdAt == createdAt &&
+        other.updatedAt == updatedAt &&
+        other.uuid == uuid &&
+        other.folderUuids == folderUuids;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, content, createdAt, updatedAt, uuid, folderUuids);
 }
