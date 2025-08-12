@@ -1,6 +1,8 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:darrt/helpers/mini_logger.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:darrt/focustimer/sound/sound_controller.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class MyAudioHandler extends BaseAudioHandler {
   final AudioPlayer _player;
@@ -76,10 +78,22 @@ class MyAudioHandler extends BaseAudioHandler {
         }
         break;
       case MediaButton.next:
-      // Could implement next sound functionality here
+        try {
+          await _player.seekToNext();
+        } catch (e, t) {
+          final message = SentryMessage('Error seeking to next sound');
+          Sentry.captureException(e,stackTrace: t, message: message);
+          MiniLogger.dp('Error seeking to next: $e');
+        }
         break;
       case MediaButton.previous:
-      // Could implement previous sound functionality here
+        try {
+          await _player.seekToPrevious();
+        } catch (e, t) {
+          final message = SentryMessage('Error seeking to previous sound');
+          Sentry.captureException(e, stackTrace: t, message: message);
+          MiniLogger.dp('Error seeking to previous: $e');
+        }
         break;
     }
   }
