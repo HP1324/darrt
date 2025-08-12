@@ -10,6 +10,8 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+def homeDir = System.getenv("HOME") ?: System.getenv("USERPROFILE")
+
 android {
     namespace = "com.stellarmotion.darrt"
     compileSdk = 35
@@ -35,6 +37,12 @@ android {
         versionName = flutter.versionName
     }
     signingConfigs {
+        debug{
+            storeFile = file("$homeDir/dev/keystores/debug.keystore")
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            storePassword = "android"
+        }
         release {
             keyAlias = keystoreProperties['keyAlias']
             keyPassword = keystoreProperties['keyPassword']
@@ -44,7 +52,7 @@ android {
     }
     buildTypes {
         release{
-            signingConfig = signingConfigs.release
+            signingConfig = signingConfigs.debug
             minifyEnabled true // Shrinks unused code
             shrinkResources true // Shrinks unused resources
         }
