@@ -36,7 +36,7 @@ class _SoundPickerDialogState extends State<SoundPickerDialog> {
 
   Future<void> showFullPageAd() async {
     final pickCount = MiniBox().read('sound_pick_count') ?? 1;
-    if (pickCount % 3 == 0) {
+    if (pickCount % 2 == 0) {
       if (g.adsController.isFullPageOnCustomSoundPickAdLoaded) {
         g.adsController.fullPageOnCustomSoundPickAd.show();
       }

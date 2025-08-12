@@ -35,7 +35,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   Future<void> showFullPageAd() async {
     if(g.adsController.isFullPageAdOnAddCategoryPopLoaded) {
       final popCount = MiniBox().read('add_category_pop_count') ?? 0;
-      if (popCount % 3 == 0) {
+      if (popCount % 2 == 0) {
         await g.adsController.fullPageAdOnAddCategoryPagePop.show();
       }
       MiniBox().write('add_category_pop_count', popCount + 1);

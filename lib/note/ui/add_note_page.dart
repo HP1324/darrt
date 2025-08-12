@@ -59,7 +59,7 @@ class _AddNotePageState extends State<AddNotePage> {
   Future<void> showFullPageAd() async {
     if(g.adsController.isFullPageOnAddNotePagePopAdLoaded) {
       final popCount = MiniBox().read('add_note_pop_count') ?? 1;
-      if (popCount % 3 == 0) {
+      if (popCount % 2 == 0) {
         MiniLogger.dp("pop count $popCount");
         await g.adsController.fullPageAdOnAddNotePagePop.show();
       }
