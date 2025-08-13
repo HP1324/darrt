@@ -503,7 +503,8 @@ class AddRemindersSection extends StatelessWidget {
         g.taskSc.textFieldNode.unfocus();
         final allowed = await AwesomeNotifications().isNotificationAllowed();
         if (context.mounted) {
-          if ((allowed || await NotificationService.showNotificationRationale(context)) &&
+          final userAllowed = await NotificationService.showNotificationRationale(context);
+          if ((allowed || (userAllowed != null && userAllowed)) &&
               context.mounted) {
             _showRemindersBottomSheet(context);
           }
