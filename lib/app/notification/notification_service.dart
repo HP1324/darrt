@@ -66,7 +66,7 @@ class NotificationService {
             importance: NotificationImportance.Max,
             enableLights: true,
             onlyAlertOnce: true,
-            criticalAlerts: true,
+            criticalAlerts: false,
             locked: true,
             enableVibration: false,
           ),
