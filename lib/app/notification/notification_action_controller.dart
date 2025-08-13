@@ -62,6 +62,16 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
       case openAppKey:
         Darrt.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const SettingsPage()));
         break;
+      case timerPlayPauseKey:
+        if(g.timerController.isRunning){
+          g.timerController.pauseTimer();
+        }else{
+          g.timerController.startTimer();
+        }
+        break;
+      case timerStopKey:
+        g.timerController.stopTimer();
+        break;
       default:
         if (task != null) {
           Darrt.navigatorKey.currentState?.push(
@@ -84,6 +94,9 @@ const String quickSnoozeActionKey = 'QUICK_SNOOZE';
 const String quickSnoozeActionLabel = 'Quick Snooze';
 const String signInAndBackupActionKey = 'SIGN_IN_AND_BACKUP';
 const String openAppKey = 'OPEN_APP';
+
+const String timerPlayPauseKey = 'timer_play_pause';
+const String timerStopKey = 'timer_stop';
 final finishedActionButton = NotificationActionButton(
   key: finishedActionKey,
   label: finishedActionLabel,

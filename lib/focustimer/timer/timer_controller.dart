@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:darrt/app/notification/notification_action_controller.dart';
 import 'package:darrt/helpers/consts.dart';
 import 'package:flutter/foundation.dart';
 import 'package:darrt/app/services/mini_box.dart';
@@ -42,15 +43,16 @@ class TimerController extends ChangeNotifier {
   int get focusDuration => _focusDuration;
   int get breakDuration => _breakDuration;
   int get remainingSeconds => _remainingSeconds;
-  int get currentDuration => _currentType == TimerType.focus ? _focusDuration : _breakDuration;
+  int get currentDuration =>
+      _currentType == TimerType.focus ? _focusDuration : _breakDuration;
   double get progress => 1.0 - (_remainingSeconds / currentDuration);
   bool get isRunning => _state == TimerState.running;
   bool get isPaused => _state == TimerState.paused;
   bool get isCompleted => _state == TimerState.completed;
   bool get isIdle => _state == TimerState.idle;
 
-
-  String get timerTypeLabel => _currentType == TimerType.focus ? 'Focus Mode' : 'Break';
+  String get timerTypeLabel =>
+      _currentType == TimerType.focus ? 'Focus Mode' : 'Break';
 
   TimerController() {
     _initializeFromStorage();
@@ -82,7 +84,9 @@ class TimerController extends ChangeNotifier {
           orElse: () => TimerType.focus,
         );
 
-        if (_state == TimerState.running && startTimeStr != null && durationStr != null) {
+        if (_state == TimerState.running &&
+            startTimeStr != null &&
+            durationStr != null) {
           _startTime = DateTime.parse(startTimeStr);
           final totalDuration = int.parse(durationStr);
           final elapsed = DateTime.now().difference(_startTime!).inSeconds;
@@ -189,7 +193,7 @@ class TimerController extends ChangeNotifier {
   //   notifyListeners();
   // }
 
-  void pauseTimer() {
+  void pauseTimer() async{
     if (_state == TimerState.running) {
       _stopTicker();
       _state = TimerState.paused;
@@ -198,15 +202,21 @@ class TimerController extends ChangeNotifier {
       _saveToStorage();
       _updatePersistentNotification();
       notifyListeners();
+      final handleSound = MiniBox().read(mPauseResumeSoundWithTimer) ?? true;
+      if (handleSound) {
+        await g.audioController.pauseAudio();
+      }
     }
   }
 
-  void startTimer() {
+  void startTimer() async{
     if (_state == TimerState.idle) {
       _remainingSeconds = currentDuration;
       _startTime = DateTime.now();
     } else if (_state == TimerState.paused) {
-      _startTime = DateTime.now().subtract(Duration(seconds: currentDuration - _pausedSeconds));
+      _startTime = DateTime.now().subtract(
+        Duration(seconds: currentDuration - _pausedSeconds),
+      );
     }
 
     _state = TimerState.running;
@@ -214,9 +224,13 @@ class TimerController extends ChangeNotifier {
     _saveToStorage();
     _updatePersistentNotification();
     notifyListeners();
+    final handleSound = MiniBox().read(mPauseResumeSoundWithTimer) ?? true;
+    if(handleSound && !g.audioController.isPlaying){
+      await g.audioController.resumeAudio();
+    }
   }
 
-  void stopTimer() {
+  void stopTimer() async{
     _stopTicker();
     _state = TimerState.idle;
     _remainingSeconds = currentDuration;
@@ -225,6 +239,10 @@ class TimerController extends ChangeNotifier {
     _saveToStorage();
     _updatePersistentNotification();
     notifyListeners();
+    final handleSound = MiniBox().read(mPauseResumeSoundWithTimer) ??true;
+    if (handleSound) {
+      await g.audioController.pauseAudio();
+    }
   }
 
   void resetTimer() {
@@ -391,7 +409,6 @@ class TimerController extends ChangeNotifier {
           body: "Great job! Time to relax and recharge 🌿",
           criticalAlert: true,
           wakeUpScreen: true,
-
         ),
       );
     } else {
@@ -420,8 +437,9 @@ class TimerController extends ChangeNotifier {
       );
     }
   }
+
   Future<void> _updatePersistentNotification() async {
-    if(!MiniBox().read(mShowTimerNotification)) return;
+    if (!MiniBox().read(mShowTimerNotification)) return;
     if (_state == TimerState.idle || _state == TimerState.completed) {
       await AwesomeNotifications().cancel(999); // 999: fixed ID for persistent
       return;
@@ -429,22 +447,33 @@ class TimerController extends ChangeNotifier {
 
     final typeLabel = _currentType == TimerType.focus ? 'Focus' : 'Break';
     final stateLabel = _state == TimerState.paused ? '⏸️ Paused' : '▶️ Running';
-    final title = typeLabel == 'Focus' ? 'Focus session - $stateLabel' : 'Taking a break';
+    final title = typeLabel == 'Focus'
+        ? 'Focus session - $stateLabel'
+        : 'Taking a break';
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: 999, // Use a fixed ID for updating
         channelKey: timerChannelKey,
         title: title,
         body: 'Time left: $formattedTime',
-        category: NotificationCategory.Status,
+        category: NotificationCategory.Reminder,
         notificationLayout: NotificationLayout.Default,
         wakeUpScreen: true,
         criticalAlert: true,
         autoDismissible: false,
         locked: true,
       ),
+      actionButtons: [
+        NotificationActionButton(
+          key: timerPlayPauseKey,
+          label: isPaused ? 'Resume' : 'Pause',
+          actionType: ActionType.KeepOnTop,
+        ),
+        NotificationActionButton(key: timerStopKey, label: 'Stop'),
+      ],
     );
   }
+
   String get formattedTime {
     final hours = _remainingSeconds ~/ 3600;
     final minutes = (_remainingSeconds % 3600) ~/ 60;

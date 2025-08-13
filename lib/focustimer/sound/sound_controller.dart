@@ -22,7 +22,7 @@ class SoundController extends ChangeNotifier {
   bool _isDisposed = false;
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
-  LoopMode _loopMode = MiniBox().read(mSoundLoopMode) != null && MiniBox().read(mSoundLoopMode) == 'one' ? LoopMode.one : LoopMode.all;
+  LoopMode _loopMode = MiniBox().read(mSoundLoopMode) == null ? LoopMode.one : LoopMode.all;
   int? _currentIndex;
 
   // ValueNotifier for dialog-specific state
@@ -277,7 +277,6 @@ class SoundController extends ChangeNotifier {
       await _audioHandler?.play();
     }
   }
-
   // Stop audio
   Future<void> stopAudio() async {
     if (isPlaying) {
