@@ -54,8 +54,11 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                     listenable: g.calMan,
                     builder: (context, child) {
                       final selectedDate = g.calMan.selectedDate;
-                      final isBefore = selectedDate.isBefore(g.calMan.previousSelectedDate);
-                      final title = DateUtils.isSameDay(selectedDate, DateTime.now())
+                      final isBefore = selectedDate.isBefore(
+                        g.calMan.previousSelectedDate,
+                      );
+                      final title =
+                          DateUtils.isSameDay(selectedDate, DateTime.now())
                           ? 'Today'
                           : formatDateNoJm(selectedDate, 'EEE, d MMM, yyyy');
                       return AnimatedSwitcher(
@@ -92,9 +95,10 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                         child: Text(
                           title,
                           key: ValueKey<DateTime>(selectedDate),
-                          style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium!
+                              .copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       );
                     },
@@ -128,17 +132,20 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                     );
                   }
 
-                  bool allowed = true;
+                  bool? allowed = true;
                   if (!await AwesomeNotifications().isNotificationAllowed()) {
                     if (!context.mounted) return; // Check before using context
-                    allowed = await NotificationService.showNotificationRationale(context);
+                    allowed =
+                        await NotificationService.showNotificationRationale(
+                          context,
+                        );
                   }
                   if (!context.mounted) return; // Check again after async call
 
-                  if (allowed) {
+                  if (allowed != null && allowed) {
                     await showQuickReminderDialog();
                   } else {
-                    showErrorToast(context,  'Notification permission denied!');
+                    showErrorToast(context, 'Notification permission denied!');
                   }
                 },
                 icon: Tooltip(
@@ -156,14 +163,15 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                     showMenu(
                       context: context,
                       elevation: 1,
-                      popUpAnimationStyle: AnimationStyle(duration: Duration(milliseconds: 100)),
+                      popUpAnimationStyle: AnimationStyle(
+                        duration: Duration(milliseconds: 100),
+                      ),
                       position: getRelativeRectFromOffsetAndSize(offset, size),
                       items: [
                         PopupMenuItem(
                           child: _MiniAppBarAction(
                             icon: Icon(Icons.handyman),
                             onTap: () async {
-
                               try {
                                 throw StateError('Sentry Test Exception');
                               } catch (exception, stackTrace) {
@@ -186,10 +194,13 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                         ),
                         PopupMenuItem(
                           child: IconButton(
-                            onPressed: () async{
-                              final list = await AwesomeNotifications().listScheduledNotifications();
-                              for (final notif in list){
-                                MiniLogger.dp('${notif.content?.id} ${notif.content?.title} ${notif.content?.body}');
+                            onPressed: () async {
+                              final list = await AwesomeNotifications()
+                                  .listScheduledNotifications();
+                              for (final notif in list) {
+                                MiniLogger.dp(
+                                  '${notif.content?.id} ${notif.content?.title} ${notif.content?.body}',
+                                );
                               }
                             },
                             icon: Icon(Icons.list),
@@ -205,17 +216,55 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
           return AppBar(
             backgroundColor: backgroundColor,
             title: Text('Focus'),
+            actions: [
+              _MiniAppBarAction(
+                icon: Container(
+                  padding: EdgeInsets.all(1),
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.3),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.question_mark),
+                ),
+                onTap: () async {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                        content: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Text(
+                            "If notification permissions are granted, you can see persistent timer notification after enabling it from settings. Go to app's Settings > Timer Settings >Enable \"Show timer as notification in notification bar until ends.\"",
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
           );
         return AppBar(
           backgroundColor: backgroundColor,
-          title: Text('Categories', style: Theme.of(context).textTheme.titleMedium),
+          title: Text(
+            'Categories',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
         );
       },
     );
   }
 
   Future<void> createNotification() async {
-    final int notifId = DateTime.now().millisecondsSinceEpoch.remainder(1000000);
+    final int notifId = DateTime.now().millisecondsSinceEpoch.remainder(
+      1000000,
+    );
     const totalDuration = Duration(minutes: 5); // 5 minutes
 
     DateTime startTime = DateTime.now();
@@ -238,9 +287,10 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     Timer.periodic(const Duration(seconds: 1), (timer) async {
       final elapsed = DateTime.now().difference(startTime);
-      final progressPercent = (elapsed.inMilliseconds / totalDuration.inMilliseconds * 100)
-          .clamp(0, 100)
-          .toDouble();
+      final progressPercent =
+          (elapsed.inMilliseconds / totalDuration.inMilliseconds * 100)
+              .clamp(0, 100)
+              .toDouble();
 
       // Update the notification
       await AwesomeNotifications().createNotification(
