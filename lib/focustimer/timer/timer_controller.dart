@@ -94,11 +94,8 @@ class TimerController extends ChangeNotifier {
 
           if (_remainingSeconds <= 0) {
             stopTimer();
-            if (MiniBox().read(mPauseResumeSoundWithTimer)) {
-              g.audioController.pauseAudio();
-            }
           } else {
-            _startTicker();
+            startTimer();
           }
         } else if (_state == TimerState.paused && pausedTimeStr != null) {
           _remainingSeconds = int.parse(pausedTimeStr);
@@ -193,7 +190,7 @@ class TimerController extends ChangeNotifier {
   //   notifyListeners();
   // }
 
-  void pauseTimer() async{
+  void pauseTimer() async {
     if (_state == TimerState.running) {
       _stopTicker();
       _state = TimerState.paused;
@@ -209,7 +206,7 @@ class TimerController extends ChangeNotifier {
     }
   }
 
-  void startTimer() async{
+  void startTimer() async {
     if (_state == TimerState.idle) {
       _remainingSeconds = currentDuration;
       _startTime = DateTime.now();
@@ -225,12 +222,12 @@ class TimerController extends ChangeNotifier {
     _updatePersistentNotification();
     notifyListeners();
     final handleSound = MiniBox().read(mPauseResumeSoundWithTimer) ?? true;
-    if(handleSound && !g.audioController.isPlaying){
+    if (handleSound && !g.audioController.isPlaying) {
       await g.audioController.resumeAudio();
     }
   }
 
-  void stopTimer() async{
+  void stopTimer() async {
     _stopTicker();
     _state = TimerState.idle;
     _remainingSeconds = currentDuration;
@@ -239,7 +236,7 @@ class TimerController extends ChangeNotifier {
     _saveToStorage();
     _updatePersistentNotification();
     notifyListeners();
-    final handleSound = MiniBox().read(mPauseResumeSoundWithTimer) ??true;
+    final handleSound = MiniBox().read(mPauseResumeSoundWithTimer) ?? true;
     if (handleSound) {
       await g.audioController.pauseAudio();
     }
@@ -439,6 +436,7 @@ class TimerController extends ChangeNotifier {
   }
 
   Future<void> _updatePersistentNotification() async {
+    if (!await AwesomeNotifications().isNotificationAllowed()) return;
     if (!MiniBox().read(mShowTimerNotification)) return;
     if (_state == TimerState.idle || _state == TimerState.completed) {
       await AwesomeNotifications().cancel(999); // 999: fixed ID for persistent
@@ -469,7 +467,10 @@ class TimerController extends ChangeNotifier {
           label: isPaused ? 'Resume' : 'Pause',
           actionType: ActionType.KeepOnTop,
         ),
-        NotificationActionButton(key: timerStopKey, label: 'Stop'),
+        NotificationActionButton(
+          key: timerStopKey,
+          label: 'Stop',
+        ),
       ],
     );
   }

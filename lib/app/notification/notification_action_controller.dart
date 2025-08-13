@@ -17,7 +17,8 @@ import 'package:darrt/helpers/utils.dart';
 Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
   try {
     final appState = SchedulerBinding.instance.lifecycleState;
-    if (appState == AppLifecycleState.detached) {
+    final appTerminated = appState == AppLifecycleState.detached;
+    if (appTerminated) {
       await ObjectBox().init();
     }
     Task? task;
@@ -63,6 +64,7 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
         Darrt.navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const SettingsPage()));
         break;
       case timerPlayPauseKey:
+        if(appTerminated) return;
         if(g.timerController.isRunning){
           g.timerController.pauseTimer();
         }else{
@@ -70,6 +72,7 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
         }
         break;
       case timerStopKey:
+        if(appTerminated) return;
         g.timerController.stopTimer();
         break;
       default:
