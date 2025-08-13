@@ -474,11 +474,12 @@ class NotificationService {
     String? title,
     int minutes, {
     NotificationCategory? category,
+    String? type,
     int? id,
   }) async {
     final now = DateTime.now();
-    final type = category == NotificationCategory.Alarm ? alarmReminderType : notifReminderType;
-    final channelKey = type == alarmReminderType ? alarmChannelKey : notifChannelKey;
+    final reminderType = type ?? (category == NotificationCategory.Alarm ? alarmReminderType : notifReminderType);
+    final channelKey = reminderType == alarmReminderType ? alarmChannelKey : notifChannelKey;
 
     final nextTime = TimeOfDay.fromDateTime(now.add(Duration(minutes: minutes)));
     await AwesomeNotifications().createNotification(
