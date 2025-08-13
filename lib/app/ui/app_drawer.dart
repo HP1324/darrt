@@ -9,6 +9,7 @@ import 'package:darrt/app/ui/settings_page/settings_page.dart';
 import 'package:darrt/app/ui/theme_settings_page.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/quickreminder/ui/quick_reminders_page.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:purchases_ui_flutter/paywall_result.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -107,9 +108,17 @@ class FooterSection extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            'Version 1.0.0',
-            style: TextStyle(fontSize: 12),
+          FutureBuilder(
+            future: PackageInfo.fromPlatform(),
+            builder: (context, snapshot) {
+              if(snapshot.hasData) {
+                return Text(
+                  snapshot.data?.version ?? "",
+                  style: TextStyle(fontSize: 12),
+                );
+              }
+              return SizedBox.shrink();
+            }
           ),
           const SizedBox(width: 8),
           Text(
