@@ -101,7 +101,6 @@ class _DarrtState extends State<Darrt> {
   @override
   void dispose() {
     MiniLogger.dp('Main dispose called');
-    g.audioController.dispose();
     super.dispose();
   }
   @override
