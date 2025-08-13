@@ -1,3 +1,4 @@
+import 'package:darrt/app/notification/notification_service.dart';
 import 'package:darrt/app/services/boxpref.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/app/services/object_box.dart';
@@ -127,7 +128,11 @@ class ShowTimerNotificationTile extends StatelessWidget {
           key: const ValueKey(mShowTimerNotification),
           title: const Text('Show timer as notification in notification bar until it ends'),
           value: isEnabled,
-          onChanged: (value) {
+          onChanged: (value) async{
+            if(value != null && value == true){
+              final allowed = await NotificationService.showNotificationRationale(context);
+              if (allowed == null || !allowed) return;
+            }
             MiniBox().write(mShowTimerNotification, value ?? false);
           },
         );
