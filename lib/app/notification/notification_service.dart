@@ -1,5 +1,4 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:darrt/app/state/managers/theme_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:darrt/app/notification/notification_action_controller.dart';
@@ -65,7 +64,6 @@ class NotificationService {
             channelDescription: 'Show timer notifications',
             playSound: false,
             importance: NotificationImportance.Max,
-            defaultColor: ThemeColors.amethyst.color,
             enableLights: true,
             onlyAlertOnce: true,
             criticalAlerts: true,
