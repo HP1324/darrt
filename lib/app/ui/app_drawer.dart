@@ -113,7 +113,7 @@ class FooterSection extends StatelessWidget {
             builder: (context, snapshot) {
               if(snapshot.hasData) {
                 return Text(
-                  snapshot.data?.version ?? "",
+                  "Version ${snapshot.data?.version ?? ""}",
                   style: TextStyle(fontSize: 12),
                 );
               }
