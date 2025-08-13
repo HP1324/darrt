@@ -426,7 +426,11 @@ class NotificationService {
     }
   }
 
-  static Future<bool> showNotificationRationale(BuildContext context) async {
+  static Future<bool?> showNotificationRationale(BuildContext context) async {
+    if (await AwesomeNotifications().isNotificationAllowed()) {
+      return true;
+    }
+
     return await showAdaptiveDialog(
       context: context,
       builder: (_) {
@@ -469,14 +473,12 @@ class NotificationService {
   static Future<void> scheduleQuickReminder(
     String? title,
     int minutes, {
-    String? type,
+    NotificationCategory? category,
     int? id,
   }) async {
     final now = DateTime.now();
+    final type = category == NotificationCategory.Alarm ? alarmReminderType : notifReminderType;
     final channelKey = type == alarmReminderType ? alarmChannelKey : notifChannelKey;
-    final category = type == alarmReminderType
-        ? NotificationCategory.Alarm
-        : NotificationCategory.Reminder;
 
     final nextTime = TimeOfDay.fromDateTime(now.add(Duration(minutes: minutes)));
     await AwesomeNotifications().createNotification(
