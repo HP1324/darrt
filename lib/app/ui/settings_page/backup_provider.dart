@@ -8,6 +8,7 @@ import 'package:darrt/helpers/consts.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import './backup_state.dart';
@@ -31,6 +32,10 @@ class BackupNotifier extends _$BackupNotifier {
   }
 
   Future<void> signIn(BuildContext context) async {
+    if(!await InternetConnection().hasInternetAccess) {
+      showErrorToast(context, 'No internet connection');
+      return;
+    }
     if (state.isAnyOperationInProgress) return;
 
     try {
@@ -106,7 +111,7 @@ class BackupNotifier extends _$BackupNotifier {
     } on GoogleClientNotAuthenticatedError catch (e) {
       if (context.mounted) showErrorToast(context, e.userMessage!);
     } on InternetOffError catch (e) {
-      if (context.mounted) showSuccessToast(context, e.userMessage!);
+      if (context.mounted) showErrorToast(context, e.userMessage!);
     } catch (e) {
       MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
       showErrorToast(context, 'Unknown error occurred, try after sometime!');

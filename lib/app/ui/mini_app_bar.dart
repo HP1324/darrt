@@ -142,10 +142,10 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   }
                   if (!context.mounted) return; // Check again after async call
 
-                  if (allowed != null && allowed) {
-                    await showQuickReminderDialog();
-                  } else {
+                  if (allowed == null || !allowed) {
                     showErrorToast(context, 'Notification permission denied!');
+                  } else {
+                    await showQuickReminderDialog();
                   }
                 },
                 icon: Tooltip(
