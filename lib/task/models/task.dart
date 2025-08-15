@@ -34,13 +34,11 @@ class Task {
        startDate = startDate ?? DateTime.now(),
        uuid = uuid ?? g.uuid.v4(),
        categoryUuids = categoryUuids ?? [];
+
   @Id()
   int id;
   String title, priority;
   DateTime? createdAt, endDate,startTime, endTime;
-
-  // @Property(uid:9114797388521663395)
-  // DateTime? ;
   DateTime dueDate, startDate;
   bool isDone, isRepeating;
   String? reminders, repeatConfig,notes,stats;
@@ -186,7 +184,10 @@ class Task {
     bool? isRepeating,
     String? reminders,
     String? repeatConfig,
-
+    String? notes,
+    String? stats,
+    String? uuid,
+    List<String>? categoryUuids,
   }) {
     return Task(
       id: id ?? this.id,
@@ -202,6 +203,10 @@ class Task {
       isRepeating: isRepeating ?? this.isRepeating,
       reminders: reminders ?? this.reminders,
       repeatConfig: repeatConfig ?? this.repeatConfig,
+      notes: notes ?? this.notes,
+      stats: stats ?? this.stats,
+      uuid: uuid ?? this.uuid,
+      categoryUuids: categoryUuids ?? this.categoryUuids,
     );
   }
 
