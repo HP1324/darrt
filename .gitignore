@@ -57,3 +57,6 @@ android/app/.cxx/
 
 sentry.properties
 sentry-wizard
+
+# FVM Version Cache
+.fvm/
