@@ -1,4 +1,5 @@
 
+import 'package:darrt/task/state/task_state.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -12,27 +13,8 @@ import 'package:darrt/task/models/reminder.dart';
 import 'package:darrt/task/models/repeat_config.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/helpers/globals.dart' as g;
-part 'task_state_controller.freezed.dart';
 
-///Immutable data-class to store the temporary state of the task add page
-@freezed
-abstract class TaskState with _$TaskState {
-  const factory TaskState({
-    required Map<TaskCategory, bool> categorySelection,
-    required DateTime dueDate,
-    required bool isRepeating,
-    required DateTime startDate,
-    DateTime? endDate,
-    DateTime? startTime,
-    DateTime? endTime,
-    required RepeatConfig repeatConfig,
-    required List<Reminder> reminders,
-    List<Note>? notes,
-    required String priority,
-    required int currentPriority,
-  }) = _TaskState;
-  const TaskState._();
-}
+
 
 ///Controls the temporary state of the task add page when task is being added or updated
 class TaskStateController extends StateController<TaskState, Task> {
@@ -109,6 +91,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       task = Task(
         id: 0,
         title: textController.text,
+        createdAt: DateTime.now(),
         dueDate: dueDate,
         priority: priority,
         startDate: startDate,
@@ -122,7 +105,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       );
     }
     final categories = g.catVm.categories
-        .where((c) => g.taskSc.categorySelection[c] == true)
+        .where((c) => categorySelection[c] == true)
         .toList();
     task.categories.clear();
     if (categories.isEmpty) {
