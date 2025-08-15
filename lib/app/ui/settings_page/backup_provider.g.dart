@@ -6,7 +6,7 @@ part of 'backup_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$backupNotifierHash() => r'9b12aea110e7cbcde54f96d767dc3e7af03b7017';
+String _$backupNotifierHash() => r'f6d5f6ec9a54335905b0617a92c733102d82e79d';
 
 /// See also [BackupNotifier].
 @ProviderFor(BackupNotifier)
