@@ -178,31 +178,33 @@ class _EmptyStateIndicator extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(48),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: scheme.primaryContainer.withValues(alpha: 0.3),
-              shape: BoxShape.circle,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer.withValues(alpha: 0.3),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.task_alt_rounded,
+                size: 32,
+                color: scheme.primary,
+              ),
             ),
-            child: Icon(
-              Icons.task_alt_rounded,
-              size: 32,
-              color: scheme.primary,
+            const SizedBox(height: 20),
+            Text(
+              'No tasks available',
+              style: textTheme.titleMedium?.copyWith(
+                color: scheme.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'No tasks available',
-            style: textTheme.titleMedium?.copyWith(
-              color: scheme.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
