@@ -15,10 +15,12 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   MiniAppBar({super.key});
+
   final GlobalKey _popupKey = GlobalKey();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
@@ -133,13 +135,10 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   }
 
                   bool? allowed = true;
-                  if (!await AwesomeNotifications().isNotificationAllowed()) {
-                    if (!context.mounted) return; // Check before using context
-                    allowed =
-                        await NotificationService.showNotificationRationale(
-                          context,
-                        );
-                  }
+                  allowed = await NotificationService.showNotificationRationale(
+                    context,
+                  );
+                  debugPrint('Notification Permission Granted? : $allowed');
                   if (!context.mounted) return; // Check again after async call
 
                   if (allowed == null || !allowed) {
@@ -233,7 +232,9 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                     context: context,
                     builder: (context) {
                       return AlertDialog(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(9),
+                        ),
                         content: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
@@ -384,8 +385,10 @@ class TimelineFilterButton extends StatelessWidget {
 
 class _MiniAppBarAction extends StatelessWidget {
   const _MiniAppBarAction({super.key, required this.icon, required this.onTap});
+
   final Widget icon;
   final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
     return Padding(

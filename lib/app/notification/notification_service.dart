@@ -431,7 +431,7 @@ class NotificationService {
       return true;
     }
 
-    return await showAdaptiveDialog(
+    return showAdaptiveDialog(
       context: context,
       builder: (_) {
         return AlertDialog(
