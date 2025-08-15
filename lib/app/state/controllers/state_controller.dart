@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Base abstract class defining the common interface for all state controllers
+/// [S] is the type of the state managed by the controller, which is usually a freezed immutable class, and [M] is the type of the model whose temporary state is managed by the controller.
 abstract class StateController<S, M> extends ChangeNotifier {
   /// The state managed by this controller
   late S state;
