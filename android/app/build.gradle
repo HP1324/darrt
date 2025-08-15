@@ -14,7 +14,7 @@ def homeDir = System.getenv("HOME") ?: System.getenv("USERPROFILE")
 
 android {
     namespace = "com.stellarmotion.darrt"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = "28.0.12674087"
 
     compileOptions {
