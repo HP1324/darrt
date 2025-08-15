@@ -25,6 +25,7 @@ class Note {
   @Id()
   int id;
   String content;
+  @Property(type: PropertyType.date)
   DateTime? createdAt, updatedAt;
   final String uuid;
   List<String> folderUuids;

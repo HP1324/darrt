@@ -38,7 +38,9 @@ class Task {
   @Id()
   int id;
   String title, priority;
+  @Property(type: PropertyType.date)
   DateTime? createdAt, endDate,startTime, endTime;
+  @Property(type: PropertyType.date)
   DateTime dueDate, startDate;
   bool isDone, isRepeating;
   String? reminders, repeatConfig,notes,stats;

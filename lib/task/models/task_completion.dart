@@ -5,6 +5,7 @@ import 'package:objectbox/objectbox.dart';
 class TaskCompletion {
   @Id()
   int id;
+  @Property(type:PropertyType.date)
   DateTime date;
   bool isDone;
   String? taskUuid;
