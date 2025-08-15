@@ -4,7 +4,7 @@ import 'package:speech_to_text/speech_to_text.dart';
 
 import '../../helpers/globals.dart' as g show taskSc;
 
-class TaskSttController extends ChangeNotifier {
+class TaskSttController{
   final SpeechToText speech = SpeechToText();
   String hintText = "What's on your mind? ";
   String _speechFinalized = '';
