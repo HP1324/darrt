@@ -24,8 +24,6 @@ import 'package:workmanager/workmanager.dart';
 import 'package:flutter/services.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-
-
 /// Initializes app services and state
 Future<void> initApp() async {
   try {
@@ -35,7 +33,7 @@ Future<void> initApp() async {
     await subService.configureRevenueCatSdk();
 
     // Initialize google mobile ads sdk only if user is not subscribed to no ads
-    if(subService.showAds) {
+    if (subService.showAds) {
       unawaited(MobileAds.instance.initialize());
     }
 
@@ -51,7 +49,9 @@ Future<void> initApp() async {
 
     FlutterNativeSplash.remove();
   } catch (e, t) {
-    MiniLogger.e('Failed to initialize app: ${e.toString()}, Error type: ${e.runtimeType}');
+    MiniLogger.e(
+      'Failed to initialize app: ${e.toString()}, Error type: ${e.runtimeType}',
+    );
     MiniLogger.t(t.toString());
   }
 }
@@ -63,7 +63,8 @@ void main() async {
   ]);
   await SentryFlutter.init(
     (options) {
-      options.dsn = 'https://99a7380b964ec1d875f7cd7ec087eff7@o4509807915237376.ingest.de.sentry.io/4509807918252112';
+      options.dsn =
+          'https://99a7380b964ec1d875f7cd7ec087eff7@o4509807915237376.ingest.de.sentry.io/4509807918252112';
       // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing.
       // We recommend adjusting this value in production.
       options.tracesSampleRate = 1.0;
@@ -72,18 +73,22 @@ void main() async {
       options.profilesSampleRate = 1.0;
       options.attachScreenshot = true;
     },
-    appRunner: () => runApp(SentryWidget(child:
-    DevicePreview(
-      enabled: !kReleaseMode,
-      builder: (context) => ProviderScope(child: const Darrt()),
+    appRunner: () => runApp(
+      SentryWidget(
+        child: DevicePreview(
+          enabled: !kReleaseMode,
+          builder: (context) => ProviderScope(child: const Darrt()),
+        ),
+      ),
     ),
-  )),
   );
 }
 
 class Darrt extends StatefulWidget {
   const Darrt({super.key});
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
   @override
   State<Darrt> createState() => _DarrtState();
@@ -103,6 +108,7 @@ class _DarrtState extends State<Darrt> {
     MiniLogger.dp('Main dispose called');
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
