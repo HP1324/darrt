@@ -412,111 +412,14 @@ class TitleTextField extends StatelessWidget {
       trailing: IconButton(
         onPressed: () async {
           g.taskSc.textFieldNode.unfocus();
-          await _handleSpeechToText(context);
+          await g.taskSttController.handleSpeechToText(context);
         },
         icon: Icon(Icons.keyboard_voice),
       ),
     );
   }
 
-  Future<void> _handleSpeechToText(BuildContext context) async {
-    showPermissionDeniedToast() {
-      showErrorToast(context, 'All requested permissions are required');
-    }
 
-    // Check permission status first using permission_handler
-    final micPermissionStatus = await Permission.microphone.status;
-    final nearbyDevicesStatus = await Permission.bluetoothConnect.status;
-
-    bool allPermissionsGranted =
-        micPermissionStatus.isGranted && (nearbyDevicesStatus.isGranted);
-
-    if (allPermissionsGranted) {
-      MiniLogger.d('All required permissions are granted');
-
-      // Check if speech is initialized
-      if (!g.taskSttController.speech.isAvailable) {
-        MiniLogger.d('Speech not initialized, initializing...');
-        final initResult = await g.taskSttController.initSpeech();
-        if (initResult) {
-          MiniLogger.d('Speech initialized successfully');
-          g.taskSttController.startListening();
-        } else {
-          MiniLogger.d('Speech initialization failed');
-          showPermissionDeniedToast();
-        }
-      } else {
-        MiniLogger.d('Speech already initialized, starting listening');
-        g.taskSttController.startListening();
-      }
-    } else {
-      MiniLogger.d('Some permissions are missing');
-
-      if (MiniBox().read(firstTimeMicTap) ?? true) {
-        MiniLogger.d('First time requesting permissions');
-        MiniBox().write(firstTimeMicTap, false);
-
-        // Request microphone permission first
-        final micResult = await Permission.microphone.request();
-
-        // Request nearby devices permission (for Bluetooth headsets)
-        final nearbyResult = await Permission.bluetoothConnect.request();
-
-        bool permissionsGranted =
-            micResult.isGranted && (nearbyResult.isGranted);
-
-        if (permissionsGranted) {
-          MiniLogger.d('Permissions granted on first request');
-          final initResult = await g.taskSttController.initSpeech();
-          if (initResult) {
-            g.taskSttController.startListening();
-          } else {
-            if (context.mounted) {
-              showPermissionDeniedToast();
-            }
-          }
-        } else {
-          MiniLogger.d('Some permissions denied on first request');
-          showPermissionDeniedToast();
-        }
-      } else {
-        MiniLogger.d('Not first time, checking if denied again flag is set');
-
-        if (!(MiniBox().read(micPermissionDeniedAgain) ?? false)) {
-          MiniLogger.d('Requesting permissions second time');
-
-          // Request both permissions again
-          final micResult = await Permission.microphone.request();
-          final nearbyResult = await Permission.bluetoothConnect.request();
-
-          bool permissionsGranted =
-              micResult.isGranted && (nearbyResult.isGranted);
-
-          if (permissionsGranted) {
-            MiniLogger.d('Permissions granted on second request');
-            // Force reinitialize speech since permission state changed
-            final initResult = await g.taskSttController.initSpeech();
-            if (initResult) {
-              g.taskSttController.startListening();
-            } else {
-              showPermissionDeniedToast();
-            }
-          } else {
-            MiniLogger.d('Some permissions denied on second request');
-            MiniBox().write(micPermissionDeniedAgain, true);
-            showPermissionDeniedToast();
-          }
-        } else {
-          MiniLogger.d(
-            'Permissions denied multiple times, showing settings dialog',
-          );
-          if (context.mounted) {
-            showSettingsDialog(context);
-          }
-        }
-      }
-    }
-  }
 }
 
 class AddRemindersSection extends StatelessWidget {
