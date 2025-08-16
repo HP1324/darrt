@@ -1,14 +1,15 @@
 import 'package:darrt/app/ads/subscription_service.dart';
 import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/app/ui/common_issues_fix_page.dart';
-import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:intl/intl.dart';
 import 'package:darrt/app/ui/settings_page/settings_page.dart';
 import 'package:darrt/app/ui/theme_settings_page.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/quickreminder/ui/quick_reminders_page.dart';
+import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:in_app_review/in_app_review.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:purchases_ui_flutter/paywall_result.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -89,7 +90,15 @@ class AppDrawer extends StatelessWidget {
               }
             },
           ),
-
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.star),
+            title: const Text('Rate us'),
+            onTap: () {
+              final inAppReview = InAppReview.instance;
+              inAppReview.openStoreListing();
+            },
+          ),
           const Spacer(),
           const FooterSection(),
         ],
