@@ -2,27 +2,27 @@ import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:darrt/app/ads/subscription_service.dart';
+import 'package:darrt/app/notification/notification_action_controller.dart';
+import 'package:darrt/app/notification/notification_service.dart';
+import 'package:darrt/app/services/auto_backup_service.dart';
+import 'package:darrt/app/services/google_sign_in_service.dart';
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/home.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:darrt/app/notification/notification_action_controller.dart';
-import 'package:darrt/app/notification/notification_service.dart';
-import 'package:darrt/app/services/auto_backup_service.dart';
-import 'package:darrt/app/services/google_sign_in_service.dart';
-import 'package:darrt/helpers/globals.dart' as g;
-import 'package:darrt/helpers/mini_logger.dart';
-import 'package:darrt/app/services/mini_box.dart';
-import 'package:darrt/app/services/object_box.dart';
-import 'package:darrt/home.dart';
-import 'package:workmanager/workmanager.dart';
-import 'package:flutter/services.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:workmanager/workmanager.dart';
 
 /// Initializes app services and state
 Future<void> initApp() async {
@@ -34,7 +34,7 @@ Future<void> initApp() async {
 
     // Initialize google mobile ads sdk only if user is not subscribed to no ads
     if (subService.showAds) {
-      unawaited(MobileAds.instance.initialize());
+      MobileAds.instance.initialize();
     }
 
     // Initialize local storage & database
