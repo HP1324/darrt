@@ -1,12 +1,12 @@
 
 import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart';
 import 'package:darrt/app/services/backup_service.dart' show MergeType;
+import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/helpers/mini_logger.dart';
-import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/objectbox.g.dart' show Box;
 import 'package:darrt/task/models/task_completion.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../note/models/folder.dart';
 import '../../../note/models/note.dart';
@@ -64,7 +64,7 @@ abstract class ViewModel<T> extends ChangeNotifier {
     }
 
     MiniLogger.d('Item added/updated with id: $id, item type: ${item.runtimeType}');
-
+    debugPrint('notify listener will now be called');
     notifyListeners();
     return edit ? getUpdateSuccessMessage() : getCreateSuccessMessage();
   }

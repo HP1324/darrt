@@ -1,14 +1,13 @@
-import 'package:darrt/task/statistics/stats_page.dart';
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/category/ui/category_chip.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/statistics/stats_page.dart';
 import 'package:darrt/task/ui/add_task_page.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 
 class TaskItem extends StatefulWidget {
   const TaskItem({super.key, required this.task});
@@ -362,13 +361,7 @@ class TaskCategoriesList extends StatelessWidget {
     return ListenableBuilder(
       listenable: g.catVm,
       builder: (context, child) {
-        var categories = g.catVm.categories;
-        task.categories.removeWhere((c) => !categories.contains(c));
-        if (task.categories.isEmpty) {
-          MiniLogger.dp('This condition called');
-          task.categories.add(TaskCategory(id: 1, name: 'General'));
-          task.categories.applyToDb();
-        }
+
         return ListView.separated(
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,

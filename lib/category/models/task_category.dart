@@ -20,6 +20,10 @@ class TaskCategory {
   @Backlink('categories')
   final tasks = ToMany<Task>();
 
+  bool didUpdateCategory(TaskCategory oldCategory){
+    return name != oldCategory.name || icon != oldCategory.icon || color != oldCategory.color;
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -27,11 +31,12 @@ class TaskCategory {
         other.id == id &&
         other.name == name &&
         icon == other.icon &&
+        uuid == other.uuid &&
         color == other.color;
   }
 
   @override
-  int get hashCode => Object.hash(id, name, icon, color);
+  int get hashCode => Object.hash(id, name, icon, color, uuid);
 
   factory TaskCategory.fromJson(Map<String, dynamic> json) => TaskCategory(
     id: json["id"],

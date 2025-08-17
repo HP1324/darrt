@@ -1,10 +1,10 @@
+import 'package:darrt/app/state/viewmodels/view_model.dart';
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/messages.dart';
-import 'package:darrt/app/state/viewmodels/view_model.dart';
-import 'package:flutter/material.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/task/models/task.dart';
+import 'package:flutter/material.dart';
 
 class CategoryViewModel extends ViewModel<TaskCategory> {
   final ScrollController scrollController = ScrollController();
@@ -18,6 +18,15 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
     }
     if (category.name.trim().isEmpty) return Messages.mCategoryEmpty;
     final message = super.putItem(category, edit: edit);
+
+    // Find those tasks that have this category, but we have to do this with id because contains uses == override, and the category is changed, here to even if this task contains it will return false, so we will find that if any task has a category with the same id that this cateogry has
+    final tasks = g.taskVm.tasks.where((task) => task.categories.any((cat) => cat.id == category.id)).toList();
+
+    for(final task in tasks){
+      task.categories.removeWhere((cat) => cat.id == category.id);
+      task.categories.add(category);
+      g.taskVm.updateTaskFromAppWideStateChanges(task);
+    }
 
     if (scrollToBottom && !edit) {
       scrollController.animateTo(
@@ -33,7 +42,15 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
   @override
   String deleteItem(int id, {bool? deleteTasks}) {
     if (deleteTasks!) g.taskVm.deleteTasksByCategory(id);
-    return super.deleteItem(id);
+    final tasks = g.taskVm.tasks.where((task) => task.categories.any((cat) => cat.id == id)).toList();
+    final message =  super.deleteItem(id);
+
+    for(final task in tasks){
+      if(task.categories.isEmpty) task.categories.add(TaskCategory(name: 'General', id: 1));
+      g.taskVm.updateTaskFromAppWideStateChanges(task);
+    }
+
+    return message;
   }
 
   @override

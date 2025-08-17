@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 import 'package:darrt/category/models/task_category.dart';
-import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/icon_color_storage.dart';
+import 'package:flutter/material.dart';
 class CategoryChip extends StatelessWidget {
   const CategoryChip({super.key, required this.category});
   final TaskCategory category;
@@ -12,7 +13,8 @@ class CategoryChip extends StatelessWidget {
     return ListenableBuilder(
       listenable: g.catVm,
       builder: (_,child) {
-        final thisCategory = g.catVm.categories.firstWhere((c) => c.id == category.id);
+        final thisCategory = g.catVm.categories.firstWhereOrNull((c) => c.id == category.id);
+        if(thisCategory == null) return SizedBox.shrink();
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 0.5, vertical: 2),
           decoration: BoxDecoration(
@@ -24,7 +26,7 @@ class CategoryChip extends StatelessWidget {
             children: [
               Icon(IconColorStorage.flattenedIcons[thisCategory.icon],size:12,color: IconColorStorage.colors[thisCategory.color]),
               const SizedBox(width: 4),
-              Text(category.name, style: textTheme.labelMedium),
+              Text(thisCategory.name, style: textTheme.labelMedium),
             ],
           ),
         );

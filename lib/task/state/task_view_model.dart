@@ -1,18 +1,19 @@
+import 'package:darrt/app/notification/notification_service.dart';
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/app/state/viewmodels/view_model.dart';
+import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/messages.dart';
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/helpers/typedefs.dart';
+import 'package:darrt/objectbox.g.dart';
+import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/models/task_completion.dart';
 import 'package:darrt/task/statistics/achievement_dialog.dart';
 import 'package:darrt/task/statistics/achievements.dart';
 import 'package:darrt/task/statistics/task_stats.dart';
 import 'package:flutter/material.dart';
-import 'package:darrt/app/notification/notification_service.dart';
-import 'package:darrt/helpers/globals.dart' as g;
-import 'package:darrt/helpers/messages.dart';
-import 'package:darrt/app/services/mini_box.dart';
-import 'package:darrt/helpers/mini_logger.dart';
-import 'package:darrt/app/services/object_box.dart';
-import 'package:darrt/helpers/typedefs.dart';
-import 'package:darrt/objectbox.g.dart';
-import 'package:darrt/app/state/viewmodels/view_model.dart';
-import 'package:darrt/task/models/task.dart';
-import 'package:darrt/task/models/task_completion.dart';
 
 import '../../note/models/note.dart' show Note;
 
