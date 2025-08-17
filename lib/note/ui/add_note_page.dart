@@ -1,24 +1,23 @@
-import 'package:darrt/app/services/toast_service.dart';
-import 'package:darrt/helpers/utils.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:darrt/app/ads/my_banner_ad_widget.dart';
 import 'package:darrt/app/ads/timed_banner_ad_widget.dart';
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/app/services/toast_service.dart';
+import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/messages.dart' show Messages;
-import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/note/models/folder.dart';
 import 'package:darrt/note/models/note.dart';
 import 'package:darrt/note/state/note_state_controller.dart';
 import 'package:darrt/note/ui/add_folder_page.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
-import 'package:darrt/helpers/globals.dart' as g;
 
 import '../../helpers/consts.dart';
 import '../../task/models/task.dart';
@@ -385,6 +384,7 @@ class NotesQuillEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final textTheme = TextTheme.of(context);
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -433,15 +433,11 @@ class NotesQuillEditor extends StatelessWidget {
             textCapitalization: TextCapitalization.sentences,
             customStyles: DefaultStyles(
               inlineCode: InlineCodeStyle(
-                style: GoogleFonts.sourceCodeProTextTheme().labelMedium!.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
+                style: textTheme.labelMedium!.copyWith(fontFamily: 'SourceCodePro', color: scheme.onSurfaceVariant),
                 backgroundColor: scheme.surfaceContainerHighest,
               ),
               code: DefaultTextBlockStyle(
-                GoogleFonts.sourceCodeProTextTheme().labelMedium!.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
+                textTheme.labelMedium!.copyWith(fontFamily: 'SourceCodePro', color: scheme.onSurfaceVariant),
                 HorizontalSpacing(5, 5),
                 VerticalSpacing(10, 10),
                 VerticalSpacing(5, 5),
