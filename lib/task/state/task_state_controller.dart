@@ -1,18 +1,18 @@
 
-import 'package:darrt/task/state/task_state.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
-import 'package:flutter/material.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:darrt/category/models/task_category.dart';
-import 'package:darrt/helpers/messages.dart';
-import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/app/state/controllers/state_controller.dart';
+import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/messages.dart';
+import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/note/models/note.dart';
 import 'package:darrt/task/models/reminder.dart';
 import 'package:darrt/task/models/repeat_config.dart';
 import 'package:darrt/task/models/task.dart';
-import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/task/state/task_state.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/material.dart';
 
 
 
@@ -26,7 +26,7 @@ class TaskStateController extends StateController<TaskState, Task> {
     state = TaskState(
       categorySelection: category == null
           ? edit
-                ? {for (var cat in categories) cat: task!.categories.contains(cat)}
+                ? {for (var cat in categories) cat: task!.containsCategory(cat)}
                 : {TaskCategory(id: 1, name: 'General'): true}
           : {category: true},
       priority: edit ? task!.priority : priorities[3],

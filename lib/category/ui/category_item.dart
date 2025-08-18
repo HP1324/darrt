@@ -1,5 +1,5 @@
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/app/services/toast_service.dart';
-import 'package:flutter/material.dart';
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/category/ui/add_category_page.dart';
 import 'package:darrt/category/ui/tasks_for_category_page.dart';
@@ -7,6 +7,7 @@ import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/helpers/utils.dart';
+import 'package:flutter/material.dart';
 
 class CategoryItem extends StatefulWidget {
   const CategoryItem({super.key, required this.category});
@@ -106,7 +107,7 @@ class TaskCountLabel extends StatelessWidget {
       listenable: g.taskVm,
       builder: (context, child) {
         final tasks = g.taskVm.tasks;
-        final count = tasks.where((t) => t.categories.contains(category)).toList().length;
+        final count = tasks.forCategory(category).length;
         return Text(
           '$count ${count != 1 ? 'tasks' : 'task'}',
           overflow: TextOverflow.ellipsis,

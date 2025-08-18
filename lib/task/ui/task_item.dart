@@ -1,18 +1,19 @@
-import 'package:darrt/task/statistics/stats_page.dart';
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/category/ui/category_chip.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/statistics/stats_page.dart';
 import 'package:darrt/task/ui/add_task_page.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 
 class TaskItem extends StatefulWidget {
   const TaskItem({super.key, required this.task});
+
   final Task task;
+
   @override
   State<TaskItem> createState() => _TaskItemState();
 }
@@ -66,7 +67,9 @@ class TaskItemContainer extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: isSelected ? scheme.outline.withAlpha(130) : scheme.surface.withAlpha(100),
+        color: isSelected
+            ? scheme.outline.withAlpha(130)
+            : scheme.surface.withAlpha(100),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: scheme.outline.withAlpha(60),
@@ -182,7 +185,11 @@ class TaskTitleRow extends StatelessWidget {
           InkWell(
             borderRadius: BorderRadius.circular(8),
             onTap: () => MiniRouter.to(context, StatsPage(task: task)),
-            child: Icon(Icons.calendar_month_outlined, size: 21, color: scheme.secondary),
+            child: Icon(
+              Icons.calendar_month_outlined,
+              size: 21,
+              color: scheme.secondary,
+            ),
           ),
         ],
         // TaskPrioritySection(task: task, isUrgent: isUrgent, context: context),
@@ -261,10 +268,15 @@ class TaskTitle extends StatelessWidget {
       child: ListenableBuilder(
         listenable: Listenable.merge([g.calMan, g.taskVm]),
         builder: (context, child) {
-          final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
+          final date = DateUtils.dateOnly(
+            g.calMan.selectedDate,
+          ).millisecondsSinceEpoch;
           final repeat = task.isRepeating;
-          final stc = g.taskVm.onetimeTaskCompletions, rtc = g.taskVm.repeatingTaskCompletions;
-          final isFinished = repeat ? rtc[task.id]?.contains(date) ?? false : stc[task.id] ?? false;
+          final stc = g.taskVm.onetimeTaskCompletions,
+              rtc = g.taskVm.repeatingTaskCompletions;
+          final isFinished = repeat
+              ? rtc[task.id]?.contains(date) ?? false
+              : stc[task.id] ?? false;
 
           return Text(
             task.title,
@@ -337,7 +349,12 @@ class TaskCategoriesSection extends StatelessWidget {
             return LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
-              colors: [Colors.transparent, Colors.black, Colors.black, Colors.transparent],
+              colors: [
+                Colors.transparent,
+                Colors.black,
+                Colors.black,
+                Colors.transparent,
+              ],
               stops: [0.0, 0.05, 0.95, 1.0],
             ).createShader(bounds);
           },
@@ -350,46 +367,28 @@ class TaskCategoriesSection extends StatelessWidget {
 }
 
 class TaskCategoriesList extends StatelessWidget {
-  const TaskCategoriesList({
-    super.key,
-    required this.task,
-  });
+  const TaskCategoriesList({super.key, required this.task});
 
   final Task task;
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: g.catVm,
-      builder: (context, child) {
-        var categories = g.catVm.categories;
-        task.categories.removeWhere((c) => !categories.contains(c));
-        if (task.categories.isEmpty) {
-          MiniLogger.dp('This condition called');
-          task.categories.add(TaskCategory(id: 1, name: 'General'));
-          task.categories.applyToDb();
-        }
-        return ListView.separated(
-          scrollDirection: Axis.horizontal,
-          shrinkWrap: true,
-          physics: BouncingScrollPhysics(),
-          separatorBuilder: (context, index) => const SizedBox(width: 2),
-          itemCount: task.categories.length,
-          itemBuilder: (context, index) {
-            final category = task.categories[index];
-            return CategoryChip(category: category);
-          },
-        );
+    return ListView.separated(
+      scrollDirection: Axis.horizontal,
+      shrinkWrap: true,
+      physics: BouncingScrollPhysics(),
+      separatorBuilder: (context, index) => const SizedBox(width: 2),
+      itemCount: task.categories.length,
+      itemBuilder: (context, index) {
+        final category = task.categories[index];
+        return CategoryChip(category: category);
       },
     );
   }
 }
 
 class TaskFinishCheckbox extends StatelessWidget {
-  const TaskFinishCheckbox({
-    super.key,
-    required this.task,
-  });
+  const TaskFinishCheckbox({super.key, required this.task});
 
   final Task task;
 
@@ -405,7 +404,9 @@ class TaskFinishCheckbox extends StatelessWidget {
             final repeat = task.isRepeating;
             final oneTimeCompletions = g.taskVm.onetimeTaskCompletions;
             final repeatingCompletions = g.taskVm.repeatingTaskCompletions;
-            final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
+            final date = DateUtils.dateOnly(
+              g.calMan.selectedDate,
+            ).millisecondsSinceEpoch;
 
             return CheckboxTheme(
               data: _buildCheckboxTheme(context),
@@ -415,7 +416,12 @@ class TaskFinishCheckbox extends StatelessWidget {
                     ? repeatingCompletions[task.id]?.contains(date) ?? false
                     : oneTimeCompletions[task.id] ?? false,
                 onChanged: (value) {
-                  g.taskVm.toggleStatus(task, value ?? false, g.calMan.selectedDate, context);
+                  g.taskVm.toggleStatus(
+                    task,
+                    value ?? false,
+                    g.calMan.selectedDate,
+                    context,
+                  );
                 },
               ),
             );
@@ -437,7 +443,10 @@ class TaskFinishCheckbox extends StatelessWidget {
           return BorderSide(color: colorScheme.secondary, width: 2.5);
         }
         if (states.contains(WidgetState.hovered)) {
-          return BorderSide(color: colorScheme.secondary.withAlpha(160), width: 2.5);
+          return BorderSide(
+            color: colorScheme.secondary.withAlpha(160),
+            width: 2.5,
+          );
         }
         return BorderSide(color: colorScheme.outline, width: 2.0);
       }),

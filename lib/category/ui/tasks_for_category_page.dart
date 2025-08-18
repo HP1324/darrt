@@ -1,13 +1,14 @@
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/app/ui/mini_app_bar.dart';
-import 'package:darrt/task/ui/task_delete_confirmation_dialog.dart';
-import 'package:darrt/task/ui/task_timeline_item.dart';
-import 'package:flutter/material.dart';
 import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/task/ui/add_task_page.dart';
+import 'package:darrt/task/ui/task_delete_confirmation_dialog.dart';
 import 'package:darrt/task/ui/task_item.dart';
-import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/task/ui/task_timeline_item.dart';
+import 'package:flutter/material.dart';
 
 class TasksForCategoryPage extends StatefulWidget {
   const TasksForCategoryPage({super.key, required this.category});
@@ -28,7 +29,7 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
     return ListenableBuilder(
       listenable: g.taskVm,
       builder: (context, child) {
-        final tasks = g.taskVm.tasks.where((t) => t.categories.contains(widget.category)).toList();
+        final tasks = g.taskVm.tasks.forCategory(widget.category);
         final color =
             IconColorStorage.colors[widget.category.color] ?? Theme.of(context).colorScheme.primary;
         final icon = IconColorStorage.flattenedIcons[widget.category.icon];

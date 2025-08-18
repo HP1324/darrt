@@ -1,17 +1,23 @@
+import 'package:darrt/app/extensions/extensions.dart';
+import 'package:darrt/app/state/viewmodels/view_model.dart';
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/messages.dart';
-import 'package:darrt/app/state/viewmodels/view_model.dart';
-import 'package:flutter/material.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/task/models/task.dart';
+import 'package:flutter/material.dart';
 
 class CategoryViewModel extends ViewModel<TaskCategory> {
   final ScrollController scrollController = ScrollController();
 
   List<TaskCategory> get categories => items;
+
   @override
-  String putItem(TaskCategory item, {required bool edit, bool scrollToBottom = true}) {
+  String putItem(
+    TaskCategory item, {
+    required bool edit,
+    bool scrollToBottom = true,
+  }) {
     final category = item;
     if (!edit && items.indexWhere((c) => c.name == category.name) != -1) {
       return Messages.mCategoryExists;
@@ -32,7 +38,17 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
 
   @override
   String deleteItem(int id, {bool? deleteTasks}) {
-    if (deleteTasks!) g.taskVm.deleteTasksByCategory(id);
+    final tasksForCategory = g.taskVm.tasks.forCategoryById(id);
+    for (final task in tasksForCategory) {
+      task.categories.removeWhere((cat) => cat.id == id);
+      MiniLogger.dp('task categories length:  ${task.categories.length}');
+      if (task.categories.isEmpty) {
+        MiniLogger.dp('task categories empty');
+        task.categories.add(g.catVm.categories.first);
+      }
+      g.taskVm.updateTaskFromAppWideStateChanges(task, notify: true);
+    }
+    if (deleteTasks!) g.taskVm.deleteTasksForCategory(tasksForCategory, id);
     return super.deleteItem(id);
   }
 
@@ -46,8 +62,9 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
   String getUpdateSuccessMessage() => Messages.mCategoryEdited;
 
   @override
-  String getDeleteSuccessMessage(int length) =>
-      length == 1 ? '1 ${Messages.mCategoryDeleted}' : '$length ${Messages.mCategoriesDeleted}';
+  String getDeleteSuccessMessage(int length) => length == 1
+      ? '1 ${Messages.mCategoryDeleted}'
+      : '$length ${Messages.mCategoriesDeleted}';
 
   @override
   void setItemId(TaskCategory item, int id) {
@@ -55,16 +72,23 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
   }
 
   @override
-  void putManyForRestore(List<TaskCategory> restoredItems, {List<Task>? tasks}) {
+  void putManyForRestore(
+    List<TaskCategory> restoredItems, {
+    List<Task>? tasks,
+  }) {
     box.putMany(restoredItems);
     reassignTaskCategories(restoredItems, tasks: tasks!);
     initializeItems();
     notifyListeners();
   }
 
-  void reassignTaskCategories(List<TaskCategory> restoredCategories, {required List<Task> tasks}) {
-
-    final categoryByUuid = {for (final cat in restoredCategories) cat.uuid: cat};
+  void reassignTaskCategories(
+    List<TaskCategory> restoredCategories, {
+    required List<Task> tasks,
+  }) {
+    final categoryByUuid = {
+      for (final cat in restoredCategories) cat.uuid: cat,
+    };
 
     for (final task in tasks) {
       // Optional: depends on your restore design
@@ -77,7 +101,9 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
         if (category != null) {
           task.categories.add(category);
         } else {
-          MiniLogger.dp('Category with UUID $uuid not found for task ${task.title}');
+          MiniLogger.dp(
+            'Category with UUID $uuid not found for task ${task.title}',
+          );
         }
       }
     }
@@ -85,5 +111,4 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
 
   @override
   String getItemUuid(TaskCategory item) => item.uuid;
-
 }

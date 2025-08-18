@@ -1,18 +1,18 @@
+import 'package:darrt/app/notification/notification_service.dart';
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/app/state/viewmodels/view_model.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/messages.dart';
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/helpers/typedefs.dart';
+import 'package:darrt/objectbox.g.dart';
+import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/models/task_completion.dart';
 import 'package:darrt/task/statistics/achievement_dialog.dart';
 import 'package:darrt/task/statistics/achievements.dart';
 import 'package:darrt/task/statistics/task_stats.dart';
 import 'package:flutter/material.dart';
-import 'package:darrt/app/notification/notification_service.dart';
-import 'package:darrt/helpers/globals.dart' as g;
-import 'package:darrt/helpers/messages.dart';
-import 'package:darrt/app/services/mini_box.dart';
-import 'package:darrt/helpers/mini_logger.dart';
-import 'package:darrt/app/services/object_box.dart';
-import 'package:darrt/helpers/typedefs.dart';
-import 'package:darrt/objectbox.g.dart';
-import 'package:darrt/app/state/viewmodels/view_model.dart';
-import 'package:darrt/task/models/task.dart';
-import 'package:darrt/task/models/task_completion.dart';
 
 import '../../note/models/note.dart' show Note;
 
@@ -88,9 +88,8 @@ class TaskViewModel extends ViewModel<Task> {
     return message;
   }
 
-  void deleteTasksByCategory(int categoryId) {
-    final toDelete = items.where((t) => t.categories.any((c) => c.id == categoryId)).toList();
-    box.removeMany(toDelete.map((t) => t.id).toList());
+  void deleteTasksForCategory(List<Task> tasksForCategory, int categoryId) {
+    box.removeMany(tasksForCategory.map((t) => t.id).toList());
     items.removeWhere((t) => t.categories.any((c) => c.id == categoryId));
     notifyListeners();
   }
@@ -285,12 +284,14 @@ class TaskViewModel extends ViewModel<Task> {
     currentTaskStats = TaskStats.fromJsonString(task.stats);
   }
 
-  void updateTaskFromAppWideStateChanges(Task task) {
+  /// [notify] decides whether to call [notifyListeners] or not, usually, we don't need to do this when this method is called from inside the class, this can be set to true when changes are made from outside the class
+  void updateTaskFromAppWideStateChanges(Task task,{bool notify = false}) {
     final id = box.put(task);
     int index = tasks.indexWhere((i) => getItemId(i) == id);
     if (index != -1) {
       tasks[index] = task;
     }
+    if(notify) notifyListeners();
   }
 
   void performTaskStatsLogicAfterTaskFinish(Task task, DateTime dateOnly, [BuildContext? context]) {
