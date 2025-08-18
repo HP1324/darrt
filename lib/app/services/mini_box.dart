@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
+
 import 'package:darrt/app/services/boxpref.dart';
 import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/helpers/consts.dart';
 import 'package:darrt/objectbox.g.dart';
+import 'package:flutter/material.dart';
 
 class MiniBox {
   static final _instance = MiniBox._internal();
@@ -95,6 +96,7 @@ class MiniBox {
   }
 
   void initStorage() {
+    writeIfNull(mFirstTimeInstall, true);
     writeIfNull(mShowTimerNotification, true);
     writeIfNull(mPauseResumeSoundWithTimer, true);
     writeIfNull(mDefaultTaskList, 0);
@@ -105,5 +107,6 @@ class MiniBox {
     writeIfNull(mDefaultReminderType, notifReminderType);
     writeIfNull(mPickedAlarmSoundResourceUri, 'System alarm sound');
     writeIfNull(mNotificationSound, 'System notification sound');
+    writeIfNull(mDailyQuoteNotif, true);
   }
 }
