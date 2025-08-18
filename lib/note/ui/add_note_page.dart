@@ -466,7 +466,7 @@ class SaveNotePdfButton extends StatelessWidget {
           showErrorToast(context, Messages.mNoteEmpty);
           return;
         }
-        await savePdfToDownloads(file, 'note${DateTime.now().millisecondsSinceEpoch}.pdf');
+        await savePdfToDownloads(file, 'DarrtNote${DateTime.now().millisecondsSinceEpoch.remainder(100000)}.pdf');
         if (context.mounted) {
           showSuccessToast(context,'PDF saved to device');
         }

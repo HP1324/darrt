@@ -1,13 +1,15 @@
 import 'dart:io' show Platform;
+
+import 'package:darrt/app/ui/icon_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' show QuillController;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 import 'package:intl/intl.dart';
-import 'package:darrt/app/ui/icon_color_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'consts.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:permission_handler/permission_handler.dart';
+
+import 'consts.dart';
 
 /// Take a [GlobalKey] associated with a widget and return the offset and size of the widget.
 (Offset, Size) getOffsetAndSize(GlobalKey key) {
@@ -302,7 +304,7 @@ Future<Uint8List> generateNotePdf(QuillController controller) async {
 
 Future<void> savePdfToDownloads(Uint8List pdfBytes, String fileName) async {
   if (Platform.isAndroid) {
-    const platform = MethodChannel('com.hp.darrt/pdf_saver');
+    const platform = MethodChannel('com.stellarmotion.darrt/pdf_saver');
     await platform.invokeMethod('savePdfToDownloads', {
       'filename': fileName,
       'bytes': pdfBytes,

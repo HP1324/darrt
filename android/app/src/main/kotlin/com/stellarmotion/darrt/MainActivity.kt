@@ -13,7 +13,7 @@ import com.ryanheise.audioservice.AudioServiceFragmentActivity
 class MainActivity : AudioServiceFragmentActivity() {
 
     private val BATTERY_CHANNEL = "com.hp.minimaltodo/battery_settings"
-    private val PDF_CHANNEL = "com.hp.minimaltodo/pdf_saver"
+    private val PDF_CHANNEL = "com.stellarmotion.darrt/pdf_saver"
 
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
