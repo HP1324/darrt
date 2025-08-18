@@ -331,18 +331,7 @@ class TaskCategoriesSection extends StatelessWidget {
     return Expanded(
       child: SizedBox(
         height: 20,
-        child: ShaderMask(
-          shaderCallback: (bounds) {
-            return LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [Colors.transparent, Colors.black, Colors.black, Colors.transparent],
-              stops: [0.0, 0.05, 0.95, 1.0],
-            ).createShader(bounds);
-          },
-          blendMode: BlendMode.dstIn,
-          child: TaskCategoriesList(task: task),
-        ),
+        child: TaskCategoriesList(task: task),
       ),
     );
   }
