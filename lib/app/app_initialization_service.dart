@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:darrt/app/ads/subscription_service.dart';
 import 'package:darrt/app/notification/notification_service.dart';
-import 'package:darrt/app/services/auto_backup_service.dart';
 import 'package:darrt/app/services/google_sign_in_service.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/app/workmanger/callback_dispatcher.dart';
+import 'package:darrt/app/workmanger/tasks/dialy_quote_notif.dart';
+import 'package:darrt/helpers/consts.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -27,11 +29,12 @@ class AppInitializationService {
     
     await _restoreGoogleAccount();
     
-    await _initNotificationService();
-    
+
     await _initWorkmanager();
 
+    await _initNotificationService();
     FlutterNativeSplash.remove();
+    MiniBox().write(mFirstTimeInstall, false);
   }
 
   Future<void> _configureRevenueCatSdk() async {
@@ -83,6 +86,9 @@ class AppInitializationService {
   Future<void> _initWorkmanager()async{
     try{
       await Workmanager().initialize(callBackDispatcher);
+      if(MiniBox().read(mFirstTimeInstall)) {
+        await scheduleDailyQuoteNotification();
+      }
     }catch (e, t) {
       Sentry.captureException(e, stackTrace: t);
       MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');

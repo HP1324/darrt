@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -41,6 +42,7 @@ class _MotivationDialogState extends State<MotivationDialog> {
   }
 
   Future<void> _fetchQuote() async {
+
     try {
       final response = await http.get(
         Uri.parse('https://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en'),

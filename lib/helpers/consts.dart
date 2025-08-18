@@ -58,6 +58,8 @@ const mLastBackupDate = 'last_backup_date';
 
 const mAutoBackup = 'auto_backup';
 
+const mDailyQuoteNotif = 'daily_quote_notif';
+
 const mAutoBackupFrequency = 'auto_backup_frequency';
 
 const mCanPop = 'can_pop';

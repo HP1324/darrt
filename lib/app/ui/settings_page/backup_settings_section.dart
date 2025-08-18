@@ -1,9 +1,9 @@
 //ignore_for_file: curly_braces_in_flow_control_structures
 import 'package:darrt/app/ui/settings_page/backup_provider.dart';
 import 'package:darrt/app/ui/settings_page/backup_state.dart';
+import 'package:darrt/helpers/utils.dart' show formatDate;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:darrt/helpers/utils.dart' show formatDate;
 
 // UI Components
 class BackupSettingsSection extends ConsumerWidget {
@@ -12,23 +12,17 @@ class BackupSettingsSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    return Container(
-      padding: EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Backup & Restore', style: theme.textTheme.titleMedium),
-          Divider(height: 0),
-          _SignInOutSection(),
-          _AutoBackupSection(),
-          _RestoreSection(),
-          _DeleteBackupSection(),
-        ],
-      ),
+    return ExpansionTile(
+      // crossAxisAlignment: CrossAxisAlignment.start,
+
+      title: Text('Backup & Restore', style: theme.textTheme.titleMedium),
+      children: [
+        Divider(height: 0),
+        _SignInOutSection(),
+        _AutoBackupSection(),
+        _RestoreSection(),
+        _DeleteBackupSection(),
+      ],
     );
   }
 }
