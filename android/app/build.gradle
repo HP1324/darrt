@@ -17,6 +17,29 @@ android {
     compileSdk = 36
     ndkVersion = "28.0.12674087"
 
+
+    flavorDimensions += "default"
+    productFlavors {
+        staging {
+            dimension = "default"
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+            // setting targetSdk to 34 in debug flavor to avoid awesome notification receiver exception
+            targetSdk = 34
+            resValue "string", "app_name", "Darrt Dev"
+        }
+        production {
+            dimension = "default"
+            resValue "string", "app_name", "Darrt"
+        }
+        localProd{
+            dimension = "default"
+            applicationIdSuffix = ".localProd"
+            versionNameSuffix = "-localProd"
+            resValue "string", "app_name", "Darrt LocalProd"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
