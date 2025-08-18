@@ -358,21 +358,15 @@ class TaskCategoriesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: g.catVm,
-      builder: (context, child) {
-
-        return ListView.separated(
-          scrollDirection: Axis.horizontal,
-          shrinkWrap: true,
-          physics: BouncingScrollPhysics(),
-          separatorBuilder: (context, index) => const SizedBox(width: 2),
-          itemCount: task.categories.length,
-          itemBuilder: (context, index) {
-            final category = task.categories[index];
-            return CategoryChip(category: category);
-          },
-        );
+    return ListView.separated(
+      scrollDirection: Axis.horizontal,
+      shrinkWrap: true,
+      physics: BouncingScrollPhysics(),
+      separatorBuilder: (context, index) => const SizedBox(width: 2),
+      itemCount: task.categories.length,
+      itemBuilder: (context, index) {
+        final category = task.categories[index];
+        return CategoryChip(category: category);
       },
     );
   }

@@ -1,3 +1,4 @@
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/app/state/viewmodels/view_model.dart';
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/helpers/globals.dart' as g;
@@ -11,22 +12,17 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
 
   List<TaskCategory> get categories => items;
   @override
-  String putItem(TaskCategory item, {required bool edit, bool scrollToBottom = true}) {
+  String putItem(
+    TaskCategory item, {
+    required bool edit,
+    bool scrollToBottom = true,
+  }) {
     final category = item;
     if (!edit && items.indexWhere((c) => c.name == category.name) != -1) {
       return Messages.mCategoryExists;
     }
     if (category.name.trim().isEmpty) return Messages.mCategoryEmpty;
     final message = super.putItem(category, edit: edit);
-
-    // Find those tasks that have this category, but we have to do this with id because contains uses == override, and the category is changed, here to even if this task contains it will return false, so we will find that if any task has a category with the same id that this cateogry has
-    final tasks = g.taskVm.tasks.where((task) => task.categories.any((cat) => cat.id == category.id)).toList();
-
-    for(final task in tasks){
-      task.categories.removeWhere((cat) => cat.id == category.id);
-      task.categories.add(category);
-      g.taskVm.updateTaskFromAppWideStateChanges(task);
-    }
 
     if (scrollToBottom && !edit) {
       scrollController.animateTo(
@@ -41,16 +37,18 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
 
   @override
   String deleteItem(int id, {bool? deleteTasks}) {
-    if (deleteTasks!) g.taskVm.deleteTasksByCategory(id);
-    final tasks = g.taskVm.tasks.where((task) => task.categories.any((cat) => cat.id == id)).toList();
-    final message =  super.deleteItem(id);
-
-    for(final task in tasks){
-      if(task.categories.isEmpty) task.categories.add(TaskCategory(name: 'General', id: 1));
-      g.taskVm.updateTaskFromAppWideStateChanges(task);
+    final tasksForCategory = g.taskVm.tasks.forCategoryById(id);
+    for (final task in tasksForCategory) {
+      task.categories.removeWhere((cat) => cat.id == id);
+      MiniLogger.dp('task categories length:  ${task.categories.length}');
+      if (task.categories.isEmpty) {
+        MiniLogger.dp('task categories empty');
+        task.categories.add(g.catVm.categories.first);
+      }
+      g.taskVm.updateTaskFromAppWideStateChanges(task, notify: true);
     }
-
-    return message;
+    if (deleteTasks!) g.taskVm.deleteTasksForCategory(tasksForCategory, id);
+    return super.deleteItem(id);
   }
 
   @override
@@ -63,8 +61,9 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
   String getUpdateSuccessMessage() => Messages.mCategoryEdited;
 
   @override
-  String getDeleteSuccessMessage(int length) =>
-      length == 1 ? '1 ${Messages.mCategoryDeleted}' : '$length ${Messages.mCategoriesDeleted}';
+  String getDeleteSuccessMessage(int length) => length == 1
+      ? '1 ${Messages.mCategoryDeleted}'
+      : '$length ${Messages.mCategoriesDeleted}';
 
   @override
   void setItemId(TaskCategory item, int id) {
@@ -102,5 +101,4 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
 
   @override
   String getItemUuid(TaskCategory item) => item.uuid;
-
 }

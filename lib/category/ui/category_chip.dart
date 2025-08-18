@@ -12,9 +12,9 @@ class CategoryChip extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     return ListenableBuilder(
       listenable: g.catVm,
-      builder: (_,child) {
+      builder: (context,child) {
         final thisCategory = g.catVm.categories.firstWhereOrNull((c) => c.id == category.id);
-        if(thisCategory == null) return SizedBox.shrink();
+        if(thisCategory == null) return const SizedBox.shrink();
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 0.5, vertical: 2),
           decoration: BoxDecoration(
