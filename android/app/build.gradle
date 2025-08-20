@@ -60,7 +60,7 @@ android {
         versionName = flutter.versionName
     }
     signingConfigs {
-        debug{
+        debug {
             storeFile = file("$homeDir/dev/keystores/debug.keystore")
             keyAlias = "androiddebugkey"
             keyPassword = "android"
@@ -74,10 +74,10 @@ android {
         }
     }
     buildTypes {
-        debug{
+        debug {
             signingConfig = signingConfigs.debug
         }
-        release{
+        release {
             signingConfig = signingConfigs.release
             minifyEnabled true // Shrinks unused code
             shrinkResources true // Shrinks unused resources
