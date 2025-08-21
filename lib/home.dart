@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:darrt/app/ads/my_banner_ad_widget.dart';
 import 'package:darrt/app/ads/timed_banner_ad_widget.dart';
 import 'package:darrt/app/ui/app_drawer.dart';
@@ -7,13 +5,15 @@ import 'package:darrt/app/ui/mini_app_bar.dart';
 import 'package:darrt/app/ui/mini_bottom_nav_bar.dart';
 import 'package:darrt/category/ui/categories_page.dart';
 import 'package:darrt/focustimer/focus_timer_page.dart';
+import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/note/ui/notes_page.dart';
 import 'package:darrt/task/ui/add_task_page.dart';
 import 'package:darrt/task/ui/task_search_page.dart';
 import 'package:darrt/task/ui/tasks_page.dart';
-import 'package:darrt/helpers/globals.dart' as g;
+import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -153,6 +153,7 @@ class _FloatingActionButtonWidget extends StatelessWidget {
       child: Transform.scale(
         scale: 0.9,
         child: FloatingActionButton(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           onPressed: () => MiniRouter.to(context, AddTaskPage(edit: false)),
           tooltip: 'Add Task',
           elevation: 5,
