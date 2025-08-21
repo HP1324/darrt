@@ -1,25 +1,25 @@
 import 'package:app_settings/app_settings.dart';
 import 'package:awesome_notifications/awesome_notifications.dart'
     show AwesomeNotifications;
-import 'package:darrt/app/services/toast_service.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:darrt/app/notification/notification_service.dart';
+import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/category/ui/add_category_page.dart';
 import 'package:darrt/category/ui/category_chip.dart';
 import 'package:darrt/helpers/consts.dart';
+import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/messages.dart';
-import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/helpers/utils.dart';
-import 'package:darrt/task/state/task_state_controller.dart';
 import 'package:darrt/task/models/reminder.dart';
 import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/state/task_state_controller.dart';
 import 'package:darrt/task/ui/task_note_bottom_sheet.dart';
-import 'package:darrt/helpers/globals.dart' as g;
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AddTaskPage extends StatefulWidget {
   const AddTaskPage({super.key, required this.edit, this.task, this.category})
@@ -1213,7 +1213,7 @@ class CategorySelector extends StatelessWidget {
               ],
             ),
             SizedBox(
-              height: MediaQuery.sizeOf(context).height * 0.03,
+              height: MediaQuery.sizeOf(context).height * 0.033,
               child: ListenableBuilder(
                 listenable: g.taskSc,
                 builder: (context, child) {
@@ -1260,69 +1260,71 @@ class CategorySelector extends StatelessWidget {
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        child: Column(
-          children: [
-            const SizedBox(height: 8),
-            ListTile(
-              onTap: () => MiniRouter.to(context, AddCategoryPage(edit: false)),
-              title: const Text(
-                'Create New Category',
-                style: TextStyle(fontWeight: FontWeight.w500),
-              ),
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const SizedBox(height: 8),
+              ListTile(
+                onTap: () => MiniRouter.to(context, AddCategoryPage(edit: false)),
+                title: const Text(
+                  'Create New Category',
+                  style: TextStyle(fontWeight: FontWeight.w500),
                 ),
-                child: const Icon(Icons.add),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.add),
+                ),
+                trailing: const Icon(Icons.list_alt),
               ),
-              trailing: const Icon(Icons.list_alt),
-            ),
-            Expanded(
-              child: Scrollbar(
-                thickness: 8,
-                radius: const Radius.circular(4),
-                child: ListenableBuilder(
-                  listenable: Listenable.merge([g.taskSc, g.taskVm]),
-                  builder: (context, child) => ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    itemCount: g.catVm.categories.length,
-                    itemBuilder: (_, index) {
-                      final cat = g.catVm.categories[index];
-                      final map = g.taskSc.categorySelection;
-                      return ListTile(
-                        selected: map[cat] ?? false,
-                        selectedColor: IconColorStorage.colors[cat.color],
-                        leading: Icon(
-                          IconColorStorage.flattenedIcons[cat.icon],
-                        ),
-                        trailing: Checkbox(
-                          fillColor: WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return IconColorStorage.colors[cat.color];
-                            }
-                            return null;
-                          }),
-                          value: map[cat] ?? false,
-                          onChanged: (selected) {
-                            if (selected != null) {
-                              g.taskSc.setCategory(cat, selected);
-                            }
-                          },
-                        ),
-                        title: Text(
-                          cat.name,
-                          style: const TextStyle(
-                            overflow: TextOverflow.ellipsis,
+              Expanded(
+                child: Scrollbar(
+                  thickness: 8,
+                  radius: const Radius.circular(4),
+                  child: ListenableBuilder(
+                    listenable: Listenable.merge([g.taskSc, g.taskVm]),
+                    builder: (context, child) => ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      itemCount: g.catVm.categories.length,
+                      itemBuilder: (_, index) {
+                        final cat = g.catVm.categories[index];
+                        final map = g.taskSc.categorySelection;
+                        return ListTile(
+                          selected: map[cat] ?? false,
+                          selectedColor: IconColorStorage.colors[cat.color],
+                          leading: Icon(
+                            IconColorStorage.flattenedIcons[cat.icon],
                           ),
-                        ),
-                      );
-                    },
+                          trailing: Checkbox(
+                            fillColor: WidgetStateProperty.resolveWith((states) {
+                              if (states.contains(WidgetState.selected)) {
+                                return IconColorStorage.colors[cat.color];
+                              }
+                              return null;
+                            }),
+                            value: map[cat] ?? false,
+                            onChanged: (selected) {
+                              if (selected != null) {
+                                g.taskSc.setCategory(cat, selected);
+                              }
+                            },
+                          ),
+                          title: Text(
+                            cat.name,
+                            style: const TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
