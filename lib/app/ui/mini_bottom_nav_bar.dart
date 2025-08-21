@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:darrt/helpers/globals.dart' as g;
+import 'package:flutter/material.dart';
 
 class MiniBottomNavBar extends StatefulWidget {
   const MiniBottomNavBar({super.key, required this.children});
@@ -14,7 +14,7 @@ class _MiniBottomNavBarState extends State<MiniBottomNavBar> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: SizedBox(
-        height: MediaQuery.sizeOf(context).height * 0.09,
+        height: MediaQuery.sizeOf(context).height * 0.1,
         child: Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -60,6 +60,7 @@ class _MiniBottomNavBarItemState extends State<MiniBottomNavBarItem> {
         final isSelected = widget.i == value;
 
         return InkWell(
+          borderRadius: BorderRadius.circular(25),
           splashColor: primary.withAlpha(26),
           highlightColor: primary.withAlpha(52),
           hoverColor: primary.withAlpha(14),
