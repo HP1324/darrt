@@ -2,7 +2,6 @@ import 'package:darrt/app/ads/my_banner_ad_widget.dart';
 import 'package:darrt/app/ads/timed_banner_ad_widget.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/app/services/toast_service.dart';
-import 'package:darrt/app/ui/widgets/darrt_filled_button.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/messages.dart' show Messages;
@@ -90,7 +89,7 @@ class _AddNotePageState extends State<AddNotePage> {
                 ],
               ),
               actions: [
-                DarrtFilledButton(
+                FilledButton(
                   onPressed: () => Navigator.pop(context, true),
                   child: Text('Yes'),
                 ),
