@@ -11,6 +11,7 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
   final ScrollController scrollController = ScrollController();
 
   List<TaskCategory> get categories => items;
+
   @override
   String putItem(
     TaskCategory item, {
@@ -38,6 +39,10 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
   @override
   String deleteItem(int id, {bool? deleteTasks}) {
     final tasksForCategory = g.taskVm.tasks.forCategoryById(id);
+    if (deleteTasks!) {
+      g.taskVm.deleteTasksForCategory(tasksForCategory, id);
+      return super.deleteItem(id);
+    }
     for (final task in tasksForCategory) {
       task.categories.removeWhere((cat) => cat.id == id);
       MiniLogger.dp('task categories length:  ${task.categories.length}');
@@ -47,7 +52,6 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
       }
       g.taskVm.updateTaskFromAppWideStateChanges(task, notify: true);
     }
-    if (deleteTasks!) g.taskVm.deleteTasksForCategory(tasksForCategory, id);
     return super.deleteItem(id);
   }
 
@@ -71,16 +75,23 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
   }
 
   @override
-  void putManyForRestore(List<TaskCategory> restoredItems, {List<Task>? tasks}) {
+  void putManyForRestore(
+    List<TaskCategory> restoredItems, {
+    List<Task>? tasks,
+  }) {
     box.putMany(restoredItems);
     reassignTaskCategories(restoredItems, tasks: tasks!);
     initializeItems();
     notifyListeners();
   }
 
-  void reassignTaskCategories(List<TaskCategory> restoredCategories, {required List<Task> tasks}) {
-
-    final categoryByUuid = {for (final cat in restoredCategories) cat.uuid: cat};
+  void reassignTaskCategories(
+    List<TaskCategory> restoredCategories, {
+    required List<Task> tasks,
+  }) {
+    final categoryByUuid = {
+      for (final cat in restoredCategories) cat.uuid: cat,
+    };
 
     for (final task in tasks) {
       // Optional: depends on your restore design
@@ -93,7 +104,9 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
         if (category != null) {
           task.categories.add(category);
         } else {
-          MiniLogger.dp('Category with UUID $uuid not found for task ${task.title}');
+          MiniLogger.dp(
+            'Category with UUID $uuid not found for task ${task.title}',
+          );
         }
       }
     }
