@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:audio_service/audio_service.dart';
-import 'package:darrt/helpers/consts.dart';
-import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/focustimer/sound/my_audio_handler.dart';
+import 'package:darrt/helpers/consts.dart';
 import 'package:darrt/helpers/mini_logger.dart';
+import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 
 class SoundController extends ChangeNotifier {
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -64,7 +64,6 @@ class SoundController extends ChangeNotifier {
       config: const AudioServiceConfig(
         androidNotificationChannelId: 'com.stellarmotion.darrt.audio',
         androidNotificationChannelName: 'Audio Service',
-        androidStopForegroundOnPause: true,
       ),
     );
 
