@@ -12,6 +12,21 @@ extension TaskListExtension on List<Task> {
     List<Task> forCategoryById(int categoryId){
       return where((task) => task.categories.any((cat) => cat.id == categoryId)).toList();
     }
+
+    List<Task> sortByTime() {
+      final tasksWithTime = where((task) => task.startTime != null).toList();
+      final tasksWithoutTime = where((task) => task.startTime == null).toList();
+
+      // Sort tasks with time by their time
+      tasksWithTime.sort((a, b) {
+        final timeA = a.startTime!;
+        final timeB = b.startTime!;
+        return timeA.compareTo(timeB);
+      });
+
+      // Return tasks with time first, then tasks without time
+      return [...tasksWithTime, ...tasksWithoutTime];
+    }
 }
 
 extension TaskExtension on Task{

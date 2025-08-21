@@ -1,7 +1,3 @@
-import 'package:darrt/task/statistics/achievement_dialog.dart';
-import 'package:darrt/task/statistics/achievements.dart';
-import 'package:darrt/task/statistics/task_stats.dart';
-import 'package:flutter/material.dart';
 import 'package:darrt/app/notification/notification_service.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/app/services/object_box.dart';
@@ -13,6 +9,10 @@ import 'package:darrt/helpers/typedefs.dart';
 import 'package:darrt/objectbox.g.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/models/task_completion.dart';
+import 'package:darrt/task/statistics/achievement_dialog.dart';
+import 'package:darrt/task/statistics/achievements.dart';
+import 'package:darrt/task/statistics/task_stats.dart';
+import 'package:flutter/material.dart';
 
 import '../../note/models/note.dart' show Note;
 
@@ -90,7 +90,7 @@ class TaskViewModel extends ViewModel<Task> {
 
   void deleteTasksForCategory(List<Task> tasksForCategory, int categoryId) {
     box.removeMany(tasksForCategory.map((t) => t.id).toList());
-    items.removeWhere((t) => t.categories.any((c) => c.id == categoryId));
+    items.removeWhere((t) => tasksForCategory.any((task) => task.id == t.id));
     notifyListeners();
   }
 
@@ -217,22 +217,6 @@ class TaskViewModel extends ViewModel<Task> {
     }
   }
 
-  // Get tasks sorted by time for timeline view
-  List<Task> getTasksSortedByTime(List<Task> tasks) {
-    final tasksWithTime = tasks.where((task) => task.startTime != null).toList();
-    final tasksWithoutTime = tasks.where((task) => task.startTime == null).toList();
-
-    // Sort tasks with time by their time
-    tasksWithTime.sort((a, b) {
-      final timeA = a.startTime!;
-      final timeB = b.startTime!;
-      return timeA.compareTo(timeB);
-    });
-
-    // Return tasks with time first, then tasks without time
-    return [...tasksWithTime, ...tasksWithoutTime];
-  }
-
   List<Note>? taskTimerNotes;
   void putNote({required Task task, required Note note, required bool edit}) {
     final List<Note> updatedNotes = Note.notesFromJsonString(task.notes) ?? [];
@@ -308,13 +292,12 @@ class TaskViewModel extends ViewModel<Task> {
     stats.currentStreakLength = 0;
     stats.currentStreakStart = null;
 
-    // ✅ Only calculate streak if today is completed
+    // Only calculate streak if today is completed
     if (updatedCompletions.contains(today)) {
       int streak = 0;
       DateTime? streakStart;
 
-      for (int i = 0; i < 7000; i++) {
-        // Max look-back range (e.g., 1 year)
+      for (int i = 0; i < 3000; i++) {
         final date = today.subtract(Duration(days: i));
 
         if (!task.isActiveOn(date)) continue; // skip if task wasn't supposed to run
