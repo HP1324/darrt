@@ -27,7 +27,7 @@ class TaskStateController extends StateController<TaskState, Task> {
       categorySelection: category == null
           ? edit
                 ? {for (var cat in categories) cat: task!.containsCategory(cat)}
-                : {TaskCategory(id: 1, name: 'General'): true}
+                : {ObjectBox().categoryBox.generalCategory: true}
           : {category: true},
       priority: edit ? task!.priority : priorities[3],
       dueDate: edit ? task!.dueDate : g.calMan.selectedDate,
@@ -52,7 +52,7 @@ class TaskStateController extends StateController<TaskState, Task> {
   @override
   void clearState() {
     state = state.copyWith(
-      categorySelection: {TaskCategory(id: 1, name: 'General'): true},
+      categorySelection: {ObjectBox().categoryBox.generalCategory: true},
       dueDate: DateTime.now(),
       isRepeating: false,
       startDate: DateTime.now(),
