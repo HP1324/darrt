@@ -16,9 +16,9 @@ class CategoryChip extends StatelessWidget {
         final thisCategory = g.catVm.categories.firstWhereOrNull((c) => c.id == category.id);
         if(thisCategory == null) return const SizedBox.shrink();
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 0.5, vertical: 2),
+          padding: EdgeInsets.symmetric(horizontal: 0.8, vertical: 1),
           decoration: BoxDecoration(
-            color: IconColorStorage.colors[thisCategory.color]?.withAlpha(10) ?? primary.withAlpha(10),
+            color: IconColorStorage.colors[thisCategory.color]?.withAlpha(20) ?? primary.withAlpha(20),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Row(
