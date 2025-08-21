@@ -223,7 +223,7 @@ class _TaskListState extends State<TaskList> with AutomaticKeepAliveClientMixin 
           return _getEmptyIndicator();
         }
 
-        final sortedTasks = g.taskVm.getTasksSortedByTime(filteredTasks);
+        final sortedTasks = g.taskVm.tasks.sortByTime();
 
         return CustomScrollView(
           slivers: [
