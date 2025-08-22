@@ -41,9 +41,8 @@ class NoteViewModel extends ViewModel<Note> {
     notifyListeners();
   }
 
-  void deleteNotesByFolder(int folderId) {
-    final toDelete = items.where((n) => n.folders.any((f) => f.id == folderId)).toList();
-    box.removeMany(toDelete.map((n) => n.id).toList());
+  void deleteNotesByFolder(List<Note> notesForFolder, int folderId) {
+    box.removeMany(notesForFolder.map((n) => n.id).toList());
     items.removeWhere((n) => n.folders.any((f) => f.id == folderId));
     notifyListeners();
   }
@@ -52,4 +51,14 @@ class NoteViewModel extends ViewModel<Note> {
   @override
   String getItemUuid(Note item) => item.uuid;
 
+
+  /// [notify] decides whether to call [notifyListeners] or not, usually, we don't need to do this when this method is called from inside the class, this can be set to true when changes are made from outside the class
+  void updateNoteFromAppWideStateChanges(Note note,{bool notify = false}) {
+    final id = box.put(note);
+    int index = notes.indexWhere((i) => getItemId(i) == id);
+    if (index != -1) {
+      notes[index] = note;
+    }
+    if(notify) notifyListeners();
+  }
 }
