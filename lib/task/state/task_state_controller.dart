@@ -110,7 +110,7 @@ class TaskStateController extends StateController<TaskState, Task> {
     task.categories.clear();
     if (categories.isEmpty) {
       final generalCategory =
-          ObjectBox().categoryBox.get(1) ?? TaskCategory(id: 1, name: 'General');
+          ObjectBox().categoryBox.generalCategory;
       task.categories.add(generalCategory);
       task.categoryUuids = [generalCategory.uuid];
     } else {
