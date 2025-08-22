@@ -1,14 +1,14 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:darrt/app/notification/notification_action_controller.dart';
 import 'package:darrt/app/services/mini_box.dart';
 import 'package:darrt/helpers/consts.dart';
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/task/models/reminder.dart';
 import 'package:darrt/task/models/repeat_config.dart';
 import 'package:darrt/task/models/task.dart';
-import 'package:darrt/helpers/utils.dart';
-import 'package:darrt/helpers/mini_logger.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 class NotificationService {
   static final _notif = AwesomeNotifications();
@@ -64,7 +64,7 @@ class NotificationService {
             channelDescription: 'Show timer notifications',
             playSound: false,
             importance: NotificationImportance.Max,
-            enableLights: true,
+            enableLights: false,
             onlyAlertOnce: true,
             criticalAlerts: false,
             locked: true,
