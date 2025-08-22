@@ -112,3 +112,7 @@ class ObjectBox {
 extension CategoryExtension on Box<TaskCategory> {
   TaskCategory get generalCategory => get(1)!;
 }
+
+extension FolderExtension on Box<Folder> {
+  Folder get generalFolder => get(1)!;
+}
