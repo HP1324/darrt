@@ -1,12 +1,13 @@
 // timer_controller.dart
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:darrt/app/notification/notification_action_controller.dart';
-import 'package:darrt/helpers/consts.dart';
-import 'package:flutter/foundation.dart';
 import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/helpers/consts.dart';
 import 'package:darrt/helpers/mini_logger.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../helpers/globals.dart' as g;
 import '../../task/models/task.dart' show Task;
@@ -456,7 +457,7 @@ class TimerController extends ChangeNotifier {
         body: 'Time left: $formattedTime',
         category: NotificationCategory.Reminder,
         notificationLayout: NotificationLayout.Default,
-        wakeUpScreen: true,
+        wakeUpScreen: false,
         criticalAlert: true,
         autoDismissible: false,
         locked: true,
