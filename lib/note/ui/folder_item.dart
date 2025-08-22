@@ -1,12 +1,12 @@
 import 'package:darrt/app/services/toast_service.dart';
-import 'package:flutter/material.dart';
-import 'package:darrt/note/models/folder.dart';
-import 'package:darrt/note/ui/add_folder_page.dart';
-import 'package:darrt/note/ui/notes_for_folder_page.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/helpers/utils.dart';
+import 'package:darrt/note/models/folder.dart';
+import 'package:darrt/note/ui/add_folder_page.dart';
+import 'package:darrt/note/ui/notes_for_folder_page.dart';
+import 'package:flutter/material.dart';
 
 class FolderItem extends StatefulWidget {
   const FolderItem({super.key, required this.folder});
@@ -217,7 +217,7 @@ class _DeleteFolderDialogState extends State<_DeleteFolderDialog> {
       actions: [
         FilledButton(
           onPressed: () async {
-            final message = g.folderVm.deleteItem(widget.folderId, deleteTasks: deleteNotes);
+            final message = g.folderVm.deleteItem(widget.folderId, deleteNotes: deleteNotes);
             showSuccessToast(context, message);
             Navigator.pop(context);
           },
