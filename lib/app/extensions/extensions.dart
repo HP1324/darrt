@@ -1,6 +1,8 @@
 import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/note/models/folder.dart';
 import 'package:darrt/note/models/note.dart';
+import 'package:darrt/note/ui/notes_page.dart';
 import 'package:darrt/task/models/task.dart';
 
 extension TaskListExtension on List<Task> {
@@ -41,5 +43,43 @@ extension NoteListExtension on List<Note>{
   /// Returns notes that contains [folder], compares using [Folder.uuid]
   List<Note> forFolder(Folder folder){
     return where((note) => note.folders.any((f) => f.uuid == folder.uuid)).toList();
+  }
+
+  Map<String, List<Note>> groupByDate(DateFilterType dateFilterType) {
+    Map<String, List<Note>> groupedNotes = {};
+
+    for (var note in this) {
+      final dateTime = dateFilterType == DateFilterType.createdAt
+          ? note.createdAt
+          : note.updatedAt;
+
+      if (dateTime == null) continue;
+
+      final dateKey = formatDateNoJm(dateTime, 'EEE, dd MMM, yyyy');
+      if (groupedNotes[dateKey] == null) {
+        groupedNotes[dateKey] = [];
+      }
+      groupedNotes[dateKey]!.add(note);
+    }
+
+    // Sort the map by actual date (most recent first)
+    var sortedEntries = groupedNotes.entries.toList()
+      ..sort((a, b) {
+        // Get the first note from each group to compare their actual dates
+        final noteA = groupedNotes[a.key]!.first;
+        final noteB = groupedNotes[b.key]!.first;
+
+        final dateA = dateFilterType == DateFilterType.createdAt
+            ? noteA.createdAt
+            : noteA.updatedAt;
+        final dateB = dateFilterType == DateFilterType.createdAt
+            ? noteB.createdAt
+            : noteB.updatedAt;
+
+        // Compare actual DateTime objects (most recent first)
+        return dateB?.compareTo(dateA!) as int;
+      });
+
+    return Map.fromEntries(sortedEntries);
   }
 }

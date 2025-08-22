@@ -1,15 +1,17 @@
-import 'package:darrt/app/services/toast_service.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'dart:convert';
+
 import 'package:darrt/app/ads/my_banner_ad_widget.dart';
 import 'package:darrt/app/ads/timed_banner_ad_widget.dart';
+import 'package:darrt/app/extensions/extensions.dart';
+import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/note/ui/add_note_page.dart';
 import 'package:darrt/note/ui/folders_page.dart';
 import 'package:darrt/note/ui/note_item.dart';
-import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../models/note.dart';
 
@@ -168,44 +170,6 @@ class _NotesPageState extends State<NotesPage> {
         ),
       ),
     );
-  }
-
-  Map<String, List<Note>> _groupNotesByDate(List<Note> notes) {
-    Map<String, List<Note>> groupedNotes = {};
-
-    for (var note in notes) {
-      final dateTime = _dateFilterType == DateFilterType.createdAt
-          ? note.createdAt
-          : note.updatedAt;
-
-      if (dateTime == null) continue;
-
-      final dateKey = formatDateNoJm(dateTime, 'EEE, dd MMM, yyyy');
-      if (groupedNotes[dateKey] == null) {
-        groupedNotes[dateKey] = [];
-      }
-      groupedNotes[dateKey]!.add(note);
-    }
-
-    // Sort the map by actual date (most recent first)
-    var sortedEntries = groupedNotes.entries.toList()
-      ..sort((a, b) {
-        // Get the first note from each group to compare their actual dates
-        final noteA = groupedNotes[a.key]!.first;
-        final noteB = groupedNotes[b.key]!.first;
-
-        final dateA = _dateFilterType == DateFilterType.createdAt
-            ? noteA.createdAt
-            : noteA.updatedAt;
-        final dateB = _dateFilterType == DateFilterType.createdAt
-            ? noteB.createdAt
-            : noteB.updatedAt;
-
-        // Compare actual DateTime objects (most recent first)
-        return dateB?.compareTo(dateA!) as int;
-      });
-
-    return Map.fromEntries(sortedEntries);
   }
 
   Widget _buildSearchBar() {
@@ -388,7 +352,7 @@ class _NotesPageState extends State<NotesPage> {
                 _NotesEmptyIndicator(),
               ] else ...[
                 // Build grouped sections
-                ...(_groupNotesByDate(_filteredNotes).entries.map((entry) {
+                ...(_filteredNotes.groupByDate(_dateFilterType).entries.map((entry) {
                   final dateLabel = entry.key;
                   final notesForDate = entry.value;
 
@@ -454,7 +418,7 @@ class _NotesPageState extends State<NotesPage> {
         builder: (context, child) {
           return TimedBannerAdWidget(
             showFor: Duration(seconds: 50),
-            hideFor: Duration(seconds: 10),
+            hideFor: Duration(seconds: 15),
             adInitializer: () => g.adsController.initializeNotesPageBannerAd(),
             childBuilder: () {
               if (g.adsController.isNotesPageBannerAdLoaded) {
