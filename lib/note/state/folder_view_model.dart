@@ -1,3 +1,4 @@
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/app/state/viewmodels/view_model.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/messages.dart';
@@ -28,9 +29,19 @@ class FolderViewModel extends ViewModel<Folder> {
   String getDeleteSuccessMessage(int length) => Messages.mFolderDeleted;
 
   @override
-  String deleteItem(int id, {bool? deleteTasks}) {
-    if (deleteTasks!) g.noteVm.deleteNotesByFolder(id);
-
+  String deleteItem(int id, {bool? deleteNotes}) {
+    final notesForFolder = g.noteVm.notes.forFolderById(id);
+    if (deleteNotes!) {
+      g.noteVm.deleteNotesByFolder(notesForFolder, id);
+      return super.deleteItem(id);
+    }
+    for(final note in notesForFolder){
+      note.folders.removeWhere((folder) => folder.id == id);
+      if(note.folders.isEmpty){
+        note.folders.add(g.folderVm.folders.first);
+      }
+      g.noteVm.updateNoteFromAppWideStateChanges(note);
+    }
     return super.deleteItem(id);
   }
 
@@ -71,7 +82,9 @@ class FolderViewModel extends ViewModel<Folder> {
         if (folder != null) {
           note.folders.add(folder);
         } else {
-          MiniLogger.dp('Folder with UUID $uuid not found for note "${note.content}"');
+          MiniLogger.dp(
+            'Folder with UUID $uuid not found for note "${note.content}"',
+          );
         }
       }
     }
@@ -79,5 +92,4 @@ class FolderViewModel extends ViewModel<Folder> {
 
   @override
   String getItemUuid(Folder item) => item.uuid;
-
 }
