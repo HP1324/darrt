@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:darrt/note/models/folder.dart';
+import 'package:darrt/app/extensions/extensions.dart';
+import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/note/models/folder.dart';
 import 'package:darrt/note/ui/add_note_page.dart';
 import 'package:darrt/note/ui/note_item.dart';
-import 'package:darrt/helpers/globals.dart' as g;
+import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class NotesForFolderPage extends StatefulWidget {
   const NotesForFolderPage({super.key, required this.folder});
@@ -26,7 +27,7 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
     return ListenableBuilder(
       listenable: g.noteVm,
       builder: (context, child) {
-        final notes = g.noteVm.notes.where((n) => n.folders.contains(widget.folder)).toList();
+        final notes = g.noteVm.notes.forFolder(widget.folder);
         final color =
             IconColorStorage.colors[widget.folder.color] ?? Theme.of(context).colorScheme.primary;
         final icon = IconColorStorage.flattenedIcons[widget.folder.icon];
