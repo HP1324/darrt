@@ -1,12 +1,13 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_quill/flutter_quill.dart' show QuillController;
+import 'package:darrt/app/extensions/extensions.dart';
+import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/app/state/controllers/state_controller.dart';
 import 'package:darrt/helpers/globals.dart' as g;
-import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/note/models/folder.dart';
 import 'package:darrt/note/models/note.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_quill/flutter_quill.dart' show QuillController;
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'note_state_controller.freezed.dart';
@@ -45,7 +46,7 @@ class NoteStateController extends StateController<NoteState, Note> {
     final folders = g.folderVm.folders.where((f) => g.noteSc.folderSelection[f] == true).toList();
     note.folders.clear();
     if (folders.isEmpty) {
-      final generalFolder = ObjectBox().folderBox.get(1) ?? Folder(id: 1, name: 'General');
+      final generalFolder = ObjectBox().folderBox.generalFolder;
       note.folders.add(generalFolder);
       note.folderUuids = [generalFolder.uuid];
     } else {
@@ -57,6 +58,11 @@ class NoteStateController extends StateController<NoteState, Note> {
 
   @override
   void clearState() {
+    state = state.copyWith(
+      folderSelection: {ObjectBox().folderBox.generalFolder: true},
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
     textController.clear();
     controller.clear();
   }
@@ -68,8 +74,8 @@ class NoteStateController extends StateController<NoteState, Note> {
     state = NoteState(
       folderSelection: initialFolder == null
           ? edit
-                ? {for (var folder in folders) folder: model!.folders.contains(folder)}
-                : {folders[0]: true}
+                ? {for (var folder in folders) folder: model!.containsFolder(folder)}
+                : {ObjectBox().folderBox.generalFolder: true}
           : {initialFolder: true},
       createdAt: edit ? model!.createdAt! : DateTime.now(),
       updatedAt: edit ? model!.updatedAt! : DateTime.now(),
