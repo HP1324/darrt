@@ -1,4 +1,6 @@
 import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/note/models/folder.dart';
+import 'package:darrt/note/models/note.dart';
 import 'package:darrt/task/models/task.dart';
 
 extension TaskListExtension on List<Task> {
@@ -32,5 +34,12 @@ extension TaskListExtension on List<Task> {
 extension TaskExtension on Task{
   bool containsCategory(TaskCategory category){
     return categories.any((cat) => cat.uuid == category.uuid);
+  }
+}
+
+extension NoteListExtension on List<Note>{
+  /// Returns notes that contains [folder], compares using [Folder.uuid]
+  List<Note> forFolder(Folder folder){
+    return where((note) => note.folders.any((f) => f.uuid == folder.uuid)).toList();
   }
 }
