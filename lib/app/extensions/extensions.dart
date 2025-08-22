@@ -12,7 +12,7 @@ extension TaskListExtension on List<Task> {
       return where((task) => task.categories.any((cat) => cat.uuid == category.uuid)).toList();
     }
 
-    /// Returns tasks that contains [category], compares using [categoryId]
+    /// Returns tasks that contains [category], compares using [TaskCategory.id]
     List<Task> forCategoryById(int categoryId){
       return where((task) => task.categories.any((cat) => cat.id == categoryId)).toList();
     }
@@ -43,6 +43,11 @@ extension NoteListExtension on List<Note>{
   /// Returns notes that contains [folder], compares using [Folder.uuid]
   List<Note> forFolder(Folder folder){
     return where((note) => note.folders.any((f) => f.uuid == folder.uuid)).toList();
+  }
+
+  /// Returns notes that contains [folder], compares using [Folder.id]
+  List<Note> forFolderById(int folderId){
+    return where((note) => note.folders.any((f) => f.id == folderId)).toList();
   }
 
   Map<String, List<Note>> groupByDate(DateFilterType dateFilterType) {
@@ -81,5 +86,11 @@ extension NoteListExtension on List<Note>{
       });
 
     return Map.fromEntries(sortedEntries);
+  }
+}
+
+extension NoteExtension on Note{
+  bool containsFolder(Folder folder){
+    return folders.any((f) => f.uuid == folder.uuid);
   }
 }
