@@ -1,3 +1,4 @@
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/icon_color_storage.dart';
@@ -106,7 +107,7 @@ class NoteCountLabel extends StatelessWidget {
       listenable: g.noteVm,
       builder: (context, child) {
         final notes = g.noteVm.notes;
-        final count = notes.where((n) => n.folders.contains(folder)).toList().length;
+        final count = notes.forFolder(folder).length;
         return Text(
           '$count ${count != 1 ? 'notes' : 'note'}',
           overflow: TextOverflow.ellipsis,
