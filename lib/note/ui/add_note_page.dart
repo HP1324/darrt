@@ -428,7 +428,7 @@ class NotesQuillEditor extends StatelessWidget {
               );
             },
             // textSelectionControls: ,
-            placeholder: 'Enter your note here...',
+            placeholder: 'Write your thoughts here...',
             autoFocus: true,
             textCapitalization: TextCapitalization.sentences,
             customStyles: DefaultStyles(
