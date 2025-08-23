@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_logger.dart';
-import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/objectbox.g.dart';
 import 'package:darrt/task/models/reminder.dart';
 import 'package:darrt/task/models/repeat_config.dart';
@@ -107,7 +106,7 @@ class Task {
     'reminders': reminders,
     'priority': priority,
     'categoryIds': categories.map((c) => c.id).toList(),
-    'categoryUuids': categories.map((c) => c.uuid).toList(),
+    'categoryUuids': categoryUuids,
     'uuid': uuid,
     'notes': notes,
     'stats':stats,
@@ -142,28 +141,28 @@ class Task {
       );
       // Restore category relations
 
-      final ids = List<int>.from(json['categoryIds'] ?? []);
-      //The following won't work and give a TypeError: type List<dynamic> is not a subtype of type List<int> in type cast, the above line works well and got this solution from [https://stackoverflow.com/a/68079173/28525347]
-      // final ids = (json['categoryIds'] as List<int>?)?.cast<int>() ?? [];
-      final fetched = ObjectBox().categoryBox.getMany(ids);
-
-      final validCategories = <TaskCategory>[];
-      final missingIds = <int>[];
-
-      for (int i = 0; i < ids.length; i++) {
-        final cat = fetched[i];
-        if (cat != null) {
-          validCategories.add(cat);
-        } else {
-          missingIds.add(ids[i]);
-        }
-      }
-
-      if (missingIds.isNotEmpty) {
-        MiniLogger.w('Task "${task.title}" has missing categories: $missingIds. Skipping these.');
-      }
-
-      task.categories.addAll(validCategories);
+      // final ids = List<int>.from(json['categoryIds'] ?? []);
+      // //The following won't work and give a TypeError: type List<dynamic> is not a subtype of type List<int> in type cast, the above line works well and got this solution from [https://stackoverflow.com/a/68079173/28525347]
+      // // final ids = (json['categoryIds'] as List<int>?)?.cast<int>() ?? [];
+      // final fetched = ObjectBox().categoryBox.getMany(ids);
+      //
+      // final validCategories = <TaskCategory>[];
+      // final missingIds = <int>[];
+      //
+      // for (int i = 0; i < ids.length; i++) {
+      //   final cat = fetched[i];
+      //   if (cat != null) {
+      //     validCategories.add(cat);
+      //   } else {
+      //     missingIds.add(ids[i]);
+      //   }
+      // }
+      //
+      // if (missingIds.isNotEmpty) {
+      //   MiniLogger.w('Task "${task.title}" has missing categories: $missingIds. Skipping these.');
+      // }
+      //
+      // task.categories.addAll(validCategories);
 
       return task;
     } catch (e) {
