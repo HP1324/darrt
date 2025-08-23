@@ -7,7 +7,6 @@ import 'package:darrt/note/models/folder.dart';
 import 'package:darrt/note/ui/add_note_page.dart';
 import 'package:darrt/note/ui/note_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class NotesForFolderPage extends StatefulWidget {
   const NotesForFolderPage({super.key, required this.folder});
@@ -114,17 +113,21 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
                         slivers: [
                           SliverPadding(
                             padding: const EdgeInsets.all(12),
-                            sliver: SliverMasonryGrid.count(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 8,
-                              crossAxisSpacing: 8,
-                              childCount: notes.length,
+                            sliver: SliverGrid.builder(
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 8,
+                                  mainAxisSpacing: 8,
+                                  mainAxisExtent: MediaQuery.sizeOf(context).height * 0.16
+                              ),
+                              itemCount: notes.length,
                               itemBuilder: (context, index) {
                                 final note = notes[index];
                                 return NoteItem(note: note);
                               },
                             ),
                           ),
+                          SliverToBoxAdapter(child:const SizedBox(height: 100)),
                         ],
                       ),
                     ),
