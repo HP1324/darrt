@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/note/models/folder.dart';
@@ -79,7 +78,7 @@ class Note {
     'updatedAt': updatedAt?.millisecondsSinceEpoch,
     'folderIds': folders.where((f) => f.id > 0).map((f) => f.id).toList(),
     'uuid': uuid,
-    'folderUuids':folders.where((f) => f.id > 0).map((f) => f.uuid).toList(),
+    'folderUuids':folderUuids,
   };
 
   factory Note.fromJson(Map<String, dynamic> json) {
@@ -97,26 +96,26 @@ class Note {
         folderUuids: List<String>.from(json['folderUuids']),
       );
 
-      final folderIds = (json['folderIds'] as List?)?.cast<int>() ?? [];
-      final fetched = ObjectBox().folderBox.getMany(folderIds);
-
-      final validFolders = <Folder>[];
-      final missingIds = <int>[];
-
-      for (var i = 0; i < folderIds.length; i++) {
-        final folder = fetched[i];
-        if (folder != null) {
-          validFolders.add(folder);
-        } else {
-          missingIds.add(folderIds[i]);
-        }
-      }
-
-      if (missingIds.isNotEmpty) {
-        MiniLogger.w('Note "${note.id}" has missing folder IDs: $missingIds');
-      }
-
-      note.folders.addAll(validFolders);
+      // final folderIds = (json['folderIds'] as List?)?.cast<int>() ?? [];
+      // final fetched = ObjectBox().folderBox.getMany(folderIds);
+      //
+      // final validFolders = <Folder>[];
+      // final missingIds = <int>[];
+      //
+      // for (var i = 0; i < folderIds.length; i++) {
+      //   final folder = fetched[i];
+      //   if (folder != null) {
+      //     validFolders.add(folder);
+      //   } else {
+      //     missingIds.add(folderIds[i]);
+      //   }
+      // }
+      //
+      // if (missingIds.isNotEmpty) {
+      //   MiniLogger.w('Note "${note.id}" has missing folder IDs: $missingIds');
+      // }
+      //
+      // note.folders.addAll(validFolders);
       return note;
     } catch (e, t) {
       MiniLogger.e('Failed to parse Note from JSON: $e');
