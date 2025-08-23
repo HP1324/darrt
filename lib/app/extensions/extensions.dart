@@ -51,11 +51,11 @@ extension NoteListExtension on List<Note>{
     return where((note) => note.folders.any((f) => f.id == folderId)).toList();
   }
 
-  Map<String, List<Note>> groupByDate(DateFilterType dateFilterType) {
+  Map<String, List<Note>> groupByDate(NoteFilter noteFilter) {
     Map<String, List<Note>> groupedNotes = {};
 
     for (var note in this) {
-      final dateTime = dateFilterType == DateFilterType.createdAt
+      final dateTime = noteFilter == NoteFilter.createdAt
           ? note.createdAt
           : note.updatedAt;
 
@@ -75,10 +75,10 @@ extension NoteListExtension on List<Note>{
         final noteA = groupedNotes[a.key]!.first;
         final noteB = groupedNotes[b.key]!.first;
 
-        final dateA = dateFilterType == DateFilterType.createdAt
+        final dateA = noteFilter == NoteFilter.createdAt
             ? noteA.createdAt
             : noteA.updatedAt;
-        final dateB = dateFilterType == DateFilterType.createdAt
+        final dateB = noteFilter == NoteFilter.createdAt
             ? noteB.createdAt
             : noteB.updatedAt;
 
