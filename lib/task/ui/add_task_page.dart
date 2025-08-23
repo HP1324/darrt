@@ -69,6 +69,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = TextTheme.of(context);
     return PopScope(
       canPop: false,
 
@@ -120,6 +121,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
         backgroundColor: getSurfaceColor(context),
         appBar: AppBar(
           backgroundColor: getSurfaceColor(context),
+          titleSpacing: 0,
+          titleTextStyle: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           title: Text(
             widget.edit
                 ? widget.task!.title.replaceAll('\n', ' ')
@@ -153,6 +156,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         floatingActionButton: Transform.scale(
           scale: 0.9,
           child: FloatingActionButton(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             onPressed: () async {
               _putTask(context);
             },

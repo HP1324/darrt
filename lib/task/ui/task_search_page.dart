@@ -1,9 +1,9 @@
-import 'package:darrt/helpers/utils.dart';
-import 'package:flutter/material.dart';
 import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/helpers/globals.dart' as g show taskVm, catVm;
+import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/ui/task_item.dart';
-import 'package:darrt/helpers/globals.dart' as g show taskVm, catVm;
+import 'package:flutter/material.dart';
 
 ///This state controller is used only within this file that's why not put in globals.dart
 final _controller = SearchStateController();
@@ -116,6 +116,7 @@ class _SearchPageContentState extends State<_SearchPageContent> {
     return Scaffold(
       backgroundColor: getSurfaceColor(context),
       appBar: AppBar(
+        titleSpacing: 0,
         backgroundColor: getSurfaceColor(context),
         leading: BackButton(),
         title: ListenableBuilder(

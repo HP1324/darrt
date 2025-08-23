@@ -1,12 +1,12 @@
 import 'dart:convert';
 
+import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/note/models/folder.dart';
 import 'package:flutter/material.dart' show TextSelection;
 import 'package:flutter_quill/flutter_quill.dart' show Document, QuillController;
 import 'package:flutter_quill/quill_delta.dart' show Delta;
-import 'package:darrt/helpers/globals.dart' as g;
-import 'package:darrt/helpers/mini_logger.dart';
-import 'package:darrt/app/services/object_box.dart';
-import 'package:darrt/note/models/folder.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
@@ -43,6 +43,35 @@ class Note {
     return QuillController(document: doc, selection: const TextSelection.collapsed(offset: 0));
   }
 
+  /// Extracts note content as plain text, note content is stored as deltaJson, using ```
+  ///     final deltaJson = jsonEncode(controller.document.toDelta().toJson());
+  ///     final now = DateTime.now();
+  ///     return Note(content: deltaJson, createdAt: now, updatedAt: now,uuid: uuid ?? g.uuid.v4());
+  ///     ```
+  String extractPlainTextFromContent() {
+    if (content.isEmpty) return '';
+
+    try {
+      // Parse the JSON content from Quill
+      final Map<String, dynamic> delta = jsonDecode(content);
+      final List<dynamic> ops = delta['ops'] ?? [];
+
+      StringBuffer textBuffer = StringBuffer();
+      for (var op in ops) {
+        if (op is Map<String, dynamic> && op.containsKey('insert')) {
+          final insert = op['insert'];
+          if (insert is String) {
+            textBuffer.write(insert);
+          }
+        }
+      }
+
+      return textBuffer.toString();
+    } catch (e) {
+      // If parsing fails, return the raw content
+      return content;
+    }
+  }
   Map<String, dynamic> toJson() => {
     'id': id,
     'content': content,

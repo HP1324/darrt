@@ -41,7 +41,7 @@ class _TasksForCategoryPageState extends State<TasksForCategoryPage> {
           appBar: AppBar(
             title: Text(widget.category.name),
             backgroundColor: color.withAlpha(25),
-            actions: [TimelineFilterButton(),],
+            actions: [TaskViewTypeFilterButton(),],
           ),
           body: Builder(
             builder: (context) {

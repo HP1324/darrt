@@ -1,18 +1,17 @@
 import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:darrt/app/notification/notification_service.dart';
 import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/app/ui/motivation_dialog.dart';
 import 'package:darrt/app/workmanger/tasks/dialy_quote_notif.dart';
+import 'package:darrt/helpers/consts.dart';
+import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_logger.dart';
+import 'package:darrt/helpers/utils.dart';
+import 'package:darrt/quickreminder/ui/quick_reminder_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:darrt/app/notification/notification_service.dart';
-import 'package:darrt/helpers/consts.dart';
-import 'package:darrt/helpers/utils.dart';
-import 'package:darrt/helpers/globals.dart' as g;
-import 'package:darrt/quickreminder/ui/quick_reminder_dialog.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   MiniAppBar({super.key});
@@ -28,10 +27,12 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
       valueListenable: g.navMan.currentDestination,
       builder: (context, value, child) {
         final backgroundColor = getSurfaceColor(context);
+        final textTheme = TextTheme.of(context);
         if (value == 0) {
           return AppBar(
             backgroundColor: backgroundColor,
             elevation: 0,
+            titleSpacing: 0,
             title: InkWell(
               splashFactory: NoSplash.splashFactory,
               onTap: () {
@@ -98,7 +99,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                         child: Text(
                           title,
                           key: ValueKey<DateTime>(selectedDate),
-                          style: Theme.of(context).textTheme.labelMedium!
+                          style: textTheme.labelLarge!
                               .copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -123,7 +124,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                 },
               ),
 
-              TimelineFilterButton(),
+              TaskViewTypeFilterButton(),
               _MiniAppBarAction(
                 onTap: () async {
                   showQuickReminderDialog() async {
@@ -154,7 +155,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Icon(Icons.alarm_add_sharp),
                 ),
               ),
-              if (kDebugMode)
+              if (!kDebugMode)
                 _MiniAppBarAction(
                   key: _popupKey,
                   icon: Icon(Icons.more_vert),
@@ -206,8 +207,9 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
           );
         } else if (value == 1)
           return AppBar(
+            titleSpacing: 0,
             backgroundColor: backgroundColor,
-            title: Text('Focus'),
+            title: Text('Focus', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             actions: [
               _MiniAppBarAction(
                 icon: Container(
@@ -245,10 +247,11 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
             ],
           );
         return AppBar(
+          titleSpacing: 0,
           backgroundColor: backgroundColor,
           title: Text(
             'Categories',
-            style: Theme.of(context).textTheme.titleMedium,
+            style:  textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         );
       },
@@ -312,8 +315,8 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-class TimelineFilterButton extends StatelessWidget {
-  const TimelineFilterButton({super.key});
+class TaskViewTypeFilterButton extends StatelessWidget {
+  const TaskViewTypeFilterButton({super.key});
 
   @override
   Widget build(BuildContext context) {
