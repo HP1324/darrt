@@ -18,7 +18,6 @@ import 'package:flutter/material.dart';
 
 ///Controls the temporary state of the task add page when task is being added or updated
 class TaskStateController extends StateController<TaskState, Task> {
-  static int taskCount = 0;
   @override
   void initState(bool edit, [Task? task, TaskCategory? category]) {
     textController.text = edit ? task!.title : '';
@@ -117,7 +116,6 @@ class TaskStateController extends StateController<TaskState, Task> {
       task.categories.addAll(categories);
       task.categoryUuids = categories.map((c) => c.uuid).toList();
     }
-    taskCount++;
     return task;
   }
 
