@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:darrt/app/ads/my_banner_ad_widget.dart';
 import 'package:darrt/app/ads/timed_banner_ad_widget.dart';
 import 'package:darrt/app/extensions/extensions.dart';
@@ -7,13 +5,12 @@ import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/helpers/utils.dart';
+import 'package:darrt/note/search/note_search_page.dart';
 import 'package:darrt/note/ui/add_note_page.dart';
 import 'package:darrt/note/ui/folders_page.dart';
 import 'package:darrt/note/ui/note_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-
-import '../models/note.dart';
 
 class NotesPage extends StatefulWidget {
   const NotesPage({super.key});
@@ -25,79 +22,12 @@ class NotesPage extends StatefulWidget {
 enum DateFilterType { createdAt, updatedAt }
 
 class _NotesPageState extends State<NotesPage> {
-  bool _isSearching = false;
-  final TextEditingController _searchController = TextEditingController();
-  List<Note> _filteredNotes = [];
-  String _searchQuery = '';
   DateFilterType _dateFilterType = DateFilterType.createdAt;
 
   @override
-  void initState() {
-    super.initState();
-    _filteredNotes = g.noteVm.notes;
-    _searchController.addListener(_onSearchChanged);
-  }
-
-  @override
   void dispose() {
-    _searchController.removeListener(_onSearchChanged);
-    _searchController.dispose();
     super.dispose();
     g.noteVm.selectedItemIds.clear();
-  }
-
-  void _onSearchChanged() {
-    final query = _searchController.text.toLowerCase().trim();
-    setState(() {
-      _searchQuery = query;
-      if (query.isEmpty) {
-        _filteredNotes = g.noteVm.notes;
-      } else {
-        _filteredNotes = g.noteVm.notes.where((note) {
-          return _extractTextFromQuillContent(note.content).toLowerCase().contains(query);
-        }).toList();
-      }
-    });
-  }
-
-  String _extractTextFromQuillContent(String? content) {
-    if (content == null || content.isEmpty) return '';
-
-    try {
-      // Parse the JSON content from Quill
-      final Map<String, dynamic> delta = jsonDecode(content);
-      final List<dynamic> ops = delta['ops'] ?? [];
-
-      StringBuffer textBuffer = StringBuffer();
-      for (var op in ops) {
-        if (op is Map<String, dynamic> && op.containsKey('insert')) {
-          final insert = op['insert'];
-          if (insert is String) {
-            textBuffer.write(insert);
-          }
-        }
-      }
-
-      return textBuffer.toString();
-    } catch (e) {
-      // If parsing fails, return the raw content
-      return content;
-    }
-  }
-
-  void _startSearch() {
-    setState(() {
-      _isSearching = true;
-    });
-  }
-
-  void _stopSearch() {
-    setState(() {
-      _isSearching = false;
-      _searchQuery = '';
-      _searchController.clear();
-      _filteredNotes = g.noteVm.notes;
-    });
   }
 
   void _showDateFilterBottomSheet() {
@@ -115,7 +45,9 @@ class _NotesPageState extends State<NotesPage> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -137,7 +69,10 @@ class _NotesPageState extends State<NotesPage> {
               title: Text('Created Date'),
               subtitle: Text('Group by when notes were created'),
               trailing: _dateFilterType == DateFilterType.createdAt
-                  ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
+                  ? Icon(
+                      Icons.check,
+                      color: Theme.of(context).colorScheme.primary,
+                    )
                   : null,
               onTap: () {
                 setState(() {
@@ -156,7 +91,10 @@ class _NotesPageState extends State<NotesPage> {
               title: Text('Updated Date'),
               subtitle: Text('Group by when notes were last modified'),
               trailing: _dateFilterType == DateFilterType.updatedAt
-                  ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
+                  ? Icon(
+                      Icons.check,
+                      color: Theme.of(context).colorScheme.primary,
+                    )
                   : null,
               onTap: () {
                 setState(() {
@@ -172,43 +110,17 @@ class _NotesPageState extends State<NotesPage> {
     );
   }
 
-  Widget _buildSearchBar() {
-    return TextField(
-      controller: _searchController,
-      autofocus: true,
-      decoration: InputDecoration(
-        hintText: 'Search notes...',
-        border: InputBorder.none,
-        hintStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-        ),
-      ),
-      style: TextStyle(
-        color: Theme.of(context).colorScheme.onSurface,
-        fontSize: 16,
-      ),
-    );
-  }
-
   Widget _buildAppBarTitle() {
-    if (_isSearching) {
-      return _buildSearchBar();
-    }
-    return Text('Notes');
+    return Text(
+      'Notes',
+      style: Theme.of(
+        context,
+      ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+    );
   }
 
   List<Widget> _buildAppBarActions() {
     final ids = g.noteVm.selectedItemIds;
-
-    if (_isSearching) {
-      return [
-        IconButton(
-          onPressed: _stopSearch,
-          icon: Icon(Icons.close),
-          tooltip: 'Close search',
-        ),
-      ];
-    }
 
     return [
       if (ids.isNotEmpty) ...[
@@ -228,32 +140,35 @@ class _NotesPageState extends State<NotesPage> {
                   'Delete ${ids.length > 1 ? '${ids.length} notes' : '1 note'}?',
                 ),
                 actions: [
+                  FilledButton(
+                    onPressed: () {
+                      message = g.noteVm.deleteMultipleItems();
+                      Navigator.pop(context);
+                      if (mounted) {
+                        showSuccessToast(context, message);
+                      }
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(
+                        ColorScheme.of(context).error,
+                      ),
+                    ),
+                    child: const Text('Delete'),
+                  ),
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Cancel'),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      message = g.noteVm.deleteMultipleItems();
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Delete'),
-                  ),
                 ],
               ),
             );
-            if (mounted) {
-              showSuccessToast(
-                context,message
-              );
-            }
           },
           icon: Icon(Icons.delete),
           tooltip: 'Delete selected notes',
         ),
       ],
       IconButton(
-        onPressed: _startSearch,
+        onPressed: () => MiniRouter.to(context, NoteSearchPage()),
         icon: Icon(Icons.search),
         tooltip: 'Search notes',
       ),
@@ -273,57 +188,6 @@ class _NotesPageState extends State<NotesPage> {
     ];
   }
 
-  Widget _buildSearchResults() {
-    if (_searchQuery.isEmpty) {
-      return SliverToBoxAdapter(child: SizedBox.shrink());
-    }
-
-    if (_filteredNotes.isEmpty) {
-      return SliverFillRemaining(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.search_off,
-                size: 64,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-              ),
-              SizedBox(height: 16),
-              Text(
-                'No notes found',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Try searching with different keywords',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return SliverPadding(
-      padding: const EdgeInsets.all(12),
-      sliver: SliverMasonryGrid.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        childCount: _filteredNotes.length,
-        itemBuilder: (context, index) {
-          final note = _filteredNotes[index];
-          return NoteItem(note: note);
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -331,69 +195,64 @@ class _NotesPageState extends State<NotesPage> {
       body: ListenableBuilder(
         listenable: g.noteVm,
         builder: (context, child) {
-          // Update filtered notes when noteVm changes
-          if (!_isSearching || _searchQuery.isEmpty) {
-            _filteredNotes = g.noteVm.notes;
-          }
+          final notes = g.noteVm.notes;
 
+          final scheme = ColorScheme.of(context);
+          final textTheme = TextTheme.of(context);
           return CustomScrollView(
             slivers: [
               SliverAppBar(
                 backgroundColor: getSurfaceColor(context),
                 leading: BackButton(),
+                titleSpacing: 0,
                 title: _buildAppBarTitle(),
                 pinned: true,
                 actions: _buildAppBarActions(),
               ),
 
-              if (_isSearching) ...[
-                _buildSearchResults(),
-              ] else if (_filteredNotes.isEmpty) ...[
-                _NotesEmptyIndicator(),
+              if (notes.isEmpty) ...[
+                _EmptyNotesIndicator(),
               ] else ...[
-                // Build grouped sections
-                ...(_filteredNotes.groupByDate(_dateFilterType).entries.map((entry) {
+                ...(notes.groupByDate(_dateFilterType).entries.expand((
+                  entry,
+                ) {
                   final dateLabel = entry.key;
                   final notesForDate = entry.value;
 
-                  return SliverMainAxisGroup(
-                    slivers: [
-                      // Date header
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                          child: Text(
-                            dateLabel,
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context).colorScheme.primary,
+                  return [
+                    SliverList(
+                      delegate: SliverChildListDelegate.fixed(
+                        [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                            child: Text(
+                              dateLabel,
+                              style: textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: scheme.primary,
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                      // Notes grid for this date
-                      SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        sliver: SliverMasonryGrid.count(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
-                          childCount: notesForDate.length,
-                          itemBuilder: (context, index) {
-                            final note = notesForDate[index];
-                            return NoteItem(note: note);
-                          },
-                        ),
+                    ),
+                    // Notes grid for this date
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      sliver: SliverMasonryGrid.count(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        childCount: notesForDate.length,
+                        itemBuilder: (context, index) {
+                          final note = notesForDate[index];
+                          return NoteItem(note: note);
+                        },
                       ),
-                    ],
-                  );
+                    ),
+                  ];
                 }).toList()),
               ],
-
-              // Add some bottom padding
-              SliverToBoxAdapter(
-                child: SizedBox(height: 100), // Space for FAB
-              ),
             ],
           );
         },
@@ -411,8 +270,8 @@ class _NotesPageState extends State<NotesPage> {
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
 
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       bottomNavigationBar: ListenableBuilder(
         listenable: g.adsController,
         builder: (context, child) {
@@ -422,7 +281,9 @@ class _NotesPageState extends State<NotesPage> {
             adInitializer: () => g.adsController.initializeNotesPageBannerAd(),
             childBuilder: () {
               if (g.adsController.isNotesPageBannerAdLoaded) {
-                return MyBannerAdWidget(bannerAd: g.adsController.notesPageBannerAd);
+                return MyBannerAdWidget(
+                  bannerAd: g.adsController.notesPageBannerAd,
+                );
               }
               return const SizedBox.shrink();
             },
@@ -433,8 +294,8 @@ class _NotesPageState extends State<NotesPage> {
   }
 }
 
-class _NotesEmptyIndicator extends StatelessWidget {
-  const _NotesEmptyIndicator();
+class _EmptyNotesIndicator extends StatelessWidget {
+  const _EmptyNotesIndicator();
 
   @override
   Widget build(BuildContext context) {
@@ -447,13 +308,17 @@ class _NotesEmptyIndicator extends StatelessWidget {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primaryContainer.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.note_add_outlined,
                 size: 60,
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.7),
               ),
             ),
             SizedBox(height: 24),
@@ -461,14 +326,18 @@ class _NotesEmptyIndicator extends StatelessWidget {
               'No Notes Yet',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.8),
               ),
             ),
             SizedBox(height: 8),
             Text(
               'Start capturing your thoughts and ideas',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
               textAlign: TextAlign.center,
             ),
