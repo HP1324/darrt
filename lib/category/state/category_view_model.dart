@@ -94,7 +94,6 @@ class CategoryViewModel extends ViewModel<TaskCategory> {
     };
 
     for (final task in tasks) {
-      // Optional: depends on your restore design
       final List<String> categoryUuids = task.categoryUuids;
 
       task.categories.clear();
