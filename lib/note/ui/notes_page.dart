@@ -2,6 +2,7 @@ import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/note/search/note_search_page.dart';
 import 'package:darrt/note/ui/add_note_page.dart';
 import 'package:darrt/note/ui/folders_page.dart';
@@ -39,6 +40,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
     final noteFilter = ref.watch(noteFilterProvider);
 
     return Scaffold(
+      backgroundColor: getSurfaceColor(context),
       appBar: _NotesPageAppbar(),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -104,7 +106,7 @@ class _NotesPageState extends ConsumerState<NotesPage> {
 }
 
 class _NotesPageAppbar extends ConsumerWidget implements PreferredSizeWidget {
-  const _NotesPageAppbar({super.key});
+  const _NotesPageAppbar();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -113,6 +115,7 @@ class _NotesPageAppbar extends ConsumerWidget implements PreferredSizeWidget {
       builder: (context, child) {
         final ids = g.noteVm.selectedItemIds;
         return AppBar(
+          backgroundColor: getSurfaceColor(context),
           leading: BackButton(),
           titleSpacing: 0,
           title: Text('Notes'),
