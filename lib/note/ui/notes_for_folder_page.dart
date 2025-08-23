@@ -1,4 +1,5 @@
 import 'package:darrt/app/extensions/extensions.dart';
+import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/mini_router.dart';
@@ -32,6 +33,8 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
             IconColorStorage.colors[widget.folder.color] ?? Theme.of(context).colorScheme.primary;
         final icon = IconColorStorage.flattenedIcons[widget.folder.icon];
         final isDark = Theme.of(context).brightness == Brightness.dark;
+
+        final ids = g.noteVm.selectedItemIds;
         return Scaffold(
           backgroundColor: isDark
               ? Color.lerp(Theme.of(context).colorScheme.surface, color, 0.05)
@@ -55,7 +58,7 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
               return Column(
                 children: [
                   const SizedBox(height: 15),
-                  if (g.noteVm.selectedItemIds.isNotEmpty)
+                  if (ids.isNotEmpty)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -66,10 +69,41 @@ class _NotesForFolderPageState extends State<NotesForFolderPage> {
                           icon: Icon(Icons.cancel),
                         ),
                         IconButton(
-                          onPressed: () {
-                            g.noteVm.deleteMultipleItems();
+                          onPressed: () async {
+                            var message = '';
+                            await showDialog(
+                              context: context,
+                              builder: (innerContext) => AlertDialog(
+                                title: const Text('Delete Notes'),
+                                content: Text(
+                                  'Delete ${ids.length > 1 ? '${ids.length} notes' : '1 note'}?',
+                                ),
+                                actions: [
+                                  FilledButton(
+                                    onPressed: () {
+                                      message = g.noteVm.deleteMultipleItems();
+                                      Navigator.pop(context);
+                                      if (mounted) {
+                                        showSuccessToast(context, message);
+                                      }
+                                    },
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStatePropertyAll(
+                                        ColorScheme.of(context).error,
+                                      ),
+                                    ),
+                                    child: const Text('Delete'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('Cancel'),
+                                  ),
+                                ],
+                              ),
+                            );
                           },
                           icon: Icon(Icons.delete),
+                          tooltip: 'Delete selected notes',
                         ),
                       ],
                     ),
