@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/helpers/utils.dart' show formatDateAndTime, formatTime;
 import 'package:darrt/note/models/note.dart';
 import 'package:darrt/note/ui/add_note_page.dart';
+import 'package:flutter/material.dart';
 
 class NoteItem extends StatefulWidget {
   final Note note;
@@ -26,7 +26,7 @@ class _NoteItemState extends State<NoteItem> {
   String _extractInitialContent(Note note) {
     final controller = note.quillController;
     final text = controller.document.toPlainText();
-    return text.length > 50 ? '${text.substring(0, 50)}...' : text;
+    return text;
   }
 
   @override
@@ -68,17 +68,19 @@ class _NoteItemState extends State<NoteItem> {
                 }
               },
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       initialContent,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const Spacer(),
                     Builder(builder: (context) {
                       final updatedAt = note.updatedAt!;
                       final isToday = DateUtils.isSameDay(DateTime.now(), updatedAt);
@@ -90,7 +92,7 @@ class _NoteItemState extends State<NoteItem> {
                           : formatDateAndTime(updatedAt, 'dd/M/yyyy');
                       return FittedBox(
                           child: Text(
-                        'Modified: $lastUpdatedText',
+                        'Updated: $lastUpdatedText',
                         style: theme.textTheme.labelSmall?.copyWith(),
                       ));
                     }),
