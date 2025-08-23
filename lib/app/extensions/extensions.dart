@@ -4,6 +4,7 @@ import 'package:darrt/note/models/folder.dart';
 import 'package:darrt/note/models/note.dart';
 import 'package:darrt/note/ui/notes_page.dart';
 import 'package:darrt/task/models/task.dart';
+import 'package:flutter/material.dart';
 
 extension TaskListExtension on List<Task> {
 
@@ -93,4 +94,10 @@ extension NoteExtension on Note{
   bool containsFolder(Folder folder){
     return folders.any((f) => f.uuid == folder.uuid);
   }
+}
+
+
+extension ContextExtension on BuildContext{
+  ColorScheme get colorScheme => ColorScheme.of(this);
+  TextTheme get textTheme => TextTheme.of(this);
 }
