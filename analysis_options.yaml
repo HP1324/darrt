@@ -10,5 +10,5 @@ formatter:
 
 analyzer:
   plugins:
-    custom-lint
+   - custom_lint
 
