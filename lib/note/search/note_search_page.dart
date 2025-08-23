@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/app/services/object_box.dart';
+import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/note/models/note.dart';
 import 'package:darrt/note/ui/note_item.dart';
 import 'package:darrt/objectbox.g.dart';
@@ -38,9 +39,11 @@ class _NoteSearchPageState extends State<NoteSearchPage> {
     return Padding(
         padding: EdgeInsets.all(10),
       child: Material(
+        color: getSurfaceColor(context),
         child: CustomScrollView(
           slivers: [
             SliverAppBar(
+              backgroundColor: getSurfaceColor(context),
               leading: BackButton(),
               titleSpacing: 0,
               title: TextField(
