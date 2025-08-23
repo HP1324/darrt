@@ -1,294 +1,277 @@
-import 'package:darrt/app/ads/my_banner_ad_widget.dart';
-import 'package:darrt/app/ads/timed_banner_ad_widget.dart';
 import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
-import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/note/search/note_search_page.dart';
 import 'package:darrt/note/ui/add_note_page.dart';
 import 'package:darrt/note/ui/folders_page.dart';
 import 'package:darrt/note/ui/note_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class NotesPage extends StatefulWidget {
+enum NoteFilter { createdAt, updatedAt }
+
+class NoteFilterNotifier extends Notifier<NoteFilter> {
+  @override
+  NoteFilter build() => NoteFilter.createdAt;
+
+  void changeFilter(NoteFilter filter) {
+    state = filter;
+  }
+}
+
+final noteFilterProvider = NotifierProvider<NoteFilterNotifier, NoteFilter>(
+  NoteFilterNotifier.new,
+);
+
+class NotesPage extends ConsumerStatefulWidget {
   const NotesPage({super.key});
 
   @override
-  State<NotesPage> createState() => _NotesPageState();
+  ConsumerState<NotesPage> createState() => _NotesPageState();
 }
 
-enum DateFilterType { createdAt, updatedAt }
-
-class _NotesPageState extends State<NotesPage> {
-  DateFilterType _dateFilterType = DateFilterType.createdAt;
-
-  @override
-  void dispose() {
-    super.dispose();
-    g.noteVm.selectedItemIds.clear();
-  }
-
-  void _showDateFilterBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) => Container(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Group Notes By',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 16),
-            ListTile(
-              leading: Icon(
-                Icons.add_circle_outline,
-                color: _dateFilterType == DateFilterType.createdAt
-                    ? Theme.of(context).colorScheme.primary
-                    : null,
-              ),
-              title: Text('Created Date'),
-              subtitle: Text('Group by when notes were created'),
-              trailing: _dateFilterType == DateFilterType.createdAt
-                  ? Icon(
-                      Icons.check,
-                      color: Theme.of(context).colorScheme.primary,
-                    )
-                  : null,
-              onTap: () {
-                setState(() {
-                  _dateFilterType = DateFilterType.createdAt;
-                });
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.update,
-                color: _dateFilterType == DateFilterType.updatedAt
-                    ? Theme.of(context).colorScheme.primary
-                    : null,
-              ),
-              title: Text('Updated Date'),
-              subtitle: Text('Group by when notes were last modified'),
-              trailing: _dateFilterType == DateFilterType.updatedAt
-                  ? Icon(
-                      Icons.check,
-                      color: Theme.of(context).colorScheme.primary,
-                    )
-                  : null,
-              onTap: () {
-                setState(() {
-                  _dateFilterType = DateFilterType.updatedAt;
-                });
-                Navigator.pop(context);
-              },
-            ),
-            SizedBox(height: 16),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppBarTitle() {
-    return Text(
-      'Notes',
-      style: Theme.of(
-        context,
-      ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-    );
-  }
-
-  List<Widget> _buildAppBarActions() {
-    final ids = g.noteVm.selectedItemIds;
-
-    return [
-      if (ids.isNotEmpty) ...[
-        IconButton(
-          onPressed: () => g.noteVm.clearSelection(),
-          icon: Icon(Icons.cancel),
-          tooltip: 'Clear selection',
-        ),
-        IconButton(
-          onPressed: () async {
-            var message = '';
-            await showDialog(
-              context: context,
-              builder: (innerContext) => AlertDialog(
-                title: const Text('Delete Notes'),
-                content: Text(
-                  'Delete ${ids.length > 1 ? '${ids.length} notes' : '1 note'}?',
-                ),
-                actions: [
-                  FilledButton(
-                    onPressed: () {
-                      message = g.noteVm.deleteMultipleItems();
-                      Navigator.pop(context);
-                      if (mounted) {
-                        showSuccessToast(context, message);
-                      }
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(
-                        ColorScheme.of(context).error,
-                      ),
-                    ),
-                    child: const Text('Delete'),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel'),
-                  ),
-                ],
-              ),
-            );
-          },
-          icon: Icon(Icons.delete),
-          tooltip: 'Delete selected notes',
-        ),
-      ],
-      IconButton(
-        onPressed: () => MiniRouter.to(context, NoteSearchPage()),
-        icon: Icon(Icons.search),
-        tooltip: 'Search notes',
-      ),
-      IconButton(
-        onPressed: _showDateFilterBottomSheet,
-        icon: Icon(Icons.filter_list),
-        tooltip: 'Filter by date',
-      ),
-      IconButton(
-        onPressed: () {
-          g.noteVm.clearSelection();
-          MiniRouter.to(context, FoldersPage());
-        },
-        icon: Icon(Icons.folder_open),
-        tooltip: 'Open folders',
-      ),
-    ];
-  }
+class _NotesPageState extends ConsumerState<NotesPage> {
+  final scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
+    final noteFilter = ref.watch(noteFilterProvider);
+
     return Scaffold(
-      backgroundColor: getSurfaceColor(context),
-      body: ListenableBuilder(
-        listenable: g.noteVm,
-        builder: (context, child) {
-          final notes = g.noteVm.notes;
+      appBar: _NotesPageAppbar(),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: ListenableBuilder(
+          listenable: g.noteVm,
+          builder: (context, child) {
+            final textTheme = TextTheme.of(context);
+            final scheme = ColorScheme.of(context);
+            final notes = g.noteVm.notes;
 
-          final scheme = ColorScheme.of(context);
-          final textTheme = TextTheme.of(context);
-          return CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                backgroundColor: getSurfaceColor(context),
-                leading: BackButton(),
-                titleSpacing: 0,
-                title: _buildAppBarTitle(),
-                pinned: true,
-                actions: _buildAppBarActions(),
-              ),
+            if (notes.isEmpty) return _EmptyNotesIndicator();
 
-              if (notes.isEmpty) ...[
-                _EmptyNotesIndicator(),
-              ] else ...[
-                ...(notes.groupByDate(_dateFilterType).entries.expand((
-                  entry,
-                ) {
-                  final dateLabel = entry.key;
-                  final notesForDate = entry.value;
+            final noteGroups = notes.groupByDate(noteFilter);
 
-                  return [
-                    SliverList(
-                      delegate: SliverChildListDelegate.fixed(
-                        [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                            child: Text(
-                              dateLabel,
-                              style: textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: scheme.primary,
-                              ),
-                            ),
-                          ),
-                        ],
+            return CustomScrollView(
+              controller: scrollController,
+              slivers: [
+                for (var group in noteGroups.entries) ...[
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        group.key,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: scheme.primary,
+                        ),
                       ),
                     ),
-                    // Notes grid for this date
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      sliver: SliverMasonryGrid.count(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        childCount: notesForDate.length,
-                        itemBuilder: (context, index) {
-                          final note = notesForDate[index];
-                          return NoteItem(note: note);
-                        },
-                      ),
+                  ),
+                  SliverGrid.builder(
+                    key: ValueKey(group.key),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                      mainAxisExtent: MediaQuery.sizeOf(context).height * 0.16
                     ),
-                  ];
-                }).toList()),
+                    itemCount: group.value.length,
+                    itemBuilder: (context, index) {
+                      final note = group.value[index];
+                      return NoteItem(note: note);
+                    },
+                  ),
+                ],
+                SliverToBoxAdapter(child: const SizedBox(height: 100)),
               ],
-            ],
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          MiniRouter.to(context, AddNotePage(edit: false));
-        },
-        shape: StadiumBorder(),
-        label: Row(
-          children: [
-            Icon(Icons.add),
-            const SizedBox(width: 8),
-            Text('Write note'),
-          ],
+            );
+          },
         ),
       ),
-
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => MiniRouter.to(context, const AddNotePage(edit: false)),
+        tooltip: 'Add note',
+        elevation: 0,
+        label: Text('Write Note'),
+        shape: StadiumBorder(),
+        icon: Icon(Icons.add),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      bottomNavigationBar: ListenableBuilder(
-        listenable: g.adsController,
-        builder: (context, child) {
-          return TimedBannerAdWidget(
-            showFor: Duration(seconds: 50),
-            hideFor: Duration(seconds: 15),
-            adInitializer: () => g.adsController.initializeNotesPageBannerAd(),
-            childBuilder: () {
-              if (g.adsController.isNotesPageBannerAdLoaded) {
-                return MyBannerAdWidget(
-                  bannerAd: g.adsController.notesPageBannerAd,
-                );
-              }
-              return const SizedBox.shrink();
+    );
+  }
+}
+
+class _NotesPageAppbar extends ConsumerWidget implements PreferredSizeWidget {
+  const _NotesPageAppbar({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListenableBuilder(
+      listenable: g.noteVm,
+      builder: (context, child) {
+        final ids = g.noteVm.selectedItemIds;
+        return AppBar(
+          leading: BackButton(),
+          titleSpacing: 0,
+          title: Text('Notes'),
+          actions: [
+            if (ids.isNotEmpty) ...[
+              IconButton(
+                onPressed: () => g.noteVm.clearSelection(),
+                icon: Icon(Icons.cancel),
+                tooltip: 'Clear selection',
+              ),
+              IconButton(
+                onPressed: () async {
+                  var message = '';
+                  await showDialog(
+                    context: context,
+                    builder: (innerContext) => AlertDialog(
+                      title: const Text('Delete Notes'),
+                      content: Text(
+                        'Delete ${ids.length > 1 ? '${ids.length} notes' : '1 note'}?',
+                      ),
+                      actions: [
+                        FilledButton(
+                          onPressed: () {
+                            message = g.noteVm.deleteMultipleItems();
+                            Navigator.pop(context);
+                            if (context.mounted) {
+                              showSuccessToast(context, message);
+                            }
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStatePropertyAll(
+                              ColorScheme.of(context).error,
+                            ),
+                          ),
+                          child: const Text('Delete'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Cancel'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                icon: Icon(Icons.delete),
+                tooltip: 'Delete selected notes',
+              ),
+            ],
+            IconButton(
+              onPressed: () => MiniRouter.to(context, const NoteSearchPage()),
+              tooltip: 'Search Notes',
+              icon: Icon(Icons.search),
+            ),
+            IconButton(
+              onPressed: () => _showNoteFilterBottomSheet(context),
+              tooltip: 'Filter',
+              icon: Icon(Icons.filter_list),
+            ),
+            IconButton(
+              onPressed: () => MiniRouter.to(context, const FoldersPage()),
+              tooltip: 'Folders',
+              icon: Icon(Icons.folder_open_outlined),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+
+  void _showNoteFilterBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+      ),
+      builder: (context) {
+        return _NoteFilterBottomSheet();
+      },
+    );
+  }
+}
+
+class _NoteFilterBottomSheet extends ConsumerWidget {
+  const _NoteFilterBottomSheet({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scheme = context.colorScheme;
+
+    final textTheme = context.textTheme;
+
+    final noteFilter = ref.watch(noteFilterProvider);
+
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: scheme.onSurface.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Group Notes By',
+            style: textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(height: 16),
+          ListTile(
+            leading: Icon(
+              Icons.add_circle_outline,
+              color: noteFilter == NoteFilter.createdAt ? scheme.primary : null,
+            ),
+            title: Text('Created Date'),
+            subtitle: Text('Group by when notes were created'),
+            trailing: noteFilter == NoteFilter.createdAt
+                ? Icon(
+                    Icons.check,
+                    color: Theme.of(context).colorScheme.primary,
+                  )
+                : null,
+            onTap: () {
+              ref
+                  .read(noteFilterProvider.notifier)
+                  .changeFilter(NoteFilter.createdAt);
+              Navigator.pop(context);
             },
-          );
-        },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.update,
+              color: noteFilter == NoteFilter.updatedAt ? scheme.primary : null,
+            ),
+            title: Text('Updated Date'),
+            subtitle: Text('Group by when notes were last modified'),
+            trailing: noteFilter == NoteFilter.updatedAt
+                ? Icon(
+                    Icons.check,
+                    color: Theme.of(context).colorScheme.primary,
+                  )
+                : null,
+            onTap: () {
+              ref
+                  .read(noteFilterProvider.notifier)
+                  .changeFilter(NoteFilter.updatedAt);
+              Navigator.pop(context);
+            },
+          ),
+          SizedBox(height: 16),
+        ],
       ),
     );
   }
