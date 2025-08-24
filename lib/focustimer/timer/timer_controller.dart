@@ -458,7 +458,7 @@ class TimerController extends ChangeNotifier {
         category: NotificationCategory.Reminder,
         notificationLayout: NotificationLayout.Default,
         wakeUpScreen: false,
-        criticalAlert: true,
+        criticalAlert: false,
         autoDismissible: false,
         locked: true,
       ),
