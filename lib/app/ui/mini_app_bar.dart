@@ -155,7 +155,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Icon(Icons.alarm_add_sharp),
                 ),
               ),
-              if (!kDebugMode)
+              if (kDebugMode)
                 _MiniAppBarAction(
                   key: _popupKey,
                   icon: Icon(Icons.more_vert),
