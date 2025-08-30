@@ -13,6 +13,7 @@ import 'package:darrt/task/ui/add_task_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+@pragma("vm:entry-point")
 class NotificationActionController {
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
