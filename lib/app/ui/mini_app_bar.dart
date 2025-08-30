@@ -101,10 +101,9 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                         child: Text(
                           title,
                           key: ValueKey<DateTime>(selectedDate),
-                          style: textTheme.labelLarge!
-                              .copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: textTheme.labelLarge!.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       );
                     },
@@ -176,7 +175,9 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                             icon: Icon(Icons.handyman),
                             onTap: () async {
                               // await scheduleTestOneOffQuoteNotification();
-                              await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+                              await SystemChrome.setEnabledSystemUIMode(
+                                SystemUiMode.immersiveSticky,
+                              );
                             },
                           ),
                         ),
@@ -208,53 +209,13 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
             ],
           );
-        } else if (value == 1)
-          return AppBar(
-            titleSpacing: 0,
-            backgroundColor: backgroundColor,
-            title: Text('Focus', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-            actions: [
-              _MiniAppBarAction(
-                icon: Container(
-                  padding: EdgeInsets.all(1),
-                  decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withValues(alpha: 0.3),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.question_mark),
-                ),
-                onTap: () async {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(9),
-                        ),
-                        content: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Text(
-                            "If notification permissions are granted, you can see persistent timer notification after enabling it from settings. Go to app's Settings > Timer Settings >Enable \"Show timer as notification in notification bar until ends.\"",
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
-          );
+        }
         return AppBar(
           titleSpacing: 0,
           backgroundColor: backgroundColor,
           title: Text(
             'Categories',
-            style:  textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         );
       },

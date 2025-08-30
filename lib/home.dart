@@ -1,5 +1,6 @@
 import 'package:darrt/app/ads/my_banner_ad_widget.dart';
 import 'package:darrt/app/ads/timed_banner_ad_widget.dart';
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/app/ui/app_drawer.dart';
 import 'package:darrt/app/ui/mini_app_bar.dart';
 import 'package:darrt/app/ui/mini_bottom_nav_bar.dart';
@@ -70,6 +71,7 @@ class _BottomNavBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = context.colorScheme;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -79,7 +81,7 @@ class _BottomNavBarWidget extends StatelessWidget {
             return Container(
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.primary.withAlpha(20),
+                  color: scheme.primary.withAlpha(20),
                   width: 0.5,
                 ),
                 borderRadius: BorderRadius.circular(20),
@@ -95,8 +97,8 @@ class _BottomNavBarWidget extends StatelessWidget {
                   MiniBottomNavBarItem(
                     icon: Icons.psychology_outlined,
                     label: 'Focus',
-                    onTap: () => g.navMan.onDestinationChanged(1),
-                    i: 1,
+                    onTap: () => MiniRouter.to(context, const FocusTimerPage()),
+                    i: -1,
                   ),
                   MiniBottomNavBarItem(
                     icon: Icons.search,
