@@ -392,9 +392,6 @@ class TimerController extends ChangeNotifier {
         });
       } else {
         stopTimer();
-        if (MiniBox().read(mPauseResumeSoundWithTimer) ?? true) {
-          g.audioController.pauseAudio();
-        }
       }
       g.audioController.playSoundOnly('assets/sounds/focus_timer_end.mp3');
       AwesomeNotifications().createNotification(
@@ -416,9 +413,6 @@ class TimerController extends ChangeNotifier {
         });
       } else {
         stopTimer();
-        if (MiniBox().read(mPauseResumeSoundWithTimer) ?? true) {
-          g.audioController.pauseAudio();
-        }
       }
       g.audioController.playSoundOnly('assets/sounds/break_timer_end.mp3');
       AwesomeNotifications().createNotification(
