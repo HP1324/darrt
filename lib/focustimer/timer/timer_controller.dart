@@ -455,7 +455,7 @@ class TimerController extends ChangeNotifier {
         channelKey: timerChannelKey,
         title: title,
         body: 'Time left: $formattedTime',
-        category: NotificationCategory.Reminder,
+        category: NotificationCategory.Service,
         notificationLayout: NotificationLayout.Default,
         wakeUpScreen: false,
         criticalAlert: false,
