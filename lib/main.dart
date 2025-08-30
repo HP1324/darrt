@@ -1,7 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:darrt/app/notification/notification_action_controller.dart';
 import 'package:darrt/helpers/globals.dart' as g;
-import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/home.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
@@ -59,10 +58,11 @@ class Darrt extends StatefulWidget {
   State<Darrt> createState() => _DarrtState();
 }
 
-class _DarrtState extends State<Darrt> {
+class _DarrtState extends State<Darrt> with WidgetsBindingObserver{
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: onActionReceivedMethod,
     );
@@ -70,10 +70,18 @@ class _DarrtState extends State<Darrt> {
 
   @override
   void dispose() {
-    MiniLogger.dp('Main dispose called');
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async{
+    super.didChangeAppLifecycleState(state);
+    if(state == AppLifecycleState.detached){
+      await g.audioController.stopAudioService();
+      await AwesomeNotifications().cancel(999);
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
