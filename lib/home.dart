@@ -27,6 +27,8 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    // Initialize audio controller in Home to avoid audio inconsistencies
+    g.audioController.initialize();
     // g.adsController.initializeHomePageBannerAd();
   }
 
