@@ -1,7 +1,7 @@
 import 'package:darrt/app/services/mini_box.dart';
+import 'package:darrt/focustimer/sound/sound_picker_dialog.dart';
 import 'package:darrt/helpers/consts.dart';
 import 'package:flutter/material.dart';
-import 'package:darrt/focustimer/sound/sound_picker_dialog.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../helpers/globals.dart' as g show audioController;
@@ -107,7 +107,7 @@ class _SoundTabState extends State<SoundTab> {
               ),
             ),
           ),
-          AudioControls(),
+          SafeArea(child: AudioControls()),
         ],
       ),
     );
