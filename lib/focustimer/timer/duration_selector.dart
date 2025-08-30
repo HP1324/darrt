@@ -1,6 +1,7 @@
 // duration_selector.dart
-import 'package:flutter/material.dart';
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/focustimer/timer/timer_controller.dart';
+import 'package:flutter/material.dart';
 
 import '../../helpers/globals.dart' as g show timerController;
 
@@ -9,8 +10,8 @@ class DurationSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = ColorScheme.of(context);
-    final textTheme = Theme.of(context).textTheme;
+    final scheme = context.colorScheme;
+    final textTheme = context.textTheme;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
