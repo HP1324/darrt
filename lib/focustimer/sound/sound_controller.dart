@@ -431,6 +431,10 @@ class SoundController extends ChangeNotifier {
   void playNextSound() => seekToNext();
   void playPreviousSound() => seekToPrevious();
 
+  Future<void> stopAudioService()async{
+    await _audioHandler?.stop();
+  }
+
   @override
   void dispose() {
     _audioPlayer.dispose();
