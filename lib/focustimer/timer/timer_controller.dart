@@ -117,7 +117,6 @@ class TimerController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Modify your existing _resetToDefaults method:
   void _resetToDefaults() {
     _state = TimerState.idle;
     _currentType = TimerType.focus;
@@ -128,7 +127,6 @@ class TimerController extends ChangeNotifier {
     _clearStorage();
   }
 
-  // Modify your existing _clearStorage method:
   void _clearStorage() {
     try {
       MiniBox().remove(_timerStateKey);
