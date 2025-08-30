@@ -4,7 +4,6 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:darrt/app/notification/notification_service.dart';
 import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/app/ui/motivation_dialog.dart';
-import 'package:darrt/app/workmanger/tasks/dialy_quote_notif.dart';
 import 'package:darrt/helpers/consts.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_logger.dart';
@@ -12,6 +11,7 @@ import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/quickreminder/ui/quick_reminder_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
   MiniAppBar({super.key});
@@ -175,7 +175,8 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                           child: _MiniAppBarAction(
                             icon: Icon(Icons.handyman),
                             onTap: () async {
-                              await scheduleTestOneOffQuoteNotification();
+                              // await scheduleTestOneOffQuoteNotification();
+                              await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
                             },
                           ),
                         ),
