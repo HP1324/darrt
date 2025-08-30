@@ -64,7 +64,7 @@ class _DarrtState extends State<Darrt> with WidgetsBindingObserver{
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     AwesomeNotifications().setListeners(
-      onActionReceivedMethod: onActionReceivedMethod,
+      onActionReceivedMethod: NotificationActionController.onActionReceivedMethod,
     );
   }
 
