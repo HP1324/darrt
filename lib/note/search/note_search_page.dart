@@ -20,6 +20,8 @@ class _NoteSearchPageState extends State<NoteSearchPage> {
 
   late final StreamController<String> searchStreamController;
 
+  Timer? debounceTimer;
+
   @override
   void initState() {
     super.initState();
@@ -37,7 +39,7 @@ class _NoteSearchPageState extends State<NoteSearchPage> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.all(10),
+      padding: EdgeInsets.all(10),
       child: Material(
         color: getSurfaceColor(context),
         child: CustomScrollView(
@@ -54,7 +56,10 @@ class _NoteSearchPageState extends State<NoteSearchPage> {
                   border: InputBorder.none,
                 ),
                 onChanged: (value) {
-                  searchStreamController.sink.add(value);
+                  debounceTimer?.cancel();
+                  debounceTimer = Timer(Duration(milliseconds: 150), () {
+                    searchStreamController.sink.add(value);
+                  });
                 },
               ),
             ),
@@ -66,17 +71,19 @@ class _NoteSearchPageState extends State<NoteSearchPage> {
                 final box = ObjectBox().noteBox;
 
                 final List<Note> foundNotes = box
-                    .query(Note_.content.contains(searchQuery, caseSensitive: false))
+                    .query(
+                      Note_.content.contains(searchQuery, caseSensitive: false),
+                    )
                     .build()
                     .find();
 
                 if (foundNotes.isNotEmpty) {
                   return SliverGrid.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                        mainAxisExtent: MediaQuery.sizeOf(context).height * 0.16
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                      mainAxisExtent: MediaQuery.sizeOf(context).height * 0.16,
                     ),
                     itemCount: foundNotes.length,
                     itemBuilder: (context, index) {
@@ -94,7 +101,6 @@ class _NoteSearchPageState extends State<NoteSearchPage> {
     );
   }
 }
-
 
 class _NotesEmptyIndicator extends StatelessWidget {
   const _NotesEmptyIndicator();
