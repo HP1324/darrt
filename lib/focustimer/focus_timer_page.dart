@@ -1,7 +1,6 @@
 import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/focustimer/sound/sound_tab.dart';
 import 'package:darrt/focustimer/timer/focus_timer_tab.dart';
-import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +19,6 @@ class _FocusTimerPageState extends State<FocusTimerPage>
   void initState() {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
-    g.audioController.initialize();
   }
 
   @override
