@@ -1,17 +1,16 @@
 // timer_type_selector.dart
-import 'package:flutter/material.dart';
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/focustimer/timer/timer_controller.dart';
+import 'package:flutter/material.dart';
 
 import '../../helpers/globals.dart' as g show timerController;
 
 class TimerTypeSelector extends StatelessWidget {
-
   const TimerTypeSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
     final scheme = ColorScheme.of(context);
-    final textTheme = Theme.of(context).textTheme;
 
     return Container(
       padding: const EdgeInsets.all(4),
@@ -22,36 +21,27 @@ class TimerTypeSelector extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildTypeButton(
-            context,
-            'Focus',
-            TimerType.focus,
-            scheme,
-            textTheme,
-          ),
+          TypeButton(label: 'Focus', type:TimerType.focus),
           const SizedBox(width: 4),
-          _buildTypeButton(
-            context,
-            'Break',
-            TimerType.timerBreak,
-            scheme,
-            textTheme,
-          ),
+          TypeButton(label: 'Break', type: TimerType.timerBreak),
         ],
       ),
     );
   }
+}
 
-  Widget _buildTypeButton(
-      BuildContext context,
-      String label,
-      TimerType type,
-      ColorScheme scheme,
-      TextTheme textTheme,
-      ) {
+class TypeButton extends StatelessWidget {
+  const TypeButton({super.key, required this.label, required this.type});
+
+  final String label;
+  final TimerType type;
+
+  @override
+  Widget build(BuildContext context) {
     final isSelected = g.timerController.currentType == type;
     final isDisabled = !g.timerController.isIdle;
-
+    final scheme = context.colorScheme;
+    final textTheme = context.textTheme;
     return Material(
       color: isSelected ? scheme.primary : Colors.transparent,
       borderRadius: BorderRadius.circular(8),
