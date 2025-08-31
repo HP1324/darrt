@@ -331,35 +331,22 @@ class TaskCategoriesSection extends StatelessWidget {
     return Expanded(
       child: SizedBox(
         height: 20,
-        child: TaskCategoriesList(task: task),
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          physics: BouncingScrollPhysics(),
+          separatorBuilder: (context, index) => const SizedBox(width: 2),
+          itemCount: task.categories.length,
+          itemBuilder: (context, index) {
+            final category = task.categories[index];
+            return CategoryChip(category: category);
+          },
+        ),
       ),
     );
   }
 }
 
-class TaskCategoriesList extends StatelessWidget {
-  const TaskCategoriesList({
-    super.key,
-    required this.task,
-  });
-
-  final Task task;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      scrollDirection: Axis.horizontal,
-      shrinkWrap: true,
-      physics: BouncingScrollPhysics(),
-      separatorBuilder: (context, index) => const SizedBox(width: 2),
-      itemCount: task.categories.length,
-      itemBuilder: (context, index) {
-        final category = task.categories[index];
-        return CategoryChip(category: category);
-      },
-    );
-  }
-}
 
 class TaskFinishCheckbox extends StatelessWidget {
   const TaskFinishCheckbox({
