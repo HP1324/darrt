@@ -98,8 +98,8 @@ class DateItem extends StatelessWidget {
         builder: (context, child) {
           final bool isSelected = g.calMan.selectedDate == date;
           final bool isToday = DateUtils.isSameDay(date, DateTime.now());
-          final scheme = Theme.of(context).colorScheme;
-
+          final scheme = context.colorScheme;
+          final textTheme = context.textTheme;
           // Determine text and background colors based on states
           Color dayTextColor;
           Color dateBackgroundColor;
@@ -134,7 +134,7 @@ class DateItem extends StatelessWidget {
                 children: [
                   Text(
                     DateFormat('EEE').format(date),
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    style: textTheme.labelSmall?.copyWith(
                       color: dayTextColor,
                       fontWeight: isSelected || isToday ? FontWeight.w600 : FontWeight.normal,
                     ),
@@ -159,7 +159,7 @@ class DateItem extends StatelessWidget {
                     child: Center(
                       child: Text(
                         '${date.day}',
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        style:textTheme.labelMedium?.copyWith(
                           color: dateTextColor,
                           fontWeight: FontWeight.bold,
                         ),
