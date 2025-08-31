@@ -1,10 +1,13 @@
-import 'package:darrt/helpers/utils.dart';
-import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:darrt/app/ads/my_banner_ad_widget.dart';
 import 'package:darrt/app/ads/timed_banner_ad_widget.dart';
-import 'package:darrt/app/state/managers/theme_manager.dart';
+import 'package:darrt/app/extensions/extensions.dart';
+import 'package:darrt/app/theme/theme_controller.dart';
+import 'package:darrt/app/theme/theme_enums.dart';
 import 'package:darrt/helpers/globals.dart' as g;
+import 'package:darrt/helpers/utils.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class ThemeSettingsPage extends StatefulWidget {
   const ThemeSettingsPage({super.key});
@@ -21,10 +24,12 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = context.textTheme;
+    final scheme = context.colorScheme;
     return Scaffold(
       backgroundColor: getSurfaceColor(context),
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(50),
+        backgroundColor: scheme.primary.withAlpha(50),
         title: Text('Theme Colors'),
         elevation: 0,
       ),
@@ -38,7 +43,7 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 'Select Your Theme Color',
-                style: Theme.of(context).textTheme.titleMedium,
+                style: textTheme.titleMedium,
               ),
             ),
             _ColorGrid(),
@@ -46,7 +51,8 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
               listenable: g.adsController,
               builder: (context, child) {
                 return TimedBannerAdWidget(
-                  adInitializer: () => g.adsController.initializeThemePageBannerAd(),
+                  adInitializer: () =>
+                      g.adsController.initializeThemePageBannerAd(),
                   childBuilder: () {
                     if (g.adsController.isThemePageBannerAdLoaded) {
                       return MyBannerAdWidget(
@@ -67,11 +73,16 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
   }
 }
 
-class _ThemeModeSelector extends StatelessWidget {
+class _ThemeModeSelector extends ConsumerWidget {
   const _ThemeModeSelector();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeState = ref.watch(themeControllerProvider);
+
+    final themePreference = themeState.preference;
+
+    final textTheme = context.textTheme;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -80,38 +91,35 @@ class _ThemeModeSelector extends StatelessWidget {
             alignment: Alignment.topLeft,
             child: Text(
               'Theme Mode',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
           const SizedBox(height: 12),
-          ListenableBuilder(
-            listenable: g.themeMan,
-            builder: (context, child) {
-              return SegmentedButton<ThemePreference>(
-                segments: [
-                  ButtonSegment<ThemePreference>(
-                    value: ThemePreference.system,
-                    icon: Icon(Icons.brightness_auto),
-                    label: Text('System'),
-                  ),
-                  ButtonSegment<ThemePreference>(
-                    value: ThemePreference.light,
-                    icon: Icon(Icons.light_mode),
-                    label: Text('Light'),
-                  ),
-                  ButtonSegment<ThemePreference>(
-                    value: ThemePreference.dark,
-                    icon: Icon(Icons.dark_mode),
-                    label: Text('Dark'),
-                  ),
-                ],
-                selected: {g.themeMan.themePreference},
-                onSelectionChanged: (Set<ThemePreference> newSelection) {
-                  g.themeMan.setThemePreference(newSelection.first);
-                },
-              );
+          SegmentedButton<ThemePreference>(
+            segments: [
+              ButtonSegment<ThemePreference>(
+                value: ThemePreference.system,
+                icon: Icon(Icons.brightness_auto),
+                label: Text('System'),
+              ),
+              ButtonSegment<ThemePreference>(
+                value: ThemePreference.light,
+                icon: Icon(Icons.light_mode),
+                label: Text('Light'),
+              ),
+              ButtonSegment<ThemePreference>(
+                value: ThemePreference.dark,
+                icon: Icon(Icons.dark_mode),
+                label: Text('Dark'),
+              ),
+            ],
+            selected: {themePreference},
+            onSelectionChanged: (Set<ThemePreference> newSelection) {
+              ref
+                  .read(themeControllerProvider.notifier)
+                  .setThemePreference(newSelection.first);
             },
           ),
         ],
@@ -120,11 +128,13 @@ class _ThemeModeSelector extends StatelessWidget {
   }
 }
 
-class _ColorGrid extends StatelessWidget {
+class _ColorGrid extends ConsumerWidget {
   const _ColorGrid();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeState = ref.watch(themeControllerProvider);
+    final color = themeState.color;
     return GridView.builder(
       shrinkWrap: true,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -136,12 +146,13 @@ class _ColorGrid extends StatelessWidget {
       itemCount: ThemeColors.values.length,
       itemBuilder: (context, index) {
         final value = ThemeColors.values[index];
-        final isSelected = g.themeMan.selectedColor == value;
+        final isSelected = color == value;
 
         return _ColorOption(
           color: value.color,
           isSelected: isSelected,
-          onTap: () => g.themeMan.setThemeColor(value),
+          onTap: () =>
+              ref.read(themeControllerProvider.notifier).setThemeColor(value),
         );
       },
     );
@@ -174,7 +185,9 @@ class _ColorOption extends StatelessWidget {
               color: color,
               shape: BoxShape.circle,
               border: Border.all(
-                color: isSelected ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Colors.transparent,
                 width: 2,
               ),
               boxShadow: [
@@ -199,7 +212,9 @@ class _ColorOption extends StatelessWidget {
               child: Icon(
                 Icons.check,
                 size: 14,
-                color: color.computeLuminance() > 0.5 ? Colors.white : Colors.black,
+                color: color.computeLuminance() > 0.5
+                    ? Colors.white
+                    : Colors.black,
               ),
             ),
         ],
