@@ -32,7 +32,7 @@ void main() async {
     },
     appRunner: () async{
       final appInitService = providerContainer.read(appInitServiceProvider);
-      await appInitService.initApp();
+      await appInitService.initApp(container: providerContainer);
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
       ]);

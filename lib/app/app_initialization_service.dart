@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:darrt/app/ads/subscription_service.dart';
+import 'package:darrt/app/notification/notification_action_controller.dart';
 import 'package:darrt/app/notification/notification_service.dart';
 import 'package:darrt/app/services/google_sign_in_service.dart';
 import 'package:darrt/app/services/mini_box.dart';
@@ -17,9 +18,12 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 
 class AppInitializationService {
-  Future<void> initApp() async {
+  Future<void> initApp({required ProviderContainer container}) async {
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+    // Initialize the providerContainer here to later use it in NotificationActionController
+    NotificationActionController.providerContainer = container;
 
     await _configureRevenueCatSdk();
     
@@ -77,6 +81,7 @@ class AppInitializationService {
   Future<void> _initNotificationService()async{
     try{
       await NotificationService.init();
+
     }catch (e, t) {
       Sentry.captureException(e, stackTrace: t);
       MiniLogger.e('${e.toString()}, type: ${e.runtimeType}');
