@@ -1,3 +1,4 @@
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/category/ui/category_chip.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
@@ -176,8 +177,8 @@ class TimelineTaskTitle extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([g.calMan, g.taskVm]),
       builder: (context, child) {
-        final textTheme = Theme.of(context).textTheme;
-        final scheme = Theme.of(context).colorScheme;
+        final textTheme = context.textTheme;
+        final scheme = context.colorScheme;
         final date = DateUtils.dateOnly(
           g.calMan.selectedDate,
         ).millisecondsSinceEpoch;
@@ -221,7 +222,7 @@ class TimelineTaskInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final scheme = context.colorScheme;
     return Row(
       children: [
         // Categories
