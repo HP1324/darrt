@@ -1,5 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:darrt/app/notification/notification_action_controller.dart';
+import 'package:darrt/app/theme/theme_controller.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/home.dart';
 import 'package:device_preview/device_preview.dart';
@@ -12,7 +13,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'app/app_initialization_service.dart';
-
 
 void main() async {
   final providerContainer = ProviderContainer();
@@ -30,21 +30,24 @@ void main() async {
       options.attachScreenshot = true;
       options.screenshotQuality = SentryScreenshotQuality.full;
     },
-    appRunner: () async{
+    appRunner: () async {
       final appInitService = providerContainer.read(appInitServiceProvider);
       await appInitService.initApp(container: providerContainer);
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
       ]);
       runApp(
-      SentryWidget(
-        child: DevicePreview(
-          enabled: !kReleaseMode,
-          builder: (context) => UncontrolledProviderScope(container: providerContainer,
-          child: const Darrt()),
+        SentryWidget(
+          child: DevicePreview(
+            enabled: !kReleaseMode,
+            builder: (context) => UncontrolledProviderScope(
+              container: providerContainer,
+              child: const Darrt(),
+            ),
+          ),
         ),
-      ),
-    );}
+      );
+    },
   );
 }
 
@@ -58,13 +61,14 @@ class Darrt extends ConsumerStatefulWidget {
   ConsumerState<Darrt> createState() => _DarrtState();
 }
 
-class _DarrtState extends ConsumerState<Darrt> with WidgetsBindingObserver{
+class _DarrtState extends ConsumerState<Darrt> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     AwesomeNotifications().setListeners(
-      onActionReceivedMethod: NotificationActionController.onActionReceivedMethod,
+      onActionReceivedMethod:
+          NotificationActionController.onActionReceivedMethod,
     );
   }
 
@@ -75,40 +79,38 @@ class _DarrtState extends ConsumerState<Darrt> with WidgetsBindingObserver{
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async{
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
-    if(state == AppLifecycleState.detached){
+    if (state == AppLifecycleState.detached) {
       await g.audioController.stopAudioService();
       await AwesomeNotifications().cancel(999);
     }
   }
+
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: g.themeMan,
-      builder: (context, widget) {
-        final lightTheme = g.themeMan.lightTheme;
-        final darkTheme = g.themeMan.darkTheme;
-        final themeMode = g.themeMan.themeMode;
+    final themeState = ref.watch(themeControllerProvider);
 
-        return MaterialApp(
-          builder: DevicePreview.appBuilder,
-          locale: DevicePreview.locale(context),
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            FlutterQuillLocalizations.delegate,
-          ],
-          navigatorKey: Darrt.navigatorKey,
-          theme: lightTheme,
-          darkTheme: darkTheme,
-          themeMode: themeMode,
-          debugShowCheckedModeBanner: false,
-          title: 'Darrt',
-          home: Home(),
-        );
-      },
+    final lightTheme = themeState.lightTheme;
+    final darkTheme = themeState.darkTheme;
+    final themeMode = themeState.themeMode;
+
+    return MaterialApp(
+      builder: DevicePreview.appBuilder,
+      locale: DevicePreview.locale(context),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        FlutterQuillLocalizations.delegate,
+      ],
+      navigatorKey: Darrt.navigatorKey,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeMode,
+      debugShowCheckedModeBanner: false,
+      title: 'Darrt',
+      home: Home(),
     );
   }
 }
