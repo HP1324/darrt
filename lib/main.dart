@@ -48,17 +48,17 @@ void main() async {
   );
 }
 
-class Darrt extends StatefulWidget {
+class Darrt extends ConsumerStatefulWidget {
   const Darrt({super.key});
 
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
 
   @override
-  State<Darrt> createState() => _DarrtState();
+  ConsumerState<Darrt> createState() => _DarrtState();
 }
 
-class _DarrtState extends State<Darrt> with WidgetsBindingObserver{
+class _DarrtState extends ConsumerState<Darrt> with WidgetsBindingObserver{
   @override
   void initState() {
     super.initState();
