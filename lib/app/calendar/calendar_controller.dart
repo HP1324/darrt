@@ -1,6 +1,6 @@
+import 'package:darrt/app/calendar/calendar_providers.dart';
 import 'package:darrt/app/calendar/calendar_state.dart';
 import 'package:darrt/app/extensions/extensions.dart';
-import 'package:darrt/helpers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -8,21 +8,9 @@ part 'calendar_controller.g.dart';
 
 @riverpod
 class CalendarController extends _$CalendarController {
-  late final List<DateTime> dates;
-
-  final firstDate = getFirstDate();
-  final lastDate = getLastDate();
-
-  late final  ScrollController dateScrollController;
 
   @override
   CalendarState build() {
-    dateScrollController = ScrollController();
-
-    dates = List.generate(
-      lastDate.difference(firstDate).inDays + 1,
-      (index) => firstDate.add(Duration(days: index)),
-    );
 
     return CalendarState(
       selectedDate: DateTime.now(),
@@ -35,10 +23,13 @@ class CalendarController extends _$CalendarController {
     state = state.copyWith(selectedDate: date.dateOnly);
   }
 
-  void scrollToDate(DateTime date) {
+  void scrollToDate(DateTime date, [ScrollController? controller]) {
+    final dates = ref.read(datesProvider);
     final index = dates.indexOf(date.dateOnly);
     if (index != -1) {
-      dateScrollController.animateTo(
+      // ignore: avoid_manual_providers_as_generated_provider_dependency
+      // final controller = ref.read(dateBarControllerProvider);
+      controller?.animateTo(
         index * 43,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -47,3 +38,4 @@ class CalendarController extends _$CalendarController {
     }
   }
 }
+

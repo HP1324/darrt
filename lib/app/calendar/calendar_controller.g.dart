@@ -7,7 +7,7 @@ part of 'calendar_controller.dart';
 // **************************************************************************
 
 String _$calendarControllerHash() =>
-    r'803ecc8fe6ec1da5ee1990b4993357a73032e9d4';
+    r'5573df8b8fa3a45371b030c7de006d0546f9fe85';
 
 /// See also [CalendarController].
 @ProviderFor(CalendarController)
