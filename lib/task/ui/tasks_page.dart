@@ -42,9 +42,21 @@ class _TasksPageState extends State<TasksPage>
         return NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverToBoxAdapter(
-              child: SizedBox(
-                height: MediaQuery.sizeOf(context).height * 0.085,
-                child: ScrollableDateBar(),
+              child: ListenableBuilder(
+                listenable: g.calMan,
+                builder: (context, child) {
+                  final dates = g.calMan.dates;
+                  final selectedDate = g.calMan.selectedDate;
+                  final controller = g.calMan.dateScrollController;
+                  return ScrollableDateBar(
+                    selectedDate: selectedDate,
+                    onDateChanged: (date) {
+                      g.calMan.updateSelectedDate(date);
+                    },
+                    dates: dates,
+                    controller: controller,
+                  );
+                },
               ),
             ),
             SliverPersistentHeader(
