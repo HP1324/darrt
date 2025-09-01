@@ -22,26 +22,33 @@ class TaskStateController extends StateController<TaskState, Task> {
   void initState(bool edit, [Task? task, TaskCategory? category]) {
     textController.text = edit ? task!.title : '';
     final categories = g.catVm.categories;
+
+    final categorySelection = category == null
+        ? edit
+        ? {for (var cat in categories) cat: task!.containsCategory(cat)}
+        : {ObjectBox().categoryBox.generalCategory: true}
+        : {category: true};
+
+    final isRepeating = edit
+        ? task!.isRepeating
+        : g.navMan.currentTab.value == 2
+        ? true
+        : false;
+
+    final repeatConfig = edit && task!.isRepeating
+        ? RepeatConfig.fromJsonString(task.repeatConfig!)
+        : RepeatConfig();
+
     state = TaskState(
-      categorySelection: category == null
-          ? edit
-                ? {for (var cat in categories) cat: task!.containsCategory(cat)}
-                : {ObjectBox().categoryBox.generalCategory: true}
-          : {category: true},
+      categorySelection: categorySelection,
       priority: edit ? task!.priority : priorities[3],
       dueDate: edit ? task!.dueDate : g.calMan.selectedDate,
-      isRepeating: edit
-          ? task!.isRepeating
-          : g.navMan.currentTab.value == 2
-          ? true
-          : false,
+      isRepeating:isRepeating,
       startDate: edit ? task!.startDate : g.calMan.selectedDate,
       endDate: edit ? task!.endDate : null,
       startTime: edit ? task!.startTime : null,
       endTime: edit ? task!.endTime : null,
-      repeatConfig: edit && task!.isRepeating
-          ? RepeatConfig.fromJsonString(task.repeatConfig!)
-          : RepeatConfig(),
+      repeatConfig: repeatConfig,
       notes: edit && task!.notes != null ? Note.notesFromJsonString(task.notes) : null,
       reminders: edit ? task!.reminderObjects : [],
       currentPriority: 3,
