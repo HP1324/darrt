@@ -13,7 +13,7 @@ class CalendarController extends _$CalendarController {
   final firstDate = getFirstDate();
   final lastDate = getLastDate();
 
-  late ScrollController dateScrollController;
+  late final  ScrollController dateScrollController;
 
   @override
   CalendarState build() {
