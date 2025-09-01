@@ -1,11 +1,13 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:darrt/app/state/controllers/state_controller.dart';
 import 'package:darrt/note/models/folder.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'folder_state_controller.freezed.dart';
 
 @freezed
 abstract class FolderState with _$FolderState {
   const factory FolderState({
+    required String name,
     required String color,
     required String icon,
   }) = _FolderState;
@@ -17,6 +19,7 @@ class FolderStateController extends StateController<FolderState, Folder> {
   void initState(bool edit, [Folder? model]) {
     textController.text = edit ? model!.name : '';
     state = FolderState(
+      name: edit ? model!.name : '',
       color: edit ? model!.color : 'primary',
       icon: edit ? model!.icon : 'folder',
     );
@@ -31,7 +34,7 @@ class FolderStateController extends StateController<FolderState, Folder> {
   Folder buildModel({required bool edit, Folder? model}) {
     final folder = model;
     return Folder(
-      name: textController.text,
+      name: name,
       id: edit ? folder!.id : 0,
       uuid: color,
       icon: icon,
@@ -48,9 +51,14 @@ class FolderStateController extends StateController<FolderState, Folder> {
     state = state.copyWith(icon: icon);
     notifyListeners();
   }
+
+  void setName(String value){
+    state = state.copyWith(name: value);
+  }
 }
 
 extension AccessState on FolderStateController {
   String get color => state.color;
   String get icon => state.icon;
+  String get name => state.name;
 }
