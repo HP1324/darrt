@@ -34,4 +34,16 @@ class CalendarController extends _$CalendarController {
     state = state.copyWith(previousSelectedDate: state.selectedDate);
     state = state.copyWith(selectedDate: date.dateOnly);
   }
+
+  void scrollToDate(DateTime date) {
+    final index = dates.indexOf(date.dateOnly);
+    if (index != -1) {
+      dateScrollController.animateTo(
+        index * 43,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+      setSelectedDate(date);
+    }
+  }
 }
