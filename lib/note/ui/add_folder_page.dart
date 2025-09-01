@@ -147,7 +147,7 @@ class _FolderTextFormFieldState extends State<_FolderTextFormField> {
           selectionColor: widget.folderColor.withValues(alpha: 0.35),
         ),
       ),
-      child: TextFormField(
+      child: TextField(
         textCapitalization: TextCapitalization.sentences,
         controller: nameController,
         autofocus: true,
