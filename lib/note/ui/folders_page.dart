@@ -23,7 +23,7 @@ class _FoldersPageState extends State<FoldersPage> {
         builder: (context, child) {
           final folders = g.folderVm.folders;
           return ListView.builder(
-            padding: EdgeInsets.only(bottom: 90),
+            padding: EdgeInsets.only(bottom: 80),
             itemCount: folders.length,
             itemBuilder: (context, index) {
               return FolderItem(folder: folders[index]);
