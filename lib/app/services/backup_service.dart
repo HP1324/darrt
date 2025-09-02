@@ -1,22 +1,23 @@
 import 'dart:convert';
-import 'dart:io' as dart;
-import 'package:archive/archive_io.dart';
 import 'dart:developer' as dev;
-import 'package:googleapis/drive/v3.dart' as drive;
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'dart:io' as dart;
+
+import 'package:archive/archive_io.dart';
 import 'package:darrt/app/exceptions.dart';
 import 'package:darrt/app/services/google_sign_in_service.dart';
+import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/category/models/task_category.dart';
+import 'package:darrt/folder/models/folder.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_logger.dart';
-import 'package:darrt/app/services/object_box.dart';
-import 'package:darrt/task/models/task_completion.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
-import 'package:darrt/note/models/folder.dart';
 import 'package:darrt/note/models/note.dart';
 import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/models/task_completion.dart';
+import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:googleapis_auth/googleapis_auth.dart' as auth show AuthClient;
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 const String backupFileJsonName = 'darrt_backup.json';
 const String backupFileZipName = 'darrt_backup.zip';

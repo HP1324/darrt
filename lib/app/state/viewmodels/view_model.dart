@@ -8,7 +8,7 @@ import 'package:darrt/objectbox.g.dart' show Box;
 import 'package:darrt/task/models/task_completion.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../../note/models/folder.dart';
+import '../../../folder/models/folder.dart';
 import '../../../note/models/note.dart';
 import '../../../task/models/task.dart';
 
@@ -20,8 +20,6 @@ abstract class ViewModel<T> extends ChangeNotifier {
 
   /// Getter for the list of model objects
   List<T> get items => _items;
-
-  set setItems(List<T> items) => _items = items;
 
   /// The ObjectBox store box for database operations
   final _box = ObjectBox().store!.box<T>();

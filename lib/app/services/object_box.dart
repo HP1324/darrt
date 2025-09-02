@@ -1,6 +1,6 @@
 import 'package:darrt/app/services/boxpref.dart';
 import 'package:darrt/category/models/task_category.dart';
-import 'package:darrt/note/models/folder.dart';
+import 'package:darrt/folder/models/folder.dart';
 import 'package:darrt/note/models/note.dart';
 import 'package:darrt/objectbox.g.dart';
 import 'package:darrt/task/models/task.dart';

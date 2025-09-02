@@ -6,8 +6,8 @@ import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/messages.dart';
 import 'package:darrt/helpers/utils.dart';
-import 'package:darrt/note/models/folder.dart';
-import 'package:darrt/note/state/folder_state_controller.dart';
+import 'package:darrt/folder/models/folder.dart';
+import 'package:darrt/folder/state/folder_state_controller.dart';
 import 'package:flutter/material.dart';
 
 class AddFolderPage extends StatefulWidget {

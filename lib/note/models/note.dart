@@ -1,8 +1,8 @@
 import 'dart:convert';
 
+import 'package:darrt/folder/models/folder.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_logger.dart';
-import 'package:darrt/note/models/folder.dart';
 import 'package:flutter/material.dart' show TextSelection;
 import 'package:flutter_quill/flutter_quill.dart' show Document, QuillController;
 import 'package:flutter_quill/quill_delta.dart' show Delta;

@@ -3,9 +3,9 @@ import 'package:darrt/app/state/viewmodels/view_model.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/messages.dart';
 import 'package:darrt/helpers/mini_logger.dart';
-import 'package:darrt/note/models/folder.dart';
+import 'package:darrt/folder/models/folder.dart';
 
-import '../models/note.dart';
+import '../../note/models/note.dart';
 
 class FolderViewModel extends ViewModel<Folder> {
   List<Folder> get folders => items;

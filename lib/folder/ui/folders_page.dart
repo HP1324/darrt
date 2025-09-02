@@ -1,8 +1,8 @@
+import 'package:darrt/folder/ui/add_folder_page.dart';
+import 'package:darrt/folder/ui/folder_item.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/helpers/utils.dart';
-import 'package:darrt/note/ui/add_folder_page.dart';
-import 'package:darrt/note/ui/folder_item.dart';
 import 'package:flutter/material.dart';
 
 class FoldersPage extends StatefulWidget {

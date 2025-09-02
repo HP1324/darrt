@@ -1,3 +1,4 @@
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/helpers/utils.dart' show formatDateAndTime, formatTime;
@@ -31,26 +32,24 @@ class _NoteItemState extends State<NoteItem> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return ListenableBuilder(
       listenable: g.noteVm,
       builder: (context, child) {
+        final scheme = context.colorScheme;
+        final textTheme = context.textTheme;
         final note = g.noteVm.notes.firstWhere((t) => t.id == widget.note.id);
-        initialContent = _extractInitialContent(note);
         final isSelected = g.noteVm.selectedItemIds.contains(widget.note.id);
+
+        initialContent = _extractInitialContent(note);
         return Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: theme.colorScheme.outline.withAlpha(isSelected ? 255 : 60)),
-            color: isSelected ? theme.colorScheme.outline.withAlpha(150) : null,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withValues(alpha: 0.1),
-                spreadRadius: 1,
-                blurRadius: 7,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            border: Border.all(
+              color: scheme.outline.withAlpha(isSelected ? 255 : 60),
+            ),
+            color: isSelected
+                ? scheme.outline.withAlpha(150)
+                : scheme.outline.withAlpha(13),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
@@ -62,7 +61,10 @@ class _NoteItemState extends State<NoteItem> {
               onTap: () {
                 final ids = g.noteVm.selectedItemIds;
                 if (ids.isEmpty) {
-                  MiniRouter.to(context, AddNotePage(edit: true, note: widget.note));
+                  MiniRouter.to(
+                    context,
+                    AddNotePage(edit: true, note: widget.note),
+                  );
                 } else {
                   g.noteVm.toggleSelection(widget.note.id);
                 }
@@ -75,27 +77,33 @@ class _NoteItemState extends State<NoteItem> {
                     Text(
                       initialContent,
                       overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      style: theme.textTheme.bodyMedium?.copyWith(
+                      maxLines: 3,
+                      style: textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const Spacer(),
-                    Builder(builder: (context) {
-                      final updatedAt = note.updatedAt!;
-                      final isToday = DateUtils.isSameDay(DateTime.now(), updatedAt);
-                      final isYesterday = DateUtils.isSameDay(
-                          DateTime.now().subtract(const Duration(days: 1)), updatedAt);
-                      final timeOfDay = TimeOfDay.fromDateTime(updatedAt);
-                      final lastUpdatedText = isToday || isYesterday
-                          ? '${isYesterday ? 'Yesterday' : 'Today'} ${formatTime(timeOfDay)}'
-                          : formatDateAndTime(updatedAt, 'dd/M/yyyy');
-                      return FittedBox(
+                    Builder(
+                      builder: (context) {
+                        final now = DateTime.now();
+                        final updatedAt = note.updatedAt!;
+                        final isToday = updatedAt.isSameDay(now);
+                        final isYesterday = updatedAt.isSameDay(
+                          now.subtract(const Duration(days: 1)),
+                        );
+
+                        final timeOfDay = TimeOfDay.fromDateTime(updatedAt);
+                        final lastUpdatedText = isToday || isYesterday
+                            ? '${isYesterday ? 'Yesterday' : 'Today'} ${formatTime(timeOfDay)}'
+                            : formatDateAndTime(updatedAt, 'dd/M/yyyy');
+                        return FittedBox(
                           child: Text(
-                        'Updated: $lastUpdatedText',
-                        style: theme.textTheme.labelSmall?.copyWith(),
-                      ));
-                    }),
+                            'Updated: $lastUpdatedText',
+                            style: textTheme.labelSmall?.copyWith(),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),

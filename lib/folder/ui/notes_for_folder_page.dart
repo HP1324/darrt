@@ -1,9 +1,9 @@
 import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/app/services/toast_service.dart';
+import 'package:darrt/folder/models/folder.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/icon_color_storage.dart';
 import 'package:darrt/helpers/mini_router.dart';
-import 'package:darrt/note/models/folder.dart';
 import 'package:darrt/note/ui/add_note_page.dart';
 import 'package:darrt/note/ui/note_item.dart';
 import 'package:flutter/material.dart';

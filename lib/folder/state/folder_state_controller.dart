@@ -1,5 +1,5 @@
 import 'package:darrt/app/state/controllers/state_controller.dart';
-import 'package:darrt/note/models/folder.dart';
+import 'package:darrt/folder/models/folder.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'folder_state_controller.freezed.dart';

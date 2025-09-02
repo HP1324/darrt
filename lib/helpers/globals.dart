@@ -6,8 +6,8 @@ import 'package:darrt/category/state/category_state_controller.dart' show Catego
 import 'package:darrt/category/state/category_view_model.dart' show CategoryViewModel;
 import 'package:darrt/focustimer/sound/sound_controller.dart';
 import 'package:darrt/focustimer/timer/timer_controller.dart' show TimerController;
-import 'package:darrt/note/state/folder_state_controller.dart' show FolderStateController;
-import 'package:darrt/note/state/folder_view_model.dart' show FolderViewModel;
+import 'package:darrt/folder/state/folder_state_controller.dart' show FolderStateController;
+import 'package:darrt/folder/state/folder_view_model.dart' show FolderViewModel;
 import 'package:darrt/note/state/note_state_controller.dart';
 import 'package:darrt/note/state/note_view_model.dart' show NoteViewModel;
 import 'package:darrt/note/ui/add_note_page.dart';

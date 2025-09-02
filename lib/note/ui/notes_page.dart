@@ -5,7 +5,7 @@ import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/note/search/note_search_page.dart';
 import 'package:darrt/note/ui/add_note_page.dart';
-import 'package:darrt/note/ui/folders_page.dart';
+import 'package:darrt/folder/ui/folders_page.dart';
 import 'package:darrt/note/ui/note_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

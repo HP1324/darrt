@@ -16,7 +16,7 @@ import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'app/services/boxpref.dart';
 import 'category/models/task_category.dart';
-import 'note/models/folder.dart';
+import 'folder/models/folder.dart';
 import 'note/models/note.dart';
 import 'quickreminder/model/quick_reminder.dart';
 import 'task/models/task.dart';
