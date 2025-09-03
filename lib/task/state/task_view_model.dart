@@ -282,7 +282,6 @@ class TaskViewModel extends ViewModel<Task> {
     MiniLogger.dp('finish stats function called');
     var stats = TaskStats.fromJsonString(task.stats);
     final List<DateTime> updatedCompletions = List<DateTime>.from(stats.completions);
-    final today = DateUtils.dateOnly(DateTime.now());
     if (!updatedCompletions.contains(dateOnly)) {
       updatedCompletions.add(dateOnly);
     }
@@ -292,13 +291,15 @@ class TaskViewModel extends ViewModel<Task> {
     stats.currentStreakLength = 0;
     stats.currentStreakStart = null;
 
+    final now = DateTime.now().dateOnly;
     // Only calculate streak if today is completed
-    if (updatedCompletions.contains(today)) {
+    if (updatedCompletions.contains(now)) {
       int streak = 0;
       DateTime? streakStart;
-
-      for (int i = 0; i < 3000; i++) {
-        final date = today.subtract(Duration(days: i));
+      DateTime date = now;
+      int i = 0;
+      while(!date.isSameDay(getFirstDate())) {
+        date = now.subtract(Duration(days: i));
 
         if (!task.isActiveOn(date)) continue; // skip if task wasn't supposed to run
 
@@ -308,6 +309,7 @@ class TaskViewModel extends ViewModel<Task> {
         } else {
           break; // streak broken
         }
+        ++i;
       }
 
       stats.currentStreakLength = streak;
@@ -325,9 +327,8 @@ class TaskViewModel extends ViewModel<Task> {
 
   void performTaskStatsLogicAfterTaskUnfinish(Task task, DateTime dateOnly) {
     final stats = TaskStats.fromJsonString(task.stats);
-    final List<DateTime> updatedCompletions = List<DateTime>.from(stats.completions);
+    final List<DateTime> updatedCompletions = List.from(stats.completions);
 
-    final today = DateUtils.dateOnly(DateTime.now());
     updatedCompletions.removeWhere((d) => DateUtils.isSameDay(d, dateOnly));
     updatedCompletions.sort((a, b) => a.compareTo(b));
 
@@ -335,14 +336,17 @@ class TaskViewModel extends ViewModel<Task> {
     stats.currentStreakLength = 0;
     stats.currentStreakStart = null;
 
-    // ✅ Only calculate streak if today is still completed
-    if (updatedCompletions.contains(today)) {
+    final now = DateTime.now().dateOnly;
+
+    //  Only calculate streak if today is still completed
+    if (updatedCompletions.contains(now)) {
       int streak = 0;
       DateTime? streakStart;
+      DateTime date = now;
+      int i = 0;
 
-      for (int i = 0; i < 365; i++) {
-        // Max look-back range (e.g., 1 year)
-        final date = today.subtract(Duration(days: i));
+      while(!date.isSameDay(getFirstDate())) {
+        date = now.subtract(Duration(days: i));
 
         if (!task.isActiveOn(date)) continue; // skip if task wasn't supposed to run
 
@@ -352,6 +356,7 @@ class TaskViewModel extends ViewModel<Task> {
         } else {
           break; // streak broken
         }
+        ++i;
       }
 
       stats.currentStreakLength = streak;
