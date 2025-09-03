@@ -5,6 +5,7 @@ import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
 import 'package:darrt/task/completion/task_completion_stream_provider.dart';
 import 'package:darrt/task/models/task.dart';
+import 'package:darrt/task/repository/task_repository_provider.dart';
 import 'package:darrt/task/statistics/stats_page.dart';
 import 'package:darrt/task/ui/add_task_page.dart';
 import 'package:flutter/material.dart';
@@ -369,13 +370,13 @@ class TimelineCheckbox extends ConsumerWidget {
             child: Checkbox(
               value: isCompleted,
               onChanged: (value) {
-                // ref.read(taskRepositoryProvider).toggleStatus(task, value ?? false, selectedDate);
-                g.taskVm.toggleStatus(
-                  task,
-                  value ?? false,
-                  g.calMan.selectedDate,
-                  context,
-                );
+                ref.read(taskRepositoryProvider).toggleStatus(task, value ?? false, selectedDate);
+                // g.taskVm.toggleStatus(
+                //   task,
+                //   value ?? false,
+                //   g.calMan.selectedDate,
+                //   context,
+                // );
               },
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),

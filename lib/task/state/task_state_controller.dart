@@ -40,6 +40,7 @@ class TaskStateController extends StateController<TaskState, Task> {
         : RepeatConfig();
 
     state = TaskState(
+      title: '',
       categorySelection: categorySelection,
       priority: edit ? task!.priority : priorities[3],
       dueDate: edit ? task!.dueDate : g.calMan.selectedDate,

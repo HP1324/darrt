@@ -48,7 +48,7 @@ class TaskRepository {
       final removed = query.remove();
 
       query.close();
-      MiniLogger.d('Completion with id $removed is removed');
+      MiniLogger.d('Completions removed: $removed');
     }
   }
 }

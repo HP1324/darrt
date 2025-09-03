@@ -10,6 +10,7 @@ part 'task_state.freezed.dart';
 @freezed
 abstract class TaskState with _$TaskState {
   const factory TaskState({
+    required String title,
     required Map<TaskCategory, bool> categorySelection,
     required DateTime dueDate,
     required bool isRepeating,

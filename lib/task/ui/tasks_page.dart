@@ -48,7 +48,9 @@ class _TasksPageState extends ConsumerState<TasksPage>
             controller: ref.read(dateBarControllerProvider),
             selectedDate: selectedDate,
             onDateChanged: (date) {
-              ref.read(selectedDateNotifierProvider.notifier).setSelectedDate(date);
+              ref
+                  .read(selectedDateNotifierProvider.notifier)
+                  .setSelectedDate(date);
             },
             dates: dates,
           ),
@@ -148,7 +150,13 @@ class _TaskListState extends ConsumerState<TaskList>
         return Text('Error loading tasks..');
       },
       loading: () {
-        return CircularProgressIndicator();
+        return Center(
+          child: SizedBox(
+            height: 50,
+            width: 50,
+            child: CircularProgressIndicator(),
+          ),
+        );
       },
     );
   }

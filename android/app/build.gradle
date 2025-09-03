@@ -79,8 +79,8 @@ android {
         }
         release {
             signingConfig = signingConfigs.release
-            minifyEnabled true // Shrinks unused code
-            shrinkResources true // Shrinks unused resources
+//            minifyEnabled true // Shrinks unused code
+//            shrinkResources true // Shrinks unused resources
         }
     }
 
