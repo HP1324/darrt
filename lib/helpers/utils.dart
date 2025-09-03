@@ -46,7 +46,7 @@ String formatDateAndTime(DateTime dateTime, String format) {
   return DateFormat(format).add_jm().format(dateTime);
 }
 
-DateTime getFirstDate() => mInitialDate;
+DateTime getFirstDate() => DateTime(2015,1,1);
 
 DateTime getMaxDate() {
   return DateTime.now().add(Duration(days: maxExtentDateDays));
