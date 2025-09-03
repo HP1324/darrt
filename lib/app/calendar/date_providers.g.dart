@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'calendar_providers.dart';
+part of 'date_providers.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -23,5 +23,22 @@ final datesProvider = AutoDisposeProvider<List<DateTime>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef DatesRef = AutoDisposeProviderRef<List<DateTime>>;
+String _$selectedDateNotifierHash() =>
+    r'5f5ab6987b513b8e42c2bfd3b40cfade201bb28a';
+
+/// See also [SelectedDateNotifier].
+@ProviderFor(SelectedDateNotifier)
+final selectedDateNotifierProvider =
+    AutoDisposeNotifierProvider<SelectedDateNotifier, CalendarState>.internal(
+      SelectedDateNotifier.new,
+      name: r'selectedDateNotifierProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$selectedDateNotifierHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$SelectedDateNotifier = AutoDisposeNotifier<CalendarState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
