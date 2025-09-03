@@ -43,7 +43,7 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                       child: CalendarDatePicker(
                         initialDate: DateTime.now(),
                         firstDate: getFirstDate(),
-                        lastDate: getMaxDate(),
+                        lastDate: getLastDate(),
                         onDateChanged: (selectedDate) {
                           final date = DateUtils.dateOnly(selectedDate);
                           g.calMan.scrollToDate(date);

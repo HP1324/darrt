@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/app/ui/icon_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -48,8 +49,8 @@ String formatDateAndTime(DateTime dateTime, String format) {
 
 DateTime getFirstDate() => DateTime(2015,1,1);
 
-DateTime getMaxDate() {
-  return DateTime.now().add(Duration(days: maxExtentDateDays));
+DateTime getLastDate() {
+  return DateTime.now().add(Duration(days: maxExtentDateDays)).dateOnly;
 }
 
 Future<List<pw.Font>> loadAllFonts() async {

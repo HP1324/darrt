@@ -685,7 +685,7 @@ class WeeklyChart extends StatelessWidget {
 
   List<Map<String, dynamic>> _getWeeklyData() {
     final startDate = task.startDate;
-    final endDate = task.endDate ?? getMaxDate();
+    final endDate = task.endDate ?? getLastDate();
     final weeks = <Map<String, dynamic>>[];
     DateTime currentWeek = _getStartOfWeek(startDate);
 
@@ -927,7 +927,7 @@ class MonthlyChart extends StatelessWidget {
 
   List<Map<String, dynamic>> _getMonthlyData() {
     final startDate = task.startDate;
-    final endDate = task.endDate ?? getMaxDate();
+    final endDate = task.endDate ?? getLastDate();
     final months = <Map<String, dynamic>>[];
     DateTime currentMonth = DateTime(startDate.year, startDate.month, 1);
 
@@ -1155,7 +1155,7 @@ class YearlyChart extends StatelessWidget {
 
   List<Map<String, dynamic>> _getYearlyData() {
     final startDate = task.startDate;
-    final endDate = task.endDate ?? getMaxDate();
+    final endDate = task.endDate ?? getLastDate();
     final years = <Map<String, dynamic>>[];
     int currentYear = startDate.year;
 

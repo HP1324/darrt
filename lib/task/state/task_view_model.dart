@@ -100,28 +100,35 @@ class TaskViewModel extends ViewModel<Task> {
     if (task.isRepeating) {
       final dateOnly = DateUtils.dateOnly(d);
       //Can't mark finished if it's tomorrow or later
-      if (!dateOnly.isAfter(DateUtils.dateOnly(DateTime.now()))) {
-        final date = dateOnly.millisecondsSinceEpoch;
+      if (!dateOnly.isAfter(DateTime.now().dateOnly)) {
+        final dateMs = dateOnly.millisecondsSinceEpoch;
         if (value) {
-          final completion = TaskCompletion(date: DateUtils.dateOnly(d), isDone: value);
+          final completion = TaskCompletion(date: dateOnly, isDone: value);
+
           completion.task.target = task;
           completion.taskUuid = completion.task.target!.uuid;
+
           // here we need to merge completion uuid with its task's uuid, because, only giving date as uuid causes problem, that problem is that more than one completions can have same date, hence same uuid, so they will be considered duplicate in backup and restore, while in reality they are not duplicate.
           completion.uuid = '${completion.uuid}${completion.taskUuid}';
+
           MiniLogger.dp('Completion uuid: ${completion.uuid!}');
           MiniLogger.dp('Completion task uuid: ${completion.taskUuid!}');
+
           _completionBox.put(completion);
-          repeatingTaskCompletions.putIfAbsent(task.id, () => {}).add(date);
+
+          repeatingTaskCompletions.putIfAbsent(task.id, () => {}).add(dateMs);
+
           performTaskStatsLogicAfterTaskFinish(task, dateOnly, context);
+
           g.audioController.playSoundOnly('assets/sounds/bell_sound.mp3');
         } else {
           final query = _completionBox
-              .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(date)))
+              .query(TaskCompletion_.task.equals(task.id).and(TaskCompletion_.date.equals(dateMs)))
               .build();
           final removed = query.remove();
           query.close();
           MiniLogger.d('removed $removed completions for task ${task.id}');
-          repeatingTaskCompletions[task.id]?.remove(date);
+          repeatingTaskCompletions[task.id]?.remove(dateMs);
           performTaskStatsLogicAfterTaskUnfinish(task, dateOnly);
         }
       }
@@ -296,16 +303,18 @@ class TaskViewModel extends ViewModel<Task> {
     final now = DateTime.now().dateOnly;
     // Only calculate streak if today is completed
     if (updatedCompletions.contains(now)) {
+      print('if updatedCompletions condition');
       int streak = 0;
       DateTime? streakStart;
       DateTime date = now;
       int i = 0;
       while(!date.isSameDay(getFirstDate())) {
+        print('Current loop round: $i');
         date = now.subtract(Duration(days: i));
 
-        if (!task.isActiveOn(date)) continue; // skip if task wasn't supposed to run
+        // if (!task.isActiveOn(date)) continue; // skip if task wasn't supposed to run
 
-        if (updatedCompletions.any((d) => DateUtils.isSameDay(d, date))) {
+        if (updatedCompletions.any((d) => d.isSameDay(date))) {
           streak += 1;
           streakStart = date;
         } else {
@@ -385,7 +394,7 @@ class TaskViewModel extends ViewModel<Task> {
 
     for (final date in completions) {
       final d = DateUtils.dateOnly(date);
-      if (!task.isActiveOn(d)) continue;
+      // if (!task.isActiveOn(d)) continue;
 
       if (currentSegment.isEmpty) {
         currentSegment.add(d);

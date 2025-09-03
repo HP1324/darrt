@@ -36,6 +36,7 @@ class AddNotePage extends StatefulWidget {
   final Folder? folder;
   final bool? isTaskNote;
   final Task? task;
+
   @override
   State<AddNotePage> createState() => _AddNotePageState();
 }
@@ -44,7 +45,11 @@ class _AddNotePageState extends State<AddNotePage> {
   @override
   void initState() {
     super.initState();
-    g.noteSc.initState(widget.edit, widget.edit ? widget.note : null, widget.folder);
+    g.noteSc.initState(
+      widget.edit,
+      widget.edit ? widget.note : null,
+      widget.folder,
+    );
     g.adsController.initializeFullPageAdOnAddNotePagePop();
   }
 
@@ -56,7 +61,7 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 
   Future<void> showFullPageAd() async {
-    if(g.adsController.isFullPageOnAddNotePagePopAdLoaded) {
+    if (g.adsController.isFullPageOnAddNotePagePopAdLoaded) {
       final popCount = MiniBox().read('add_note_pop_count') ?? 1;
       if (popCount % 2 == 0) {
         MiniLogger.dp("pop count $popCount");
@@ -133,7 +138,8 @@ class _AddNotePageState extends State<AddNotePage> {
                 return TimedBannerAdWidget(
                   hideFor: Duration(seconds: 10),
                   showFor: Duration(seconds: 35),
-                  adInitializer: () => g.adsController.initializeAddNotePageBannerAd(),
+                  adInitializer: () =>
+                      g.adsController.initializeAddNotePageBannerAd(),
                   childBuilder: () {
                     if (g.adsController.isAddNotePageBannerAdLoaded) {
                       return MyBannerAdWidget(
@@ -158,7 +164,9 @@ class _AddNotePageState extends State<AddNotePage> {
               heroTag: null,
               onPressed: () => _handleSpeechToText(context),
               tooltip: 'Speak to write note',
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
               foregroundColor: Theme.of(context).colorScheme.surface,
               backgroundColor: Theme.of(context).colorScheme.onSurface,
               child: Icon(Icons.mic),
@@ -210,20 +218,25 @@ class _AddNotePageState extends State<AddNotePage> {
       } else {
         message = Messages.mNoteEmpty;
       }
-      if(message == Messages.mNoteEmpty) showErrorToast(context, message);
-      else showSuccessToast(context, message);
-      
+      if (message == Messages.mNoteEmpty)
+        showErrorToast(context, message);
+      else
+        showSuccessToast(context, message);
     }
   }
 
-  void showMicrophonePermissionDeniedToast() => showErrorToast(context, 'All requested permissions are necessary for speech recognition');
-  Future<void> _handleSpeechToText(BuildContext context) async {
+  void showMicrophonePermissionDeniedToast() => showErrorToast(
+    context,
+    'All requested permissions are necessary for speech recognition',
+  );
 
+  Future<void> _handleSpeechToText(BuildContext context) async {
     // Check permission status first using permission_handler
     final micPermissionStatus = await Permission.microphone.status;
     final nearbyDevicesStatus = await Permission.bluetoothConnect.status;
 
-    bool allPermissionsGranted = micPermissionStatus.isGranted && (nearbyDevicesStatus.isGranted);
+    bool allPermissionsGranted =
+        micPermissionStatus.isGranted && (nearbyDevicesStatus.isGranted);
 
     if (allPermissionsGranted) {
       MiniLogger.d('All required permissions are granted');
@@ -256,7 +269,8 @@ class _AddNotePageState extends State<AddNotePage> {
         // Request nearby devices permission (for Bluetooth headsets)
         final nearbyResult = await Permission.bluetoothConnect.request();
 
-        bool permissionsGranted = micResult.isGranted && (nearbyResult.isGranted);
+        bool permissionsGranted =
+            micResult.isGranted && (nearbyResult.isGranted);
 
         if (permissionsGranted) {
           MiniLogger.d('Permissions granted on first request');
@@ -282,7 +296,8 @@ class _AddNotePageState extends State<AddNotePage> {
           final micResult = await Permission.microphone.request();
           final nearbyResult = await Permission.bluetoothConnect.request();
 
-          bool permissionsGranted = micResult.isGranted && (nearbyResult.isGranted);
+          bool permissionsGranted =
+              micResult.isGranted && (nearbyResult.isGranted);
 
           if (permissionsGranted) {
             MiniLogger.d('Permissions granted on second request');
@@ -299,7 +314,9 @@ class _AddNotePageState extends State<AddNotePage> {
             showMicrophonePermissionDeniedToast();
           }
         } else {
-          MiniLogger.d('Permissions denied multiple times, showing settings dialog');
+          MiniLogger.d(
+            'Permissions denied multiple times, showing settings dialog',
+          );
           if (context.mounted) {
             showSettingsDialog(context);
           }
@@ -312,66 +329,42 @@ class _AddNotePageState extends State<AddNotePage> {
 class NotesQuillToolbar extends StatelessWidget {
   const NotesQuillToolbar({super.key});
 
-  // Map<String,String> fontSizes = {};
+  Map<String, String> _getFontSizeMap() {
+    return {
+      'Clear': '0',
+      for (var i = 1; i <= 48; i++) '$i': '$i',
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
-    final fontSizeMap = {
-      'Clear': '0',
-      '1': '1',
-      '2': '2',
-      '3': '3',
-      '4': '4',
-      '5': '5',
-      '6': '6',
-      '7': '7',
-      '8': '8',
-      '9': '9',
-      '10': '10',
-      '12': '12',
-      '14': '14',
-      '16': '16',
-      '18': '18',
-      '20': '20',
-      '22': '22',
-      '24': '24',
-      '26': '26',
-      '28': '28',
-      '30': '30',
-      '32': '32',
-      '34': '34',
-      '36': '36',
-      '38': '38',
-      '40': '40',
-      '42': '42',
-      '44': '44',
-      '46': '46',
-      '48': '48',
-      '50': '50',
-      '52': '52',
-      '54': '54',
-      '56': '56',
-      '58': '58',
-      '60': '60',
-    };
     return QuillSimpleToolbar(
       controller: g.noteSc.controller,
       config: QuillSimpleToolbarConfig(
         multiRowsDisplay: false,
         toolbarIconAlignment: WrapAlignment.start,
         buttonOptions: QuillSimpleToolbarButtonOptions(
-          selectHeaderStyleDropdownButton: QuillToolbarSelectHeaderStyleDropdownButtonOptions(
-            attributes: [
-              Attribute.h1,
-              Attribute.h2,
-              Attribute.h3,
-              Attribute.h4,
-              Attribute.h5,
-              Attribute.h6,
-            ],
+          selectHeaderStyleDropdownButton:
+              QuillToolbarSelectHeaderStyleDropdownButtonOptions(
+                attributes: [
+                  Attribute.h1,
+                  Attribute.h2,
+                  Attribute.h3,
+                  Attribute.h4,
+                  Attribute.h5,
+                  Attribute.h6,
+                ],
+              ),
+          fontFamily: QuillToolbarFontFamilyButtonOptions(
+            attribute: Attribute.font,
           ),
-          fontFamily: QuillToolbarFontFamilyButtonOptions(attribute: Attribute.font),
-          fontSize: QuillToolbarFontSizeButtonOptions(items: fontSizeMap, initialValue: '16'),
-          codeBlock: QuillToolbarToggleStyleButtonOptions(iconData: FontAwesomeIcons.solidFileCode),
+          fontSize: QuillToolbarFontSizeButtonOptions(
+            items: _getFontSizeMap(),
+            initialValue: '16',
+          ),
+          codeBlock: QuillToolbarToggleStyleButtonOptions(
+            iconData: FontAwesomeIcons.solidFileCode,
+          ),
         ),
       ),
     );
@@ -393,34 +386,45 @@ class NotesQuillEditor extends StatelessWidget {
           controller: g.noteSc.controller,
           focusNode: g.noteSc.focusNode,
           config: QuillEditorConfig(
+            padding: EdgeInsets.only(bottom: 200),
             contextMenuBuilder: (context, editableTextState) {
-              final TextSelectionToolbarAnchors anchors = editableTextState.contextMenuAnchors;
+              final TextSelectionToolbarAnchors anchors =
+                  editableTextState.contextMenuAnchors;
 
               return AdaptiveTextSelectionToolbar(
                 // Position below text
                 anchors: TextSelectionToolbarAnchors(
                   primaryAnchor: anchors.primaryAnchor + const Offset(0, 80),
-                  secondaryAnchor: anchors.secondaryAnchor! + const Offset(0, 80),
+                  secondaryAnchor:
+                      anchors.secondaryAnchor! + const Offset(0, 80),
                 ),
                 children: [
                   // Your custom toolbar buttons
                   TextSelectionToolbarTextButton(
-                    onPressed: () => editableTextState.cutSelection(SelectionChangedCause.toolbar),
+                    onPressed: () => editableTextState.cutSelection(
+                      SelectionChangedCause.toolbar,
+                    ),
                     padding: TextSelectionToolbarTextButton.getPadding(0, 4),
                     child: const Text('Cut'),
                   ),
                   TextSelectionToolbarTextButton(
-                    onPressed: () => editableTextState.copySelection(SelectionChangedCause.toolbar),
+                    onPressed: () => editableTextState.copySelection(
+                      SelectionChangedCause.toolbar,
+                    ),
                     padding: TextSelectionToolbarTextButton.getPadding(0, 4),
                     child: const Text('Copy'),
                   ),
                   TextSelectionToolbarTextButton(
-                    onPressed: () => editableTextState.pasteText(SelectionChangedCause.toolbar),
+                    onPressed: () => editableTextState.pasteText(
+                      SelectionChangedCause.toolbar,
+                    ),
                     padding: TextSelectionToolbarTextButton.getPadding(0, 4),
                     child: const Text('Paste'),
                   ),
                   TextSelectionToolbarTextButton(
-                    onPressed: () => editableTextState.selectAll(SelectionChangedCause.toolbar),
+                    onPressed: () => editableTextState.selectAll(
+                      SelectionChangedCause.toolbar,
+                    ),
                     padding: TextSelectionToolbarTextButton.getPadding(0, 4),
                     child: const Text('Select All'),
                   ),
@@ -433,11 +437,17 @@ class NotesQuillEditor extends StatelessWidget {
             textCapitalization: TextCapitalization.sentences,
             customStyles: DefaultStyles(
               inlineCode: InlineCodeStyle(
-                style: textTheme.labelMedium!.copyWith(fontFamily: 'SourceCodePro', color: scheme.onSurfaceVariant),
+                style: textTheme.labelMedium!.copyWith(
+                  fontFamily: 'SourceCodePro',
+                  color: scheme.onSurfaceVariant,
+                ),
                 backgroundColor: scheme.surfaceContainerHighest,
               ),
               code: DefaultTextBlockStyle(
-                textTheme.labelMedium!.copyWith(fontFamily: 'SourceCodePro', color: scheme.onSurfaceVariant),
+                textTheme.labelMedium!.copyWith(
+                  fontFamily: 'SourceCodePro',
+                  color: scheme.onSurfaceVariant,
+                ),
                 HorizontalSpacing(5, 5),
                 VerticalSpacing(10, 10),
                 VerticalSpacing(5, 5),
@@ -466,9 +476,12 @@ class SaveNotePdfButton extends StatelessWidget {
           showErrorToast(context, Messages.mNoteEmpty);
           return;
         }
-        await savePdfToDownloads(file, 'DarrtNote${DateTime.now().millisecondsSinceEpoch.remainder(100000)}.pdf');
+        await savePdfToDownloads(
+          file,
+          'DarrtNote${DateTime.now().millisecondsSinceEpoch.remainder(100000)}.pdf',
+        );
         if (context.mounted) {
-          showSuccessToast(context,'PDF saved to device');
+          showSuccessToast(context, 'PDF saved to device');
         }
       },
       icon: const Icon(FontAwesomeIcons.filePdf),
@@ -493,67 +506,75 @@ class FolderSelector extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          children: [
-            const SizedBox(height: 8),
-            ListTile(
-              onTap: () => MiniRouter.to(context, AddFolderPage(edit: false)),
-              title: const Text(
-                'Create New Folder',
-                style: TextStyle(fontWeight: FontWeight.w500),
+      builder: (context) => SafeArea(
+        child: Container(
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 8),
+              ListTile(
+                onTap: () => MiniRouter.to(context, AddFolderPage(edit: false)),
+                title: const Text(
+                  'Create New Folder',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.add),
+                ),
+                trailing: const Icon(Icons.list_alt),
               ),
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
-                child: const Icon(Icons.add),
-              ),
-              trailing: const Icon(Icons.list_alt),
-            ),
-            Expanded(
-              child: Scrollbar(
-                thickness: 8,
-                radius: const Radius.circular(4),
-                child: ListenableBuilder(
-                  listenable: Listenable.merge([g.noteSc, g.folderVm]),
-                  builder: (context, child) => ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    itemCount: g.folderVm.folders.length,
-                    itemBuilder: (_, index) {
-                      final folder = g.folderVm.folders[index];
-                      final map = g.noteSc.folderSelection;
-                      return ListTile(
-                        selected: map[folder] ?? false,
-                        selectedColor: IconColorStorage.colors[folder.color],
-                        leading: Icon(IconColorStorage.flattenedIcons[folder.icon]),
-                        trailing: Checkbox(
-                          fillColor: WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return IconColorStorage.colors[folder.color];
-                            }
-                            return null;
-                          }),
-                          value: map[folder] ?? false,
-                          onChanged: (selected) {
-                            if (selected != null) {
-                              g.noteSc.setFolder(folder, selected);
-                            }
-                          },
-                        ),
-                        title: Text(
-                          folder.name,
-                          style: const TextStyle(overflow: TextOverflow.ellipsis),
-                        ),
-                      );
-                    },
+              Expanded(
+                child: Scrollbar(
+                  thickness: 8,
+                  radius: const Radius.circular(4),
+                  child: ListenableBuilder(
+                    listenable: Listenable.merge([g.noteSc, g.folderVm]),
+                    builder: (context, child) => ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      itemCount: g.folderVm.folders.length,
+                      itemBuilder: (_, index) {
+                        final folder = g.folderVm.folders[index];
+                        final map = g.noteSc.folderSelection;
+                        return ListTile(
+                          selected: map[folder] ?? false,
+                          selectedColor: IconColorStorage.colors[folder.color],
+                          leading: Icon(
+                            IconColorStorage.flattenedIcons[folder.icon],
+                          ),
+                          trailing: Checkbox(
+                            fillColor: WidgetStateProperty.resolveWith((states) {
+                              if (states.contains(WidgetState.selected)) {
+                                return IconColorStorage.colors[folder.color];
+                              }
+                              return null;
+                            }),
+                            value: map[folder] ?? false,
+                            onChanged: (selected) {
+                              if (selected != null) {
+                                g.noteSc.setFolder(folder, selected);
+                              }
+                            },
+                          ),
+                          title: Text(
+                            folder.name,
+                            style: const TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -570,7 +591,8 @@ class NoteSttController extends ChangeNotifier {
 
   void startListening() async {
     final quillController = g.noteSc.controller;
-    originalCursorPosition = quillController.selection.baseOffset; // Store cursor position
+    originalCursorPosition =
+        quillController.selection.baseOffset; // Store cursor position
     speechFinalized = '';
     currentLiveSpeech = '';
     previousSpeechLength = 0;
@@ -594,6 +616,7 @@ class NoteSttController extends ChangeNotifier {
   String speechFinalized = '';
   String currentLiveSpeech = '';
   int previousSpeechLength = 0;
+
   void onSpeechResult(SpeechRecognitionResult result) {
     final quillController = g.noteSc.controller;
     currentLiveSpeech = result.recognizedWords.trim();
@@ -621,7 +644,9 @@ class NoteSttController extends ChangeNotifier {
           originalCursorPosition,
           previousSpeechLength,
           combinedSpeechText,
-          TextSelection.collapsed(offset: originalCursorPosition + combinedSpeechText.length),
+          TextSelection.collapsed(
+            offset: originalCursorPosition + combinedSpeechText.length,
+          ),
         );
       } else {
         // Insert the speech text at cursor position
@@ -629,7 +654,9 @@ class NoteSttController extends ChangeNotifier {
           originalCursorPosition,
           0,
           combinedSpeechText,
-          TextSelection.collapsed(offset: originalCursorPosition + combinedSpeechText.length),
+          TextSelection.collapsed(
+            offset: originalCursorPosition + combinedSpeechText.length,
+          ),
         );
       }
 
@@ -637,7 +664,8 @@ class NoteSttController extends ChangeNotifier {
       previousSpeechLength = combinedSpeechText.length;
 
       // Set cursor at the end of the inserted text
-      final newCursorPosition = originalCursorPosition + combinedSpeechText.length;
+      final newCursorPosition =
+          originalCursorPosition + combinedSpeechText.length;
       quillController.updateSelection(
         TextSelection.collapsed(offset: newCursorPosition),
         ChangeSource.local,

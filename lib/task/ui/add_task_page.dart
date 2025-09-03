@@ -666,7 +666,7 @@ class EasyReminderActions extends StatelessWidget {
         g.taskSc.startTime!.subtract(Duration(minutes: minutes)),
       );
     }
-    reminder = Reminder(time: reminderTime);
+    reminder = Reminder(time: reminderTime, type: MiniBox().read(mDefaultReminderType));
     return reminder;
   }
 }
@@ -688,7 +688,7 @@ class DuedateSelector extends StatelessWidget {
               context: context,
               initialDate: g.taskSc.dueDate,
               firstDate: getFirstDate(),
-              lastDate: getMaxDate(),
+              lastDate: getLastDate(),
             );
             if (date != null) {
               g.taskSc.setDueDate(date);
@@ -895,7 +895,7 @@ class DateRangeSelector extends StatelessWidget {
                     context: context,
                     initialDate: g.taskSc.startDate,
                     firstDate: getFirstDate(),
-                    lastDate: getMaxDate(),
+                    lastDate: getLastDate(),
                   );
                   if (date != null) {
                     g.taskSc.setStartDate(date);
@@ -917,7 +917,7 @@ class DateRangeSelector extends StatelessWidget {
                     context: context,
                     initialDate: g.taskSc.endDate,
                     firstDate: g.taskSc.startDate.add(Duration(days: 1)),
-                    lastDate: getMaxDate(),
+                    lastDate: getLastDate(),
                   );
                   if (date != null) {
                     g.taskSc.setEndDate(date);

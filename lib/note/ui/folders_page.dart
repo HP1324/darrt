@@ -1,9 +1,9 @@
-import 'package:darrt/helpers/utils.dart';
-import 'package:flutter/material.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/note/ui/add_folder_page.dart';
 import 'package:darrt/note/ui/folder_item.dart';
+import 'package:flutter/material.dart';
 
 class FoldersPage extends StatefulWidget {
   const FoldersPage({super.key});
@@ -23,6 +23,7 @@ class _FoldersPageState extends State<FoldersPage> {
         builder: (context, child) {
           final folders = g.folderVm.folders;
           return ListView.builder(
+            padding: EdgeInsets.only(bottom: 90),
             itemCount: folders.length,
             itemBuilder: (context, index) {
               return FolderItem(folder: folders[index]);
