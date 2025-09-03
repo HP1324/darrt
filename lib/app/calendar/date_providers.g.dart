@@ -24,7 +24,7 @@ final datesProvider = AutoDisposeProvider<List<DateTime>>.internal(
 // ignore: unused_element
 typedef DatesRef = AutoDisposeProviderRef<List<DateTime>>;
 String _$selectedDateNotifierHash() =>
-    r'5f5ab6987b513b8e42c2bfd3b40cfade201bb28a';
+    r'75d371637fc7927964bd5d4455c380ce3f28407e';
 
 /// See also [SelectedDateNotifier].
 @ProviderFor(SelectedDateNotifier)
