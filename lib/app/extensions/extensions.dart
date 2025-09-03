@@ -101,3 +101,9 @@ extension ContextExtension on BuildContext{
   ColorScheme get colorScheme => ColorScheme.of(this);
   TextTheme get textTheme => TextTheme.of(this);
 }
+
+extension DateExtension on DateTime{
+  DateTime get dateOnly => DateUtils.dateOnly(this);
+
+  bool isSameDay(DateTime date) => DateUtils.isSameDay(date, this);
+}
