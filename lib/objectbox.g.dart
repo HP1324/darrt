@@ -21,6 +21,7 @@ import 'note/models/note.dart';
 import 'quickreminder/model/quick_reminder.dart';
 import 'task/completion/task_completion.dart';
 import 'task/models/task.dart';
+import 'task/models/task_completion.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -152,7 +153,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(3, 2058329802195215529),
     name: 'TaskCompletion',
-    lastPropertyId: const obx_int.IdUid(6, 1722549919444422731),
+    lastPropertyId: const obx_int.IdUid(7, 4722616572789091526),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -185,6 +186,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(6, 1722549919444422731),
         name: 'taskUuid',
         type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 4722616572789091526),
+        name: 'isDone',
+        type: 1,
         flags: 0,
       ),
     ],
@@ -675,12 +682,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final taskUuidOffset = object.taskUuid == null
             ? null
             : fbb.writeString(object.taskUuid!);
-        fbb.startTable(7);
+        fbb.startTable(8);
         fbb.addInt64(0, object.id);
         fbb.addInt64(1, object.date.millisecondsSinceEpoch);
         fbb.addInt64(3, object.task.targetId);
         fbb.addOffset(4, uuidOffset);
         fbb.addOffset(5, taskUuidOffset);
+        fbb.addBool(6, object.isDone);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -696,6 +704,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final dateParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0),
         );
+        final isDoneParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          16,
+          false,
+        );
         final taskUuidParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 14);
@@ -705,6 +719,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final object = TaskCompletion(
           id: idParam,
           date: dateParam,
+          isDone: isDoneParam,
           taskUuid: taskUuidParam,
           uuid: uuidParam,
         );
@@ -1144,6 +1159,11 @@ class TaskCompletion_ {
   /// See [TaskCompletion.taskUuid].
   static final taskUuid = obx.QueryStringProperty<TaskCompletion>(
     _entities[1].properties[4],
+  );
+
+  /// See [TaskCompletion.isDone].
+  static final isDone = obx.QueryBooleanProperty<TaskCompletion>(
+    _entities[1].properties[5],
   );
 }
 
