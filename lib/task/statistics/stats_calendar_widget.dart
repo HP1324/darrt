@@ -1,3 +1,4 @@
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/app/services/toast_service.dart';
 import 'package:darrt/helpers/consts.dart';
 import 'package:darrt/helpers/globals.dart' as g;
@@ -244,7 +245,7 @@ class _MonthView extends StatelessWidget {
         ListenableBuilder(
           listenable: g.taskVm,
           builder: (context, child) {
-            final dateMs = DateUtils.dateOnly(date).millisecondsSinceEpoch;
+            final dateMs = date.dateOnly.millisecondsSinceEpoch;
             final rtc = g.taskVm.repeatingTaskCompletions;
             final isFinished = rtc[task.id]?.contains(dateMs) ?? false;
 

@@ -13,8 +13,8 @@ class SelectedDateNotifier extends _$SelectedDateNotifier {
   @override
   CalendarState build() {
     return CalendarState(
-      selectedDate: DateTime.now(),
-      previousSelectedDate: DateTime.now(),
+      selectedDate: DateTime.now().dateOnly,
+      previousSelectedDate: DateTime.now().dateOnly,
     );
   }
 

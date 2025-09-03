@@ -6,7 +6,7 @@ import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/objectbox.g.dart';
 import 'package:darrt/task/models/reminder.dart';
 import 'package:darrt/task/models/repeat_config.dart';
-import 'package:darrt/task/models/task_completion.dart';
+import 'package:darrt/task/completion/task_completion.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()

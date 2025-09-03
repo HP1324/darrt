@@ -19,8 +19,8 @@ import 'category/models/task_category.dart';
 import 'folder/models/folder.dart';
 import 'note/models/note.dart';
 import 'quickreminder/model/quick_reminder.dart';
+import 'task/completion/task_completion.dart';
 import 'task/models/task.dart';
-import 'task/models/task_completion.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -165,12 +165,6 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(2, 5370597500820433678),
         name: 'date',
         type: 10,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 3558835726652927299),
-        name: 'isDone',
-        type: 1,
         flags: 0,
       ),
       obx_int.ModelProperty(
@@ -482,6 +476,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
       4127554963078891830,
       6805630063619366929,
       1402961393425076424,
+      3558835726652927299,
     ],
     retiredRelationUids: const [],
     modelVersion: 5,
@@ -683,7 +678,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.startTable(7);
         fbb.addInt64(0, object.id);
         fbb.addInt64(1, object.date.millisecondsSinceEpoch);
-        fbb.addBool(2, object.isDone);
         fbb.addInt64(3, object.task.targetId);
         fbb.addOffset(4, uuidOffset);
         fbb.addOffset(5, taskUuidOffset);
@@ -702,12 +696,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final dateParam = DateTime.fromMillisecondsSinceEpoch(
           const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0),
         );
-        final isDoneParam = const fb.BoolReader().vTableGet(
-          buffer,
-          rootOffset,
-          8,
-          false,
-        );
         final taskUuidParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 14);
@@ -717,7 +705,6 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final object = TaskCompletion(
           id: idParam,
           date: dateParam,
-          isDone: isDoneParam,
           taskUuid: taskUuidParam,
           uuid: uuidParam,
         );
@@ -1144,24 +1131,19 @@ class TaskCompletion_ {
     _entities[1].properties[1],
   );
 
-  /// See [TaskCompletion.isDone].
-  static final isDone = obx.QueryBooleanProperty<TaskCompletion>(
-    _entities[1].properties[2],
-  );
-
   /// See [TaskCompletion.task].
   static final task = obx.QueryRelationToOne<TaskCompletion, Task>(
-    _entities[1].properties[3],
+    _entities[1].properties[2],
   );
 
   /// See [TaskCompletion.uuid].
   static final uuid = obx.QueryStringProperty<TaskCompletion>(
-    _entities[1].properties[4],
+    _entities[1].properties[3],
   );
 
   /// See [TaskCompletion.taskUuid].
   static final taskUuid = obx.QueryStringProperty<TaskCompletion>(
-    _entities[1].properties[5],
+    _entities[1].properties[4],
   );
 }
 

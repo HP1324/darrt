@@ -1,5 +1,5 @@
 import 'package:darrt/app/state/viewmodels/view_model.dart';
-import 'package:darrt/task/models/task_completion.dart';
+import 'package:darrt/task/completion/task_completion.dart';
 
 class CompletionViewModel extends ViewModel<TaskCompletion> {
 

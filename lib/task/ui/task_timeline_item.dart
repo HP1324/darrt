@@ -1,11 +1,14 @@
+import 'package:darrt/app/calendar/date_providers.dart';
 import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/category/ui/category_chip.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/task/completion/task_completion_stream_provider.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/statistics/stats_page.dart';
 import 'package:darrt/task/ui/add_task_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
@@ -167,45 +170,42 @@ class TimelineTaskContent extends StatelessWidget {
   }
 }
 
-class TimelineTaskTitle extends StatelessWidget {
+class TimelineTaskTitle extends ConsumerWidget {
   const TimelineTaskTitle({super.key, required this.task});
 
   final Task task;
 
   @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: Listenable.merge([g.calMan, g.taskVm]),
-      builder: (context, child) {
-        final textTheme = context.textTheme;
-        final scheme = context.colorScheme;
-        final date = DateUtils.dateOnly(
-          g.calMan.selectedDate,
-        ).millisecondsSinceEpoch;
-        final repeat = task.isRepeating;
-        final stc = g.taskVm.onetimeTaskCompletions;
-        final rtc = g.taskVm.repeatingTaskCompletions;
-        final isFinished = repeat
-            ? rtc[task.id]?.contains(date) ?? false
-            : stc[task.id] ?? false;
-        return Row(
-          children: [
-            Expanded(
-              child: Text(
-                task.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: textTheme.titleSmall!.fontSize,
-                  fontWeight: FontWeight.w600,
-                  decorationColor: scheme.outline,
-                  decorationThickness: 2,
-                  decoration: isFinished ? TextDecoration.lineThrough : null,
-                  color: isFinished ? scheme.outline : scheme.onSurface,
-                ),
-              ),
-            ),
-          ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scheme = context.colorScheme;
+    final textTheme = context.textTheme;
+
+    final completionStream = ref.watch(taskCompletionStreamProvider);
+    final selectedDate = ref.watch(
+      selectedDateNotifierProvider.select((provider) => provider.selectedDate),
+    );
+
+    return completionStream.when(
+      error: (error, stackTrace) => Text(''),
+      loading: () => CircularProgressIndicator(),
+      data: (completions) {
+        final isCompleted = completions.any(
+          (completion) =>
+              completion.task.targetId == task.id &&
+              completion.date == selectedDate,
+        );
+        return Text(
+          task.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: textTheme.titleSmall!.fontSize,
+            fontWeight: FontWeight.w500,
+            decorationColor: scheme.outline,
+            decorationThickness: 2,
+            decoration: isCompleted ? TextDecoration.lineThrough : null,
+            color: isCompleted ? scheme.outline : scheme.onSurface,
+          ),
         );
       },
     );
@@ -342,34 +342,34 @@ class TimelineTaskTime extends StatelessWidget {
   }
 }
 
-class TimelineCheckbox extends StatelessWidget {
+class TimelineCheckbox extends ConsumerWidget {
   const TimelineCheckbox({super.key, required this.task});
 
   final Task task;
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 24,
-      height: 24,
-      child: ListenableBuilder(
-        listenable: Listenable.merge([g.taskVm, g.calMan]),
-        builder: (context, child) {
-          final repeat = task.isRepeating;
-          final oneTimeCompletions = g.taskVm.onetimeTaskCompletions;
-          final repeatingCompletions = g.taskVm.repeatingTaskCompletions;
-          final date = DateUtils.dateOnly(
-            g.calMan.selectedDate,
-          ).millisecondsSinceEpoch;
-          final isCompleted = repeat
-              ? repeatingCompletions[task.id]?.contains(date) ?? false
-              : oneTimeCompletions[task.id] ?? false;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final completionStream = ref.watch(taskCompletionStreamProvider);
+    final selectedDate = ref.watch(selectedDateNotifierProvider).selectedDate;
 
-          return CheckboxTheme(
-            data: _buildTimelineCheckboxTheme(context, isCompleted),
+    return completionStream.when(
+      error: (error, stackTrace) => const SizedBox.shrink(),
+      loading: () => CircularProgressIndicator(),
+      data: (completions) {
+        final isCompleted = completions.any((completion) {
+          return completion.task.targetId == task.id &&
+              completion.date == selectedDate;
+        });
+
+        return SizedBox(
+          width: 24,
+          height: 24,
+          child: CheckboxTheme(
+            data: _buildTimelineCheckboxTheme(context),
             child: Checkbox(
               value: isCompleted,
               onChanged: (value) {
+                // ref.read(taskRepositoryProvider).toggleStatus(task, value ?? false, selectedDate);
                 g.taskVm.toggleStatus(
                   task,
                   value ?? false,
@@ -379,17 +379,14 @@ class TimelineCheckbox extends StatelessWidget {
               },
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
-  CheckboxThemeData _buildTimelineCheckboxTheme(
-    BuildContext context,
-    bool isCompleted,
-  ) {
-    final colorScheme = Theme.of(context).colorScheme;
+  CheckboxThemeData _buildTimelineCheckboxTheme(BuildContext context) {
+    final scheme = context.colorScheme;
     final hasTime = task.startTime != null;
 
     return CheckboxThemeData(
@@ -397,33 +394,34 @@ class TimelineCheckbox extends StatelessWidget {
       side: WidgetStateBorderSide.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
           return BorderSide(
-            color: hasTime ? colorScheme.primary : colorScheme.outline,
+            color: hasTime ? scheme.primary : scheme.outline,
             width: 2,
           );
         }
         return BorderSide(
           color: hasTime
-              ? colorScheme.primary.withValues(alpha: 0.6)
-              : colorScheme.outline.withValues(alpha: 0.4),
+              ? scheme.primary.withValues(alpha: 0.6)
+              : scheme.outline.withValues(alpha: 0.4),
           width: 2,
         );
       }),
       fillColor: WidgetStateProperty.resolveWith<Color>((states) {
         if (states.contains(WidgetState.selected)) {
-          return hasTime ? colorScheme.primary : colorScheme.outline;
+          return hasTime ? scheme.primary : scheme.outline;
         }
         return Colors.transparent;
       }),
       checkColor: WidgetStateProperty.resolveWith<Color>((states) {
         if (states.contains(WidgetState.selected)) {
-          return hasTime ? colorScheme.onPrimary : colorScheme.surface;
+          return hasTime ? scheme.onPrimary : scheme.surface;
         }
-        return colorScheme.onSurface;
+        return scheme.onSurface;
       }),
       overlayColor: WidgetStateProperty.resolveWith<Color>((states) {
         if (states.contains(WidgetState.pressed)) {
-          return (hasTime ? colorScheme.primary : colorScheme.outline)
-              .withValues(alpha: 0.1);
+          return (hasTime ? scheme.primary : scheme.outline).withValues(
+            alpha: 0.1,
+          );
         }
         return Colors.transparent;
       }),

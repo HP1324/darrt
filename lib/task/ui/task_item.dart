@@ -1,17 +1,23 @@
+import 'package:darrt/app/calendar/date_providers.dart';
+import 'package:darrt/app/extensions/extensions.dart';
 import 'package:darrt/category/ui/category_chip.dart';
 import 'package:darrt/helpers/globals.dart' as g;
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/helpers/mini_router.dart';
+import 'package:darrt/task/completion/task_completion_stream_provider.dart';
 import 'package:darrt/task/models/task.dart';
 import 'package:darrt/task/statistics/stats_page.dart';
 import 'package:darrt/task/ui/add_task_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
 class TaskItem extends StatefulWidget {
   const TaskItem({super.key, required this.task});
+
   final Task task;
+
   @override
   State<TaskItem> createState() => _TaskItemState();
 }
@@ -65,7 +71,9 @@ class TaskItemContainer extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: isSelected ? scheme.outline.withAlpha(130) : scheme.surface.withAlpha(100),
+        color: isSelected
+            ? scheme.outline.withAlpha(130)
+            : scheme.surface.withAlpha(100),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: scheme.outline.withAlpha(60),
@@ -170,7 +178,7 @@ class TaskTitleRow extends StatelessWidget {
     return Row(
       spacing: 8.0,
       children: [
-        TaskTitle(task: task),
+        Expanded(child: TaskTitle(task: task)),
         if (task.isRepeating) ...[
           const SizedBox(width: 4),
           Icon(
@@ -181,7 +189,11 @@ class TaskTitleRow extends StatelessWidget {
           InkWell(
             borderRadius: BorderRadius.circular(8),
             onTap: () => MiniRouter.to(context, StatsPage(task: task)),
-            child: Icon(Icons.calendar_month_outlined, size: 21, color: scheme.secondary),
+            child: Icon(
+              Icons.calendar_month_outlined,
+              size: 21,
+              color: scheme.secondary,
+            ),
           ),
         ],
         // TaskPrioritySection(task: task, isUrgent: isUrgent, context: context),
@@ -246,7 +258,7 @@ class TaskTime extends StatelessWidget {
   }
 }
 
-class TaskTitle extends StatelessWidget {
+class TaskTitle extends ConsumerWidget {
   const TaskTitle({
     super.key,
     required this.task,
@@ -255,32 +267,37 @@ class TaskTitle extends StatelessWidget {
   final Task task;
 
   @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: ListenableBuilder(
-        listenable: Listenable.merge([g.calMan, g.taskVm]),
-        builder: (context, child) {
-          final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
-          final repeat = task.isRepeating;
-          final stc = g.taskVm.onetimeTaskCompletions, rtc = g.taskVm.repeatingTaskCompletions;
-          final isFinished = repeat ? rtc[task.id]?.contains(date) ?? false : stc[task.id] ?? false;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scheme = context.colorScheme;
+    final textTheme = context.textTheme;
 
-          return Text(
-            task.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: Theme.of(context).textTheme.titleSmall!.fontSize,
-              fontWeight: FontWeight.w500,
-              decorationColor: Theme.of(context).colorScheme.outline,
-              decorationThickness: 2,
-              color: isFinished
-                  ? Theme.of(context).colorScheme.outline
-                  : Theme.of(context).colorScheme.onSurface,
-            ),
-          );
-        },
-      ),
+    final completionStream = ref.watch(taskCompletionStreamProvider);
+    final selectedDate = ref.watch(
+      selectedDateNotifierProvider.select((provider) => provider.selectedDate),
+    );
+
+    return completionStream.when(
+      error: (error, stackTrace) => Text(''),
+      loading: () => CircularProgressIndicator(),
+      data: (completions) {
+        final isFinished = completions.any(
+          (completion) =>
+              completion.task.targetId == task.id &&
+              completion.date == selectedDate,
+        );
+        return Text(
+          task.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: textTheme.titleSmall!.fontSize,
+            fontWeight: FontWeight.w500,
+            decorationColor: scheme.outline,
+            decorationThickness: 2,
+            color: isFinished ? scheme.outline : scheme.onSurface,
+          ),
+        );
+      },
     );
   }
 }
@@ -347,49 +364,51 @@ class TaskCategoriesSection extends StatelessWidget {
   }
 }
 
-
-class TaskFinishCheckbox extends StatelessWidget {
-  const TaskFinishCheckbox({
-    super.key,
-    required this.task,
-  });
+class TaskFinishCheckbox extends ConsumerWidget {
+  const TaskFinishCheckbox({super.key, required this.task});
 
   final Task task;
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 2),
-      child: Transform.scale(
-        scale: 1.0,
-        child: ListenableBuilder(
-          listenable: Listenable.merge([g.taskVm, g.calMan]),
-          builder: (context, child) {
-            final repeat = task.isRepeating;
-            final oneTimeCompletions = g.taskVm.onetimeTaskCompletions;
-            final repeatingCompletions = g.taskVm.repeatingTaskCompletions;
-            final date = DateUtils.dateOnly(g.calMan.selectedDate).millisecondsSinceEpoch;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final completionStream = ref.watch(taskCompletionStreamProvider);
+    final selectedDate = ref.watch(selectedDateNotifierProvider).selectedDate;
 
-            return CheckboxTheme(
-              data: _buildCheckboxTheme(context),
-              child: Checkbox(
-                key: ValueKey('selection_${task.id}'),
-                value: repeat
-                    ? repeatingCompletions[task.id]?.contains(date) ?? false
-                    : oneTimeCompletions[task.id] ?? false,
-                onChanged: (value) {
-                  g.taskVm.toggleStatus(task, value ?? false, g.calMan.selectedDate, context);
-                },
-              ),
-            );
-          },
-        ),
-      ),
+    return completionStream.when(
+      error: (error, stackTrace) => const SizedBox.shrink(),
+      loading: () => CircularProgressIndicator(),
+      data: (completions) {
+        final isCompleted = completions.any((completion) {
+          return completion.task.targetId == task.id &&
+              completion.date == selectedDate;
+        });
+
+        return SizedBox(
+          width: 24,
+          height: 24,
+          child: CheckboxTheme(
+            data: _buildCheckboxTheme(context),
+            child: Checkbox(
+              value: isCompleted,
+              onChanged: (value) {
+                // ref.read(taskRepositoryProvider).toggleStatus(task, value ?? false, selectedDate);
+                g.taskVm.toggleStatus(
+                  task,
+                  value ?? false,
+                  g.calMan.selectedDate,
+                  context,
+                );
+              },
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        );
+      },
     );
   }
 
   CheckboxThemeData _buildCheckboxTheme(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final scheme = context.colorScheme;
 
     return CheckboxThemeData(
       shape: const RoundedRectangleBorder(
@@ -397,36 +416,39 @@ class TaskFinishCheckbox extends StatelessWidget {
       ),
       side: WidgetStateBorderSide.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return BorderSide(color: colorScheme.secondary, width: 2.5);
+          return BorderSide(color: scheme.secondary, width: 2.5);
         }
         if (states.contains(WidgetState.hovered)) {
-          return BorderSide(color: colorScheme.secondary.withAlpha(160), width: 2.5);
+          return BorderSide(
+            color: scheme.secondary.withAlpha(160),
+            width: 2.5,
+          );
         }
-        return BorderSide(color: colorScheme.outline, width: 2.0);
+        return BorderSide(color: scheme.outline, width: 2.0);
       }),
       fillColor: WidgetStateProperty.resolveWith<Color>((states) {
         if (states.contains(WidgetState.selected)) {
-          return colorScheme.secondary;
+          return scheme.secondary;
         }
         if (states.contains(WidgetState.hovered)) {
-          return colorScheme.secondary.withAlpha(40);
+          return scheme.secondary.withAlpha(40);
         }
-        return colorScheme.surface;
+        return scheme.surface;
       }),
       overlayColor: WidgetStateProperty.resolveWith<Color>((states) {
         if (states.contains(WidgetState.pressed)) {
-          return colorScheme.secondary.withAlpha(100);
+          return scheme.secondary.withAlpha(100);
         }
         if (states.contains(WidgetState.hovered)) {
-          return colorScheme.secondary.withAlpha(50);
+          return scheme.secondary.withAlpha(50);
         }
         return Colors.transparent;
       }),
       checkColor: WidgetStateProperty.resolveWith<Color>((states) {
         if (states.contains(WidgetState.selected)) {
-          return colorScheme.onSecondary;
+          return scheme.onSecondary;
         }
-        return colorScheme.onSurface;
+        return scheme.onSurface;
       }),
       splashRadius: 22,
     );

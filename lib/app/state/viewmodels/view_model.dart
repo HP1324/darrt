@@ -5,7 +5,7 @@ import 'package:darrt/app/services/object_box.dart';
 import 'package:darrt/category/models/task_category.dart';
 import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/objectbox.g.dart' show Box;
-import 'package:darrt/task/models/task_completion.dart';
+import 'package:darrt/task/completion/task_completion.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../folder/models/folder.dart';
