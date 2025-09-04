@@ -9,8 +9,8 @@ import 'package:darrt/helpers/mini_logger.dart';
 import 'package:darrt/helpers/typedefs.dart';
 import 'package:darrt/helpers/utils.dart';
 import 'package:darrt/objectbox.g.dart';
+import 'package:darrt/task/completion/task_completion.dart';
 import 'package:darrt/task/models/task.dart';
-import 'package:darrt/task/models/task_completion.dart';
 import 'package:darrt/task/statistics/achievement_dialog.dart';
 import 'package:darrt/task/statistics/achievements.dart';
 import 'package:darrt/task/statistics/task_stats.dart';
@@ -103,7 +103,7 @@ class TaskViewModel extends ViewModel<Task> {
       if (!dateOnly.isAfter(DateTime.now().dateOnly)) {
         final dateMs = dateOnly.millisecondsSinceEpoch;
         if (value) {
-          final completion = TaskCompletion(date: dateOnly, isDone: value);
+          final completion = TaskCompletion(date: dateOnly);
 
           completion.task.target = task;
           completion.taskUuid = completion.task.target!.uuid;

@@ -39,14 +39,6 @@ class MiniAppBar extends StatelessWidget implements PreferredSizeWidget {
                 showModalBottomSheet(
                   context: context,
                   builder: (context) {
-                    return CalendarDatePicker(
-                      initialDate: DateTime.now(),
-                      firstDate: getFirstDate(),
-                      lastDate: getLastDate(),
-                      onDateChanged: (selectedDate) {
-                        final date = DateUtils.dateOnly(selectedDate);
-                        g.calMan.scrollToDate(date);
-                      },
                     return SafeArea(
                       child: CalendarDatePicker(
                         initialDate: DateTime.now(),
