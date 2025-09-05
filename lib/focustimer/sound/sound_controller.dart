@@ -240,12 +240,8 @@ class SoundController extends ChangeNotifier {
       await player.setAudioSource(audioSource);
       await player.play();
 
-      // Listen for completion to dispose the player
-      player.playerStateStream.listen((state) {
-        if (state.processingState == ProcessingState.completed) {
-          player.dispose();
-        }
-      });
+      // Dispose player
+      player.dispose();
     } catch (e) {
       MiniLogger.dp('Error playing sound only: $e');
       player.dispose();

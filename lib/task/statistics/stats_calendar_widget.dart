@@ -23,7 +23,7 @@ class _StatsCalendarWidgetState extends State<StatsCalendarWidget> {
   void initState() {
     super.initState();
     _currentMonth = DateTime.now();
-    _initialPage = _getMonthDifference(mInitialDate, _currentMonth);
+    _initialPage = _getMonthDifference(getFirstDate(), _currentMonth);
     _pageController = PageController(initialPage: _initialPage);
   }
 
@@ -38,8 +38,8 @@ class _StatsCalendarWidgetState extends State<StatsCalendarWidget> {
   }
 
   DateTime _getMonthFromPage(int page) {
-    final totalMonths = mInitialDate.month + page;
-    final year = mInitialDate.year + (totalMonths - 1) ~/ 12;
+    final totalMonths = getFirstDate().month + page;
+    final year = getFirstDate().year + (totalMonths - 1) ~/ 12;
     final month = ((totalMonths - 1) % 12) + 1;
     return DateTime(year, month);
   }
@@ -219,7 +219,7 @@ class _MonthView extends StatelessWidget {
     final firstWeekday = firstDayOfMonth.weekday % 7;
     final daysInMonth = lastDayOfMonth.day;
 
-    final maxDate = getMaxDate();
+    final maxDate = getLastDate();
 
     List<Widget> dayWidgets = [];
 
@@ -232,7 +232,7 @@ class _MonthView extends StatelessWidget {
       }
 
       final date = DateTime(month.year, month.month, dayNumber);
-      final isBeforeMinDate = date.isBefore(mInitialDate);
+      final isBeforeMinDate = date.isBefore(getFirstDate());
       final isAfterMaxDate = date.isAfter(maxDate);
 
       if (isBeforeMinDate || isAfterMaxDate) {

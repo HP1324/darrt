@@ -3,7 +3,7 @@ name: darrt
 description: "A simple yet powerful todo and notes app"
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.2.11+33
+version: 1.2.12+35
 
 environment:
   sdk: ^3.8.1
