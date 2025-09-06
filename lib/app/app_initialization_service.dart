@@ -18,12 +18,13 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 
 class AppInitializationService {
-  Future<void> initApp({required ProviderContainer container}) async {
+  AppInitializationService(Ref ref);
+
+  Future<void> initApp() async {
     final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-    // Initialize the providerContainer here to later use it in NotificationActionController
-    NotificationActionController.providerContainer = container;
+
 
     await _configureRevenueCatSdk();
     
@@ -103,5 +104,7 @@ class AppInitializationService {
 }
 
 final appInitServiceProvider = Provider<AppInitializationService>((ref) {
-  return AppInitializationService();
+  NotificationActionController.ref = ref;
+
+  return AppInitializationService(ref);
 });

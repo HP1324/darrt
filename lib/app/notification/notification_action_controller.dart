@@ -17,7 +17,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 @pragma("vm:entry-point")
 class NotificationActionController {
 
-  static late final ProviderContainer providerContainer;
+  static late final Ref ref;
 
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
